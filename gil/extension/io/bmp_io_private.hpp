@@ -12,17 +12,12 @@
 /// \file
 /// \brief  Internal support for reading and writing BMP files
 /// \author Christian Henning
-/// \date   2005-2006 \n Last updated August 27, 2006
-
-#ifndef WIN32
-   #error Win32 is required!
-#endif
+/// \date   2005-2006 \n Last updated November 06, 2006
 
 #include <stdio.h>
 #include <boost/static_assert.hpp>
 #include <boost/scoped_array.hpp>
 #include <vector>
-#include <windows.h>
 #include "../../core/gil_all.hpp"
 #include "io_error.hpp"
 
@@ -32,20 +27,52 @@ namespace detail {
 
 // TODO chh: define bmp_read_support_private structs
 
+
+#pragma pack(push,2)
+struct gil_bitmap_file_header
+{
+   unsigned short  _bfType; 
+   unsigned long   _bfSize; 
+   unsigned short  _bfReserved1; 
+   unsigned short  _bfReserved2; 
+   unsigned long   _bfOffBits; 
+};
+
+struct gil_bitmap_info_header
+{
+   unsigned long  _biSize;
+   long           _biWidth;
+   long           _biHeight;
+   unsigned short _biPlanes;
+   unsigned short _biBitCount;
+   unsigned long  _biCompression;
+   unsigned long  _biSizeImage;
+   long           _biXPelsPerMeter;
+   long           _biYPelsPerMeter;
+   unsigned long  _biClrUsed;
+   unsigned long  _biClrImportant;
+};
+#pragma pack(pop)
+
+
 class bmp_reader : public file_mgr {
 protected:
-   BITMAPINFOHEADER _info_header;
+   gil_bitmap_info_header _info_header;
 
     void init() {
       // Read file and info header.
-      BITMAPFILEHEADER file_header;
-      io_error_if( fread( &file_header, sizeof( char ), sizeof( BITMAPFILEHEADER ), get() ) == 0 
+      gil_bitmap_file_header file_header;
+
+      BOOST_STATIC_ASSERT( sizeof( gil_bitmap_file_header ) == 14 );
+      BOOST_STATIC_ASSERT( sizeof( gil_bitmap_info_header ) == 40 );
+
+      io_error_if( fread( &file_header, sizeof( char ), sizeof( gil_bitmap_file_header ), get() ) == 0 
                  , "file_mgr: failed to read file" );
 
-      io_error_if( file_header.bfType != 0x4D42
+      io_error_if( file_header._bfType != 0x4D42
                  , "file_mgr: this is not a bitmap file" );
 
-      io_error_if( fread( &_info_header, sizeof( char ), sizeof( BITMAPINFOHEADER ), get() ) == 0 
+      io_error_if( fread( &_info_header, sizeof( char ), sizeof( gil_bitmap_info_header ), get() ) == 0 
                  , "file_mgr: failed to read file" );
     }
 
@@ -56,11 +83,11 @@ public:
 
     template <typename VIEW>
     void apply(const VIEW& view) {
-      io_error_if( _info_header.biBitCount    != 24
+      io_error_if( _info_header._biBitCount    != 24
                  , "bmp_reader::apply(): Only 24bit images are supported." );
-      io_error_if( _info_header.biClrUsed     != 0
+      io_error_if( _info_header._biClrUsed     != 0
                  , "bmp_reader::apply(): no indexed images are supported, yet." );
-      io_error_if( _info_header.biCompression != BI_RGB
+      io_error_if( _info_header._biCompression != 0L // only BI_RGB is supported
                  , "bmp_reader::apply(): only RGB images are supported." );
       io_error_if( view.dimensions() != get_dimensions()
                  , "bmp_reader::apply(): input view dimensions do not match the image file");
@@ -68,7 +95,7 @@ public:
       const int nNumChannels = VIEW::color_space_t::num_channels;
 
       unsigned int nScanline = view.width() * nNumChannels;
-      unsigned int nPadding  = sizeof( DWORD ) - view.width() % sizeof( DWORD );
+      unsigned int nPadding  = sizeof( unsigned long ) - view.width() % sizeof( unsigned long );
 
       boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline ] );
 
@@ -96,7 +123,7 @@ public:
     }
 
     point2<int> get_dimensions() const {
-        return point2<int>( _info_header.biWidth,_info_header.biHeight );
+        return point2<int>( _info_header._biWidth,_info_header._biHeight );
     }
 };
 
@@ -148,7 +175,7 @@ public:
             const int nNumChannels = VIEW::color_space_t::num_channels;
 
             unsigned int nScanline = view.width() * nNumChannels;
-            unsigned int nPadding  = view.width() % sizeof( DWORD );
+            unsigned int nPadding  = view.width() % sizeof( unsigned long );
 
             boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline ] );
 
@@ -204,41 +231,41 @@ public:
                               * view.height() 
                               * VIEW::color_space_t::num_channels;
       // Write the file header.
-      BITMAPFILEHEADER file_header;
-      file_header.bfType = 0x4D42;
-      file_header.bfSize = sizeof( BITMAPFILEHEADER )
-                         + sizeof( BITMAPINFOHEADER )
+      gil_bitmap_file_header file_header;
+      file_header._bfType = 0x4D42;
+      file_header._bfSize = sizeof( gil_bitmap_file_header )
+                         + sizeof( gil_bitmap_info_header )
                          + nImageSize;
 
-      file_header.bfReserved1 = 0;
-      file_header.bfReserved2 = 0;
-      file_header.bfOffBits = sizeof( BITMAPFILEHEADER )
-                            + sizeof( BITMAPINFOHEADER );
+      file_header._bfReserved1 = 0;
+      file_header._bfReserved2 = 0;
+      file_header._bfOffBits = sizeof( gil_bitmap_file_header )
+                            + sizeof( gil_bitmap_info_header );
 
 
-      io_error_if( fwrite( &file_header, sizeof(char), sizeof( BITMAPFILEHEADER ), get() ) == 0
+      io_error_if( fwrite( &file_header, sizeof(char), sizeof( gil_bitmap_file_header ), get() ) == 0
                  , "file_mgr: failed to write file" );
 
       // Write the info header.
-      BITMAPINFOHEADER info_header;
+      gil_bitmap_info_header info_header;
 
-      info_header.biSize = sizeof( BITMAPINFOHEADER );
-      info_header.biWidth  = view.width();
-      info_header.biHeight = view.height();
-      info_header.biPlanes = 1;
-      info_header.biBitCount = nNumChannels * 8;
-      info_header.biCompression  = BI_RGB;
-      info_header.biSizeImage = nImageSize;
-      info_header.biXPelsPerMeter = 0;
-      info_header.biYPelsPerMeter = 0;
-      info_header.biClrUsed       = 0;
-      info_header.biClrImportant  = 0;
+      info_header._biSize = sizeof( gil_bitmap_info_header );
+      info_header._biWidth  = view.width();
+      info_header._biHeight = view.height();
+      info_header._biPlanes = 1;
+      info_header._biBitCount = nNumChannels * 8;
+      info_header._biCompression  = 0L; // only BI_RGB is supported
+      info_header._biSizeImage = nImageSize;
+      info_header._biXPelsPerMeter = 0;
+      info_header._biYPelsPerMeter = 0;
+      info_header._biClrUsed       = 0;
+      info_header._biClrImportant  = 0;
 
-      io_error_if( fwrite( &info_header, sizeof(char), sizeof( BITMAPINFOHEADER ), get() ) == 0 
+      io_error_if( fwrite( &info_header, sizeof(char), sizeof( gil_bitmap_info_header ), get() ) == 0 
                  , "file_mgr: failed to write file"                                              );
 
       unsigned int nScanline = view.width() * nNumChannels;
-      unsigned int nPadding  = view.width() % sizeof( DWORD );
+      unsigned int nPadding  = view.width() % sizeof( unsigned long );
 
       std::vector<bgr8_pixel_t> bgr_row( view.width() );
 
@@ -247,8 +274,9 @@ public:
       VIEW store_view = flipped_up_down_view( view );
 
       for( int y=0;y<view.height(); ++y ) {
+
          std::transform( store_view.row_begin(y), store_view.row_end(y), bgr_row.begin(),
-                         color_converter<bgr8_pixel_t>());
+                           color_converter<bgr8_pixel_t>());
 
          io_error_if( fwrite( &bgr_row.front(), sizeof(char), nScanline, get() ) == 0
                   , "file_mgr: failed to write file"                                );

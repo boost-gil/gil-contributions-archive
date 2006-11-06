@@ -17,16 +17,11 @@
 ///         
 /// \date   2005-2006 \n Last updated August 13, 2006
 
-#ifndef WIN32
-   #error Win32 is required!
-#endif
-
 #include <cstdio>
 #include <algorithm>
 #include <string>
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
-#include <windows.h>
 #include "io_error.hpp"
 #include "bmp_io_private.hpp"
 
