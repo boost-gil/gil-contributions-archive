@@ -54,6 +54,28 @@ struct gil_bitmap_info_header
 };
 #pragma pack(pop)
 
+template <typename DstP, typename CC=default_color_converter >
+class color_converter_unary {
+private:
+   CC _cc;                     // color-converter
+public:
+   color_converter_unary() {}
+   color_converter_unary(CC cc_in) : _cc(cc_in) {}
+
+   template <typename SrcP>
+   DstP operator()(const SrcP& srcP) const {
+       DstP dstP;
+       _cc(srcP,dstP);
+       return dstP;
+   }
+};
+
+unsigned int calc_padding( unsigned int width
+                         , unsigned int bits_per_pixel )
+{
+   int scanline = (( width * ( bits_per_pixel / 8)) + 3) & (~3);
+   return scanline - ( width * ( bits_per_pixel / 8 ));
+}
 
 class bmp_reader : public file_mgr {
 protected:
@@ -63,6 +85,8 @@ protected:
       // Read file and info header.
       gil_bitmap_file_header file_header;
 
+      // Make sure the right struct alignment is enabled. If not reading
+      // from file will result in indefined result.
       BOOST_STATIC_ASSERT( sizeof( gil_bitmap_file_header ) == 14 );
       BOOST_STATIC_ASSERT( sizeof( gil_bitmap_info_header ) == 40 );
 
@@ -95,7 +119,8 @@ public:
       const int nNumChannels = VIEW::color_space_t::num_channels;
 
       unsigned int nScanline = view.width() * nNumChannels;
-      unsigned int nPadding  = sizeof( unsigned long ) - view.width() % sizeof( unsigned long );
+      unsigned int nPadding  = calc_padding( view.width()
+                                           , nNumChannels * 8 ); 
 
       boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline ] );
 
@@ -137,12 +162,12 @@ public:
     template <typename VIEW>
     void apply(const VIEW& view) {
 
-        if( _info_header.biCompression != BI_RGB )
+        if( _info_header._biCompression != 0L ) // only BI_RGB is supported
         {
            io_error("bmp_reader_color_covert::apply(): No compression is supported.");
         }
 
-        switch (_info_header.biBitCount) {
+        switch (_info_header._biBitCount) {
         case 0: {
             // see msdn: Windows 98/Me, Windows 2000/XP: The number of bits-per-pixel is specified or is implied by the JPEG or PNG format.
             io_error("bmp_reader_color_covert::apply(): unknown color type");
@@ -172,26 +197,32 @@ public:
         }
         case 24: {
             // see msdn: The bitmap has a maximum of 2^24 colors.
-            const int nNumChannels = VIEW::color_space_t::num_channels;
 
-            unsigned int nScanline = view.width() * nNumChannels;
-            unsigned int nPadding  = view.width() % sizeof( unsigned long );
+            unsigned int nScanline_Src = _info_header._biWidth * 3;
+            unsigned int nPadding_Src  = calc_padding( _info_header._biWidth
+                                                     , 24                     ); 
 
-            boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline ] );
+
+            const int nNumChannels_Dest = VIEW::color_space_t::num_channels;
+            unsigned int nScanline_Dest = view.width() * nNumChannels_Dest;
+            unsigned int nPadding_Dest  = calc_padding( view.width()
+                                                      , nNumChannels_Dest * 8 ); 
+
+            boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline_Src ] );
 
             typedef typename VIEW::pixel_t pixel_t;
-            for( int y=0; y < view.height(); ++y )
+            for( int y = 0; y < view.height(); ++y )
             {
-               io_error_if( fread( spScanlineBuffer.get(), sizeof( char ), nScanline, get() ) == 0 
-                        , "file_mgr: failed to read file" );
+               io_error_if( fread( spScanlineBuffer.get(), sizeof( char ), nScanline_Src, get() ) == 0 
+                          , "file_mgr: failed to read file" );
 
-               pixel_t* pPixels = reinterpret_cast<pixel_t*>( spScanlineBuffer.get() );
+               bgr8_pixel_t* pPixels = reinterpret_cast<bgr8_pixel_t*>( spScanlineBuffer.get() );
 
                std::transform( pPixels, pPixels + view.width(), view.row_begin(y),
-                               color_converter<pixel_t>());
+                               color_converter_unary<pixel_t>());
 
-               if( nPadding )
-                  fseek( get(), nPadding, SEEK_CUR );
+               if( nPadding_Src )
+                  fseek( get(), nPadding_Src, SEEK_CUR );
             }
 
             break;
@@ -214,7 +245,6 @@ public:
         apply(view(im));
     }
 };
-
 
 class bmp_writer : public file_mgr {
 
@@ -265,7 +295,8 @@ public:
                  , "file_mgr: failed to write file"                                              );
 
       unsigned int nScanline = view.width() * nNumChannels;
-      unsigned int nPadding  = view.width() % sizeof( unsigned long );
+      unsigned int nPadding  = calc_padding( view.width()
+                                           , nNumChannels * 8 ); 
 
       std::vector<bgr8_pixel_t> bgr_row( view.width() );
 
@@ -276,7 +307,7 @@ public:
       for( int y=0;y<view.height(); ++y ) {
 
          std::transform( store_view.row_begin(y), store_view.row_end(y), bgr_row.begin(),
-                           color_converter<bgr8_pixel_t>());
+                           color_converter_unary<bgr8_pixel_t>());
 
          io_error_if( fwrite( &bgr_row.front(), sizeof(char), nScanline, get() ) == 0
                   , "file_mgr: failed to write file"                                );
