@@ -12,7 +12,7 @@
 /// \file
 /// \brief  Internal support for reading and writing BMP files
 /// \author Christian Henning
-/// \date   2005-2006 \n Last updated November 06, 2006
+/// \date   2005-2006 \n Last updated December 11, 2006
 
 #include <stdio.h>
 #include <boost/static_assert.hpp>
@@ -52,7 +52,39 @@ struct gil_bitmap_info_header
    unsigned long  _biClrUsed;
    unsigned long  _biClrImportant;
 };
+
+struct gil_rgb_quad
+{  
+   boost::uint8_t _blue;
+   boost::uint8_t _green;
+   boost::uint8_t _red;
+   boost::uint8_t _reserved;
+};
 #pragma pack(pop)
+
+struct indexed_pixel_deref_fn
+{
+   typedef indexed_pixel_deref_fn const_t;
+   typedef rgb8_pixel_t value_type;
+   typedef value_type reference;   // returns by value!
+   typedef value_type const_reference;
+   typedef reference result_type;
+
+   typedef rgb8_pixel_t value_type;
+   static const bool is_mutable = false;
+
+   typedef std::vector< rgb8_pixel_t > colors_t;
+
+   indexed_pixel_deref_fn( const colors_t& table ) : _table( table ) {}
+
+   rgb8_pixel_t operator()( const gray8_pixel_t& index ) const
+   {
+      return _table[index[0]];
+   }
+
+   const colors_t& _table;
+};
+
 
 template <typename DstP, typename CC=default_color_converter >
 class color_converter_unary {
@@ -160,7 +192,7 @@ public:
     bmp_reader_color_convert(const char* filename) : bmp_reader(filename) {}
 
     template <typename VIEW>
-    void apply(const VIEW& view) {
+    void apply(const VIEW& target) {
 
         if( _info_header._biCompression != 0L ) // only BI_RGB is supported
         {
@@ -187,7 +219,71 @@ public:
         case 8: {
             // see msdn: The bitmap has a maximum of 256 colors.
 
-            io_error("bmp_reader_color_covert::apply(): no indexed images are supported.");
+            // OK, we have read file and info header. Next should be the color table.
+            
+            if( _info_header._biClrUsed > 0 )
+            {
+               boost::scoped_array<gil_rgb_quad> colors( new gil_rgb_quad[ _info_header._biClrUsed ] );
+
+               io_error_if( fread( colors.get(), sizeof( gil_rgb_quad ), _info_header._biClrUsed, get() ) == 0 
+                          , "file_mgr: failed to read file" );
+
+
+               // Create rgb8 color table
+               std::vector<rgb8_pixel_t> color_table( _info_header._biClrUsed );
+
+               for( unsigned int i = 0; i < _info_header._biClrUsed; ++i )
+               {
+                  color_table[i] = rgb8_pixel_t( colors[i]._red
+                                               , colors[i]._green
+                                               , colors[i]._blue   );
+               }
+
+
+               // Read image pixels, without the padding bytes.
+               // The image is flipped upside down.
+
+               unsigned int nScanline_Src = _info_header._biWidth;
+               unsigned int nPadding_Src  = calc_padding( _info_header._biWidth
+                                                        , 8                      );
+
+               unsigned int nImageSize = nScanline_Src * _info_header._biHeight;
+
+               boost::scoped_array<unsigned char> scanline( new unsigned char[ nScanline_Src ] );
+
+               gray8_image_t indices( _info_header._biWidth
+                                    , _info_header._biHeight );
+
+               gray8_view_t indices_view = view( indices );
+
+               for( unsigned int y = _info_header._biHeight; y > 0; --y )
+               {
+                  io_error_if( fread( scanline.get(), sizeof( unsigned char ), nScanline_Src, get() ) == 0 
+                             , "file_mgr: failed to read file" );
+
+                  std::copy( scanline.get()
+                           , scanline.get() + nScanline_Src
+                           , indices_view.row_begin( y - 1 ));
+
+                  if( nPadding_Src )
+                     fseek( get(), nPadding_Src, SEEK_CUR );
+               }
+
+               // Convert to requested view.
+               typedef gray8_view_t::add_deref<indexed_pixel_deref_fn> indexed_factory_t;
+               typedef indexed_factory_t::type rgb8_indexed_view_t;
+
+               rgb8_indexed_view_t indexed_view = indexed_factory_t::make( indices_view
+                                                            , indexed_pixel_deref_fn( color_table ));
+
+
+               copy_pixels( indexed_view, target );
+            }
+            else
+            {
+               io_error("bmp_reader_color_covert::apply(): unknown color type");
+            }
+
             break;
         }
         case 16: {
@@ -204,21 +300,21 @@ public:
 
 
             const int nNumChannels_Dest = VIEW::color_space_t::num_channels;
-            unsigned int nScanline_Dest = view.width() * nNumChannels_Dest;
-            unsigned int nPadding_Dest  = calc_padding( view.width()
+            unsigned int nScanline_Dest = target.width() * nNumChannels_Dest;
+            unsigned int nPadding_Dest  = calc_padding( target.width()
                                                       , nNumChannels_Dest * 8 ); 
 
             boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline_Src ] );
 
             typedef typename VIEW::pixel_t pixel_t;
-            for( int y = 0; y < view.height(); ++y )
+            for( int y = 0; y < target.height(); ++y )
             {
                io_error_if( fread( spScanlineBuffer.get(), sizeof( char ), nScanline_Src, get() ) == 0 
                           , "file_mgr: failed to read file" );
 
                bgr8_pixel_t* pPixels = reinterpret_cast<bgr8_pixel_t*>( spScanlineBuffer.get() );
 
-               std::transform( pPixels, pPixels + view.width(), view.row_begin(y),
+               std::transform( pPixels, pPixels + target.width(), target.row_begin(y),
                                color_converter_unary<pixel_t>());
 
                if( nPadding_Src )
@@ -229,7 +325,6 @@ public:
         }
         case 32: {
             // see msdn: The bitmap has a maximum of 2^32 colors.
-            // TODO chh: Are the row still padded, even in 32 bit mode?
 
             io_error("bmp_reader_color_covert::apply(): no indexed images are supported.");
             break;

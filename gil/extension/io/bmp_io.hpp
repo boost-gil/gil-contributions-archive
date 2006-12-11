@@ -15,7 +15,7 @@
 //
 /// \author Christian Henning
 ///         
-/// \date   2005-2006 \n Last updated August 13, 2006
+/// \date   2005-2006 \n Last updated December 11, 2006
 
 #include <cstdio>
 #include <algorithm>
