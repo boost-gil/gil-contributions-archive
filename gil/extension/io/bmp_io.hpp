@@ -11,11 +11,11 @@
 
 /// \file
 /// \brief  Support for reading and writing BMP files
-///         Requires libbmp
 //
+/// \author Svetlozar Fotev, Motorola Inc.
 /// \author Christian Henning
 ///         
-/// \date   2005-2006 \n Last updated December 11, 2006
+/// \date   2005-2006 \n Last updated January 21, 2007
 
 #include <cstdio>
 #include <algorithm>
@@ -27,21 +27,28 @@
 
 ADOBE_GIL_NAMESPACE_BEGIN
 
+/// Determines whether the given view type is supported for reading
+
 /// \brief Determines whether the given view type is supported for reading
 /// \ingroup BMP_IO
-template <typename VIEW>
-struct bmp_read_support {
-   // TODO chh: define constants
+template <typename VIEW> struct bmp_read_write_support {
 
-/*
-    BOOST_STATIC_CONSTANT(bool,is_supported=
-                          (detail::bmp_read_support_private<typename VIEW::channel_t,
-                                                             typename VIEW::color_space_t::base>::is_supported));
-    BOOST_STATIC_CONSTANT(int,color_type=
-                          (detail::bmp_read_support_private<typename VIEW::channel_t,
-                                                             typename VIEW::color_space_t::base>::color_type));
+    BOOST_STATIC_CONSTANT( bool
+                         , is_supported =
+                           (detail::bmp_read_write_support_private<typename VIEW::channel_t
+                                                               , typename VIEW::color_space_t::base>::supported ));
+
+    BOOST_STATIC_CONSTANT( unsigned int
+                         , bit_depth =
+                           ( detail::bmp_read_write_support_private<typename VIEW::channel_t
+                                                                 , typename VIEW::color_space_t::base>::channel ));
+
+    BOOST_STATIC_CONSTANT( unsigned int
+                         , bit_pixel =
+                           ( detail::bmp_read_write_support_private< typename VIEW::channel_t
+                                                                   , typename VIEW::color_space_t::base>::pixel ));
+
     BOOST_STATIC_CONSTANT(bool, value=is_supported);
-*/
 };
 
 /// \brief Returns the width and height of the BMP file at the specified location.
@@ -66,7 +73,7 @@ inline point2<int> bmp_read_dimensions(const std::string& filename) {
 /// compatible with the ones specified by VIEW, or if its dimensions don't match the ones of the view.
 template <typename VIEW>
 inline void bmp_read_view(const char* filename,const VIEW& view) {
-//    BOOST_STATIC_ASSERT(bmp_read_support<VIEW>::is_supported);
+    BOOST_STATIC_ASSERT(bmp_read_write_support<VIEW>::is_supported);
 
     detail::bmp_reader m(filename);
     m.apply(view);
@@ -86,7 +93,7 @@ inline void bmp_read_view(const std::string& filename,const VIEW& view) {
 /// compatible with the ones specified by IMAGE
 template <typename IMAGE>
 inline void bmp_read_image(const char* filename,IMAGE& im) {
-//    BOOST_STATIC_ASSERT(bmp_read_support<typename IMAGE::view_t>::is_supported);
+   BOOST_STATIC_ASSERT(bmp_read_write_support<VIEW>::is_supported);
 
     detail::bmp_reader m(filename);
     m.read_image(im);
@@ -137,7 +144,7 @@ inline void bmp_read_and_convert_image(const std::string& filename,IMAGE& im) {
 /// Throws std::ios_base::failure if it fails to create the file.
 template <typename VIEW>
 inline void bmp_write_view(const char* filename,const VIEW& view ) {
-    //BOOST_STATIC_ASSERT(bmp_write_support<VIEW>::is_supported);
+    BOOST_STATIC_ASSERT(bmp_read_write_support<VIEW>::is_supported);
 
     detail::bmp_writer m(filename);
     m.apply(view);

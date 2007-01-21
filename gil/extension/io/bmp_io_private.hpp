@@ -11,8 +11,11 @@
 
 /// \file
 /// \brief  Internal support for reading and writing BMP files
+//
+/// \author Svetlozar Fotev, Motorola Inc.
 /// \author Christian Henning
-/// \date   2005-2006 \n Last updated December 11, 2006
+///         
+/// \date   2005-2006 \n Last updated January 21, 2007
 
 #include <stdio.h>
 #include <boost/static_assert.hpp>
@@ -25,42 +28,88 @@ ADOBE_GIL_NAMESPACE_BEGIN
 
 namespace detail {
 
-// TODO chh: define bmp_read_support_private structs
+static const int header_size     = 14;
+static const int win32_info_size = 40;
+static const int os2_info_size   = 12;
+static const int bm_signature    = 0x4D42;
 
-
-#pragma pack(push,2)
-struct gil_bitmap_file_header
-{
-   unsigned short  _bfType; 
-   unsigned long   _bfSize; 
-   unsigned short  _bfReserved1; 
-   unsigned short  _bfReserved2; 
-   unsigned long   _bfOffBits; 
+/// BMP compression types
+enum {
+	ct_rgb		= 0,	///< RGB without compression
+	ct_rle8		= 1,	///< 8 bit index with RLE compression
+	ct_rle4		= 2,	///< 4 bit index with RLE compression
+	ct_bitfield	= 3		///< 16 or 32 bit fields without compression
 };
 
-struct gil_bitmap_info_header
-{
-   unsigned long  _biSize;
-   long           _biWidth;
-   long           _biHeight;
-   unsigned short _biPlanes;
-   unsigned short _biBitCount;
-   unsigned long  _biCompression;
-   unsigned long  _biSizeImage;
-   long           _biXPelsPerMeter;
-   long           _biYPelsPerMeter;
-   unsigned long  _biClrUsed;
-   unsigned long  _biClrImportant;
+/// BMP file header
+struct file_header {
+	int			type;	///< File type
+	long		size;	///< File size in bytes
+	long		offset;	///< Pixels file offset
 };
 
-struct gil_rgb_quad
-{  
-   boost::uint8_t _blue;
-   boost::uint8_t _green;
-   boost::uint8_t _red;
-   boost::uint8_t _reserved;
+/// BMP information (Windows) or core (OS2) header
+struct info_header {
+	int			what;	///< Compression type
+	int			width;	///< Width in pixels
+	int			height;	///< Height in pixels, negative for top-down
+	int			planes;	///< Bit planes, always 1
+	int			bpp;	///< Bits per pixel
+	int			colors;	///< Number of colors in the palette, zero for all colors
+	int			entry;	///< Size of pallete entry in bytes
 };
-#pragma pack(pop)
+
+/// BMP color palette
+struct color_map {
+	unsigned	blue;	///< Blue bits mask
+	unsigned	green;	///< Green bits mask
+	unsigned	red;	///< Red bits mask
+	unsigned	unused;	///< Reserved
+};
+
+/// Color channel mask
+struct bit_field {
+	unsigned	mask;	///< Bit mask at corresponding position
+	unsigned	width;	///< Bit width of the mask
+	unsigned	shift;	///< Bit position from right to left
+};
+
+/// BMP color masks
+struct color_mask {
+	bit_field	red;	 ///< Red bits
+	bit_field	green; ///< Green bits
+	bit_field	blue;	 ///< Blue bits
+};
+
+/// Determines whether the given channel width and color space are supported for reading and writing
+template <typename Chn, typename Spc> struct bmp_read_write_support_private {
+	enum {
+		supported	= false,
+		channel		= 0,
+		pixel		= 0
+	};
+};
+template <> struct bmp_read_write_support_private<bits8, gray_t> {
+	enum {
+		supported	= true,
+		channel		= 8,
+		pixel		= 8
+	};
+};
+template <> struct bmp_read_write_support_private<bits8, rgb_t> {
+	enum {
+		supported	= true,
+		channel		= 8,
+		pixel		= 24
+	};
+};
+template <> struct bmp_read_write_support_private<bits8, rgba_t> {
+	enum {
+		supported	= true,
+		channel		= 8,
+		pixel		= 32
+	};
+};
 
 struct indexed_pixel_deref_fn
 {
@@ -102,34 +151,265 @@ public:
    }
 };
 
-unsigned int calc_padding( unsigned int width
-                         , unsigned int bits_per_pixel )
-{
-   int scanline = (( width * ( bits_per_pixel / 8)) + 3) & (~3);
-   return scanline - ( width * ( bits_per_pixel / 8 ));
-}
+/// Assembles and disassembles pixel of given type
+template <typename V, typename C> struct convertor {
+};
+
+template <typename V> struct convertor<V, gray_t> {
+	typedef typename V::channel_t channel_t;
+	typedef typename V::pixel_t   pixel_t;
+
+	/// Create gray from luminance
+	static pixel_t make(channel_t y) throw() {
+		return pixel_t(y);
+	}
+
+	/// Create gray from RGBA components
+	static pixel_t make(channel_t r, channel_t g, channel_t b, channel_t a = ~0) throw() {
+		return pixel_t(rgb_to_luminance(r, g, b));
+	}
+
+	/// Split gray to RGBA components
+	static void split(const pixel_t& p, channel_t& r, channel_t& g, channel_t& b, channel_t& a) throw() {
+		r = p.gray;
+		g = p.gray;
+		b = p.gray;
+		a = ~0;
+	}
+};
+
+template <typename V> struct convertor<V, rgb_t> {
+	typedef typename V::channel_t channel_t;
+	typedef typename V::pixel_t   pixel_t;
+
+	/// Create RGB from luminance
+	static pixel_t make(channel_t y) throw() {
+		return pixel_t(y, y, y);
+	}
+
+	/// Create RGB from RGBA components
+	static pixel_t make(channel_t r, channel_t g, channel_t b, channel_t a = ~0) throw() {
+		return pixel_t(r, g, b);
+	}
+
+	/// Split RGB to RGBA components
+	static void split(const pixel_t& p, channel_t& r, channel_t& g, channel_t& b, channel_t& a) throw() {
+		r = p.red;
+		g = p.green;
+		b = p.blue;
+		a = ~0;
+	}
+};
+
+template <typename V> struct convertor<V, rgba_t> {
+	typedef typename V::channel_t channel_t;
+	typedef typename V::pixel_t   pixel_t;
+
+	/// Create RGBA from luminance
+	static pixel_t make(channel_t y) throw() {
+		return pixel_t(y, y, y, ~0);
+	}
+
+	/// Create RGBA from RGBA components
+	static pixel_t make(channel_t r, channel_t g, channel_t b, channel_t a = ~0) throw() {
+		return pixel_t(r, g, b, a);
+	}
+
+	/// Split RGBA to RGBA components
+	static void split(const pixel_t& p, channel_t& r, channel_t& g, channel_t& b, channel_t& a) throw() {
+		r = p.red;
+		g = p.green;
+		b = p.blue;
+		a = p.alpha;
+	}
+};			
+
+/// Transfers and converts row of pixels
+template <typename V, typename C> struct transfer {
+	typedef typename V::x_iterator iterator_t;
+	typedef typename V::pixel_t    pixel_t;
+	typedef typename V::channel_t  channel_t;
+
+	/// From BMP to GIL
+	static void convert(int bpp, const byte_t *src, iterator_t dest, int cnt, const color_map pal[], const color_mask& msk) throw() {
+		unsigned bit;
+		byte_t   pak, idx;
+
+		switch (bpp)
+		{
+		case 1:
+			// 1 indexed
+			for (bit = 0; cnt > 0; --cnt, ++dest) {
+				if (bit == 0) {
+					bit = 8;
+					pak = *src++;
+				}
+				idx = (pak >> --bit) & 0x01;
+
+				*dest = convertor<V, C>::make(pal[idx].red, pal[idx].green, pal[idx].blue);
+			}
+			break;
+
+		case 4:
+			// 4 indexed
+			for (bit = 0; cnt > 0; --cnt, ++dest) {
+				if (bit == 0) {
+					bit = 8;
+					pak = *src++;
+				}
+				bit -= 4;
+				idx = (pak >> bit) & 0x0F;
+
+				*dest = convertor<V, C>::make(pal[idx].red, pal[idx].green, pal[idx].blue);
+			}
+			break;
+
+		case 8:
+			// 8 indexed
+			for (; cnt > 0; --cnt, ++src, ++dest) {
+				idx = *src;
+				*dest = convertor<V, C>::make(pal[idx].red, pal[idx].green, pal[idx].blue);
+			}
+			break;
+
+		case 15:
+		case 16:
+			// 5-5-5, 5-6-5 BGR
+			for (; cnt > 0; --cnt, ++dest, src += 2) {
+				int p = (src[1] << 8) | src[0];
+
+				int r = ((p & msk.red.mask)   >> msk.red.shift)   << (8 - msk.red.width);
+				int g = ((p & msk.green.mask) >> msk.green.shift) << (8 - msk.green.width);
+				int b = ((p & msk.blue.mask)  >> msk.blue.shift)  << (8 - msk.blue.width);
+
+				*dest = convertor<V, C>::make(r, g, b);
+			}
+			break;
+
+		case 24:
+			// 8-8-8 BGR
+			for (; cnt > 0; --cnt, ++dest) {
+				byte_t b = *src++;
+				byte_t g = *src++;
+				byte_t r = *src++;
+
+				*dest = convertor<V, C>::make(r, g, b);
+			}
+			break;
+
+		case 32:
+			// 8-8-8-8 BGR*
+			for (; cnt > 0; --cnt, ++dest) {
+				byte_t b = *src++;
+				byte_t g = *src++;
+				byte_t r = *src++;
+				byte_t a = *src++;
+
+				*dest = convertor<V, C>::make(r, g, b);
+			}
+			break;
+		}
+	}
+
+	/// From GIL to BMP
+	static void convert(int bpp, iterator_t src, byte_t *dest, int cnt) throw() {
+		channel_t r, g, b, a;
+
+		switch (bpp)
+		{
+		case 8:
+			// 8
+			for (; cnt > 0; --cnt, ++src, ++dest) {
+				convertor<V, C>::split(*src, r, g, b, a);
+				*dest = g;
+			}
+			break;
+
+		case 24:
+			// 8-8-8
+			for (; cnt > 0; --cnt, ++src) {
+				convertor<V, C>::split(*src, r, g, b, a);
+
+				*dest++ = b;
+				*dest++ = g;
+				*dest++ = r;
+			}
+			break;
+
+		case 32:
+			// 8-8-8-8
+			for (; cnt > 0; --cnt, ++src) {
+				convertor<V, C>::split(*src, r, g, b, a);
+
+				*dest++ = b;
+				*dest++ = g;
+				*dest++ = r;
+				*dest++ = 0;
+			}
+			break;
+		}
+	}
+};
 
 class bmp_reader : public file_mgr {
 protected:
-   gil_bitmap_info_header _info_header;
+   info_header _info_header;
+   file_header _file_header;
 
     void init() {
-      // Read file and info header.
-      gil_bitmap_file_header file_header;
 
-      // Make sure the right struct alignment is enabled. If not reading
-      // from file will result in indefined result.
-      BOOST_STATIC_ASSERT( sizeof( gil_bitmap_file_header ) == 14 );
-      BOOST_STATIC_ASSERT( sizeof( gil_bitmap_info_header ) == 40 );
+      // Read file header.
+      _file_header.type = read_int16();
+      _file_header.size = read_int32();
+      read_int16(); // read reserved bytes
+      read_int16(); // read reserved bytes
+      _file_header.offset = read_int32();
 
-      io_error_if( fread( &file_header, sizeof( char ), sizeof( gil_bitmap_file_header ), get() ) == 0 
-                 , "file_mgr: failed to read file" );
+      if (_file_header.type != bm_signature) {
+	      io_error("file_mgr: not a BMP file");
+      }
 
-      io_error_if( file_header._bfType != 0x4D42
-                 , "file_mgr: this is not a bitmap file" );
+      if (_file_header.offset >= _file_header.size) {
+	      io_error("file_mgr: invalid BMP file header");
+      }
 
-      io_error_if( fread( &_info_header, sizeof( char ), sizeof( gil_bitmap_info_header ), get() ) == 0 
-                 , "file_mgr: failed to read file" );
+      // Read the info header size.
+      int info_header_size = read_int32();
+
+      if( info_header_size == win32_info_size )
+      {
+	      // Windows header
+	      _info_header.width  = read_int32();
+	      _info_header.height = read_int32();
+	      _info_header.planes = read_int16();
+	      _info_header.bpp    = read_int16();
+	      _info_header.what   = read_int32();
+					         read_int32();
+					         read_int32();
+					         read_int32();
+	      _info_header.colors = read_int32();
+					         read_int32();
+	      _info_header.entry  = 4;
+      }
+      else if ( info_header_size == os2_info_size )
+      {
+	      // OS2 header
+	      _info_header.width  = read_int16();
+	      _info_header.height = read_int16();
+	      _info_header.planes = read_int16();
+	      _info_header.bpp    = read_int16();
+	      _info_header.what   = ct_rgb;
+	      _info_header.colors = 0;
+	      _info_header.entry  = 3;
+      }
+      else {
+	      io_error("file_mgr: invalid BMP info header");
+      }
+
+      /// check supported bits per pixel
+      if (_info_header.bpp < 1 || _info_header.bpp > 32) {
+	      io_error("file_mgr: unsupported BMP format");
+      }
     }
 
 
@@ -137,39 +417,123 @@ public:
     bmp_reader(FILE* file)           : file_mgr(file)           { init(); }
     bmp_reader(const char* filename) : file_mgr(filename, "rb") { init(); }
 
-    template <typename VIEW>
-    void apply(const VIEW& view) {
-      io_error_if( _info_header._biBitCount    != 24
-                 , "bmp_reader::apply(): Only 24bit images are supported." );
-      io_error_if( _info_header._biClrUsed     != 0
-                 , "bmp_reader::apply(): no indexed images are supported, yet." );
-      io_error_if( _info_header._biCompression != 0L // only BI_RGB is supported
-                 , "bmp_reader::apply(): only RGB images are supported." );
+   template <typename VIEW>
+   void apply( const VIEW& view )
+   {
       io_error_if( view.dimensions() != get_dimensions()
                  , "bmp_reader::apply(): input view dimensions do not match the image file");
 
-      const int nNumChannels = VIEW::color_space_t::num_channels;
+      color_mask mask;
 
-      unsigned int nScanline = view.width() * nNumChannels;
-      unsigned int nPadding  = calc_padding( view.width()
-                                           , nNumChannels * 8 ); 
-
-      boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline ] );
-
-      typedef typename bgr8_image_t::pixel_t pixel_t;
-
-      // Read image pixels, without the padding bytes.
-      // The rgb channels are stored in bgr order. Also, the image is flipped upside down.
-      for( int y=view.height(); y > 0; --y )
+      // read the color masks
+      if( _info_header.what == ct_bitfield )
       {
-         io_error_if( fread( spScanlineBuffer.get(), sizeof( char ), nScanline, get() ) == 0 
-                    , "file_mgr: failed to read file" );
+         mask.red.mask    = read_int32();
+         mask.green.mask  = read_int32();
+         mask.blue.mask   = read_int32();
 
-         pixel_t* pPixels = reinterpret_cast<pixel_t*>( spScanlineBuffer.get() );
-         std::copy( pPixels, pPixels + view.width(), view.row_begin( y-1 ) );
+         mask.red.width   = count_ones( mask.red.mask   );
+         mask.green.width = count_ones( mask.green.mask );
+         mask.blue.width  = count_ones( mask.blue.mask  );
 
-         if( nPadding )
-            fseek( get(), nPadding, SEEK_CUR );
+         mask.red.shift   = trailing_zeros( mask.red.mask   );
+         mask.green.shift = trailing_zeros( mask.green.mask );
+         mask.blue.shift  = trailing_zeros( mask.blue.mask  );
+      }
+      else if( _info_header.what == ct_rgb )
+      {
+         switch( _info_header.bpp )
+         {
+            case 15: case 16:
+            {
+		         mask.red.mask   = 0x007C00; mask.red.width   = 5; mask.red.shift   = 10;
+		         mask.green.mask = 0x0003E0; mask.green.width = 5; mask.green.shift =  5;
+		         mask.blue.mask  = 0x00001F; mask.blue.width  = 5; mask.blue.shift  =  0;
+		         break;
+            }
+
+	         case 24: case 32:
+	         {
+		         mask.red.mask   = 0xFF0000; mask.red.width   = 8; mask.red.shift   = 16;
+		         mask.green.mask = 0x00FF00; mask.green.width = 8; mask.green.shift =  8;
+		         mask.blue.mask  = 0x0000FF; mask.blue.width  = 8; mask.blue.shift  =  0;
+		         break;
+            }
+	      }
+      }
+      else
+      {
+	      io_error( "bmp_reader::apply(): unsupported BMP compression" );
+      }
+
+      // Read the color map.
+
+		std::vector<color_map> palette;
+
+      if( _info_header.bpp <= 8 )
+      {
+	      int entries = _info_header.colors;
+
+	      if( entries == 0 )
+	      {
+		      entries = 1 << _info_header.bpp;
+	      }
+
+         palette.resize( entries );
+
+	      for( int i = 0; i < entries; ++i )
+	      {
+		      palette[i].blue  = read_int8();
+		      palette[i].green = read_int8();
+		      palette[i].red   = read_int8();
+
+		      if( _info_header.entry > 3 )
+		      {
+			      read_int8();
+		      }
+	      }
+      }
+
+      seek(_file_header.offset);
+
+      // the row pitch must be multiple 4 bytes
+      int pitch;
+
+      if (_info_header.bpp < 8) {
+	      pitch = ((_info_header.width * _info_header.bpp) + 7) >> 3;
+      }
+      else {
+	      pitch = _info_header.width * ((_info_header.bpp + 7) >> 3);
+      }
+      pitch = (pitch + 3) & ~3;
+
+      // read the raster
+      std::vector<byte_t> row(pitch);
+
+      int ybeg = 0;
+      int yend = _info_header.height;
+      int yinc = 1;
+
+      if( _info_header.height > 0 )
+      {
+	      ybeg = _info_header.height - 1;
+	      yend = -1;
+	      yinc = -1;
+      }
+
+		const color_map *pal = 0;
+
+		if( palette.size() > 0 )
+		{
+			pal = &palette.front();
+		}
+
+      for( int y = ybeg; y != yend; y += yinc )
+      {
+         typedef typename VIEW::color_space_t::base Spc;
+
+	      read(&row.front(), pitch);
+	      transfer<VIEW, Spc>::convert(_info_header.bpp, &row.front(), view.row_begin(y), _info_header.width, pal, mask);
       }
     }
     
@@ -180,164 +544,19 @@ public:
     }
 
     point2<int> get_dimensions() const {
-        return point2<int>( _info_header._biWidth,_info_header._biHeight );
+        return point2<int>( _info_header.width,_info_header.height );
     }
 };
-
 
 //  Used when user want to read and convert image at the same time.
 class bmp_reader_color_convert : public bmp_reader {
 public:
-    bmp_reader_color_convert(FILE* file)           : bmp_reader(file) {}
-    bmp_reader_color_convert(const char* filename) : bmp_reader(filename) {}
+   bmp_reader_color_convert(FILE* file)           : bmp_reader(file) {}
+   bmp_reader_color_convert(const char* filename) : bmp_reader(filename) {}
 
     template <typename VIEW>
-    void apply(const VIEW& target) {
+    void apply(const VIEW& view) {
 
-        if( _info_header._biCompression != 0L ) // only BI_RGB is supported
-        {
-           io_error("bmp_reader_color_covert::apply(): No compression is supported.");
-        }
-
-        switch (_info_header._biBitCount) {
-        case 0: {
-            // see msdn: Windows 98/Me, Windows 2000/XP: The number of bits-per-pixel is specified or is implied by the JPEG or PNG format.
-            io_error("bmp_reader_color_covert::apply(): unknown color type");
-            break;
-        }
-
-        case 1: {
-            // see msdn: The bitmap has 2 colors.
-            io_error("bmp_reader_color_covert::apply(): unknown color type");
-            break;
-        }
-        case 4: {
-            // see msdn: The bitmap has a maximum of 16 colors.
-            io_error("bmp_reader_color_covert::apply(): unknown color type");
-            break;
-        }
-        case 8: {
-            // see msdn: The bitmap has a maximum of 256 colors.
-
-            // OK, we have read file and info header. Next should be the color table.
-            
-            if( _info_header._biClrUsed > 0 )
-            {
-               boost::scoped_array<gil_rgb_quad> colors( new gil_rgb_quad[ _info_header._biClrUsed ] );
-
-               io_error_if( fread( colors.get(), sizeof( gil_rgb_quad ), _info_header._biClrUsed, get() ) == 0 
-                          , "file_mgr: failed to read file" );
-
-
-               // Create rgb8 color table
-               std::vector<rgb8_pixel_t> color_table( _info_header._biClrUsed );
-
-               for( unsigned int i = 0; i < _info_header._biClrUsed; ++i )
-               {
-                  color_table[i] = rgb8_pixel_t( colors[i]._red
-                                               , colors[i]._green
-                                               , colors[i]._blue   );
-               }
-
-
-               // Read image pixels, without the padding bytes.
-               // The image is flipped upside down.
-
-               unsigned int nScanline_Src = _info_header._biWidth;
-               unsigned int nPadding_Src  = calc_padding( _info_header._biWidth
-                                                        , 8                      );
-
-               unsigned int nImageSize = nScanline_Src * _info_header._biHeight;
-
-               boost::scoped_array<unsigned char> scanline( new unsigned char[ nScanline_Src ] );
-
-               gray8_image_t indices( _info_header._biWidth
-                                    , _info_header._biHeight );
-
-               gray8_view_t indices_view = view( indices );
-
-               for( unsigned int y = _info_header._biHeight; y > 0; --y )
-               {
-                  io_error_if( fread( scanline.get(), sizeof( unsigned char ), nScanline_Src, get() ) == 0 
-                             , "file_mgr: failed to read file" );
-
-                  std::copy( scanline.get()
-                           , scanline.get() + nScanline_Src
-                           , indices_view.row_begin( y - 1 ));
-
-                  if( nPadding_Src )
-                     fseek( get(), nPadding_Src, SEEK_CUR );
-               }
-
-               // Convert to requested view.
-               typedef gray8_view_t::add_deref<indexed_pixel_deref_fn> indexed_factory_t;
-               typedef indexed_factory_t::type rgb8_indexed_view_t;
-
-               rgb8_indexed_view_t indexed_view = indexed_factory_t::make( indices_view
-                                                            , indexed_pixel_deref_fn( color_table ));
-
-
-               copy_pixels( indexed_view, target );
-            }
-            else
-            {
-               io_error("bmp_reader_color_covert::apply(): unknown color type");
-            }
-
-            break;
-        }
-        case 16: {
-            // see msdn: The bitmap has a maximum of 2^16 colors.
-            io_error("bmp_reader_color_covert::apply(): unknown color type");
-            break;
-        }
-        case 24: {
-            // see msdn: The bitmap has a maximum of 2^24 colors.
-
-            unsigned int nScanline_Src = _info_header._biWidth * 3;
-            unsigned int nPadding_Src  = calc_padding( _info_header._biWidth
-                                                     , 24                     ); 
-
-
-            const int nNumChannels_Dest = VIEW::color_space_t::num_channels;
-            unsigned int nScanline_Dest = target.width() * nNumChannels_Dest;
-            unsigned int nPadding_Dest  = calc_padding( target.width()
-                                                      , nNumChannels_Dest * 8 ); 
-
-            boost::scoped_array<unsigned char> spScanlineBuffer( new unsigned char[ nScanline_Src ] );
-
-            typedef typename VIEW::pixel_t pixel_t;
-            for( int y = 0; y < target.height(); ++y )
-            {
-               io_error_if( fread( spScanlineBuffer.get(), sizeof( char ), nScanline_Src, get() ) == 0 
-                          , "file_mgr: failed to read file" );
-
-               bgr8_pixel_t* pPixels = reinterpret_cast<bgr8_pixel_t*>( spScanlineBuffer.get() );
-
-               std::transform( pPixels, pPixels + target.width(), target.row_begin(y),
-                               color_converter_unary<pixel_t>());
-
-               if( nPadding_Src )
-                  fseek( get(), nPadding_Src, SEEK_CUR );
-            }
-
-            break;
-        }
-        case 32: {
-            // see msdn: The bitmap has a maximum of 2^32 colors.
-
-            io_error("bmp_reader_color_covert::apply(): no indexed images are supported.");
-            break;
-        }
-        default:
-            io_error("bmp_reader_color_covert::apply(): unknown color type");
-        }
-    }    
-
-    template <typename IMAGE>
-    void read_image(IMAGE& im) {
-        resize_clobber_image(im,get_dimensions());
-        apply(view(im));
     }
 };
 
@@ -350,67 +569,59 @@ public:
     template <typename VIEW>
     void apply(const VIEW& view) {
 
-      const int nNumChannels = VIEW::color_space_t::num_channels;
+      typedef typename VIEW::channel_t           channel_t;
+      typedef typename VIEW::color_space_t::base color_space_t;
 
-      unsigned int nImageSize = view.width() 
-                              * view.height() 
-                              * VIEW::color_space_t::num_channels;
-      // Write the file header.
-      gil_bitmap_file_header file_header;
-      file_header._bfType = 0x4D42;
-      file_header._bfSize = sizeof( gil_bitmap_file_header )
-                         + sizeof( gil_bitmap_info_header )
-                         + nImageSize;
+      // check if supported
+      if (bmp_read_write_support_private<channel_t, color_space_t>::channel != 8) {
+	      io_error("Input view type is incompatible with the image type");
+      }
 
-      file_header._bfReserved1 = 0;
-      file_header._bfReserved2 = 0;
-      file_header._bfOffBits = sizeof( gil_bitmap_file_header )
-                            + sizeof( gil_bitmap_info_header );
+      // compute the file size
+      int bpp = color_space_t::num_channels * 8;
+      int ent = 0;
 
+      if (bpp <= 8) {
+	      ent = 1 << bpp;
+      }
+      int spn = (view.width() * color_space_t::num_channels + 3) & ~3;
+      int ofs = header_size + win32_info_size + ent * 4;
+      int siz = ofs + spn * view.height();
 
-      io_error_if( fwrite( &file_header, sizeof(char), sizeof( gil_bitmap_file_header ), get() ) == 0
-                 , "file_mgr: failed to write file" );
+      // write the BMP file header
+      write_int16(bm_signature);
+      write_int32(siz);
+      write_int16(0);
+      write_int16(0);
+      write_int32(ofs);
 
-      // Write the info header.
-      gil_bitmap_info_header info_header;
+      // writes Windows information header
+      write_int32( win32_info_size );
+      write_int32(view.width());
+      write_int32(view.height());
+      write_int16(1);
+      write_int16(bpp);
+      write_int32(ct_rgb);
+      write_int32(0);
+      write_int32(0);
+      write_int32(0);
+      write_int32(ent);
+      write_int32(0);
 
-      info_header._biSize = sizeof( gil_bitmap_info_header );
-      info_header._biWidth  = view.width();
-      info_header._biHeight = view.height();
-      info_header._biPlanes = 1;
-      info_header._biBitCount = nNumChannels * 8;
-      info_header._biCompression  = 0L; // only BI_RGB is supported
-      info_header._biSizeImage = nImageSize;
-      info_header._biXPelsPerMeter = 0;
-      info_header._biYPelsPerMeter = 0;
-      info_header._biClrUsed       = 0;
-      info_header._biClrImportant  = 0;
+      // writes artificial gray palette
+      for (int i = 0; i < ent; ++i) {
+	      write_int8(i);
+	      write_int8(i);
+	      write_int8(i);
+	      write_int8(0);
+      }
 
-      io_error_if( fwrite( &info_header, sizeof(char), sizeof( gil_bitmap_info_header ), get() ) == 0 
-                 , "file_mgr: failed to write file"                                              );
+      // writes the raster
+      std::vector<byte_t> row(spn);
 
-      unsigned int nScanline = view.width() * nNumChannels;
-      unsigned int nPadding  = calc_padding( view.width()
-                                           , nNumChannels * 8 ); 
-
-      std::vector<bgr8_pixel_t> bgr_row( view.width() );
-
-      // Write the pixels. Scanlines must be DWORD aligned.
-      // The rgb channels are stored in bgr order. Also, the image is flipped upside down.
-      VIEW store_view = flipped_up_down_view( view );
-
-      for( int y=0;y<view.height(); ++y ) {
-
-         std::transform( store_view.row_begin(y), store_view.row_end(y), bgr_row.begin(),
-                           color_converter_unary<bgr8_pixel_t>());
-
-         io_error_if( fwrite( &bgr_row.front(), sizeof(char), nScanline, get() ) == 0
-                  , "file_mgr: failed to write file"                                );
-
-         for( unsigned int i = 0; i < nPadding; ++i ) {
-            io_error_if( fputc( 0, get() ) == EOF
-                       , "file_mgr: failed to write file" );
-         }
+      for (int y = view.height() - 1; y >= 0; --y) {
+	      transfer<VIEW, color_space_t>::convert(bpp, view.row_begin(y), &row.front(), view.width());
+	      write(&row.front(), spn);
       }
     }
 };
