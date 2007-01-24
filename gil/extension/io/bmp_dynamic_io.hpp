@@ -28,13 +28,13 @@ ADOBE_GIL_NAMESPACE_BEGIN
 namespace detail {
 	/// Determines whether the given view type is supported for reading
 	struct bmp_read_check {
-		template <typename V> struct apply: boost::mpl::bool_<bmp_read_support<V>::is_supported> {
+		template <typename V> struct apply: boost::mpl::bool_<bmp_read_write_support<V>::is_supported> {
 		};
 	};
 
 	/// Determines whether the given view type is supported for writing
 	struct bmp_write_check {
-		template <typename V> struct apply: boost::mpl::bool_<bmp_write_support<V>::is_supported> {
+		template <typename V> struct apply: boost::mpl::bool_<bmp_read_write_support<V>::is_supported> {
 		};
 	};
 
@@ -44,7 +44,7 @@ namespace detail {
 		}
 
 		template <typename IMG> bool apply() {
-			return bmp_read_support<typename IMG::view_t>::bit_pixel == bit_depth;
+			return bmp_read_write_support<typename IMG::view_t>::bit_pixel == bit_depth;
 		}
 
 	private:
@@ -59,11 +59,11 @@ namespace detail {
 
 		/// Reads a run-time instantiated image from file
 		template <typename IMG> void read_image(any_image<IMG>& img) {
-			if (!construct_matched(img, bmp_format_check(info.bpp))) {
+			if (!construct_matched(img, bmp_format_check(_info_header.bpp))) {
 				io_error("No matching image type");
 			}
 			else {
-				resize_clobber_image(img, point2<int>(info.width, abs(info.height)));
+				resize_clobber_image(img, point2<int>(_info_header.width, abs(_info_header.height)));
 				detail::dynamic_io_fnobj<bmp_read_check, bmp_reader> op(this);
 				apply_operation(view(img), op);
 			}
@@ -91,18 +91,16 @@ namespace detail {
 /// Opens the given BMP file name, selects the first type in Images whose color space and channel are compatible to those of the image file
 /// and creates a new image of that type with the dimensions specified by the image file.
 /// Throws std::ios_base::failure if none of the types in Images are compatible with the type on disk.
-template <typename IMG
-         , typename T> 
-inline void bmp_read_image(const T *file, any_image<IMG>& img) {
-	bmp::bmp_reader_dynamic m(file);
+template <typename IMG> 
+inline void bmp_read_image(const char *file, any_image<IMG>& img) {
+	detail::bmp_reader_dynamic m(file);
 	m.read_image(img);
 }
 
 /// \brief reads a BMP image into a run-time instantiated image
 /// \ingroup BMP_IO
-template <typename IMG
-         , typename T> 
-inline void bmp_read_image(const std::basic_string<T>& file, any_image<IMG>& img) {
+template <typename IMG> 
+inline void bmp_read_image(const std::string& file, any_image<IMG>& img) {
 	bmp_read_image(file.c_str(), img);
 }
 
@@ -110,15 +108,15 @@ inline void bmp_read_image(const std::basic_string<T>& file, any_image<IMG>& img
 /// \ingroup BMP_IO
 /// Throws std::ios_base::failure if the currently instantiated view type is not supported for writing by the I/O extension 
 /// or if it fails to create the file.
-template <typename V, typename T> 
-inline void bmp_write_view(const T *file, const any_image_view<V>& view) {
-	bmp::bmp_writer_dynamic m(file);
+template <typename V> 
+inline void bmp_write_view(const char *file, const any_image_view<V>& view) {
+	detail::bmp_writer_dynamic m(file);
 	m.write_view(view);
 }
 
 /// \brief Saves the currently instantiated view to a bmp file specified by the given bmp image file name.
 /// \ingroup BMP_IO
-template <typename V, typename T> inline void bmp_write_view(const std::string& file, const any_image_view<V>& view) {
+template <typename V> inline void bmp_write_view(const std::string& file, const any_image_view<V>& view) {
 	bmp_write_view(file.c_str(), view);
 }
 

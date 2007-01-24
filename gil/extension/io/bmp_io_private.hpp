@@ -15,7 +15,7 @@
 /// \author Svetlozar Fotev, Motorola Inc.
 /// \author Christian Henning
 ///         
-/// \date   2005-2006 \n Last updated January 21, 2007
+/// \date   2005-2007 \n Last updated January 21, 2007
 
 #include <stdio.h>
 #include <boost/static_assert.hpp>
@@ -548,20 +548,7 @@ public:
     }
 };
 
-//  Used when user want to read and convert image at the same time.
-class bmp_reader_color_convert : public bmp_reader {
-public:
-   bmp_reader_color_convert(FILE* file)           : bmp_reader(file) {}
-   bmp_reader_color_convert(const char* filename) : bmp_reader(filename) {}
-
-    template <typename VIEW>
-    void apply(const VIEW& view) {
-
-    }
-};
-
 class bmp_writer : public file_mgr {
-
 public:
     bmp_writer(FILE* file)           : file_mgr(file)           {}
     bmp_writer(const char* filename) : file_mgr(filename, "wb") {}

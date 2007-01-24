@@ -106,38 +106,6 @@ inline void bmp_read_image(const std::string& filename,IMAGE& im) {
     bmp_read_image(filename.c_str(),im);
 }
 
-/// \brief Loads and color-converts the image specified by the given bmp image file name into the given view.
-/// \ingroup BMP_IO
-/// Throws std::ios_base::failure if the file is not a valid BMP file, or if its dimensions don't match the ones of the view.
-template <typename VIEW>
-inline void bmp_read_and_convert_view(const char* filename,const VIEW& view) {
-    detail::bmp_reader_color_convert m(filename);
-    m.apply(view);
-}
-
-/// \brief Loads and color-converts the image specified by the given bmp image file name into the given view.
-/// \ingroup BMP_IO
-template <typename VIEW>
-inline void bmp_read_and_convert_view(const std::string& filename,const VIEW& view) {
-    bmp_read_and_convert_view(filename.c_str(),view);
-}
-
-/// \brief Allocates a new image whose dimensions are determined by the given bmp image file, loads and color-converts the pixels into it.
-/// \ingroup BMP_IO
-/// Throws std::ios_base::failure if the file is not a valid BMP file
-template <typename IMAGE>
-inline void bmp_read_and_convert_image(const char* filename,IMAGE& im) {
-    detail::bmp_reader_color_convert m(filename);
-    m.read_image(im);
-}
-
-/// \brief Allocates a new image whose dimensions are determined by the given bmp image file, loads and color-converts the pixels into it.
-/// \ingroup BMP_IO
-template <typename IMAGE>
-inline void bmp_read_and_convert_image(const std::string& filename,IMAGE& im) {
-    bmp_read_and_convert_image(filename.c_str(),im);
-}
-
 /// \brief Saves the view to a bmp file specified by the given bmp image file name.
 /// \ingroup bmp_IO
 /// Triggers a compile assert if the view color space and channel depth are not supported by the bmp library or by the I/O extension.
