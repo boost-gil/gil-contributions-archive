@@ -416,6 +416,7 @@ protected:
 public:
     bmp_reader(FILE* file)           : file_mgr(file)           { init(); }
     bmp_reader(const char* filename) : file_mgr(filename, "rb") { init(); }
+    bmp_reader(const wchar_t* filename) : file_mgr(filename, L"rb") { init(); }
 
    template <typename VIEW>
    void apply( const VIEW& view )
@@ -552,6 +553,7 @@ class bmp_writer : public file_mgr {
 public:
     bmp_writer(FILE* file)           : file_mgr(file)           {}
     bmp_writer(const char* filename) : file_mgr(filename, "wb") {}
+    bmp_writer(const wchar_t* filename) : file_mgr(filename, L"wb") {}
     
     template <typename VIEW>
     void apply(const VIEW& view) {

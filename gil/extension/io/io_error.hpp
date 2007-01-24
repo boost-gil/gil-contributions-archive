@@ -15,6 +15,12 @@
 ///         Adobe Systems Incorporated
 /// \date   2005-2006 \n  Last updated on May 30, 2006
 
+#if defined _WIN32
+	#include <malloc.h>
+#elif defined __GNUC__
+	#include <alloca.h>
+#endif
+
 #include <ios>
 #include <stdarg.h>
 
@@ -51,6 +57,28 @@ namespace detail {
         file_mgr(const char* filename, const char* flags) {
             FILE* fp;
             io_error_if((fp=fopen(filename,flags))==NULL, "file_mgr: failed to open file");
+            _fp=boost::shared_ptr<FILE>(fp,fclose);
+        }
+
+        file_mgr(const wchar_t* filename, const wchar_t* flags) {
+            FILE* fp;
+            #ifdef _WIN32
+               io_error_if((fp=_wfopen(filename,flags))==NULL, "file_mgr: failed to open file");
+            #else
+               // convert filename string
+			      int   len = wcslen(filename);
+			      char* filename_buf = reinterpret_cast<char*>( alloca(len));
+			      wcstombs(filename_buf, filename, len);
+
+               // convert flags string
+               len = wcslen(flags);
+               char* flags_buf = reinterpret_cast<char*>( alloca(len));
+			      wcstombs(flags_buf, flags, len);
+
+               // open file
+               io_error_if((fp=fopen(filename_buf,flags_buf))==NULL, "file_mgr: failed to open file");
+            #endif
+            
             _fp=boost::shared_ptr<FILE>(fp,fclose);
         }
 

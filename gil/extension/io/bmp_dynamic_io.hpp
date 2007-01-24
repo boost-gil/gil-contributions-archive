@@ -92,6 +92,17 @@ namespace detail {
 /// and creates a new image of that type with the dimensions specified by the image file.
 /// Throws std::ios_base::failure if none of the types in Images are compatible with the type on disk.
 template <typename IMG> 
+inline void bmp_read_image(const wchar_t *file, any_image<IMG>& img) {
+	detail::bmp_reader_dynamic m(file);
+	m.read_image(img);
+}
+
+/// \brief reads a BMP image into a run-time instantiated image
+/// \ingroup BMP_IO
+/// Opens the given BMP file name, selects the first type in Images whose color space and channel are compatible to those of the image file
+/// and creates a new image of that type with the dimensions specified by the image file.
+/// Throws std::ios_base::failure if none of the types in Images are compatible with the type on disk.
+template <typename IMG> 
 inline void bmp_read_image(const char *file, any_image<IMG>& img) {
 	detail::bmp_reader_dynamic m(file);
 	m.read_image(img);
@@ -102,6 +113,16 @@ inline void bmp_read_image(const char *file, any_image<IMG>& img) {
 template <typename IMG> 
 inline void bmp_read_image(const std::string& file, any_image<IMG>& img) {
 	bmp_read_image(file.c_str(), img);
+}
+
+/// \brief Saves the currently instantiated view to a bmp file specified by the given bmp image file name.
+/// \ingroup BMP_IO
+/// Throws std::ios_base::failure if the currently instantiated view type is not supported for writing by the I/O extension 
+/// or if it fails to create the file.
+template <typename V> 
+inline void bmp_write_view(const wchar_t *file, const any_image_view<V>& view) {
+	detail::bmp_writer_dynamic m(file);
+	m.write_view(view);
 }
 
 /// \brief Saves the currently instantiated view to a bmp file specified by the given bmp image file name.
