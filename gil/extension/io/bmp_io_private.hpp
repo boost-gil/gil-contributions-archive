@@ -111,46 +111,6 @@ template <> struct bmp_read_write_support_private<bits8, rgba_t> {
 	};
 };
 
-struct indexed_pixel_deref_fn
-{
-   typedef indexed_pixel_deref_fn const_t;
-   typedef rgb8_pixel_t value_type;
-   typedef value_type reference;   // returns by value!
-   typedef value_type const_reference;
-   typedef reference result_type;
-
-   typedef rgb8_pixel_t value_type;
-   static const bool is_mutable = false;
-
-   typedef std::vector< rgb8_pixel_t > colors_t;
-
-   indexed_pixel_deref_fn( const colors_t& table ) : _table( table ) {}
-
-   rgb8_pixel_t operator()( const gray8_pixel_t& index ) const
-   {
-      return _table[index[0]];
-   }
-
-   const colors_t& _table;
-};
-
-
-template <typename DstP, typename CC=default_color_converter >
-class color_converter_unary {
-private:
-   CC _cc;                     // color-converter
-public:
-   color_converter_unary() {}
-   color_converter_unary(CC cc_in) : _cc(cc_in) {}
-
-   template <typename SrcP>
-   DstP operator()(const SrcP& srcP) const {
-       DstP dstP;
-       _cc(srcP,dstP);
-       return dstP;
-   }
-};
-
 /// Assembles and disassembles pixel of given type
 template <typename V, typename C> struct convertor {
 };
