@@ -106,7 +106,7 @@ inline void bmp_read_view(const std::string& filename,const VIEW& view) {
 /// compatible with the ones specified by IMAGE
 template <typename IMAGE>
 inline void bmp_read_image(const wchar_t* filename,IMAGE& im) {
-   BOOST_STATIC_ASSERT(bmp_read_write_support<VIEW>::is_supported);
+   BOOST_STATIC_ASSERT(bmp_read_write_support<IMAGE::view_t>::is_supported);
 
     detail::bmp_reader m(filename);
     m.read_image(im);
@@ -119,7 +119,7 @@ inline void bmp_read_image(const wchar_t* filename,IMAGE& im) {
 /// compatible with the ones specified by IMAGE
 template <typename IMAGE>
 inline void bmp_read_image(const char* filename,IMAGE& im) {
-   BOOST_STATIC_ASSERT(bmp_read_write_support<VIEW>::is_supported);
+   BOOST_STATIC_ASSERT(bmp_read_write_support<IMAGE::view_t>::is_supported);
 
     detail::bmp_reader m(filename);
     m.read_image(im);
