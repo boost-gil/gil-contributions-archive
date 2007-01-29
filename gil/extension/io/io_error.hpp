@@ -24,8 +24,9 @@
 #include <ios>
 #include <stdarg.h>
 
-#include "../../core/gil_config.hpp"
+#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <gil/core/gil_config.hpp>
 
 ADOBE_GIL_NAMESPACE_BEGIN
 
@@ -78,7 +79,7 @@ namespace detail {
                // open file
                io_error_if((fp=fopen(filename_buf,flags_buf))==NULL, "file_mgr: failed to open file");
             #endif
-            
+
             _fp=boost::shared_ptr<FILE>(fp,fclose);
         }
 

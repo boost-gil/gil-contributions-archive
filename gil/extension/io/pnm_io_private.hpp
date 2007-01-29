@@ -14,7 +14,7 @@
 //
 /// \author Svetlozar Fotev, Motorola Inc.
 /// \author Christian Henning
-///         
+///
 /// \date   2005-2007 \n Last updated January 24, 2007
 
 #include <stdio.h>
@@ -31,7 +31,7 @@ namespace detail {
 enum {
 	type_mono_asc	= 1,	///< Monochrome ASCII encoding
 	type_gray_asc	= 2,	///< Gray level ASCII encoding
-	type_color_asc	= 3,	///< sRGB color binary encoding
+	type_color_asc	= 3,	///< sRGB color ASCII encoding
 	type_mono_bin	= 4,	///< Monochrome binary encoding
 	type_gray_bin	= 5,	///< Gray level binary encoding
 	type_color_bin	= 6		///< sRGB color binary encoding
@@ -239,9 +239,9 @@ public:
 				transfer_pnm<VIEW, color_space_t>::convert(bpp, &row.front(), view.row_begin(y), width, maxv);
 			}
 		}
-   
+
    }
-    
+
     template <typename IMAGE>
     void read_image(IMAGE& im) {
         resize_clobber_image(im,get_dimensions());
@@ -253,36 +253,77 @@ public:
     }
 
 protected:
+	/// Read PNM character
+	char read_char(FILE *file) {
+		int ch = getc(file);
+
+		if (ch == EOF) {
+			io_error("Unexpected EOF");
+		}
+		if (ch == '#') {
+			// skip comment to EOL
+			do {
+				ch = getc(file);
+
+				if (ch == EOF) {
+					io_error("Unexpected EOF reading comment");
+				}
+			} while (ch != '\n' && ch != '\r');
+		}
+		return (char) ch;
+	}
+
+	/// Read PNM integer
+	unsigned int read_int(FILE *file) {
+		char ch;
+
+		do {
+			ch = read_char(file);
+		} while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
+
+		if (ch < '0' || '9' < ch) {
+			io_error("Unexpected characters reading decimal digits");
+		}
+		unsigned val = 0;
+
+		do {
+			unsigned dig = ch - '0';
+
+			if (val > INT_MAX / 10 - dig) {
+				io_error("Integer too large");
+			}
+			val = val * 10 + dig;
+
+			ch = read_char(file);
+		} while ('0' <= ch && ch <= '9');
+
+		return val;
+	}
 
 	/// Read PNM information
 	void init() {
-		char line[512];
+		FILE *fp = get();
 
 		// read PNM type information
-		read_line(line);
-		sscanf(line, "P%d", &type);
+		if (read_char(fp) != 'P') {
+			io_error("Invalid PNM signature");
+		}
+		type = read_char(fp) - '0';
 
 		if (type < type_mono_asc || type > type_color_bin) {
 			io_error("Invalid PNM file (supports P1 to P6)");
 		}
 
-		// skip comment lines and get dimensions
-		do {
-			read_line(line);
-		} while (line[0] == '#');
+		// get dimensions
+		width  = read_int(fp);
+		height = read_int(fp);
 
-		sscanf(line, "%d %d", &width, &height);
-
-		// skip comment lines and get pixel range
+		// get pixel range
 		if (type == type_mono_asc || type == type_mono_bin) {
 			maxv = 1;
 		}
 		else {
-			do {
-				read_line(line);
-			} while (line[0] == '#');
-
-			sscanf(line, "%d", &maxv);
+			maxv = read_int(fp);
 
 			if (maxv > 255) {
 				io_error("Unsupported PNM format (supports maximum value 255)");
@@ -317,7 +358,7 @@ public:
     pnm_writer(FILE* file)           : file_mgr(file)           {}
     pnm_writer(const char* filename) : file_mgr(filename, "wb") {}
     pnm_writer(const wchar_t* filename) : file_mgr(filename, L"wb") {}
-    
+
     template <typename VIEW>
     void apply(const VIEW& view) {
 
@@ -342,7 +383,7 @@ public:
 		for (int y = 0; y < height; ++y) {
 			transfer_pnm<VIEW, color_space_t>::convert(bpp, view.row_begin(y), &row.front(), width);
 			write(&row.front(), pitch);
-		}	  
+		}
 	}
 };
 
