@@ -480,33 +480,27 @@ void test_image_io() {
    }
 
    {
-      /* not supported, yet
       // a PBMB file
       rgb8_image_t image;
       pnm_read_image( in_dir+"p4.pnm", image );
 
       pnm_write_view( out_dir+"p4.pnm", view( image ));
-      */
    }
 
 
    {
-      /* not supported, yet
       // a PGMB file
       rgb8_image_t image;
       pnm_read_image( in_dir+"p5.pnm", image );
 
       pnm_write_view( out_dir+"p5.pnm", view( image ));
-      */
    }
 
    {
-      /* not supported, yet
       // a PBMA file
       rgb8_image_t image;
       pnm_read_image( in_dir+"p6.pnm", image );
 
       pnm_write_view( out_dir+"p6.pnm", view( image ));
-      */
    }
 }
