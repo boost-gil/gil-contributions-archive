@@ -1,11 +1,15 @@
 #pragma once
 
-#include <boost/shared_ptr.hpp>
+#include <vector>
+
+#include <boost/scoped_array.hpp>
 
 using namespace gil;
 
 
 typedef point2<ptrdiff_t> point_t;
+typedef std::vector< point_t > curve_t;
+typedef std::vector< curve_t > curve_vec_t;
 
 inline
 CvPoint make_cvPoint( point_t point )
@@ -154,14 +158,40 @@ void drawPolyLine( VIEW&                  view
 {
    create_cv_image<VIEW> cv_img( view );
 
-/*
-   cvPolyLine( img
-             , curveArr  // C array of CvPoints that hold all points of all curves.
-             , nCurvePts // int array that contains number of points of each curve.
-             , curves.size()
+   const std::size_t num_curves = curves.size();
+
+   boost::scoped_array<std::size_t> num_points_per_curve( new std::size_t[num_curves] );
+
+   std::size_t total_num_points = 0;
+   for( std::size_t i = 0; i < num_curves; ++i )
+   {
+      std::size_t num_points = curves[i].size();
+
+      num_points_per_curve[i] = num_points;
+      total_num_points += num_points;
+   }
+
+/* doesnn't work like this. needs to be a CvPoint**
+   boost::scoped_array<CvPoint> all_points( new CvPoint[ total_num_points ] );
+   for( std::size_t j = 0; j < num_curves; ++j )
+   {
+      const std::vector<point_t>& points_vec = curves[j];
+
+      for( std::size_t i = 0; i < total_num_points; ++i )
+      {
+         all_points[i] = make_cvPoint( points_vec[i] );
+      }
+   }
+
+
+
+   cvPolyLine( cv_img.get()
+             , all_points.get()  // needs to be pointer to C array of CvPoints.
+             , num_points_per_curve.get() // int array that contains number of points of each curve.
+             , num_curves
              , is_closed
              , make_cvScalar( color )
-             , lineWidth              );
+             , line_width             );
 
 */
 }
