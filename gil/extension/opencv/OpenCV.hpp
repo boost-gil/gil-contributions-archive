@@ -24,9 +24,9 @@ inline
 CvScalar make_cvScalar( const PIXEL& pixel )
 {
    CvScalar s;
-   for( int c=0; c<PIXEL::num_channels; ++c )
+   for( int i = 0; i < PIXEL::num_channels; ++i )
    {
-      s.val[c] = pixel[c];
+      s.val[i] = pixel[i];
    }
 
    return s;
@@ -74,13 +74,10 @@ unsigned int get_depth( const VIEW& view )
    }
 }
 
-
-
 template< class VIEW >
 class create_cv_image
 {
    IplImage* _img;
-
 
 public:
 
@@ -146,4 +143,25 @@ void drawLine( VIEW&                  view
          , make_cvPoint( end )
          , make_cvScalar( color )
          , line_width             );
+}
+
+template<class VIEW>
+void drawPolyLine( VIEW&                  view
+                 , const curve_vec_t&     curves
+                 , bool                   is_closed
+                 , typename VIEW::pixel_t color
+                 , std::size_t            line_width )
+{
+   create_cv_image<VIEW> cv_img( view );
+
+/*
+   cvPolyLine( img
+             , curveArr  // C array of CvPoints that hold all points of all curves.
+             , nCurvePts // int array that contains number of points of each curve.
+             , curves.size()
+             , is_closed
+             , make_cvScalar( color )
+             , lineWidth              );
+
+*/
 }
