@@ -20,45 +20,60 @@ CvSize make_cvSize( point_t point )
 }
 
 template< class PIXEL >
-struct pixel_converter
-{};
-
-template<> struct pixel_converter< gray8_pixel_t >
+inline
+CvScalar make_cvScalar( const PIXEL& pixel )
 {
-   typedef gray8_pixel_t pixel_t;
-
-   static const unsigned int depth = IPL_DEPTH_8U;
-   
-   static CvScalar make_cvScalar( pixel_t pixel )
+   CvScalar s;
+   for( int c=0; c<PIXEL::num_channels; ++c )
    {
-      return cvScalar( pixel.gray );
+      s.val[c] = pixel[c];
    }
-};
+
+   return s;
+}
 
 
-template<> struct pixel_converter< rgb8_pixel_t >
+// function that provides gil to IPL_DEPTH_<bit_depth>(S|U|F) mapping
+template< class VIEW >
+inline
+unsigned int get_depth( const VIEW& view )
 {
-   typedef rgb8_pixel_t pixel_t;
+   typedef VIEW::channel_t channel_t;
 
-   static const unsigned int depth = IPL_DEPTH_8U;
-   
-   static CvScalar make_cvScalar( pixel_t pixel )
+   switch( sizeof( channel_t ))
    {
-      return cvScalar( pixel.red, pixel.green, pixel.blue );
-   }
-};
+      case 1:
+      {
+         // either IPL_DEPTH_8U or IPL_DEPTH_8S
+         return IPL_DEPTH_8U;
+      }
 
-template<> struct pixel_converter< bgr8_pixel_t >
-{
-   typedef bgr8_pixel_t pixel_t;
+      case 2:
+      {
+         // either IPL_DEPTH_16U or IPL_DEPTH_16S
+         return IPL_DEPTH_16U;
+      }
 
-   static const unsigned int depth = IPL_DEPTH_8U;
-   
-   static CvScalar make_cvScalar( pixel_t pixel )
-   {
-      return cvScalar( pixel.red, pixel.green, pixel.blue );
+      case 3:
+      {
+         // either IPL_DEPTH_32S or IPL_DEPTH_32F
+         return IPL_DEPTH_32S;
+      }
+
+      case 4:
+      {
+         // only IPL_DEPTH_64F
+         return IPL_DEPTH_64F;
+      }
+
+      default:
+      {
+         assert( false );
+         return 0;
+      }
    }
-};
+}
+
 
 
 template< class VIEW >
@@ -66,15 +81,16 @@ class create_cv_image
 {
    IplImage* _img;
 
-   typedef typename VIEW::pixel_t pixel_t;
 
 public:
 
    create_cv_image( VIEW view )
    {
+      const unsigned int num_channels = VIEW::num_channels;
+
       _img = cvCreateImage( make_cvSize( view.dimensions() )
-                          , pixel_converter<pixel_t>::depth
-                          , pixel_t::num_channels            );
+                          , get_depth( view )
+                          , num_channels                       );
       
       _img->imageData = (char*) ( &view.begin()[0] );
    }
@@ -91,14 +107,12 @@ void drawRectangle( VIEW&                  view
                   , typename VIEW::pixel_t pixel
                   , std::size_t            line_width )
 {
-   typedef VIEW::pixel_t pixel_t;
-
    create_cv_image<VIEW> cv_img( view );
 
    cvRectangle( cv_img.get()
               , make_cvPoint( start )
               , make_cvPoint( end   )
-              , pixel_converter<pixel_t>::make_cvScalar( pixel )
+              , make_cvScalar( pixel )
               , line_width             );
 }
 
@@ -109,15 +123,13 @@ void drawCircle( VIEW&                  view
                , typename VIEW::pixel_t color
                , std::size_t            line_width )
 {
-   typedef VIEW::pixel_t pixel_t;
-
    create_cv_image<VIEW> cv_img( view );
 
    cvCircle( cv_img.get()
            , make_cvPoint( center )
            , radius
-           , pixel_converter<pixel_t>::make_cvScalar( color )
-           , line_width           );
+           , make_cvScalar( color )
+           , line_width             );
 }
 
 template<class VIEW>
@@ -127,13 +139,11 @@ void drawLine( VIEW&                  view
              , typename VIEW::pixel_t color
              , std::size_t            line_width )
 {
-   typedef VIEW::pixel_t pixel_t;
-
    create_cv_image<VIEW> cv_img( view );
 
    cvLine( cv_img.get()
          , make_cvPoint( start )
          , make_cvPoint( end )
-         , pixel_converter<pixel_t>::make_cvScalar( color )
-         , 1                                                );
+         , make_cvScalar( color )
+         , line_width             );
 }
