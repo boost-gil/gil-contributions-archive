@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <boost/scoped_array.hpp>
+#include <boost/shared_array.hpp>
 
 using namespace gil;
 
@@ -11,10 +12,27 @@ typedef point2<ptrdiff_t> point_t;
 typedef std::vector< point_t > curve_t;
 typedef std::vector< curve_t > curve_vec_t;
 
+typedef boost::shared_array<CvPoint> cvpoint_array_t;
+
 inline
 CvPoint make_cvPoint( point_t point )
 {
    return cvPoint( point.x, point.y );
+}
+
+inline
+cvpoint_array_t make_cvPoint_array( const curve_t& curve )
+{
+   std::size_t curve_size = curve.size();
+
+   cvpoint_array_t cvpoint_array( new CvPoint[ curve.size() ] );
+
+   for( std::size_t i = 0; i < curve_size ; ++i )
+   {
+      cvpoint_array[i] = make_cvPoint( curve[i] );
+   }
+
+   return cvpoint_array;
 }
 
 inline
@@ -160,38 +178,26 @@ void drawPolyLine( VIEW&                  view
 
    const std::size_t num_curves = curves.size();
 
-   boost::scoped_array<std::size_t> num_points_per_curve( new std::size_t[num_curves] );
+   boost::scoped_array<int> num_points_per_curve( new int[num_curves] );
 
-   std::size_t total_num_points = 0;
+   std::vector< cvpoint_array_t > arrays( num_curves );
+   CvPoint** points = new CvPoint*[ num_curves ];
+
    for( std::size_t i = 0; i < num_curves; ++i )
    {
       std::size_t num_points = curves[i].size();
-
       num_points_per_curve[i] = num_points;
-      total_num_points += num_points;
+
+      arrays[i] = make_cvPoint_array( curves[i] );
+      points[i] = arrays[i].get();
    }
-
-/* doesnn't work like this. needs to be a CvPoint**
-   boost::scoped_array<CvPoint> all_points( new CvPoint[ total_num_points ] );
-   for( std::size_t j = 0; j < num_curves; ++j )
-   {
-      const std::vector<point_t>& points_vec = curves[j];
-
-      for( std::size_t i = 0; i < total_num_points; ++i )
-      {
-         all_points[i] = make_cvPoint( points_vec[i] );
-      }
-   }
-
-
 
    cvPolyLine( cv_img.get()
-             , all_points.get()  // needs to be pointer to C array of CvPoints.
+             , points  // needs to be pointer to C array of CvPoints.
              , num_points_per_curve.get() // int array that contains number of points of each curve.
              , num_curves
              , is_closed
              , make_cvScalar( color )
              , line_width             );
 
-*/
 }
