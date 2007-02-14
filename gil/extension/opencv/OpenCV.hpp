@@ -2,17 +2,20 @@
 
 #include <vector>
 
-#include <boost/scoped_array.hpp>
 #include <boost/shared_array.hpp>
 
-using namespace gil;
+#include <boost/mpl/map.hpp>
+#include <boost/mpl/at.hpp>
 
+
+using namespace gil;
 
 typedef point2<ptrdiff_t> point_t;
 typedef std::vector< point_t > curve_t;
 typedef std::vector< curve_t > curve_vec_t;
 
 typedef boost::shared_array<CvPoint> cvpoint_array_t;
+typedef std::vector< cvpoint_array_t > cvpoint_array_vec_t;
 
 inline
 CvPoint make_cvPoint( point_t point )
@@ -54,63 +57,47 @@ CvScalar make_cvScalar( const PIXEL& pixel )
    return s;
 }
 
+// taken from Hirotaka's stllcv code
+typedef boost::mpl::map<
+	 boost::mpl::pair<gil::bits8	,  boost::mpl::int_<IPL_DEPTH_8U> >
+,	 boost::mpl::pair<gil::bits16	,  boost::mpl::int_<IPL_DEPTH_16U> >
+,	 boost::mpl::pair<gil::bits32f	,  boost::mpl::int_<IPL_DEPTH_32F> >
+,	 boost::mpl::pair<gil::bits64f	,  boost::mpl::int_<IPL_DEPTH_64F> >
+,	 boost::mpl::pair<gil::bits8s	,  boost::mpl::int_<IPL_DEPTH_8S> >
+,	 boost::mpl::pair<gil::bits16s	,  boost::mpl::int_<IPL_DEPTH_16S> >
+,	 boost::mpl::pair<gil::bits32s	,  boost::mpl::int_<IPL_DEPTH_32S> >
+    > ipl_depth_map_from_channel_t_map;
 
-// function that provides gil to IPL_DEPTH_<bit_depth>(S|U|F) mapping
-template< class VIEW >
-inline
-unsigned int get_depth( const VIEW& view )
-{
-   typedef VIEW::channel_t channel_t;
 
-   switch( sizeof( channel_t ))
-   {
-      case 1:
-      {
-         // either IPL_DEPTH_8U or IPL_DEPTH_8S
-         return IPL_DEPTH_8U;
-      }
-
-      case 2:
-      {
-         // either IPL_DEPTH_16U or IPL_DEPTH_16S
-         return IPL_DEPTH_16U;
-      }
-
-      case 3:
-      {
-         // either IPL_DEPTH_32S or IPL_DEPTH_32F
-         return IPL_DEPTH_32S;
-      }
-
-      case 4:
-      {
-         // only IPL_DEPTH_64F
-         return IPL_DEPTH_64F;
-      }
-
-      default:
-      {
-         assert( false );
-         return 0;
-      }
-   }
-}
+typedef boost::mpl::map<
+	 boost::mpl::pair<gil::gray_t	,  boost::mpl::int_<1> >
+,	 boost::mpl::pair<gil::bgr_t	,  boost::mpl::int_<3> >
+,	 boost::mpl::pair<gil::bgra_t	,  boost::mpl::int_<4> >
+,	 boost::mpl::pair<gil::rgb_t	,  boost::mpl::int_<3> >
+,	 boost::mpl::pair<gil::rgba_t	,  boost::mpl::int_<4> >
+    > ipl_nchannels_from_gil_color_space_map;
 
 template< class VIEW >
 class create_cv_image
 {
    IplImage* _img;
 
+   typedef typename VIEW::channel_t channel_t;
+   typedef typename VIEW::color_space_t color_space_t;
+
 public:
 
    create_cv_image( VIEW view )
    {
-      const unsigned int num_channels = VIEW::num_channels;
-
       _img = cvCreateImage( make_cvSize( view.dimensions() )
-                          , get_depth( view )
-                          , num_channels                       );
-      
+			                 , boost::mpl::at< ipl_depth_map_from_channel_t_map		, channel_t>::type::value
+			                 , boost::mpl::at< ipl_nchannels_from_gil_color_space_map	, color_space_t>::type::value );
+
+      if( !_img )
+      {
+         throw std::runtime_error( "Cannot create IPL image." );
+      }
+
       _img->imageData = (char*) ( &view.begin()[0] );
    }
 
@@ -180,24 +167,89 @@ void drawPolyLine( VIEW&                  view
 
    boost::scoped_array<int> num_points_per_curve( new int[num_curves] );
 
-   std::vector< cvpoint_array_t > arrays( num_curves );
-   CvPoint** points = new CvPoint*[ num_curves ];
+   std::size_t total_num_points = 0;
+   for( std::size_t i = 0; i < num_curves; ++i )
+   {
+      num_points_per_curve[i] = curves[i].size();
+   }
+
+   // The curve array vector will deallocate all memory by itself.
+   cvpoint_array_vec_t pp( num_curves );
+
+   CvPoint** curve_array = new CvPoint*[num_curves];
 
    for( std::size_t i = 0; i < num_curves; ++i )
    {
-      std::size_t num_points = curves[i].size();
-      num_points_per_curve[i] = num_points;
+      pp[i] = make_cvPoint_array( curves[i] );
 
-      arrays[i] = make_cvPoint_array( curves[i] );
-      points[i] = arrays[i].get();
+      curve_array[i] = pp[i].get();
    }
-
+   
    cvPolyLine( cv_img.get()
-             , points  // needs to be pointer to C array of CvPoints.
-             , num_points_per_curve.get() // int array that contains number of points of each curve.
-             , num_curves
+             , curve_array  // needs to be pointer to C array of CvPoints.
+             , num_points_per_curve.get()// int array that contains number of points of each curve.
+             , curves.size()
              , is_closed
              , make_cvScalar( color )
              , line_width             );
 
+}
+
+
+template<class VIEW>
+void drawFillPoly( VIEW&                  view
+                 , const curve_vec_t&     curves
+                 , typename VIEW::pixel_t color   )
+{
+   create_cv_image<VIEW> cv_img( view );
+
+   const std::size_t num_curves = curves.size();
+
+   boost::scoped_array<int> num_points_per_curve( new int[num_curves] );
+
+   std::size_t total_num_points = 0;
+   for( std::size_t i = 0; i < num_curves; ++i )
+   {
+      num_points_per_curve[i] = curves[i].size();
+   }
+
+   // The curve array vector will deallocate all memory by itself.
+   cvpoint_array_vec_t pp( num_curves );
+
+   CvPoint** curve_array = new CvPoint*[num_curves];
+
+   for( std::size_t i = 0; i < num_curves; ++i )
+   {
+      pp[i] = make_cvPoint_array( curves[i] );
+
+      curve_array[i] = pp[i].get();
+   }
+   
+   cvFillPoly( cv_img.get()
+             , curve_array                // needs to be pointer to C array of CvPoints.
+             , num_points_per_curve.get() // int array that contains number of points of each curve.
+             , curves.size()
+             , make_cvScalar( color ));
+}
+
+struct cv_font
+{
+   double hScale;
+   double vScale;
+
+   // e.g. CV_FONT_HERSHEY_SIMPLEX | CV_FONT_ITALIC
+   int font_description;
+
+   std::size_t line_width;
+};
+
+template<class VIEW>
+void putText( VIEW&                  view
+            , const cv_font&         font
+            , const std::string&     text
+            , const poin_t&          start_point
+            , typename VIEW::pixel_t color       )
+{
+
+   CvFont font = make_cv_font( cvFont )
 }
