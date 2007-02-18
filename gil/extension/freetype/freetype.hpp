@@ -1,10 +1,11 @@
 #ifndef _GIL_FREETYPE_HPP_
 #define _GIL_FREETYPE_HPP_
 
-#include <gil/extension/io/png_dynamic_io.hpp>
-#include <iostream>
+#include <vector>
+#include <string>
 #include <boost/shared_ptr.hpp>
-#include <boost/lambda/lambda.hpp>
+#include <boost/function.hpp>
+#include <gil/core/gil_all.hpp>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -132,8 +133,6 @@ struct render_glyph_bitmap
 
 	void operator()(boost::shared_ptr<glyph_position> glyph_position_ptr)
 	{
-		using namespace boost::lambda;
-
 		boost::function_requires<gil::PixelsCompatibleConcept<typename View::pixel_t,Pixel> >();
 		boost::function_requires<gil::ImageViewConcept<View> >();
 
@@ -164,5 +163,92 @@ struct render_glyph_bitmap
 			}
 	}
 };
+
+template <typename View, typename Pixel>
+inline void draw_string(
+	char* str,
+	const View& view,
+	Pixel pixel = gil::rgba8_pixel_t(0,0,0,255),
+	FT_Face face,
+	int align = Center|Middle, 
+	int xBorder=0, 
+	int yBorder=0)
+{
+	std::vector<boost::shared_ptr<glyph_position> > glyphs;
+	std::transform(str,str+strlen(str),
+		std::back_inserter(glyphs),
+		get_glyph_positions(face));
+
+	FT_BBox bbox; 
+	std::for_each(glyphs.begin(), glyphs.end(),
+		get_glyph_bbox(bbox));
+
+	int width = bbox.xMax-bbox.xMin;
+	int height = bbox.yMax-bbox.yMin;
+
+	//TODO: not working
+	if (width > view.width())
+	{
+		std::vector<boost::shared_ptr<glyph_position> > dotglyphs;
+		char dots[4];
+		strcpy(dots,"...");
+		std::transform(dots,dots+strlen(dots),
+			std::back_inserter(dotglyphs),
+			get_glyph_positions(face));
+
+		FT_BBox dbbox; 
+		std::for_each(dotglyphs.begin(), dotglyphs.end(),
+			get_glyph_bbox(dbbox));
+	
+		int dwidth = bbox.xMax-bbox.xMin;
+		int dheight = bbox.yMax-bbox.yMin;
+
+		char tmp[1000];
+		int n = strlen(str);
+		for (; n >= 0; n--)
+		{
+			strncpy(tmp,str,n);
+			tmp[n+1]='\0';
+
+			std::for_each(glyphs.begin(), glyphs.begin()+n,
+				get_glyph_bbox(bbox));
+
+			int awidth = bbox.xMax-bbox.xMin;
+			if (awidth + dwidth > view.width())
+				continue;
+
+			strcpy(str,tmp);
+			strcat(str,"...");
+
+			glyphs.clear();
+			std::transform(str,str+strlen(str),
+				std::back_inserter(glyphs),
+				get_glyph_positions(face));
+
+			std::for_each(glyphs.begin(), glyphs.end(),
+				get_glyph_bbox(bbox));
+			width = bbox.xMax-bbox.xMin;
+			break;
+		}
+	}	
+
+	int x = xBorder;
+	if (align & Center)
+		x = (view.width()-width)/2;
+	else if (align & Right)
+		x = view.width()-width-xBorder;
+
+	int y = yBorder;
+	if (align & Middle)
+		y = (view.height()-height)/2;
+	else if (align & Bottom)
+		y = view.height()-height-yBorder;
+
+	typedef typename View::pixel_t pixel_t;
+
+	std::for_each(glyphs.begin(), glyphs.end(), 
+		render_glyph_bitmap<View,pixel_t>(
+			gil::subimage_view(view,x,y,width,height),pixel));
+}
 
 #endif
