@@ -7,7 +7,8 @@
 
 #include <gil/extension/io/bmp_io.hpp>
 
-#include "drawing.hpp"
+#include "opencv/drawing.hpp"
+#include "opencv/resize.hpp"
 
 using namespace gil;
 using namespace opencv;
@@ -155,13 +156,16 @@ int _tmain(int argc, _TCHAR* argv[])
    }
 
    {
-/*
-      rgb8_image_t img( 640, 480 );
-      fill_pixels( view(img), rgb8_pixel_t( 0, 0, 0 ));
+      rgb8_image_t in;
+      bmp_read_image( ".\\domrep.bmp", in );
+      ipl_image_wrapper ipl_in = create_ipl_image( view( in ) );
 
-      ipl_image_wrapper ipl_img = create_ipl_image( view( img ) );
-      bmp_write_view( ".\\polyline_test_2.bmp", view( img ) );
-*/
+      rgb8_image_t target( 320, 240 );
+      ipl_image_wrapper ipl_target = create_ipl_image( view( target ) );
+
+      opencv::resize( ipl_in, ipl_target, nearest_neigbor() );
+
+      bmp_write_view( ".\\domrep_resized.bmp",  view( target ));
    }
 
 }

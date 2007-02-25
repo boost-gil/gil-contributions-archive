@@ -36,6 +36,8 @@ public:
    ~ipl_image_wrapper() { if( _img ) cvReleaseImage( &_img); }
 
    IplImage* get() { return _img; }
+
+   const IplImage* get() const { return _img; }
    
 private:
 
