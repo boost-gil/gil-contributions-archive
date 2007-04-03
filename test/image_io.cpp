@@ -1,29 +1,71 @@
 // image_test.cpp : Defines the entry point for the console application.
 //
 
-#include <gil/core/image_view.hpp>
-#include <gil/core/planar_ref.hpp>
-#include <gil/extension/dynamic_image/dynamic_image_all.hpp>
-#include <gil/core/color_convert.hpp>
-#include <gil/core/typedefs.hpp>
-#include <gil/core/image_view_factory.hpp>
-#include <gil/extension/io/tiff_dynamic_io.hpp>
-#include <gil/extension/io/jpeg_dynamic_io.hpp>
-#include <gil/extension/io/png_dynamic_io.hpp>
-#include <gil/extension/io/bmp_dynamic_io.hpp>
-#include <gil/extension/io/pnm_dynamic_io.hpp>
-#include "any_image_impl.hpp"
+#include <boost/gil/gil_all.hpp>
+#include <boost/gil/image_view.hpp>
+#include <boost/gil/planar_pixel_reference.hpp>
+#include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
+#include <boost/gil/color_convert.hpp>
+#include <boost/gil/typedefs.hpp>
+#include <boost/gil/image_view_factory.hpp>
+#include <boost/filesystem.hpp>
 
-using namespace GIL;
+#define GIL_NO_BMP  //(un)comment this line to allow/disallow the BMP support 
+#define GIL_NO_TIFF  //(un)comment this line to allow/disallow the BMP support 
+#define GIL_NO_JPEG  //(un)comment this line to allow/disallow the BMP support 
+#define GIL_NO_PNG  //(un)comment this line to allow/disallow the BMP support 
+
+
+#ifndef GIL_NO_TIFF
+#include <boost/gil/extension/io/tiff_dynamic_io.hpp>
+#endif
+
+#ifndef GIL_NO_JPEG
+#include <boost/gil/extension/io/jpeg_dynamic_io.hpp>
+#endif
+
+#ifndef GIL_NO_PNG
+#include <boost/gil/extension/io/png_dynamic_io.hpp>
+#endif 
+
+#ifndef GIL_NO_BMP
+#include <boost/gil/extension/io/bmp_dynamic_io.hpp>
+#endif
+
+#ifndef GIL_NO_PNM
+#include <boost/gil/extension/io/pnm_dynamic_io.hpp>
+#endif
+
+
+
+using namespace boost::gil;
 using namespace std;
+
+//this was formerly in any_image_impl -JCF
+typedef any_image<
+    boost::mpl::vector< 
+       rgb8_image_t,
+       argb8_image_t,
+       gray8_image_t
+    >
+> any_image_t;
+   
+
 
 void test_image_io() {
     const string in_dir="";  // directory of source images
     const std::string out_dir=in_dir+"image_io-out/";
 
+
+    namespace fs = boost::filesystem;
+    if (! fs::exists(fs::path(out_dir)))
+        fs::create_directory(fs::path(out_dir));
+
+
 // *********************************** 
 // ************************ GRAY IMAGE
 // *********************************** 
+#ifndef GIL_NO_TIFF
     gray8_image_t imgGray;
 // TIFF
     // load gray tiff into gray image
@@ -36,7 +78,9 @@ void test_image_io() {
 
     // save gray image to tiff (again!)
     tiff_write_view(out_dir+"grayFromRGB.tif",view(imgGray));
+#endif
 
+#ifndef GIL_NO_JPEG
 // JPEG
     // load gray jpeg into gray image
     jpeg_read_image(in_dir+"gray.jpg",imgGray);
@@ -47,7 +91,9 @@ void test_image_io() {
     jpeg_read_and_convert_image(in_dir+"RGB.jpg",imgGray);
     // save gray image to RGB jpeg
     jpeg_write_view(out_dir+"grayFromRGB.jpg",color_converted_view<rgb8_pixel_t>(view(imgGray)));
+#endif
 
+#ifndef GIL_NO_PNG
 // PNG
     // load gray png into gray image
     png_read_image(in_dir+"gray.png",imgGray);
@@ -58,6 +104,7 @@ void test_image_io() {
     png_read_and_convert_image(in_dir+"RGB.png",imgGray);
     // save gray image to RGB png
     png_write_view(out_dir+"grayFromRGB.png",color_converted_view<rgb8_pixel_t>(view(imgGray)));
+#endif 
 
 // *********************************** 
 // ************************* RGB Planar
@@ -65,6 +112,7 @@ void test_image_io() {
 
     rgb8_image_t imgRGB;
 
+#ifndef GIL_NO_TIFF
 // TIFF
 
     // load gray tiff into RGB image
@@ -76,7 +124,9 @@ void test_image_io() {
     tiff_read_image(in_dir+"RGB.tif",imgRGB);
     // save RGB image to tiff (again!)
     tiff_write_view(out_dir+"RGBFromRGB.tif",view(imgRGB));
+#endif 
 
+#ifndef GIL_NO_JPEG
 // JPEG
     // load gray jpeg into RGB image
     jpeg_read_and_convert_image(in_dir+"gray.jpg",imgRGB);
@@ -87,7 +137,9 @@ void test_image_io() {
     jpeg_read_image(in_dir+"RGB.jpg",imgRGB);
     // save RGB image to RGB jpeg
     jpeg_write_view(out_dir+"RGBFromRGB.jpg",view(imgRGB));
+#endif
 
+#ifndef GIL_NO_PNG
 // PNG
     // load gray png into RGB image
     png_read_and_convert_image(in_dir+"gray.png",imgRGB);
@@ -98,11 +150,14 @@ void test_image_io() {
     png_read_image(in_dir+"RGB.png",imgRGB);
     // save RGB image to RGB png
     png_write_view(out_dir+"RGBFromRGB.png",view(imgRGB));
+#endif
 
 // *********************************** 
 // ************************ GRAY32 Planar
 // *********************************** 
     gray32f_image_t imgGray32;
+
+#ifndef GIL_NO_TIFF
 // TIFF
     // load gray tiff into gray image
     tiff_read_and_convert_image(in_dir+"gray.tif",imgGray32);
@@ -114,7 +169,9 @@ void test_image_io() {
 
     // save gray image to tiff (again!)
     tiff_write_view(out_dir+"gray32FromRGB.tif",view(imgGray32));
+#endif
 
+#ifndef GIL_NO_JPEG
 // JPEG
     tiff_read_and_convert_image(in_dir+"gray.tif",imgGray32);    // again TIF (jpeg load not supported)
     // save RGB image to gray jpeg
@@ -124,12 +181,14 @@ void test_image_io() {
     tiff_read_and_convert_image(in_dir+"RGB.tif",imgGray32);    // again TIF (jpeg load not supported)
     // save RGB image to RGB jpeg
     tiff_write_view(out_dir+"gray32FromRGB.jpg",color_converted_view<rgb32f_pixel_t>(view(imgGray32)));
+#endif
 
 // *********************************** 
 // ************************ NATIVE Planar
 // *********************************** 
     any_image_t anyImg;
 
+#ifndef GIL_NO_TIFF
 // TIFF
     // load RGB tiff into any image
     tiff_read_image(in_dir+"RGB.tif",anyImg);
@@ -142,7 +201,9 @@ void test_image_io() {
     
     // save any image to tiff
     tiff_write_view(out_dir+"grayNative.tif",view(anyImg));
+#endif
 
+#ifndef GIL_NO_JPEG
 // JPEG
     // load gray jpeg into any image
     jpeg_read_image(in_dir+"gray.jpg",anyImg);
@@ -153,7 +214,9 @@ void test_image_io() {
     jpeg_read_image(in_dir+"RGB.jpg",anyImg);
     // save any image to jpeg
     jpeg_write_view(out_dir+"RGBNative.jpg",view(anyImg));
+#endif
 
+#ifndef GIL_NO_PNG
 // PNG
     // load gray png into any image
     png_read_image(in_dir+"gray.png",anyImg);
@@ -164,12 +227,12 @@ void test_image_io() {
     png_read_image(in_dir+"RGB.png",anyImg);
     // save any image to png
     png_write_view(out_dir+"RGBNative.png",view(anyImg));
-
+#endif
 
 // *********************************** 
 // ************************ BMP Test
 // *********************************** 
-
+#ifndef GIL_NO_BMP
 ///////////////////
 // 1-bit images
 ///////////////////
@@ -450,11 +513,13 @@ void test_image_io() {
 
       bmp_write_view( out_dir+"g32bf.bmp", view( image ));
    }
-
+#endif //GIL_NO_BMP
 
 // *********************************** 
 // ************************ PNM Test
 // *********************************** 
+
+#ifndef GIL_NO_PNM
    {
       // a PBMA file
       gray8_image_t image;
@@ -503,4 +568,5 @@ void test_image_io() {
 
       pnm_write_view( out_dir+"p6.pnm", view( image ));
    }
+#endif //GIL_NO_PNM
 }
