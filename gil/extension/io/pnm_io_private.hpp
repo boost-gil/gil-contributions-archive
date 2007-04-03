@@ -21,10 +21,10 @@
 #include <boost/static_assert.hpp>
 #include <boost/scoped_array.hpp>
 #include <vector>
-#include "../../core/gil_all.hpp"
-#include "io_error.hpp"
+#include <boost/gil/gil_all.hpp>
+#include "io_helper.hpp"
 
-ADOBE_GIL_NAMESPACE_BEGIN
+namespace boost{ namespace gil{
 
 namespace detail {
 
@@ -74,10 +74,10 @@ template <> struct pnm_read_write_support_private<bits8, rgba_t> {
 /// Determines whether the given view type is supported for reading
 template <typename V> struct pnm_read_support {
 	enum {
-		is_supported	= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::supported,
-		num_channels	= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::channels,
-		bit_depth		= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::channel,
-		bit_pixel		= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::pixel,
+		is_supported	= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::supported,
+		num_channels	= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::channels,
+		bit_depth		= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::channel,
+		bit_pixel		= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::pixel,
 		value			= is_supported
 	};
 };
@@ -85,10 +85,10 @@ template <typename V> struct pnm_read_support {
 /// Determines whether the given view type is supported for writing
 template <typename V> struct pnm_write_support {
 	enum {
-		is_supported	= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::supported,
-		num_channels	= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::channels,
-		bit_depth		= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::channel,
-		bit_pixel		= pnm_read_write_support_private<typename V::channel_t, typename V::color_space_t::base>::pixel,
+		is_supported	= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::supported,
+		num_channels	= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::channels,
+		bit_depth		= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::channel,
+		bit_pixel		= pnm_read_write_support_private<typename channel_type<V>::type, typename color_space_type<V>::type>::pixel,
 		value			= is_supported
 	};
 };
@@ -97,8 +97,8 @@ template <typename V> struct pnm_write_support {
 /// Transfers and converts row of pixels
 template <typename V, typename C> struct transfer_pnm {
 	typedef typename V::x_iterator iterator_t;
-	typedef typename V::pixel_t    pixel_t;
-	typedef typename V::channel_t  channel_t;
+    typedef typename V::value_type    pixel_t;
+	typedef typename channel_type<V>::type  channel_t;
 
 	/// From PNM to GIL
 	static void convert(int bpp, const byte_t *src, iterator_t dest, int cnt, int maxv) throw() {
@@ -116,7 +116,7 @@ template <typename V, typename C> struct transfer_pnm {
 				}
 				byte_t y = (pak >> --bit) & 0x01;
 
-				*dest = convertor<V, C>::make(y * maxp / maxv);
+				color_convert(gray8_pixel_t(y * maxp / maxv), *dest);
 			}
 			break;
 
@@ -124,12 +124,12 @@ template <typename V, typename C> struct transfer_pnm {
 			// 8 mono negative, 8 gray
 			if (maxv == 1) {
 				for (; cnt > 0; --cnt, ++src, ++dest) {
-					*dest = convertor<V, C>::make((1 - *src) * maxp);
+                        color_convert(gray8_pixel_t((1 - *src) * maxp), *dest);
 				}
 			}
 			else {
 				for (; cnt > 0; --cnt, ++src, ++dest) {
-					*dest = convertor<V, C>::make(*src * maxp / maxv);
+					color_convert(gray8_pixel_t(*src * maxp / maxv), *dest);
 				}
 			}
 			break;
@@ -141,7 +141,7 @@ template <typename V, typename C> struct transfer_pnm {
 				byte_t g = *src++ * maxp / maxv;
 				byte_t b = *src++ * maxp / maxv;
 
-				*dest = convertor<V, C>::make(r, g, b);
+                color_convert(rgb8_pixel_t(r,g,b), *dest);
 			}
 			break;
 		}
@@ -149,15 +149,14 @@ template <typename V, typename C> struct transfer_pnm {
 
 	/// From GIL to PNM
 	static void convert(int bpp, iterator_t src, byte_t *dest, int cnt) throw() {
-		channel_t r, g, b, a;
-
 		switch (bpp)
 		{
 		case 8:
 			// 8 gray
 			for (; cnt > 0; --cnt, ++src, ++dest) {
-				convertor<V, C>::split(*src, r, g, b, a);
-				*dest = g;
+                gray8_pixel_t g;
+                color_convert(*src, g);
+                *dest = g;
 			}
 			break;
 
@@ -165,11 +164,11 @@ template <typename V, typename C> struct transfer_pnm {
 		case 32:
 			// 8-8-8 RGB, 8-8-8-8 RGB*
 			for (; cnt > 0; --cnt, ++src) {
-				convertor<V, C>::split(*src, r, g, b, a);
-
-				*dest++ = r;
-				*dest++ = g;
-				*dest++ = b;
+                rgb8_pixel_t p;
+                color_convert(*src, p);
+				*dest++ = get_color(p, red_t());
+				*dest++ = get_color(p, green_t());
+				*dest++ = get_color(p, blue_t());
 			}
 			break;
 		}
@@ -178,18 +177,18 @@ template <typename V, typename C> struct transfer_pnm {
 
 
 
-class pnm_reader : public file_mgr {
+class pnm_reader : public file_helper {
 
 public:
-    pnm_reader(FILE* file)           : file_mgr(file)           { init(); }
-    pnm_reader(const char* filename) : file_mgr(filename, "rb") { init(); }
-    pnm_reader(const wchar_t* filename) : file_mgr(filename, L"rb") { init(); }
+    pnm_reader(FILE* file)           : file_helper(file)           { init(); }
+    pnm_reader(const char* filename) : file_helper(filename, "rb") { init(); }
+    pnm_reader(const wchar_t* filename) : file_helper(filename, L"rb") { init(); }
 
    template <typename VIEW>
    void apply( const VIEW& view )
    {
-		typedef typename VIEW::channel_t           channel_t;
-		typedef typename VIEW::color_space_t::base color_space_t;
+		typedef typename channel_type<VIEW>::type           channel_t;
+		typedef typename color_space_type<VIEW>::type color_space_t;
 
 		io_error_if( view.dimensions() != get_dimensions()
 				 , "pnm_reader::apply(): input view dimensions do not match the image file");
@@ -244,7 +243,7 @@ public:
 
     template <typename IMAGE>
     void read_image(IMAGE& im) {
-        resize_clobber_image(im,get_dimensions());
+        im.recreate(get_dimensions());
         apply(view(im));
     }
 
@@ -353,17 +352,17 @@ protected:
 	int width, height;
 };
 
-class pnm_writer : public file_mgr {
+class pnm_writer : public file_helper {
 public:
-    pnm_writer(FILE* file)           : file_mgr(file)           {}
-    pnm_writer(const char* filename) : file_mgr(filename, "wb") {}
-    pnm_writer(const wchar_t* filename) : file_mgr(filename, L"wb") {}
+    pnm_writer(FILE* file)           : file_helper(file)           {}
+    pnm_writer(const char* filename) : file_helper(filename, "wb") {}
+    pnm_writer(const wchar_t* filename) : file_helper(filename, L"wb") {}
 
     template <typename VIEW>
     void apply(const VIEW& view) {
 
-      typedef typename VIEW::channel_t           channel_t;
-      typedef typename VIEW::color_space_t::base color_space_t;
+      typedef typename channel_type<VIEW>::type           channel_t;
+      typedef typename color_space_type<VIEW>::type color_space_t;
 
       // check if supported
       if( pnm_read_write_support_private<channel_t, color_space_t>::channel != 8) {
@@ -372,16 +371,22 @@ public:
 
 		int width  = view.width();
 		int height = view.height();
-		int chn    = std::min(3, color_space_t::num_channels);
+        int chn    = std::min(3, (int)num_channels<VIEW>::value);
 		int bpp    = chn * 8;
 		int pitch  = chn * width;
-		int type   = (color_space_t::num_channels == 1) ? type_gray_bin : type_color_bin;
+		int type   = (num_channels<VIEW>::value == 1) ? type_gray_bin : type_color_bin;
+
+        print_line("P%i", type);
+        print_line("%i", width);
+        print_line("%i", height);
+        print_line("255");
+        
 
 		// writes the raster
 		std::vector<byte_t> row(pitch);
 
 		for (int y = 0; y < height; ++y) {
-			transfer_pnm<VIEW, color_space_t>::convert(bpp, view.row_begin(y), &row.front(), width);
+			transfer_pnm<VIEW, color_space_t>::convert(bpp, view.row_begin(y), &row.front(), width);  //Why bother copying into a buffer? -JCF
 			write(&row.front(), pitch);
 		}
 	}
@@ -389,6 +394,6 @@ public:
 
 } // namespace detail
 
-ADOBE_GIL_NAMESPACE_END
+}} //ns 
 
 #endif

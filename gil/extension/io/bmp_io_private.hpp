@@ -21,10 +21,10 @@
 #include <boost/static_assert.hpp>
 #include <boost/scoped_array.hpp>
 #include <vector>
-#include "../../core/gil_all.hpp"
-#include "io_error.hpp"
+#include <boost/gil/gil_all.hpp>
+#include "io_helper.hpp"
 
-ADOBE_GIL_NAMESPACE_BEGIN
+namespace boost{namespace gil{
 
 namespace detail {
 
@@ -116,7 +116,7 @@ template <typename V, typename C> struct convertor {
 };
 
 template <typename V> struct convertor<V, gray_t> {
-	typedef typename V::channel_t channel_t;
+	typedef typename channel_type<V>::type channel_t;
 	typedef typename V::pixel_t   pixel_t;
 
 	/// Create gray from luminance
@@ -139,7 +139,7 @@ template <typename V> struct convertor<V, gray_t> {
 };
 
 template <typename V> struct convertor<V, rgb_t> {
-	typedef typename V::channel_t channel_t;
+	typedef typename channel_type<V>::type channel_t;
 	typedef typename V::pixel_t   pixel_t;
 
 	/// Create RGB from luminance
@@ -162,7 +162,7 @@ template <typename V> struct convertor<V, rgb_t> {
 };
 
 template <typename V> struct convertor<V, rgba_t> {
-	typedef typename V::channel_t channel_t;
+	typedef typename channel_type<V>::type channel_t;
 	typedef typename V::pixel_t   pixel_t;
 
 	/// Create RGBA from luminance
@@ -188,7 +188,7 @@ template <typename V> struct convertor<V, rgba_t> {
 template <typename V, typename C> struct transfer {
 	typedef typename V::x_iterator iterator_t;
 	typedef typename V::pixel_t    pixel_t;
-	typedef typename V::channel_t  channel_t;
+	typedef typename channel_type<V>::type  channel_t;
 
 	/// From BMP to GIL
 	static void convert(int bpp, const byte_t *src, iterator_t dest, int cnt, const color_map pal[], const color_mask& msk) throw() {
@@ -311,7 +311,7 @@ template <typename V, typename C> struct transfer {
 	}
 };
 
-class bmp_reader : public file_mgr {
+class bmp_reader : public file_helper {
 protected:
    info_header _info_header;
    file_header _file_header;
@@ -326,11 +326,11 @@ protected:
       _file_header.offset = read_int32();
 
       if (_file_header.type != bm_signature) {
-	      io_error("file_mgr: not a BMP file");
+	      io_error("file_helper: not a BMP file");
       }
 
       if (_file_header.offset >= _file_header.size) {
-	      io_error("file_mgr: invalid BMP file header");
+	      io_error("file_helper: invalid BMP file header");
       }
 
       // Read the info header size.
@@ -363,20 +363,20 @@ protected:
 	      _info_header.entry  = 3;
       }
       else {
-	      io_error("file_mgr: invalid BMP info header");
+	      io_error("file_helper: invalid BMP info header");
       }
 
       /// check supported bits per pixel
       if (_info_header.bpp < 1 || _info_header.bpp > 32) {
-	      io_error("file_mgr: unsupported BMP format");
+	      io_error("file_helper: unsupported BMP format");
       }
     }
 
 
 public:
-    bmp_reader(FILE* file)           : file_mgr(file)           { init(); }
-    bmp_reader(const char* filename) : file_mgr(filename, "rb") { init(); }
-    bmp_reader(const wchar_t* filename) : file_mgr(filename, L"rb") { init(); }
+    bmp_reader(FILE* file)           : file_helper(file)           { init(); }
+    bmp_reader(const char* filename) : file_helper(filename, "rb") { init(); }
+    bmp_reader(const wchar_t* filename) : file_helper(filename, L"rb") { init(); }
 
    template <typename VIEW>
    void apply( const VIEW& view )
@@ -491,7 +491,7 @@ public:
 
       for( int y = ybeg; y != yend; y += yinc )
       {
-         typedef typename VIEW::color_space_t::base Spc;
+         typedef typename color_space_type<VIEW>::type Spc;
 
 	      read(&row.front(), pitch);
 	      transfer<VIEW, Spc>::convert(_info_header.bpp, &row.front(), view.row_begin(y), _info_header.width, pal, mask);
@@ -509,17 +509,17 @@ public:
     }
 };
 
-class bmp_writer : public file_mgr {
+class bmp_writer : public file_helper {
 public:
-    bmp_writer(FILE* file)           : file_mgr(file)           {}
-    bmp_writer(const char* filename) : file_mgr(filename, "wb") {}
-    bmp_writer(const wchar_t* filename) : file_mgr(filename, L"wb") {}
+    bmp_writer(FILE* file)           : file_helper(file)           {}
+    bmp_writer(const char* filename) : file_helper(filename, "wb") {}
+    bmp_writer(const wchar_t* filename) : file_helper(filename, L"wb") {}
     
     template <typename VIEW>
     void apply(const VIEW& view) {
 
-      typedef typename VIEW::channel_t           channel_t;
-      typedef typename VIEW::color_space_t::base color_space_t;
+      typedef typename channel_type<VIEW>::type           channel_t;
+      typedef typename color_space_type<VIEW>::type color_space_t;
 
       // check if supported
       if (bmp_read_write_support_private<channel_t, color_space_t>::channel != 8) {
@@ -527,13 +527,13 @@ public:
       }
 
       // compute the file size
-      int bpp = color_space_t::num_channels * 8;
+      int bpp = num_channels<color_space_t>::value * 8;
       int ent = 0;
 
       if (bpp <= 8) {
 	      ent = 1 << bpp;
       }
-      int spn = (view.width() * color_space_t::num_channels + 3) & ~3;
+      int spn = (view.width() * num_channels<color_space_t>::value + 3) & ~3;
       int ofs = header_size + win32_info_size + ent * 4;
       int siz = ofs + spn * view.height();
 
@@ -577,6 +577,6 @@ public:
 
 } // namespace detail
 
-ADOBE_GIL_NAMESPACE_END
+}} //ns boost::gil
 
 #endif

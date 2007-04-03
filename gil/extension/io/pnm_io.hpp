@@ -22,10 +22,11 @@
 #include <string>
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
-#include "io_error.hpp"
+#include <boost/gil/image_view.hpp>
+#include "io_helper.hpp"
 #include "pnm_io_private.hpp"
 
-ADOBE_GIL_NAMESPACE_BEGIN
+namespace boost{ namespace gil{
 
 /// Determines whether the given view type is supported for reading
 
@@ -35,18 +36,18 @@ template <typename VIEW> struct pnm_read_write_support {
 
     BOOST_STATIC_CONSTANT( bool
                          , is_supported =
-                           (detail::pnm_read_write_support_private<typename VIEW::channel_t
-                                                               , typename VIEW::color_space_t::base>::supported ));
+                         (detail::pnm_read_write_support_private<typename channel_type<VIEW>::type
+                                                               , typename color_space_type<VIEW>::type >::supported ));
 
     BOOST_STATIC_CONSTANT( unsigned int
                          , bit_depth =
-                           ( detail::pnm_read_write_support_private<typename VIEW::channel_t
-                                                                 , typename VIEW::color_space_t::base>::channel ));
+                           ( detail::pnm_read_write_support_private<typename channel_type<VIEW>::type
+                                                                 , typename color_space_type<VIEW>::type>::channel ));
 
     BOOST_STATIC_CONSTANT( unsigned int
                          , bit_pixel =
-                           ( detail::pnm_read_write_support_private< typename VIEW::channel_t
-                                                                   , typename VIEW::color_space_t::base>::pixel ));
+                           ( detail::pnm_read_write_support_private< typename channel_type<VIEW>::type
+                                                                   , typename color_space_type<VIEW>::type>::pixel ));
 
     BOOST_STATIC_CONSTANT(bool, value=is_supported);
 };
@@ -163,6 +164,6 @@ inline void pnm_write_view(const std::string& filename,const VIEW& view ) {
     pnm_write_view(filename.c_str(),view);
 }
 
-ADOBE_GIL_NAMESPACE_END
+}} //ns boost::gil
 
 #endif
