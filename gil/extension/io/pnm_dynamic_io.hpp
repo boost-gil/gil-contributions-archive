@@ -16,15 +16,15 @@
 /// \date   2006-2007 \n Last updated January 24, 2007
 
 
-#include <gil/extension/io/pnm_io.hpp>
-#include <gil/extension/io/pnm_io_private.hpp>
-#include <gil/extension/dynamic_image/any_image.hpp>
-#include <gil/extension/dynamic_image/apply_operation.hpp>
-#include <gil/extension/io/dynamic_io.hpp>
+#include <boost/gil/extension/io/pnm_io.hpp>
+#include <boost/gil/extension/io/pnm_io_private.hpp>
+#include <boost/gil/extension/dynamic_image/any_image.hpp>
+#include <boost/gil/extension/dynamic_image/apply_operation.hpp>
+#include <boost/gil/extension/io/dynamic_io.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/vector.hpp>
 
-ADOBE_GIL_NAMESPACE_BEGIN
+namespace boost{ namespace gil{
 
 namespace detail {
 	/// Determines whether the given view type is supported for reading
@@ -145,6 +145,6 @@ template <typename V> inline void pnm_write_view(const std::string& file, const 
 /// Supported PNM images types list
 typedef boost::mpl::vector<gray8_image_t, rgb8_image_t, rgba8_image_t> pnm_types_t;
 
-ADOBE_GIL_NAMESPACE_END
+}} //ns boost::gil
 
 #endif
