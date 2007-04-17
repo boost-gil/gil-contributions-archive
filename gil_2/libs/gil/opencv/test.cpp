@@ -9,6 +9,10 @@
 
 #include <boost/gil/extension/opencv/drawing.hpp>
 #include <boost/gil/extension/opencv/resize.hpp>
+#include <boost/gil/extension/opencv/drawing.hpp>
+#include <boost/gil/extension/opencv/resize.hpp>
+#include <boost/gil/extension/opencv/edge_detection.hpp>
+#include <boost/gil/extension/opencv/smoothing.hpp>
 
 using namespace boost;
 using namespace gil;
@@ -186,4 +190,43 @@ int main(int argc, char* argv[] )
       opencv::resize( ipl_in, ipl_target, bicubic() );
       bmp_write_view( ".\\bicubic_rgb_resized.bmp",  view( target ));
    }
+
+// edge detection
+
+   // sobel
+   {
+      rgb8_image_t in;
+      bmp_read_image( ".\\rgb.bmp", in );
+      ipl_image_wrapper ipl_in = create_ipl_image( view( in ) );
+
+      rgb8_image_t out( in.dimensions() );
+      ipl_image_wrapper ipl_out = create_ipl_image( view( out ) );
+
+      sobel( ipl_in, ipl_out );
+
+      bmp_write_view( ".\\sobel.bmp",  view( out ));
+   }
+
+   // laplace
+   {
+      rgb8_image_t in;
+      bmp_read_image( ".\\rgb.bmp", in );
+      ipl_image_wrapper ipl_in = create_ipl_image( view( in ) );
+
+      rgb16s_image_t temp( in.dimensions() );
+      ipl_image_wrapper ipl_temp = create_ipl_image( view( temp ));
+
+      laplace( ipl_in
+             , ipl_temp );
+
+      rgb8_image_t out( in.dimensions() );
+      ipl_image_wrapper ipl_out = create_ipl_image( view( out ) );
+
+      cvConvertScaleAbs( ipl_temp.get()
+                       , ipl_out.get()
+                       , 1, 0 );
+
+      bmp_write_view( ".\\laplace.bmp",  view( out ));
+   }
+
 }
