@@ -3,6 +3,9 @@
 
 #include "ipl_image_wrapper.hpp"
 
+#include <boost/mpl/map.hpp>
+#include <boost/mpl/at.hpp>
+
 namespace boost { namespace gil {
 namespace opencv {
 
@@ -19,7 +22,7 @@ void drawRectangle( ipl_image_wrapper&  ipl_image
               , make_cvPoint( start )
               , make_cvPoint( end   )
               , make_cvScalar( pixel )
-              , (int) line_width      );
+              , static_cast<int>( line_width ));
 }
 
 template<class VIEW>
@@ -33,7 +36,7 @@ void drawRectangle( VIEW&                  view
                 , start
                 , end
                 , pixel
-                , line_width                 );
+                , static_cast<int>( line_width ));
 }
 
 /// circle
@@ -47,9 +50,9 @@ void drawCircle( ipl_image_wrapper& ipl_image
 {
    cvCircle( ipl_image.get()
            , make_cvPoint( center )
-           , radius
+           , static_cast<int>( radius )
            , make_cvScalar( color )
-           , line_width             );
+           , static_cast<int>( line_width ));
 }
 
 template<class VIEW>
@@ -61,25 +64,41 @@ void drawCircle( VIEW&                  view
 {
    drawCircle( create_ipl_image( view )
              , center
-             , radius
+             , static_cast<int>( radius )
              , color
-             , line_width                );
+             , static_cast<int>( line_width ));
 }
 
 /// line
 
-template< class PIXEL >
+struct eight_connected_Line{};
+struct four_connected_Line{};
+struct anti_aliased_Line{};
+
+typedef boost::mpl::map< boost::mpl::pair< eight_connected_Line, boost::mpl::int_< 8    > >
+                       , boost::mpl::pair< four_connected_Line , boost::mpl::int_< 4    > >
+                       , boost::mpl::pair< anti_aliased_Line   , boost::mpl::int_<CV_AA > > 
+                       > line_type_map;
+
+
+template< class PIXEL
+        , class LINE_TYPE
+        >
 void drawLine( ipl_image_wrapper& ipl_image
              , point_t            start
              , point_t            end
              , PIXEL              color
-             , std::size_t        line_width )
+             , std::size_t        line_width
+             , LINE_TYPE                      )
 {
    cvLine( ipl_image.get()
          , make_cvPoint( start )
          , make_cvPoint( end )
          , make_cvScalar( color )
-         , line_width              );
+         , static_cast<int>( line_width )
+         , boost::mpl::at< line_type_map
+                         , LINE_TYPE
+                         >::type::value   );
 }
 
 template< class VIEW >
@@ -93,7 +112,7 @@ void drawLine( VIEW&                  view
            , start
            , end
            , color
-           , line_width               );
+           , static_cast<int>( line_width ));
 }
 
 /// polyline
@@ -112,7 +131,7 @@ void drawPolyLine( ipl_image_wrapper& ipl_image
    std::size_t total_num_points = 0;
    for( std::size_t i = 0; i < num_curves; ++i )
    {
-      num_points_per_curve[i] = curves[i].size();
+      num_points_per_curve[i] = static_cast<int>( curves[i].size() );
    }
 
    // The curve array vector will deallocate all memory by itself.
@@ -130,10 +149,10 @@ void drawPolyLine( ipl_image_wrapper& ipl_image
    cvPolyLine( ipl_image.get()
              , curve_array  // needs to be pointer to C array of CvPoints.
              , num_points_per_curve.get()// int array that contains number of points of each curve.
-             , curves.size()
+             , static_cast<int>( curves.size() )
              , is_closed
              , make_cvScalar( color )
-             , line_width             );
+             , static_cast<int>( line_width ));
 
 }
 
