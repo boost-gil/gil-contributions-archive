@@ -172,8 +172,16 @@ int main(int argc, char* argv[] )
       ipl_image_wrapper ipl_target = create_ipl_image( view( target ) );
 
       opencv::resize( ipl_in, ipl_target, nearest_neigbor() );
+      bmp_write_view( ".\\nn_rgb_resized.bmp",  view( target ));
 
-      bmp_write_view( ".\\rgb_resized.bmp",  view( target ));
+      opencv::resize( ipl_in, ipl_target, bilinear() );
+      bmp_write_view( ".\\bilinear_rgb_resized.bmp",  view( target ));
+
+      opencv::resize( ipl_in, ipl_target, area() );
+      bmp_write_view( ".\\area_rgb_resized.bmp",  view( target ));
+
+      opencv::resize( ipl_in, ipl_target, bicubic() );
+      bmp_write_view( ".\\bicubic_rgb_resized.bmp",  view( target ));
+
    }
-
 }
