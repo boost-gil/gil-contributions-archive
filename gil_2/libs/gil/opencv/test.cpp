@@ -104,7 +104,8 @@ int main(int argc, char* argv[] )
               , point_t( 100, 100 )
               , point_t( 200, 200 )
               , rgb8_pixel_t( 255, 0, 0 )
-              , 1                          );
+              , 1
+              , anti_aliased_Line() );
 
       bmp_write_view( ".\\line_test.bmp", view( img ) );
    }
@@ -119,13 +120,15 @@ int main(int argc, char* argv[] )
               , point_t( 100, 100 )
               , point_t( 200, 200 )
               , rgb8_pixel_t( 255, 0, 0 )
-              , 1                          );
+              , 1
+              , eight_connected_Line()    );
 
       drawLine( ipl_img
               , point_t( 250, 250 )
               , point_t( 350, 350 )
               , rgb8_pixel_t( 255, 0, 0 )
-              , 1                          );
+              , 1 
+              , four_connected_Line()     );
 
       bmp_write_view( ".\\line_test_2.bmp", view( img ) );
    }
@@ -182,6 +185,5 @@ int main(int argc, char* argv[] )
 
       opencv::resize( ipl_in, ipl_target, bicubic() );
       bmp_write_view( ".\\bicubic_rgb_resized.bmp",  view( target ));
-
    }
 }
