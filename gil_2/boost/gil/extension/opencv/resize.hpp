@@ -8,8 +8,11 @@ namespace opencv {
 
 struct nearest_neigbor{};
 struct bilinear{};
-struct area{};
 struct bicubic{};
+
+// OpenCV doc: It is preferred method for image 
+// decimation that gives moire-free results.
+struct area{};
 
 typedef boost::mpl::map<
   boost::mpl::pair< nearest_neigbor, boost::mpl::int_<CV_INTER_NN     > >
