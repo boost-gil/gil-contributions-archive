@@ -32,7 +32,7 @@ class ipl_image_wrapper
 public:
    ipl_image_wrapper( IplImage* img ) : _img( img ) {}
 
-   ~ipl_image_wrapper() { if( _img ) cvReleaseImage( &_img); }
+   ~ipl_image_wrapper() { /* if( _img ) cvReleaseImage( &_img ); */ }
 
    IplImage* get() { return _img; }
 
@@ -52,18 +52,20 @@ ipl_image_wrapper create_ipl_image( VIEW view )
 
    IplImage* img;
 
-   img = cvCreateImage( make_cvSize( view.dimensions() )
-		               , boost::mpl::at< ipl_depth_map_from_channel_t_map
-                                       , channel_t>::type::value
-		               , boost::mpl::at< ipl_nchannels_from_gil_color_space_map
-                                     , color_space_t>::type::value             );
+   img = cvCreateImageHeader( make_cvSize( view.dimensions() )
+		                      , boost::mpl::at< ipl_depth_map_from_channel_t_map
+                                            , channel_t>::type::value
+                            , boost::mpl::at< ipl_nchannels_from_gil_color_space_map
+                                            , color_space_t>::type::value             );
 
    if( !img )
    {
       throw std::runtime_error( "Cannot create IPL image." );
    }
 
-   img->imageData = (char*) ( &view.begin()[0] );
+   cvSetData( img
+            , &view.begin()[0]
+            , num_channels<VIEW>::value * view.width() );
 
    return ipl_image_wrapper( img );
 }
