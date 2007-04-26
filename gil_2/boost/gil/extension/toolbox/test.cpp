@@ -76,23 +76,27 @@ struct set_to_min
 template< class PIXEL
         , class VIEW >
 inline
-PIXEL min_pixel_value( const VIEW& view )
+PIXEL min_channel_values( const VIEW& view )
 {
    PIXEL min;
 
    // initialize the min pixel with the max values
    static_for_each( min, set_to_max() );
 
-   // find the min values
-   for( VIEW::iterator it = view.begin()
-      ; it != view.end()
-      ; ++it )
+   for( int y=0; y < view.height(); ++y )
    {
-      for( int i = 0; i < num_channels<PIXEL>::type::value; ++i )
+      VIEW::x_iterator x_it = view.row_begin( y );
+
+      for( int x = 0; x < view.width(); ++x )
       {
-         if( dynamic_at_c( *it, i ) < dynamic_at_c( min, i ))
+         typename PIXEL::const_reference p = x_it[x];
+
+         for( int i = 0; i < num_channels<PIXEL>::type::value; ++i )
          {
-            dynamic_at_c( min, i ) = dynamic_at_c( *it, i );
+            if( dynamic_at_c( p, i ) < dynamic_at_c( min, i ))
+            {
+               dynamic_at_c( min, i ) = dynamic_at_c( p, i );
+            }
          }
       }
    }
@@ -100,10 +104,31 @@ PIXEL min_pixel_value( const VIEW& view )
    return min;
 }
 
+template <typename T>
+struct add_vector
+{
+   typedef std::vector<T> type;
+};
+
 template< class PIXEL
         , class VIEW >
 inline
-PIXEL max_pixel_value( const VIEW& view )
+PIXEL min_channel_values_( const VIEW&  view
+                        , const size_t percent = 1 )
+{
+   typedef mpl::transform1< color_space_type<VIEW>::type, add_vector<mpl::_1> >::type channels_t;
+
+   typedef kth_semantic_element_type< PIXEL, 0 >::type channel_t; //channel_0 = semantic_at_c<0>( PIXEL() );
+   channel_t max = channel_traits<channel_t>::max_value();
+
+   return PIXEL();
+}
+
+
+template< class PIXEL
+        , class VIEW >
+inline
+PIXEL max_channel_values( const VIEW& view )
 {
    PIXEL max;
 
@@ -131,7 +156,7 @@ template< class PIXEL
         , class VIEW >
 inline
 boost::fusion::vector<PIXEL, PIXEL>
-minmax_pixel_value( const VIEW& view )
+minmax_channel_values( const VIEW& view )
 {
    PIXEL min, max;
 
@@ -187,7 +212,7 @@ void down_sample( const SRC& src_view
    typedef DST::value_type dst_pixel_t;
    typedef channel_type<dst_pixel_t>::type dst_channel_t;
 
-   boost::fusion::vector<src_pixel_t,src_pixel_t> minmax = minmax_pixel_value<src_pixel_t>( src_view );
+   boost::fusion::vector<src_pixel_t,src_pixel_t> minmax = minmax_channel_values<src_pixel_t>( src_view );
 
    const src_pixel_t& min = at_c<0>( minmax );
    const src_pixel_t& max = at_c<1>( minmax );
@@ -230,9 +255,9 @@ void down_sample( const SRC& src_view
    } // for
 }
 
+// channel_wise calculation.
 
 // @todo need better name
-
 template< typename DST_MAX >
 struct foo
 {
@@ -243,7 +268,8 @@ struct foo
             , typename SRC_CHANNEL >
    void operator()( DST_CHANNEL&  dst
                   , SRC_CHANNEL&  src
-                  , SRC_CHANNEL&  min )
+                  , SRC_CHANNEL&  min
+                  , SRC_CHANNEL&  diff )
    const
    {
       if( diff == 0 )
@@ -255,7 +281,7 @@ struct foo
 
       float d = ( static_cast<float>( _dst_max )
                 * ( ( static_cast<float>( src ) - static_cast<float>( min ))
-                  / ( diff )));
+                  / static_cast<float>( diff ))));
 
       dst_channel = static_cast<DST_CHANNEL>( dst );
    }
@@ -263,6 +289,9 @@ struct foo
    DST_MAX _dst_max;
 };
 
+// pixel_wise calculation.
+
+// @todo need better name
 template< typename SRC_VIEW
         , typename SRC_PIXEL
         , typename DST_VIEW
@@ -277,26 +306,24 @@ struct do_it
    : _dst_view( dst_view )
    , _min( min )
    , _diff( diff )
-   , _f( dst_max )
+   , _op( dst_max )
    {
       _dst_it = dst_view.begin();
    }
 
    void operator()( SRC_PIXEL& src ) 
    {
-/*
       static_for_each( *_dst_it
                      , src
                      , _min
-                     , _f );
-*/
-
+                     , _diff
+                     , _op    );
       ++_dst_it;
    }
 
    typename DST_VIEW::iterator _dst_it;
 
-   foo<DST_MAX> _f;
+   foo<DST_MAX> _op;
 
    DST_VIEW _dst_view;
 
@@ -307,6 +334,13 @@ struct do_it
 int main(int argc, char* argv[])
 {
    {
+      rgb8_image_t dst( 10, 10 );
+
+      min_channel_values<rgb8_image_t::value_type>( view( dst ));
+   }
+
+   {
+/*
       bits8 max = 255;
       rgb16_pixel_t min;
       rgb16_pixel_t diff;
@@ -325,6 +359,7 @@ int main(int argc, char* argv[])
       for_each_pixel( view( src ), d );
 
       bmp_write_view( ".\\red.bmp", view( dst ));
+*/
    }
 
    {
