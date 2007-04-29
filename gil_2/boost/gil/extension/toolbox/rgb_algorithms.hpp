@@ -17,15 +17,37 @@ struct calc_negative
 
       dst = max - src;
    }
+
+   template < typename CHANNEL
+            > void operator()( CHANNEL& c ) const
+   {
+      CHANNEL max = channel_traits< CHANNEL >::max_value();
+
+      c = max - c;
+   }
 };
 
+template< typename RGB_VIEW >
+void negative( const RGB_VIEW& view )
+{
+   typedef channel_type< RGB_VIEW >::type channel_t;
+   channel_t max = channel_traits<channel_t>::max_value();
+
+   for( int y=0; y < view.height(); ++y )
+   {
+      typename RGB_VIEW::x_iterator it = view.row_begin( y );
+
+      for( int x = 0; x < view.width(); ++x )
+      {
+         static_for_each( it[x], calc_negative() );
+      }
+   }
+}
 
 template< typename RGB_VIEW >
 void negative( const RGB_VIEW& src
              , const RGB_VIEW& dst )
 {
-   // only for rgb views.
-
    // make sure src and dst have same dimensions.
 
    // for rgba do it only for rgb channels
@@ -44,7 +66,6 @@ void negative( const RGB_VIEW& src
       }
    }
 }
-
 
 struct calc_brightness
 {
@@ -88,6 +109,58 @@ void brightness( const RGB_VIEW& src
          static_for_each( dst_it[x], src_it[x], calc );
       }
    }
+}
+
+template< typename VALUE >
+struct calc_brightness_
+{
+   VALUE _number;
+
+   template < typename DST_CHANNEL
+            , typename SRC_CHANNEL
+            > void operator()( DST_CHANNEL&       dst 
+                             , const SRC_CHANNEL& src ) const
+   {
+      VALUE d = static_cast< VALUE >( src ) + _number;
+
+      if( d > channel_traits< DST_CHANNEL >::max_value() )
+      {
+         dst = channel_traits< DST_CHANNEL >::max_value();
+      }
+      else
+      {
+         dst = d;
+      }
+   }
+};
+
+template< typename RGB_VIEW
+        , typename VALUE >
+void brightness_( const RGB_VIEW& src
+                , const RGB_VIEW& dst
+                , VALUE           number )
+{
+   calc_brightness_<VALUE> calc;
+   calc._number = number;
+
+   for( int y=0; y < src.height(); ++y )
+   {
+      typename RGB_VIEW::x_iterator src_it = src.row_begin( y );
+      typename RGB_VIEW::x_iterator dst_it = dst.row_begin( y );
+
+      for( int x = 0; x < src.width(); ++x )
+      {
+         static_for_each( dst_it[x], src_it[x], calc );
+      }
+   }
+}
+
+template< typename RGB_VIEW
+        , typename CHANNEL >
+void remove_channel( const RGB_VIEW& src
+                   , const RGB_VIEW& dst )
+{
+   
 }
 
 } //namespace toolbox
