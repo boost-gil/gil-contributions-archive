@@ -5,13 +5,16 @@
 
 namespace boost { namespace gil {
 
+namespace hsl_color_space
+{
 struct hue_t {};    
 struct saturation_t {};
 struct lightness_t {}; 
+}
 
-typedef mpl::vector3< hue_t
-                    , saturation_t
-                    , lightness_t
+typedef mpl::vector3< hsl_color_space::hue_t
+                    , hsl_color_space::saturation_t
+                    , hsl_color_space::lightness_t
                     > hsl_t;
 
 typedef layout<hsl_t> hsl_layout_t;
@@ -25,6 +28,8 @@ struct default_color_converter_impl< rgb_t, hsl_t >
    template <typename P1, typename P2>
    void operator()( const P1& src, P2& dst ) const
    {
+      using namespace hsl_color_space;
+
       // only bits32f for hsl is supported
       bits32f temp_red   = channel_convert<bits32f>( get_color( src, red_t()   ));
       bits32f temp_green = channel_convert<bits32f>( get_color( src, green_t() ));
@@ -113,6 +118,8 @@ struct default_color_converter_impl<hsl_t,rgb_t>
    template <typename P1, typename P2>
    void operator()( const P1& src, P2& dst) const
    {
+      using namespace hsl_color_space;
+
       bits32f red, green, blue;
 
       if( abs( get_color( src, saturation_t() )) < 0.0001  )
