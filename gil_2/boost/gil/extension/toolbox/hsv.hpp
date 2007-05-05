@@ -1,27 +1,50 @@
+// Copyright 2004 Christian Henning.
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+/*************************************************************************************************/
+
 #ifndef GIL_HSV_H
 #define GIL_HSV_H
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief Support for HSV color space
+/// \author Christian Henning \n
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/gil/gil_all.hpp>
 
 namespace boost { namespace gil {
 
+/// \addtogroup ColorNameModel
+/// \{
 namespace hsv_color_space
 {
+/// \brief Hue
 struct hue_t {};    
+/// \brief Saturation
 struct saturation_t{};
+/// \brief Value
 struct value_t {}; 
 }
+/// \}
 
+/// \ingroup ColorSpaceModel
 typedef mpl::vector3< hsv_color_space::hue_t
                     , hsv_color_space::saturation_t
                     , hsv_color_space::value_t
                     > hsv_t;
 
+/// \ingroup LayoutModel
 typedef layout<hsv_t> hsv_layout_t;
 
 
 GIL_DEFINE_ALL_TYPEDEFS( 32f, hsv );
 
+/// \ingroup ColorConvert
+/// \brief RGB to HSV
 template <>
 struct default_color_converter_impl< rgb_t, hsv_t >
 {
@@ -92,6 +115,8 @@ struct default_color_converter_impl< rgb_t, hsv_t >
    }
 };
 
+/// \ingroup ColorConvert
+/// \brief HSV to RGB
 template <>
 struct default_color_converter_impl<hsv_t,rgb_t>
 {

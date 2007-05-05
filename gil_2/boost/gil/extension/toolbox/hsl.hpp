@@ -1,27 +1,50 @@
+// Copyright 2004 Christian Henning
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+/*************************************************************************************************/
+
 #ifndef GIL_HSL_H
 #define GIL_HSL_H
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief Support for HSL color space
+/// \author Christian Henning \n
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/gil/gil_all.hpp>
 
 namespace boost { namespace gil {
 
+/// \addtogroup ColorNameModel
+/// \{
 namespace hsl_color_space
 {
+/// \brief Hue
 struct hue_t {};    
+/// \brief Saturation
 struct saturation_t {};
+/// \brief Lightness
 struct lightness_t {}; 
 }
+/// \}
 
+/// \ingroup ColorSpaceModel
 typedef mpl::vector3< hsl_color_space::hue_t
                     , hsl_color_space::saturation_t
                     , hsl_color_space::lightness_t
                     > hsl_t;
 
+/// \ingroup LayoutModel
 typedef layout<hsl_t> hsl_layout_t;
 
 
 GIL_DEFINE_ALL_TYPEDEFS( 32f, hsl );
 
+/// \ingroup ColorConvert
+/// \brief RGB to HSL
 template <>
 struct default_color_converter_impl< rgb_t, hsl_t >
 {
@@ -112,6 +135,8 @@ struct default_color_converter_impl< rgb_t, hsl_t >
    }
 };
 
+/// \ingroup ColorConvert
+/// \brief HSL to RGB
 template <>
 struct default_color_converter_impl<hsl_t,rgb_t>
 {
