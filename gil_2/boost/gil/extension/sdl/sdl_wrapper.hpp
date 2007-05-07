@@ -1,10 +1,17 @@
 #ifndef SDL_WRAPPER_HPP
 #define SDL_WRAPPER_HPP
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <exception>
+#include <string>
 
 #include <math.h>
+
+#include <boost/bind.hpp>
+
+#include <boost/scoped_ptr.hpp>
+
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <SDL.h>
 
@@ -25,7 +32,7 @@ public:
 
       if( _screen == NULL )
       {
-         throw runtime_error( "Couldn't create SDL window" );
+         throw std::runtime_error( "Couldn't create SDL window" );
       }
 
 
@@ -41,19 +48,19 @@ public:
 
    void cancel()
    {
-      boost::mutex::scoped_lock oLock( _oSentinel );
+      boost::mutex::scoped_lock oLock( _sentinel );
 
       _cancel = true;
    }
 
 private:
 
-   void run()
+   void _run()
    {
       while( _cancel == false )
       {
          // Render stuff
-         render();
+         _render();
 
          // Poll for events, and handle the ones we care about.
          SDL_Event event;
@@ -70,14 +77,14 @@ private:
                {
                   // If escape is pressed, return (and thus, quit)
                   if( event.key.keysym.sym == SDLK_ESCAPE )
-                     return 0;
+                     return ;
 
                   break;
                }
 
                case SDL_QUIT:
                {
-                  return(0);
+                  return ;
                }
 
             } //switch
@@ -85,7 +92,7 @@ private:
       } // while
    }
 
-   void render()
+   void _render()
    {
       // Lock surface if needed
       if( SDL_MUSTLOCK( _screen ))
@@ -108,10 +115,10 @@ private:
       {
          for (j = 0, ofs = yofs; j < 1024; j++, ofs++)
          {
-            ((unsigned int*)screen->pixels)[ofs] = i * j + i * j + tick;
+            ((unsigned int*) _screen->pixels)[ofs] = i * j + i * j + tick;
          }
 
-         yofs += screen->pitch / 4;
+         yofs += _screen->pitch / 4;
       }
 
       // Unlock if needed
@@ -159,9 +166,9 @@ public:
       // Initialize SDL's subsystems - in this case, only video.
       if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) 
       {
-         string error( "Unable to init SDL: " );
+         std::string error( "Unable to init SDL: " );
          error += SDL_GetError();
-         throw  runtime_error( error )
+         throw  std::runtime_error( error );
       }
 
       // Register SDL_Quit to be called at exit; makes sure things are
@@ -171,9 +178,9 @@ public:
 
 private:
 
-   sdl_wrapper();
-   sdl_wrapper( const sdl_wrapper& );
-   sdl_wrapper& operator= ( const sdl_wrapper& );
+   sdl_wrapper() {}
+   sdl_wrapper( const sdl_wrapper& ) {}
+   sdl_wrapper& operator= ( const sdl_wrapper& ) {}
 
 };
 
