@@ -111,9 +111,9 @@ private:
 
       // Draw to screen
       yofs = 0;
-      for (i = 0; i < 768; i++)
+      for (i = 0; i < _height; i++)
       {
-         for (j = 0, ofs = yofs; j < 1024; j++, ofs++)
+         for (j = 0, ofs = yofs; j < _width; j++, ofs++)
          {
             ((unsigned int*) _screen->pixels)[ofs] = i * j + i * j + tick;
          }
@@ -170,15 +170,12 @@ public:
          error += SDL_GetError();
          throw  std::runtime_error( error );
       }
-
-      // Register SDL_Quit to be called at exit; makes sure things are
-      // cleaned up when we quit.
-      atexit(SDL_Quit);
    }
 
 private:
 
    sdl_wrapper() {}
+   ~sdl_wrapper() { SDL_Quit(); }
    sdl_wrapper( const sdl_wrapper& ) {}
    sdl_wrapper& operator= ( const sdl_wrapper& ) {}
 

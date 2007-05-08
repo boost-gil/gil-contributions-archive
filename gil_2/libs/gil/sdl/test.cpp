@@ -21,7 +21,7 @@ int main( int argc, char* argv[] )
 
    boost::xtime xt;
    xtime_get(&xt, boost::TIME_UTC);
-   xt.sec += 10;    // change xt to next second
+   xt.sec += 20;    // change xt to next second
    thread::sleep( xt );
 
 	return 0;
