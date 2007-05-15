@@ -1,6 +1,7 @@
 #ifndef SDL_WRAPPER_HPP
 #define SDL_WRAPPER_HPP
 
+#include <iostream>
 #include <exception>
 #include <string>
 
@@ -66,6 +67,7 @@ private:
          SDL_Event event;
          while( SDL_PollEvent( &event ))
          {
+            std::cout << "event" << std::endl;
             switch (event.type) 
             {
                case SDL_KEYDOWN:
