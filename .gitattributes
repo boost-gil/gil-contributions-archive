@@ -38,6 +38,7 @@ gil_2/libs/gil/io/p5.pnm svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io/p6.pnm svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io/rgb.bmp svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/opencv/rgb.bmp svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/sdl/flower.bmp svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/toolbox/flower.bmp svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/toolbox/flower_brightness.bmp svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/toolbox/flower_neg.bmp svn_mime_002dtype=application%2Foctet-stream

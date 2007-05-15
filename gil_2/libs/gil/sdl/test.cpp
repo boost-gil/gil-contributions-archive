@@ -1,8 +1,13 @@
 // test.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
+#pragma warning( disable: 4675 )
 
+#include "boost/thread/xtime.hpp"
+
+#include "boost/gil/gil_all.hpp"
+
+#include "boost/gil/extension/io/bmp_io.hpp"
 #include "boost/gil/extension/sdl/sdl_wrapper.hpp"
 
 using namespace std;
