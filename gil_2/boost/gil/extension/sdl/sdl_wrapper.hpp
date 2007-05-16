@@ -16,15 +16,41 @@
 
 #include <SDL.h>
 
+struct painter_base
+{
+   virtual void render( SDL_Surface* screen ) =0;
+
+protected:
+
+   void set_pixel( const boost::gil::rgb8_pixel_t& pixel
+                 , SDL_Surface*        screen
+                 , int                 x
+                 , int                 y       )
+   {
+      Uint32 col = SDL_MapRGB( screen->format
+                             , get_color( pixel, boost::gil::red_t() )
+                             , get_color( pixel, boost::gil::green_t() )
+                             , get_color( pixel, boost::gil::blue_t() ));
+
+      char* pos = static_cast<char*>( screen->pixels );
+
+      pos += screen->pitch * y;
+      pos += screen->format->BytesPerPixel * x;
+      
+      memcpy( pos, &col, screen->format->BytesPerPixel );
+   }
+};
+
 // active object for displaying images
 class sdl_window
 {
 public:
 
-   sdl_window( int width, int height )
+   sdl_window( int width, int height, painter_base* painter )
    : _cancel( false )
-   , _width ( width  )
-   , _height( height )
+   , _width  ( width  )
+   , _height ( height )
+   , _painter( painter )
    {
       _screen = SDL_SetVideoMode( width
                                 , height
@@ -60,38 +86,7 @@ private:
    {
       while( _cancel == false )
       {
-         // Render stuff
-         _render();
-
-         // Poll for events, and handle the ones we care about.
-         SDL_Event event;
-         while( SDL_PollEvent( &event ))
-         {
-            std::cout << "event" << std::endl;
-            switch (event.type) 
-            {
-               case SDL_KEYDOWN:
-               {
-                  break;
-               }
-
-               case SDL_KEYUP:
-               {
-                  // If escape is pressed, return (and thus, quit)
-                  if( event.key.keysym.sym == SDLK_ESCAPE )
-                     return ;
-
-                  break;
-               }
-
-               case SDL_QUIT:
-               {
-                  return ;
-               }
-
-            } //switch
-         } // while
-      } // while
+      }
    }
 
    void _render()
@@ -105,23 +100,7 @@ private:
          }
       }
 
-      // Ask SDL for the time in milliseconds
-      int tick = SDL_GetTicks();
-
-      // Declare a couple of variables
-      int i, j, yofs, ofs;
-
-      // Draw to screen
-      yofs = 0;
-      for (i = 0; i < _height; i++)
-      {
-         for (j = 0, ofs = yofs; j < _width; j++, ofs++)
-         {
-            ((unsigned int*) _screen->pixels)[ofs] = i * j + i * j + tick;
-         }
-
-         yofs += _screen->pitch / 4;
-      }
+      _painter->render( _screen );
 
       // Unlock if needed
       if( SDL_MUSTLOCK( _screen )) 
@@ -150,23 +129,21 @@ private:
 
    int _width;
    int _height;
+
+   painter_base* _painter;
+
+   friend class sdl_service;
 };
 
 
-class sdl_wrapper
+class sdl_service
 {
 public:
 
-   static sdl_wrapper& get()
+   sdl_service()
+   : _terminate( false )
    {
-      static sdl_wrapper s;
-      return s;
-   }
-
-   static void init_sdl()
-   {
-      // Initialize SDL's subsystems - in this case, only video.
-      if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) 
+      if ( SDL_Init( SDL_INIT_VIDEO ) < 0 ) 
       {
          std::string error( "Unable to init SDL: " );
          error += SDL_GetError();
@@ -174,14 +151,59 @@ public:
       }
    }
 
+   ~sdl_service()
+   {
+      _terminate = true;
+   }
+
+   void add_window( sdl_window& win )
+   {
+      _win = &win;
+   }
+
+   void run()
+   {
+      while( _terminate == false )
+      {
+         // send out render signal.
+         _win->_render();
+
+         SDL_Event event;
+         while( SDL_PollEvent( &event ))
+         {
+            switch (event.type) 
+            {
+               case SDL_KEYDOWN:
+               {
+                  break;
+               }
+
+               case SDL_KEYUP:
+               {
+                  // If escape is pressed, return (and thus, quit)
+                  if( event.key.keysym.sym == SDLK_ESCAPE )
+                     return ;
+
+                  break;
+               }
+
+               case SDL_QUIT:
+               {
+                  return ;
+               }
+
+            } //switch
+         } // while
+      } // while
+   }
+
 private:
 
-   sdl_wrapper() {}
-   ~sdl_wrapper() { SDL_Quit(); }
-   sdl_wrapper( const sdl_wrapper& ) {}
-   sdl_wrapper& operator= ( const sdl_wrapper& ) {}
+   bool _terminate;
 
+   sdl_window* _win;
 };
+
 
 
 #endif //SDL_WRAPPER_HPP
