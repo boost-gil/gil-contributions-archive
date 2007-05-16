@@ -18,10 +18,16 @@ using namespace gil;
 
 // called from window's thread
 class draw_something : public painter_base
+                     , public keyboard_event_base
 {
 public:
 
    draw_something( const rgb8_view_t& view ) : _view( view ) {}
+
+   virtual void key_up( SDL_Surface* screen )
+   {
+      cout << "key up event" << endl;
+   }
 
    virtual void render( SDL_Surface* screen )
    {
@@ -53,7 +59,8 @@ int main( int argc, char* argv[] )
    draw_something painter( view( img ));
    sdl_window win( view( img ).width()
                  , view( img ).height()
-                 , &painter );
+                 , &painter
+                 , &painter               );
 
    ss.add_window( win );
 

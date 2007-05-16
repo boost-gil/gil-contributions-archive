@@ -16,6 +16,11 @@
 
 #include <SDL.h>
 
+struct keyboard_event_base
+{
+   virtual void key_up( SDL_Surface* screen ) =0;
+};
+
 struct painter_base
 {
    virtual void render( SDL_Surface* screen ) =0;
@@ -46,11 +51,15 @@ class sdl_window
 {
 public:
 
-   sdl_window( int width, int height, painter_base* painter )
+   sdl_window( int width
+             , int height
+             , painter_base*        painter
+             , keyboard_event_base* keyboard_handler )
    : _cancel( false )
    , _width  ( width  )
    , _height ( height )
    , _painter( painter )
+   , _keyboard_handler( keyboard_handler )
    {
       _screen = SDL_SetVideoMode( width
                                 , height
@@ -89,6 +98,14 @@ private:
       }
    }
 
+   void _key_up()
+   {
+      if( _keyboard_handler )
+      {
+         _keyboard_handler->key_up( _screen );
+      }
+   }
+
    void _render()
    {
       // Lock surface if needed
@@ -100,7 +117,10 @@ private:
          }
       }
 
-      _painter->render( _screen );
+      if( _painter )
+      {
+         _painter->render( _screen );
+      }
 
       // Unlock if needed
       if( SDL_MUSTLOCK( _screen )) 
@@ -130,7 +150,8 @@ private:
    int _width;
    int _height;
 
-   painter_base* _painter;
+   painter_base*        _painter;
+   keyboard_event_base* _keyboard_handler;
 
    friend class sdl_service;
 };
@@ -183,6 +204,8 @@ public:
                   // If escape is pressed, return (and thus, quit)
                   if( event.key.keysym.sym == SDLK_ESCAPE )
                      return ;
+
+                  _win->_key_up();
 
                   break;
                }
