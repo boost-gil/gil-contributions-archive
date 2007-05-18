@@ -62,45 +62,8 @@ int main( int argc, char* argv[] )
                  , &painter
                  , &painter               );
 
-<<<<<<< .mine
-   while( true )
-   {
-      // Poll for events, and handle the ones we care about.
-      SDL_Event event;
-      while( SDL_PollEvent( &event ))
-      {
-         switch (event.type) 
-         {
-            case SDL_KEYDOWN:
-            {
-               break;
-            }
-=======
    ss.add_window( win );
->>>>>>> .r102
-
-<<<<<<< .mine
-            case SDL_KEYUP:
-            {
-               // If escape is pressed, return (and thus, quit)
-               if( event.key.keysym.sym == SDLK_ESCAPE )
-                  return 0;
-
-               break;
-            }
-
-            case SDL_QUIT:
-            {
-               return 0;
-            }
-
-         } //switch
-      } // while
-   } // while
-
-=======
    ss.run();
 
->>>>>>> .r102
 	return 0;
 }
