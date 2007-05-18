@@ -70,8 +70,6 @@ struct redraw_event : public event_base
    : event_base( type )
    {}
 
-private:
-
    static const int type = 1;
 };
 
@@ -81,8 +79,6 @@ struct key_up_event : public event_base
    : event_base( type )
    {}
 
-private:
-
    static const int type = 2;
 };
 
@@ -91,8 +87,6 @@ struct quit_event : public event_base
    quit_event()
    : event_base( type )
    {}
-
-private:
 
    static const int type = 3;
 };
@@ -164,21 +158,21 @@ private:
 
             switch( e->type() )
             {
-               case 1:
+               case redraw_event::type:
                {
                   _render();
 
                   break;
                }
 
-               case 2:
+               case key_up_event::type:
                {
                   _key_up();
 
                   break;
                }
 
-               case 3:
+               case quit_event::type:
                {
                   return;
                }
@@ -316,7 +310,11 @@ public:
                {
                   // If escape is pressed, return (and thus, quit)
                   if( event.key.keysym.sym == SDLK_ESCAPE )
+                  {
+                     _queue.enqueue( boost::shared_ptr< quit_event >( new quit_event() ));
+
                      return ;
+                  }
 
          			_queue.enqueue( boost::shared_ptr< key_up_event >( new key_up_event() ));
 
