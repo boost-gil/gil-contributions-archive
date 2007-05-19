@@ -1,7 +1,6 @@
 // test.cpp : Defines the entry point for the console application.
 //
-
-#pragma warning( disable: 4675 )
+#include "stdafx.h"
 
 #include "boost/any.hpp"
 
@@ -15,21 +14,16 @@
 using namespace std;
 using namespace boost;
 using namespace gil;
+using namespace sdl;
 
 // called from window's thread
-class draw_something : public painter_base
-                     , public keyboard_event_base
+class draw_something : public keyboard_event_base
 {
 public:
 
    draw_something( const rgb8_view_t& view ) : _view( view ) {}
 
    virtual void key_up( SDL_Surface* screen )
-   {
-      cout << "key up event" << endl;
-   }
-
-   virtual void render( SDL_Surface* screen )
    {
       for( int y = 0; y < screen->h; ++y )
       {
@@ -57,9 +51,10 @@ int main( int argc, char* argv[] )
    bmp_read_image( "flower.bmp", img );
 
    draw_something painter( view( img ));
+
    sdl_window win( view( img ).width()
                  , view( img ).height()
-                 , &painter
+                 , NULL
                  , &painter               );
 
    ss.add_window( win );
