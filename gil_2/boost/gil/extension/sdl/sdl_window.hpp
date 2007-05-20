@@ -126,7 +126,7 @@ private:
 
                   if( _painter )
                   {
-                     _painter->redraw( _screen );
+                     _painter->redraw( wrap_sdl_image( _screen ));
                   }
 
                   unlock( _screen
@@ -142,7 +142,7 @@ private:
 
                   if( _keyboard_handler )
                   {
-                     _keyboard_handler->key_up( _screen );
+                     _keyboard_handler->key_up( wrap_sdl_image( _screen ));
                   }
 
                   unlock( _screen

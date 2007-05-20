@@ -12,12 +12,12 @@ namespace boost { namespace gil { namespace sdl {
 
 struct keyboard_event_base
 {
-   virtual void key_up( SDL_Surface* screen ) =0;
+   virtual void key_up( const bgra8_view_t& sdl_view ) =0;
 };
 
 struct redraw_event_base
 {
-   virtual void redraw( SDL_Surface* screen ) =0;
+   virtual void redraw( const bgra8_view_t& sdl_view ) =0;
 };
 
 struct quit_event_base

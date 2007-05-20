@@ -31,6 +31,14 @@ void set_pixel( const boost::gil::rgb8_pixel_t& pixel
    memcpy( pos, &col, screen->format->BytesPerPixel );
 }
 
+inline
+bgra8_view_t wrap_sdl_image( SDL_Surface* screen )
+{
+   return interleaved_view( screen->w
+                          , screen->h
+                          , (bgra8_pixel_t*) screen->pixels
+                          , screen->pitch   );
+}
 
 } } } // namespace boost::gil::sdl
 

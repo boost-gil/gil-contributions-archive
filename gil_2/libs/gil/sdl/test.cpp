@@ -23,19 +23,10 @@ public:
 
    draw_something( const rgb8_view_t& view ) : _view( view ) {}
 
-   virtual void key_up( SDL_Surface* screen )
+   virtual void key_up( const bgra8_view_t& sdl_view )
    {
-      for( int y = 0; y < screen->h; ++y )
-      {
-         rgb8_view_t::x_iterator x_it = _view.row_begin( y );
-
-         for( int x = 0; x < screen->w; ++x )
-         {
-            const rgb8_pixel_t& p = x_it[x];
-
-            set_pixel( p, screen, x, y );
-         }
-      }
+      copy_pixels( color_converted_view<bgra8_pixel_t>( _view )
+                 , sdl_view );
    }
 
 private:
