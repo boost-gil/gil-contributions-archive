@@ -2,10 +2,6 @@
 //
 #include "stdafx.h"
 
-#include "boost/any.hpp"
-
-#include "boost/thread/xtime.hpp"
-
 #include "boost/gil/gil_all.hpp"
 
 #include "boost/gil/extension/io/bmp_io.hpp"
@@ -15,6 +11,16 @@ using namespace std;
 using namespace boost;
 using namespace gil;
 using namespace sdl;
+
+class my_timer : public timer_event_base
+{
+public:
+
+   virtual void time_elapsed()
+   {
+      std::cout << "time elapsed" << std::endl;
+   }
+};
 
 // called from window's thread
 class draw_something : public keyboard_event_base
@@ -42,11 +48,14 @@ int main( int argc, char* argv[] )
    bmp_read_image( "flower.bmp", img );
 
    draw_something painter( view( img ));
-
+   my_timer mytimer;
    sdl_window win( view( img ).width()
                  , view( img ).height()
                  , NULL
-                 , &painter               );
+                 , &painter
+                 , &mytimer );
+
+   win.set_timer( 1000 );
 
    ss.add_window( win );
    ss.run();

@@ -16,6 +16,7 @@
 #include <SDL.h>
 
 #include "sdl_events.hpp"
+#include "sdl_timer.hpp"
 #include "user_events.hpp"
 #include "message_queue.h"
 
@@ -57,20 +58,32 @@ protected:
    }
 };
 
+// use policy classes for handling groups of events
+/*
+template< typename KEYBOARD_EVENTS = detail::keyboard_events
+class sdl_window : public sdl_window_base
+                 , public detail::sdl_timer_base
+
+*/
+
 // active object for displaying images
 class sdl_window : public sdl_window_base
+                 , public detail::sdl_timer_base
 {
 public:
 
    sdl_window( int width
              , int height
-             , redraw_event_base*   painter
-             , keyboard_event_base* keyboard_handler )
-   : _cancel( false )
+             , redraw_event_base*   painter          = NULL
+             , keyboard_event_base* keyboard_handler = NULL
+             , timer_event_base*    timer_handler    = NULL )
+   : sdl_timer_base( timer_handler )
+   , _cancel( false )
    , _width  ( width  )
    , _height ( height )
    , _painter( painter )
    , _keyboard_handler( keyboard_handler )
+   , _timer_handler( timer_handler )
    , _queue( NULL )
    {
       _screen = SDL_SetVideoMode( width
@@ -161,7 +174,6 @@ private:
       }
    }
 
-
 private:
 
    typedef boost::scoped_ptr<boost::thread> thread_t;
@@ -176,8 +188,10 @@ private:
    int _width;
    int _height;
 
+   // How about shared pointers?
    redraw_event_base*   _painter;
    keyboard_event_base* _keyboard_handler;
+   timer_event_base*    _timer_handler;
 
    queue_t* _queue;
 

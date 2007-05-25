@@ -20,6 +20,11 @@ struct redraw_event_base
    virtual void redraw( const bgra8_view_t& sdl_view ) =0;
 };
 
+struct timer_event_base
+{
+   virtual void time_elapsed() =0;
+};
+
 struct quit_event_base
 {
    virtual void quit() =0;

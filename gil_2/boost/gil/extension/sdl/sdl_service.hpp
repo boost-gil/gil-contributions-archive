@@ -30,8 +30,9 @@ public:
 
    sdl_service()
    : _terminate( false )
+   , _init_redraw( true )
    {
-      if ( SDL_Init( SDL_INIT_VIDEO ) < 0 ) 
+      if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ) 
       {
          std::string error( "Unable to init SDL: " );
          error += SDL_GetError();
@@ -59,6 +60,13 @@ public:
    {
       while( _terminate == false )
       {
+         if( _init_redraw && _win )
+         {
+            add_message<detail::redraw_event>();
+
+            _init_redraw = false;
+         }
+
          SDL_Event event;
          while( SDL_PollEvent( &event ))
          {
@@ -94,6 +102,10 @@ public:
                }
 
             } //switch
+
+            // Redraw after each event.
+            add_message<detail::redraw_event>();
+
          } // while
       } // while
    }
@@ -111,6 +123,8 @@ private:
    sdl_window* _win;
 
    queue_t _queue;
+
+   bool _init_redraw;
 };
 
 

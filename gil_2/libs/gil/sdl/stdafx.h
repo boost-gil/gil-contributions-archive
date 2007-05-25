@@ -9,11 +9,3 @@
 
 #include <iostream>
 #include <tchar.h>
-
-#include <boost/any.hpp>
-
-#include <boost/thread/xtime.hpp>
-
-#include <boost/gil/gil_all.hpp>
-
-#include <boost/gil/extension/io/bmp_io.hpp>
