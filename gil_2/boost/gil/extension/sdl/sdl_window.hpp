@@ -29,65 +29,14 @@ class sdl_window_base
 {
 protected:
 
-   void lock( SDL_Surface* screen )
+   sdl_window_base( int width
+                  , int height )
+   : _queue( NULL )
+   , _width ( width  )
+   , _height( height )
    {
-      if( screen && SDL_MUSTLOCK( screen ))
-      {
-         if( SDL_LockSurface( screen ) < 0 ) 
-         {
-            return;
-         }
-      }
-   }
-
-   void unlock( SDL_Surface* screen
-              , int          width
-              , int          height )
-   {
-      if( screen && SDL_MUSTLOCK( screen )) 
-      {
-         SDL_UnlockSurface( screen );
-      }
-
-      // Tell SDL to update the whole screen
-      SDL_UpdateRect( screen
-                    , 0
-                    , 0
-                    , width
-                    , height );
-   }
-};
-
-// use policy classes for handling groups of events
-/*
-template< typename KEYBOARD_EVENTS = detail::keyboard_events
-class sdl_window : public sdl_window_base
-                 , public detail::sdl_timer_base
-
-*/
-
-// active object for displaying images
-class sdl_window : public sdl_window_base
-                 , public detail::sdl_timer_base
-{
-public:
-
-   sdl_window( int width
-             , int height
-             , redraw_event_base*   painter          = NULL
-             , keyboard_event_base* keyboard_handler = NULL
-             , timer_event_base*    timer_handler    = NULL )
-   : sdl_timer_base( timer_handler )
-   , _cancel( false )
-   , _width  ( width  )
-   , _height ( height )
-   , _painter( painter )
-   , _keyboard_handler( keyboard_handler )
-   , _timer_handler( timer_handler )
-   , _queue( NULL )
-   {
-      _screen = SDL_SetVideoMode( width
-                                , height
+      _screen = SDL_SetVideoMode( _width
+                                , _height
                                 , 32
                                 , SDL_SWSURFACE );
 
@@ -95,8 +44,78 @@ public:
       {
          throw std::runtime_error( "Couldn't create SDL window" );
       }
+   }
 
+   void lock()
+   {
+      if( _screen && SDL_MUSTLOCK( _screen ))
+      {
+         if( SDL_LockSurface( _screen ) < 0 ) 
+         {
+            return;
+         }
+      }
+   }
 
+   void unlock()
+   {
+      if( _screen && SDL_MUSTLOCK( _screen )) 
+      {
+         SDL_UnlockSurface( _screen );
+      }
+
+      // Tell SDL to update the whole screen
+      SDL_UpdateRect( _screen
+                    , 0
+                    , 0
+                    , _width
+                    , _height );
+   }
+
+   queue_t* get_queue() { return _queue; }
+
+private:
+
+   void set_queue( queue_t& queue )
+   {
+      _queue = &queue;
+   }
+
+protected:
+
+   int _width;
+   int _height;
+
+   SDL_Surface* _screen;
+
+private:
+
+   queue_t* _queue;
+
+   friend class sdl_service;
+};
+
+// active object for displaying images
+
+template < typename KEYBOARD_EVENTS = detail::default_keyboard_events
+         , typename REDRAW_EVENT    = detail::default_redraw_event
+         , typename TIMER_EVENT     = detail::default_timer_event
+         , typename QUIT_EVENT      = detail::default_quit_event
+         >
+class sdl_window : public sdl_window_base
+                 , public detail::sdl_timer_base< TIMER_EVENT >
+                 , public KEYBOARD_EVENTS
+                 , public REDRAW_EVENT
+                 , public QUIT_EVENT
+{
+public:
+
+   sdl_window( int width
+             , int height )
+   : sdl_window_base( width
+                    , height )
+   , _cancel( false )
+   {
       _thread.reset( new boost::thread( boost::bind( _run
                                                    , this )));
    }
@@ -116,57 +135,47 @@ public:
 
 private:
 
-   void set_queue( queue_t& queue )
-   {
-      _queue = &queue;
-   }
-
    void _run()
    {
       boost::shared_ptr< sdl_event_t > e;
 
       while( _cancel == false )
       {
-         if( _queue )
+         if( get_queue() )
          {
-            _queue->dequeue( e );
+            get_queue()->dequeue( e );
 
             switch( e->type() )
             {
                case detail::redraw_event::type:
                {
-                  lock( _screen );
+                  lock();
 
-                  if( _painter )
-                  {
-                     _painter->redraw( wrap_sdl_image( _screen ));
-                  }
+                  redraw( wrap_sdl_image( _screen ));
 
-                  unlock( _screen
-                        , _width
-                        , _height  );
+                  unlock();
 
                   break;
                }
 
                case detail::key_up_event::type:
                {
-                  lock( _screen );
+                  lock();
 
-                  if( _keyboard_handler )
+                  if( key_up() == true )
                   {
-                     _keyboard_handler->key_up( wrap_sdl_image( _screen ));
+                     redraw( wrap_sdl_image( _screen ));
                   }
 
-                  unlock( _screen
-                        , _width
-                        , _height  );
+                  unlock();
 
                   break;
                }
 
                case detail::quit_event::type:
                {
+                  quit();
+
                   return;
                }
             }
@@ -182,20 +191,6 @@ private:
    mutable boost::mutex _sentinel;
 
    bool _cancel;
-
-   SDL_Surface* _screen;
-
-   int _width;
-   int _height;
-
-   // How about shared pointers?
-   redraw_event_base*   _painter;
-   keyboard_event_base* _keyboard_handler;
-   timer_event_base*    _timer_handler;
-
-   queue_t* _queue;
-
-   friend class sdl_service;
 };
 
 

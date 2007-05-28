@@ -47,9 +47,9 @@ public:
       SDL_Quit();
    }
 
-   void add_window( sdl_window& win )
+   void add_window( shared_ptr< sdl_window_base > win )
    {
-      _win = &win;
+      _win.swap( win );
 
       // Pass the window a message queue.
       
@@ -70,8 +70,6 @@ public:
          SDL_Event event;
          while( SDL_PollEvent( &event ))
          {
-            add_message<detail::redraw_event>();
-
             switch (event.type) 
             {
                case SDL_KEYDOWN:
@@ -98,14 +96,13 @@ public:
                {
                   add_message<detail::quit_event>();
 
+                  // todo: We should probably wait for the windows to
+                  // terminate.
+
                   return ;
                }
 
             } //switch
-
-            // Redraw after each event.
-            add_message<detail::redraw_event>();
-
          } // while
       } // while
    }
@@ -120,7 +117,7 @@ private:
 
    bool _terminate;
 
-   sdl_window* _win;
+   shared_ptr< sdl_window_base > _win;
 
    queue_t _queue;
 
