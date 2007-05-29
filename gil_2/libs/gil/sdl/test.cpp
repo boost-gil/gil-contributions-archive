@@ -12,6 +12,39 @@ using namespace boost;
 using namespace gil;
 using namespace sdl;
 
+int main( int argc, char* argv[] )
+{
+   sdl_service ss;
+
+   rgb8_image_t img;
+   bmp_read_image( "flower.bmp", img );
+
+   typedef sdl_window<> window_t;
+   typedef shared_ptr< window_t > window_ptr_t;
+
+   typedef sdl::detail::default_redraw_event_handler rh_t;   
+   
+   window_ptr_t win( new window_t( view( img ).width()
+                                 , view( img ).height()
+                                 , window_t::redraw_handler_t( new rh_t )));
+
+   win->set_timer( 1000 );
+
+   ss.add_window( win );
+   ss.run();
+
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+/*
 class my_timer : public timer_event_base
 {
 public:
@@ -62,3 +95,4 @@ int main( int argc, char* argv[] )
 
 	return 0;
 }
+*/

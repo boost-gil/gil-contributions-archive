@@ -8,20 +8,33 @@
 #ifndef SDL_TIMER_HPP
 #define SDL_TIMER_HPP
 
+#include <boost/shared_ptr.hpp>
+
 #include <SDL.h>
 
+#include "sdl_window_base.hpp"
 #include "user_events.hpp"
 
 namespace boost { namespace gil { namespace sdl { namespace detail {
 
-template< typename TIMER_EVENT = detail::default_timer_event
+template< typename TIMER_EVENT_HANDLER  = detail::default_timer_event_handler
+        , typename REDRAW_EVENT_HANDLER = detail::default_timer_event_handler
         >
-class sdl_timer_base : public TIMER_EVENT
+class sdl_timer_base : virtual public sdl_window_base
+                     , public TIMER_EVENT_HANDLER
 {
 public:
 
-   sdl_timer_base()
-   : _timer_id( 0 )
+ typedef boost::shared_ptr<REDRAW_EVENT_HANDLER> redraw_handler_t;
+
+public:
+
+   sdl_timer_base( int width
+                 , int height
+                 , redraw_handler_t redraw_handler )
+   : sdl_window_base( width, height )
+   , _redraw_handler( redraw_handler )
+   , _timer_id( 0 )
    , _timer_init( false )
    {}
 
@@ -58,7 +71,7 @@ private:
 
       if( p && p->time_elapsed() )
       {
-         //redraw( wrap_sdl_image( _screen ));
+         p->_redraw_handler->redraw( wrap_sdl_image( p->_screen ));
       }
 
       // The return value needs to be different from the interval parameter.
@@ -71,6 +84,8 @@ private:
    bool _timer_init;
 
    SDL_TimerID _timer_id;
+
+   redraw_handler_t _redraw_handler;
 };
 
 } } } } // namespace boost::gil::sdl::detail

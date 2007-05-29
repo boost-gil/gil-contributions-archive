@@ -13,25 +13,6 @@
 namespace boost { namespace gil { namespace sdl { 
 
 inline
-void set_pixel( const boost::gil::rgb8_pixel_t& pixel
-              , SDL_Surface*                    screen
-              , int                             x
-              , int                             y       )
-{
-   Uint32 col = SDL_MapRGB( screen->format
-                          , get_color( pixel, boost::gil::red_t()   )
-                          , get_color( pixel, boost::gil::green_t() )
-                          , get_color( pixel, boost::gil::blue_t() ));
-
-   char* pos = static_cast<char*>( screen->pixels );
-
-   pos += screen->pitch * y;
-   pos += screen->format->BytesPerPixel * x;
-   
-   memcpy( pos, &col, screen->format->BytesPerPixel );
-}
-
-inline
 bgra8_view_t wrap_sdl_image( SDL_Surface* screen )
 {
    return interleaved_view( screen->w

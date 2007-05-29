@@ -10,25 +10,25 @@
 
 namespace boost { namespace gil { namespace sdl { namespace detail {
 
-struct default_keyboard_events
+struct default_keyboard_event_handler
 {
    // Return true to trigger redraw.
    bool key_up() { return false; }
 };
 
-struct default_redraw_event
+struct default_redraw_event_handler
 {
    void redraw( const bgra8_view_t& sdl_view ) {}
 };
 
-struct default_timer_event
+struct default_timer_event_handler
 {
    // Return true to trigger redraw.
    bool time_elapsed() { return false; }
 };
 
 
-struct default_quit_event
+struct default_quit_event_handler
 {
    void quit() {}
 };

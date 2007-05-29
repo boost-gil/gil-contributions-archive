@@ -17,103 +17,44 @@
 
 #include "sdl_events.hpp"
 #include "sdl_timer.hpp"
+#include "sdl_window_base.hpp"
 #include "user_events.hpp"
 #include "message_queue.h"
 
 namespace boost { namespace gil { namespace sdl { 
 
 typedef detail::sdl_event_base sdl_event_t;
-typedef ogx::message_queue< sdl_event_t > queue_t;
-
-class sdl_window_base
-{
-protected:
-
-   sdl_window_base( int width
-                  , int height )
-   : _queue( NULL )
-   , _width ( width  )
-   , _height( height )
-   {
-      _screen = SDL_SetVideoMode( _width
-                                , _height
-                                , 32
-                                , SDL_SWSURFACE );
-
-      if( _screen == NULL )
-      {
-         throw std::runtime_error( "Couldn't create SDL window" );
-      }
-   }
-
-   void lock()
-   {
-      if( _screen && SDL_MUSTLOCK( _screen ))
-      {
-         if( SDL_LockSurface( _screen ) < 0 ) 
-         {
-            return;
-         }
-      }
-   }
-
-   void unlock()
-   {
-      if( _screen && SDL_MUSTLOCK( _screen )) 
-      {
-         SDL_UnlockSurface( _screen );
-      }
-
-      // Tell SDL to update the whole screen
-      SDL_UpdateRect( _screen
-                    , 0
-                    , 0
-                    , _width
-                    , _height );
-   }
-
-   queue_t* get_queue() { return _queue; }
-
-private:
-
-   void set_queue( queue_t& queue )
-   {
-      _queue = &queue;
-   }
-
-protected:
-
-   int _width;
-   int _height;
-
-   SDL_Surface* _screen;
-
-private:
-
-   queue_t* _queue;
-
-   friend class sdl_service;
-};
 
 // active object for displaying images
 
-template < typename KEYBOARD_EVENTS = detail::default_keyboard_events
-         , typename REDRAW_EVENT    = detail::default_redraw_event
-         , typename TIMER_EVENT     = detail::default_timer_event
-         , typename QUIT_EVENT      = detail::default_quit_event
+template < typename KEYBOARD_EVENTS = detail::default_keyboard_event_handler
+         , typename REDRAW_EVENT    = detail::default_redraw_event_handler
+         , typename TIMER_EVENT     = detail::default_timer_event_handler
+         , typename QUIT_EVENT      = detail::default_quit_event_handler
          >
-class sdl_window : public sdl_window_base
-                 , public detail::sdl_timer_base< TIMER_EVENT >
+class sdl_window : virtual public sdl_window_base
+                 , public detail::sdl_timer_base< TIMER_EVENT
+                                                , REDRAW_EVENT >
                  , public KEYBOARD_EVENTS
-                 , public REDRAW_EVENT
                  , public QUIT_EVENT
 {
 public:
 
+   typedef shared_ptr<REDRAW_EVENT> redraw_handler_t;
+
+public:
+
    sdl_window( int width
-             , int height )
+             , int height
+             , redraw_handler_t rh )
    : sdl_window_base( width
                     , height )
+   , detail::sdl_timer_base< TIMER_EVENT
+                           , REDRAW_EVENT>( width
+                                          , height
+                                          , rh     )
+
+   , _redraw_handler( rh )
    , _cancel( false )
    {
       _thread.reset( new boost::thread( boost::bind( _run
@@ -151,7 +92,7 @@ private:
                {
                   lock();
 
-                  redraw( wrap_sdl_image( _screen ));
+                  _redraw_handler->redraw( wrap_sdl_image( _screen ));
 
                   unlock();
 
@@ -164,7 +105,7 @@ private:
 
                   if( key_up() == true )
                   {
-                     redraw( wrap_sdl_image( _screen ));
+                     _redraw_handler->redraw( wrap_sdl_image( _screen ));
                   }
 
                   unlock();
@@ -189,6 +130,8 @@ private:
    thread_t _thread;
 
    mutable boost::mutex _sentinel;
+
+   redraw_handler_t _redraw_handler;
 
    bool _cancel;
 };
