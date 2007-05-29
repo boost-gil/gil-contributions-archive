@@ -38,7 +38,7 @@ class sdl_window : virtual public sdl_window_base
                  , public KEYBOARD_EVENTS
                  , public QUIT_EVENT
 {
-public:
+private:
 
    typedef shared_ptr<REDRAW_EVENT> redraw_handler_t;
 
@@ -46,7 +46,7 @@ public:
 
    sdl_window( int width
              , int height
-             , redraw_handler_t rh )
+             , redraw_handler_t rh = redraw_handler_t( new REDRAW_EVENT() ))
    : sdl_window_base( width
                     , height )
    , detail::sdl_timer_base< TIMER_EVENT

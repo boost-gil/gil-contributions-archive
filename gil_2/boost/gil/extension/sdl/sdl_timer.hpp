@@ -17,15 +17,15 @@
 
 namespace boost { namespace gil { namespace sdl { namespace detail {
 
-template< typename TIMER_EVENT_HANDLER  = detail::default_timer_event_handler
-        , typename REDRAW_EVENT_HANDLER = detail::default_timer_event_handler
+template< typename TIMER_HANDLER  = detail::default_timer_event_handler
+        , typename REDRAW_HANDLER = detail::default_timer_event_handler
         >
 class sdl_timer_base : virtual public sdl_window_base
-                     , public TIMER_EVENT_HANDLER
+                     , public TIMER_HANDLER
 {
-public:
+private:
 
- typedef boost::shared_ptr<REDRAW_EVENT_HANDLER> redraw_handler_t;
+ typedef boost::shared_ptr<REDRAW_HANDLER> redraw_handler_t;
 
 public:
 
@@ -55,6 +55,8 @@ public:
                                  , &sdl_timer_base::timer_callback
                                  , this                              );
 
+         char* error = SDL_GetError();
+
          _timer_init = true;
       }
       else
@@ -69,9 +71,12 @@ private:
    {
       sdl_timer_base* p = (sdl_timer_base*) param;
 
+
       if( p && p->time_elapsed() )
       {
+         p->lock();
          p->_redraw_handler->redraw( wrap_sdl_image( p->_screen ));
+         p->unlock();
       }
 
       // The return value needs to be different from the interval parameter.

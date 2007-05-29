@@ -86,6 +86,8 @@ private:
       _queue = &queue;
    }
 
+   friend class sdl_service;
+
 protected:
 
    bool _surface_init;
@@ -98,8 +100,6 @@ protected:
 private:
 
    queue_t* _queue;
-
-   friend class sdl_service;
 };
 
 } } } // namespace boost::gil::sdl
