@@ -319,7 +319,7 @@ void main() {
       pnm_write_view( out_dir+"p1.pnm", view( image ));
 
       pnm_read_image( out_dir+"p1.pnm", image );
-      bmp_write_view( "p1.pnm.bmp", view( image ));
+      bmp_write_view( out_dir+"p1.pnm.bmp", view( image ));
    }
 
    {
@@ -330,7 +330,7 @@ void main() {
       pnm_write_view( out_dir+"p2.pnm", view( image ));
 
       pnm_read_image( out_dir+"p2.pnm", image );
-      bmp_write_view( "p2.pnm.bmp", view( image ));
+      bmp_write_view( out_dir+"p2.pnm.bmp", view( image ));
    }
 
    {
@@ -341,7 +341,7 @@ void main() {
       pnm_write_view( out_dir+"p3.pnm", view( image ));
 
       pnm_read_image( out_dir+"p3.pnm", image );
-      bmp_write_view( "p3.pnm.bmp", view( image ));
+      bmp_write_view( out_dir+"p3.pnm.bmp", view( image ));
    }
 
    {
@@ -352,7 +352,7 @@ void main() {
       pnm_write_view( out_dir+"p4.pnm", view( image ));
 
       pnm_read_image( out_dir+"p4.pnm", image );
-      bmp_write_view( "p4.pnm.bmp", view( image ));
+      bmp_write_view( out_dir+"p4.pnm.bmp", view( image ));
    }
 
 
@@ -364,7 +364,7 @@ void main() {
       pnm_write_view( out_dir+"p5.pnm", view( image ));
 
       pnm_read_image( out_dir+"p5.pnm", image );
-      bmp_write_view( "p5.pnm.bmp", view( image ));
+      bmp_write_view( out_dir+"p5.pnm.bmp", view( image ));
    }
 
    {
@@ -375,7 +375,7 @@ void main() {
       pnm_write_view( out_dir+"p6.pnm", view( image ));
 
       pnm_read_image( out_dir+"p6.pnm", image );
-      bmp_write_view( "p6.pnm.bmp", view( image ));
+      bmp_write_view( out_dir+"p6.pnm.bmp", view( image ));
    }
 }
 
