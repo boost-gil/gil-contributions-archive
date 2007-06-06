@@ -1,17 +1,17 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simplest", "simplest\simplest.vcproj", "{E098635A-8534-4E93-9298-3E5A24B321FE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simplest", "simplest\simplest_VC71.vcproj", "{E098635A-8534-4E93-9298-3E5A24B321FE}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "display_image", "display_image\display_image.vcproj", "{56F27191-06CC-49F8-8441-0BDF17C5DA84}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "display_image", "display_image\display_image_VC71.vcproj", "{56F27191-06CC-49F8-8441-0BDF17C5DA84}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyboard_events", "keyboard_events\keyboard_events.vcproj", "{182B3A9D-196C-4FB1-ADB4-F5622A820941}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyboard_events", "keyboard_events\keyboard_events_VC71.vcproj", "{182B3A9D-196C-4FB1-ADB4-F5622A820941}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer_event", "timer_event\timer_event.vcproj", "{26039EAB-9921-4397-AAFC-0D7A775000AF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer_event", "timer_event\timer_event_VC71.vcproj", "{26039EAB-9921-4397-AAFC-0D7A775000AF}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
