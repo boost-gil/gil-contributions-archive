@@ -57,7 +57,10 @@ public:
    , _redraw_handler( rh )
    , _cancel( false )
    {
-      _thread.reset( new boost::thread( boost::bind( _run
+      _thread.reset( new boost::thread( boost::bind( &boost::gil::sdl::sdl_window< KEYBOARD_EVENTS
+                                                                                 , REDRAW_EVENT
+                                                                                 , TIMER_EVENT 
+                                                                                 , QUIT_EVENT >::_run
                                                    , this )));
    }
 
