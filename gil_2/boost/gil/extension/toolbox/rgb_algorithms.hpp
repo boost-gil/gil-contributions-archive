@@ -160,7 +160,38 @@ template< typename RGB_VIEW
 void remove_channel( const RGB_VIEW& src
                    , const RGB_VIEW& dst )
 {
-   
+   throw runtime_error( "Not yet implemented. Sorry" );
+}
+
+template< typename RGB_VIEW >
+void difference( const RGB_VIEW& src_1
+               , const RGB_VIEW& src_2
+               , const RGB_VIEW& dst    )
+{
+   if( src_1.dimensions() != src_2.dimensions() )
+   {
+      throw runtime_error( "Source image have different dimensions." );
+   }
+
+   if( src_1.dimensions() != dst.dimensions() )
+   {
+      throw runtime_error( "Destination image must have equal dimensions as the source images." );
+   }
+
+   for( int y = 0; y < src_1.dimensions().y; ++y )
+   {
+      typename RGB_VIEW::x_iterator src_1_it = src_1.row_begin( y );
+      typename RGB_VIEW::x_iterator src_2_it = src_2.row_begin( y );
+
+      typename RGB_VIEW::x_iterator dst_it = dst.row_begin( y );
+
+      typedef channel_type<RGB_VIEW>::type channel_t;
+
+      for( int x = 0; x < src_1.dimensions().x; ++x )
+      {
+         static_for_each( src_1_it[x], src_1_it[x], dst_it[x], calc_diff() );
+      }
+   }
 }
 
 } //namespace toolbox
