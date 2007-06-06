@@ -176,12 +176,12 @@ template <typename V, typename C> struct transfer_pnm {
 
 
 
-class pnm_reader : public file_mgr {
+class pnm_reader : public file_mgr_ext {
 
 public:
-    pnm_reader(FILE* file)           : file_mgr(file)           { init(); }
-    pnm_reader(const char* filename) : file_mgr(filename, "rb") { init(); }
-    pnm_reader(const wchar_t* filename) : file_mgr(filename, L"rb") { init(); }
+    pnm_reader(FILE* file)           : file_mgr_ext(file)           { init(); }
+    pnm_reader(const char* filename) : file_mgr_ext(filename, "rb") { init(); }
+    pnm_reader(const wchar_t* filename) : file_mgr_ext(filename, L"rb") { init(); }
 
    template <typename VIEW>
    void apply( const VIEW& view )
@@ -351,11 +351,11 @@ protected:
 	int width, height;
 };
 
-class pnm_writer : public file_mgr {
+class pnm_writer : public file_mgr_ext {
 public:
-    pnm_writer(FILE* file)           : file_mgr(file)           {}
-    pnm_writer(const char* filename) : file_mgr(filename, "wb") {}
-    pnm_writer(const wchar_t* filename) : file_mgr(filename, L"wb") {}
+    pnm_writer(FILE* file)           : file_mgr_ext(file)           {}
+    pnm_writer(const char* filename) : file_mgr_ext(filename, "wb") {}
+    pnm_writer(const wchar_t* filename) : file_mgr_ext(filename, L"wb") {}
 
     template <typename VIEW>
     void apply(const VIEW& view) {

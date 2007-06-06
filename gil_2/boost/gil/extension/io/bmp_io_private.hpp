@@ -314,7 +314,7 @@ template <typename V, typename C> struct transfer
 	}
 };
 
-class bmp_reader : public file_mgr {
+class bmp_reader : public file_mgr_ext {
 protected:
    info_header _info_header;
    file_header _file_header;
@@ -377,9 +377,9 @@ protected:
 
 
 public:
-    bmp_reader(FILE* file)           : file_mgr(file)           { init(); }
-    bmp_reader(const char* filename) : file_mgr(filename, "rb") { init(); }
-    bmp_reader(const wchar_t* filename) : file_mgr(filename, L"rb") { init(); }
+    bmp_reader(FILE* file)              : file_mgr_ext( file )            { init(); }
+    bmp_reader(const char* filename)    : file_mgr_ext( filename, "rb" )  { init(); }
+    bmp_reader(const wchar_t* filename) : file_mgr_ext( filename, L"rb" ) { init(); }
 
    template <typename VIEW>
    void apply( const VIEW& view )
@@ -517,11 +517,11 @@ public:
     }
 };
 
-class bmp_writer : public file_mgr {
+class bmp_writer : public file_mgr_ext {
 public:
-    bmp_writer(FILE* file)           : file_mgr(file)           {}
-    bmp_writer(const char* filename) : file_mgr(filename, "wb") {}
-    bmp_writer(const wchar_t* filename) : file_mgr(filename, L"wb") {}
+    bmp_writer(FILE* file)           : file_mgr_ext(file)           {}
+    bmp_writer(const char* filename) : file_mgr_ext(filename, "wb") {}
+    bmp_writer(const wchar_t* filename) : file_mgr_ext(filename, L"wb") {}
     
     template <typename VIEW>
     void apply(const VIEW& view) {

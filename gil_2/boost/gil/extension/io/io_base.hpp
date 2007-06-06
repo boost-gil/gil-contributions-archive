@@ -6,8 +6,8 @@
 
 /*************************************************************************************************/
 
-#ifndef GIL_IO_ERROR_H
-#define GIL_IO_ERROR_H
+#ifndef GIL_IO_BASE_H
+#define GIL_IO_BASE_H
 
 /// \file
 /// \brief  Handle input-output errors
@@ -24,14 +24,12 @@
 #include <ios>
 #include <stdarg.h>
 
+#include <boost/gil/extension/io/io_error.hpp>
+
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace boost { namespace gil {
-
-/// Byte type
-inline void io_error(const char* descr) { throw std::ios_base::failure(descr); }
-inline void io_error_if(bool expr, const char* descr="") { if (expr) io_error(descr); }
 
 namespace detail {
 
@@ -45,22 +43,21 @@ namespace detail {
 			enum { size = 1 };
 		};
 
-    class file_mgr {
-
+    class file_mgr_ext : public file_mgr
+    {
     protected:
 
-        boost::shared_ptr<FILE> _fp;
+        file_mgr_ext(FILE* file) 
+        : file_mgr( file )
+        {}
 
-        struct null_deleter { void operator()(void const*) const {} };
-        file_mgr(FILE* file) : _fp(file, null_deleter()) {}
+        file_mgr_ext( const char* filename, const char* flags )
+        : file_mgr( filename, flags )
+        {}
 
-        file_mgr(const char* filename, const char* flags) {
-            FILE* fp;
-            io_error_if((fp=fopen(filename,flags))==NULL, "file_mgr: failed to open file");
-            _fp=boost::shared_ptr<FILE>(fp,fclose);
-        }
-
-        file_mgr(const wchar_t* filename, const wchar_t* flags) {
+        file_mgr_ext(const wchar_t* filename, const wchar_t* flags)
+        : file_mgr( "", "" )
+        {
             FILE* fp;
             #ifdef _WIN32
                io_error_if((fp=_wfopen(filename,flags))==NULL, "file_mgr: failed to open file");
@@ -217,4 +214,4 @@ namespace detail {
 } // namespace gil
 } // namespace boost
 
-#endif
+#endif // GIL_IO_BASE_H
