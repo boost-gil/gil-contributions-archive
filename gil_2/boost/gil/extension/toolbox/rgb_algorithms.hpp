@@ -155,13 +155,42 @@ void brightness_( const RGB_VIEW& src
    }
 }
 
-template< typename RGB_VIEW
-        , typename CHANNEL >
+template< typename RGB_VIEW >
 void remove_channel( const RGB_VIEW& src
-                   , const RGB_VIEW& dst )
+                   , unsigned int    c   )
 {
-   throw runtime_error( "Not yet implemented. Sorry" );
+   typedef channel_type< RGB_VIEW >::type channel_t;
+   channel_t min = channel_traits<channel_t>::min_value();
+
+   for( int y = 0; y < src.dimensions().y; ++y )
+   {
+      typename RGB_VIEW::x_iterator src_it = src.row_begin( y );
+
+      for( int x = 0; x < src.dimensions().x; ++x )
+      {
+         dynamic_at_c( src_it[x], c ) = min;
+      }
+   }
 }
+
+template< typename CHANNEL
+        , typename RGB_VIEW >
+void remove_channel( const RGB_VIEW& src )
+{
+   typedef channel_type< RGB_VIEW >::type channel_t;
+   channel_t min = channel_traits<channel_t>::min_value();
+
+   for( int y = 0; y < src.dimensions().y; ++y )
+   {
+      typename RGB_VIEW::x_iterator src_it = src.row_begin( y );
+
+      for( int x = 0; x < src.dimensions().x; ++x )
+      {
+         get_color( src_it[x], CHANNEL() ) = min;
+      }
+   }
+}
+
 
 template< typename RGB_VIEW >
 void difference( const RGB_VIEW& src_1
