@@ -205,9 +205,6 @@ namespace detail {
 			}
 			return n;
 		}
-
-    public:
-        FILE* get() { return _fp.get(); }
     };
 }
 
