@@ -79,9 +79,7 @@ private:
          p->unlock();
       }
 
-      // The return value needs to be different from the interval parameter.
-      // Otherwise the timer will stop.
-      return ++interval;
+      return interval;
    }
 
 private:
