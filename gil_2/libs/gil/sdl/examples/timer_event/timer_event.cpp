@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
 
    // set the image and clock the timer
    win->my_timer_handler::set_img( view( img ));
-   win->set_timer( 5000 );
+   win->set_timer( 100 );
 
    // create service and let's roll
    ss.add_window( win );

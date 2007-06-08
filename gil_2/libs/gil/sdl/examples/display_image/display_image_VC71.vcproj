@@ -69,8 +69,9 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="c:\boost_1.34;C:\gil\repos\gil_2\;C:\gil\repos\gil_2\externals\SDL-1.2.11\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -79,8 +80,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="sdl.lib sdlmain.lib"
 				OutputFile="$(OutDir)/display_image.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="c:\boost_1.34\stage\lib;C:\gil\repos\gil_2\externals\SDL-1.2.11\lib"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
