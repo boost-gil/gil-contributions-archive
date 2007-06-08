@@ -109,7 +109,7 @@ int main( int argc, char* argv[] )
 {
    // load the image
    rgb8_image_t img;
-   bmp_read_image( "..\\..\\flower.bmp", img );
+   bmp_read_image( ".\\flower.bmp", img );
 
 
    // define window type
