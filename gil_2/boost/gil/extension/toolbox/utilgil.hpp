@@ -20,10 +20,10 @@ enum
  	FBottom = (0x1 << 7), 
 }; 
 
-struct make_archstone_interval
+struct make_archstone_list
 {
 	int size,r,adj,pos;
-	make_archstone_interval(int width, int size) : 
+	make_archstone_list(int width, int size) : 
 		size(size), r((width-1)%size),
 			adj((width-1)/size), pos(0){}
 		

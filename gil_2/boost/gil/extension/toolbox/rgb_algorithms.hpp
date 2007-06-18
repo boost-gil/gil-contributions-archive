@@ -30,7 +30,7 @@ struct calc_negative
 template< typename RGB_VIEW >
 void negative( const RGB_VIEW& view )
 {
-   typedef channel_type< RGB_VIEW >::type channel_t;
+   typedef typename channel_type< RGB_VIEW >::type channel_t;
    channel_t max = channel_traits<channel_t>::max_value();
 
    for( int y=0; y < view.height(); ++y )
@@ -52,7 +52,7 @@ void negative( const RGB_VIEW& src
 
    // for rgba do it only for rgb channels
 
-   typedef channel_type< RGB_VIEW >::type channel_t;
+   typedef typename channel_type< RGB_VIEW >::type channel_t;
    channel_t max = channel_traits<channel_t>::max_value();
 
    for( int y=0; y < src.height(); ++y )
@@ -159,8 +159,8 @@ template< typename RGB_VIEW >
 void remove_channel( const RGB_VIEW& src
                    , unsigned int    c   )
 {
-   typedef channel_type< RGB_VIEW >::type channel_t;
-   channel_t min = channel_traits<channel_t>::min_value();
+   typedef typename channel_type< RGB_VIEW >::type channel_t;
+   channel_t min_value = channel_traits<channel_t>::min_value();
 
    for( int y = 0; y < src.dimensions().y; ++y )
    {
@@ -168,7 +168,7 @@ void remove_channel( const RGB_VIEW& src
 
       for( int x = 0; x < src.dimensions().x; ++x )
       {
-         dynamic_at_c( src_it[x], c ) = min;
+         dynamic_at_c( src_it[x], c ) = min_value;
       }
    }
 }
@@ -177,7 +177,7 @@ template< typename CHANNEL
         , typename RGB_VIEW >
 void remove_channel( const RGB_VIEW& src )
 {
-   typedef channel_type< RGB_VIEW >::type channel_t;
+   typedef typename channel_type< RGB_VIEW >::type channel_t;
    channel_t min = channel_traits<channel_t>::min_value();
 
    for( int y = 0; y < src.dimensions().y; ++y )
@@ -199,12 +199,12 @@ void difference( const RGB_VIEW& src_1
 {
    if( src_1.dimensions() != src_2.dimensions() )
    {
-      throw runtime_error( "Source image have different dimensions." );
+      throw std::runtime_error( "Source image have different dimensions." );
    }
 
    if( src_1.dimensions() != dst.dimensions() )
    {
-      throw runtime_error( "Destination image must have equal dimensions as the source images." );
+      throw std::runtime_error( "Destination image must have equal dimensions as the source images." );
    }
 
    for( int y = 0; y < src_1.dimensions().y; ++y )
@@ -214,11 +214,13 @@ void difference( const RGB_VIEW& src_1
 
       typename RGB_VIEW::x_iterator dst_it = dst.row_begin( y );
 
-      typedef channel_type<RGB_VIEW>::type channel_t;
+      typedef typename channel_type<RGB_VIEW>::type channel_t;
 
       for( int x = 0; x < src_1.dimensions().x; ++x )
       {
-         static_for_each( src_1_it[x], src_1_it[x], dst_it[x], calc_diff() );
+			 assert(false);
+		//TODO: what is calc_diff?
+         //static_for_each( src_1_it[x], src_1_it[x], dst_it[x], calc_diff() );
       }
    }
 }
