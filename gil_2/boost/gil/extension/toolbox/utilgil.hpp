@@ -7,6 +7,7 @@
 
 #include <boost/cast.hpp>
 #include <boost/gil/image.hpp>
+#include <boost/iterator/counting_iterator.hpp>
 
 enum 
  { 
@@ -57,28 +58,42 @@ struct make_alpha_blend
 
 struct make_gradient
 {
-	int width,pos;
-	make_gradient(int pos, int width) : pos(pos),width(width){}
+	int size,pos;
+	make_gradient(int pos, int width) : pos(pos),size(size){}
 
 	template <typename type_t>
 	void operator()(type_t& dst, const type_t& src)
 	{
-		double dbl = (double)dst + (pos * (double)(src-dst) / (double)width);
+		double dbl = (double)dst + (pos * (double)(src-dst) / (double)size);
 		dst = boost::numeric_cast<type_t>(dbl);
 	}
 };
 
 template <typename view_t, typename pixel_t> inline
-void gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
+void horizontal_gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
 {
 	using namespace boost::gil;
-	
+
 	for (int x = 0; x < view.width(); ++x)
 	{
 		pixel_t dst = start;
 		static_for_each(dst, finish, 
 			make_gradient(x,view.width()));
 		fill_pixels(subimage_view(view,x,0,1,view.height()),dst);
+	}
+}
+
+template <typename view_t, typename pixel_t> inline
+void vertical_gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
+{
+	using namespace boost::gil;
+
+	for (int y = 0; y < view.height(); ++y)
+	{
+		pixel_t dst = start;
+		static_for_each(dst, finish, 
+			make_gradient(y,view.width()));
+		fill_pixels(subimage_view(view,0,y,view.width(),1),dst);
 	}
 }
 
