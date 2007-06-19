@@ -176,4 +176,3 @@ struct find_last_fitted_glyph
 
 #endif
 
-

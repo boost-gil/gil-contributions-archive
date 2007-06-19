@@ -20,10 +20,10 @@ enum
  	FBottom = (0x1 << 7), 
 }; 
 
-struct make_archstone_list
+struct make_archstone_interval
 {
 	int size,r,adj,pos;
-	make_archstone_list(int width, int size) : 
+	make_archstone_interval(int width, int size) : 
 		size(size), r((width-1)%size),
 			adj((width-1)/size), pos(0){}
 		
@@ -47,23 +47,50 @@ struct make_alpha_blend
 	short alpha;
 	make_alpha_blend(short alpha) : alpha(alpha){}
 
-	template <typename T>
-	void operator()(T& dst, const T src)
+	template <typename type_t>
+	void operator()(type_t& dst, const type_t& src)
 	{
 		double dbl = (dst * alpha - src * alpha + src * 255.0) / 255.0;
-		dst = boost::numeric_cast<int>(dbl);
+		dst = boost::numeric_cast<type_t>(dbl);
 	}
 };
 
-template <typename color_t, typename gview_t, typename view_t> inline
-void copy_alpha_blended_pixels(color_t color, const gview_t& grayview, const view_t& view)
+struct make_gradient
+{
+	int width,pos;
+	make_gradient(int pos, int width) : pos(pos),width(width){}
+
+	template <typename type_t>
+	void operator()(type_t& dst, const type_t& src)
+	{
+		double dbl = (double)dst + (pos * (double)(src-dst) / (double)width);
+		dst = boost::numeric_cast<type_t>(dbl);
+	}
+};
+
+template <typename view_t, typename pixel_t> inline
+void gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
+{
+	using namespace boost::gil;
+	
+	for (int x = 0; x < view.width(); ++x)
+	{
+		pixel_t dst = start;
+		static_for_each(dst, finish, 
+			make_gradient(x,view.width()));
+		fill_pixels(subimage_view(view,x,0,1,view.height()),dst);
+	}
+}
+
+template <typename gview_t, typename view_t, typename pixel_t> inline
+void alpha_blend(const gview_t& grayview, const view_t& view, const pixel_t& color)
 {
 	using namespace boost::gil;
 
 	for (int y = 0; y < view.height(); ++y)
 		for (int x = 0; x < view.width(); ++x)
 		{
-			color_t dst = color;
+			pixel_t dst = color;
 			static_for_each(dst, view(x,y), 
 				make_alpha_blend(grayview(x,y)));
 			view(x,y) = dst;
@@ -222,4 +249,3 @@ struct draw_line
 };
 
 #endif
-
