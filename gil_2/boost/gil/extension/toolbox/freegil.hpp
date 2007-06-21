@@ -151,8 +151,7 @@ struct render_gray_glyph
 		boost::gil::gray8c_view_t grayview = boost::gil::interleaved_view(
 			width,height,(pixel_t*)slot->bitmap.buffer,
 				sizeof(unsigned char)*slot->bitmap.width);
-		copy_alpha_blended_pixels(glyph->color,grayview,
-			boost::gil::subimage_view(view,x,y,width,height));
+		alpha_blend(grayview,boost::gil::subimage_view(view,x,y,width,height),glyph->color);
 
 		x += xadvance; 
 	}

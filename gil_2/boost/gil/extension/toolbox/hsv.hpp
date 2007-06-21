@@ -14,6 +14,7 @@
 /// \author Christian Henning \n
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/cast.hpp>
 #include <boost/gil/gil_all.hpp>
 
 namespace boost { namespace gil {
@@ -84,7 +85,7 @@ struct default_color_converter_impl< rgb_t, hsv_t >
       }   
       else
       { 
-         if( abs( temp_red - max_color ) < 0.0001 )
+         if( (std::abs)( boost::numeric_cast<int>(temp_red - max_color) ) < 0.0001 )
          {
             hue = ( temp_green - temp_blue )
                 / diff;

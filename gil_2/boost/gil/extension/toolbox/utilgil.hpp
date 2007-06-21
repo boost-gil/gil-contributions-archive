@@ -5,6 +5,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.)
 
+#include <iostream>
 #include <boost/cast.hpp>
 #include <boost/gil/image.hpp>
 #include <boost/iterator/counting_iterator.hpp>
@@ -21,10 +22,10 @@ enum
  	FBottom = (0x1 << 7), 
 }; 
 
-struct make_archstone_interval
+struct make_balanced_interval
 {
 	int size,r,adj,pos;
-	make_archstone_interval(int width, int size) : 
+	make_balanced_interval(int width, int size) : 
 		size(size), r((width-1)%size),
 			adj((width-1)/size), pos(0){}
 		
@@ -58,13 +59,13 @@ struct make_alpha_blend
 
 struct make_gradient
 {
-	int size,pos;
-	make_gradient(int pos, int width) : pos(pos),size(size){}
+	double adj,adj2;
+	make_gradient(double adj) : adj(adj),adj2(1-adj){}
 
 	template <typename type_t>
 	void operator()(type_t& dst, const type_t& src)
 	{
-		double dbl = (double)dst + (pos * (double)(src-dst) / (double)size);
+		double dbl = (double)src * adj  + (double)dst * adj2;
 		dst = boost::numeric_cast<type_t>(dbl);
 	}
 };
@@ -78,7 +79,7 @@ void horizontal_gradient(const view_t& view, const pixel_t& start, const pixel_t
 	{
 		pixel_t dst = start;
 		static_for_each(dst, finish, 
-			make_gradient(x,view.width()));
+			make_gradient(x/(double)view.width()));
 		fill_pixels(subimage_view(view,x,0,1,view.height()),dst);
 	}
 }
@@ -92,7 +93,7 @@ void vertical_gradient(const view_t& view, const pixel_t& start, const pixel_t& 
 	{
 		pixel_t dst = start;
 		static_for_each(dst, finish, 
-			make_gradient(y,view.width()));
+			make_gradient(y/(double)view.height()));
 		fill_pixels(subimage_view(view,0,y,view.width(),1),dst);
 	}
 }
@@ -262,5 +263,32 @@ struct draw_line
 			NumLevels,IntensityBits);
 	}
 };
+
+template <typename view_t, typename pixel_t> inline
+void diagonal_gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
+{
+	int x1=0,y1=0;
+    int x2=0,y2=0;
+
+    while(x1 < view.width() && y1 < view.height())
+    {
+        if(y1 < view.height()-1)
+            y1++;
+        else
+            x1++;
+
+        if(x2 < view.width()-1)
+            x2++;
+        else
+            y2++;
+
+        double adj = (x1+y1)/((double)view.width()+view.height());
+		pixel_t dst = start;
+		static_for_each(dst, finish, 
+			make_gradient(adj));
+
+		wuline(view,dst,x1,y1,x2,y2,256,8);
+    } 
+}
 
 #endif
