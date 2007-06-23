@@ -26,10 +26,6 @@ enum
 template <int h, int s, int v> 
 struct hsv 
 {
-	static const int hue=h;
-	static const int saturation=s;
-	static const int value=v;
-
 	static const boost::gil::hsv32f_pixel_t hsv32f_pixel()
 	{
 		return boost::gil::hsv32f_pixel_t(h/360.0,s/100.0,v/100.0);
@@ -47,18 +43,14 @@ struct hsv
 template <int r, int g, int b> 
 struct rgb
 {
-	static const int red=r;
-	static const int green=g;
-	static const int blue=b;
-
 	static const boost::gil::rgb8_pixel_t rgb8_pixel()
 	{
 		return boost::gil::rgb8_pixel_t(r,g,b);
 	}
 };
 
-typedef rgb<0,0,1> invalid_rgb_color;
-typedef rgb<0,0,0> black_t;
+typedef rgb<0,0,-1> rgb_invalid_t;
+typedef rgb<0,0,0> rgb_black_t;
 
 template <typename T>
 struct is_valid_color
@@ -67,7 +59,7 @@ struct is_valid_color
 };
 
 template<>
-struct is_valid_color<invalid_rgb_color>
+struct is_valid_color<rgb_invalid_t>
 {
 	static const int good = false;
 };
@@ -121,29 +113,37 @@ struct make_gradient
 };
 
 template <typename view_t, typename pixel_t> inline
-void horizontal_gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
+void horizontal_gradient(const std::vector<double>& gradients,
+	const view_t& view, const pixel_t& start, const pixel_t& finish)
 {
 	using namespace boost::gil;
+	BOOST_ASSERT(gradients.size() == view.width());
 
-	for (int x = 0; x < view.width(); ++x)
+	std::vector<double>::const_iterator it = gradients.begin();
+	for (; it != gradients.end(); it++)
 	{
+		int x = std::distance(gradients.begin(),it);
 		pixel_t dst = start;
 		static_for_each(dst, finish, 
-			make_gradient(x/(double)view.width()));
+			make_gradient(*it));
 		fill_pixels(subimage_view(view,x,0,1,view.height()),dst);
 	}
 }
 
 template <typename view_t, typename pixel_t> inline
-void vertical_gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
+void vertical_gradient(const std::vector<double>& gradients, const view_t& view, 
+	const pixel_t& start, const pixel_t& finish)
 {
 	using namespace boost::gil;
+	BOOST_ASSERT(gradients.size() == view.height());
 
-	for (int y = 0; y < view.height(); ++y)
+	std::vector<double>::const_iterator it = gradients.begin();
+	for (; it != gradients.end(); it++)
 	{
+		int y = std::distance(gradients.begin(),it);
 		pixel_t dst = start;
 		static_for_each(dst, finish, 
-			make_gradient(y/(double)view.height()));
+			make_gradient(*it));
 		fill_pixels(subimage_view(view,0,y,view.width(),1),dst);
 	}
 }
@@ -304,6 +304,13 @@ struct draw_line
 		int NumLevels = 256, int IntensityBits=8) :
 		view(view), pixel(pixel), NumLevels(NumLevels),
 		IntensityBits(IntensityBits){}
+
+	void operator()(int x, int y, int x1, int y1)
+	{
+		wuline(view,pixel,
+			x,y,x1,y1,
+			NumLevels,IntensityBits);
+	}
 
 	template <typename point_t>
 	void operator()(point_t pt0, point_t pt1)
