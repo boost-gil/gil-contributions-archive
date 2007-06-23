@@ -5,10 +5,11 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.)
 
-#include <iostream>
 #include <boost/cast.hpp>
 #include <boost/gil/image.hpp>
 #include <boost/iterator/counting_iterator.hpp>
+#include <hsv.hpp>
+#include <hsl.hpp>
 
 enum 
  { 
@@ -21,6 +22,55 @@ enum
  	FMiddle = (0x1 << 6), 
  	FBottom = (0x1 << 7), 
 }; 
+
+template <int h, int s, int v> 
+struct hsv 
+{
+	static const int hue=h;
+	static const int saturation=s;
+	static const int value=v;
+
+	static const boost::gil::hsv32f_pixel_t hsv32f_pixel()
+	{
+		return boost::gil::hsv32f_pixel_t(h/360.0,s/100.0,v/100.0);
+	}
+
+	static const boost::gil::rgb8_pixel_t rgb8_pixel()
+	{
+		boost::gil::hsv32f_pixel_t frm(h,s,v);
+		boost::gil::rgb8_pixel_t to;
+		boost::gil::color_convert(frm,to);
+		return to;
+	}
+};
+
+template <int r, int g, int b> 
+struct rgb
+{
+	static const int red=r;
+	static const int green=g;
+	static const int blue=b;
+
+	static const boost::gil::rgb8_pixel_t rgb8_pixel()
+	{
+		return boost::gil::rgb8_pixel_t(r,g,b);
+	}
+};
+
+typedef rgb<0,0,1> invalid_rgb_color;
+typedef rgb<0,0,0> black_t;
+
+template <typename T>
+struct is_valid_color
+{
+	static const int good = true;
+};
+
+template<>
+struct is_valid_color<invalid_rgb_color>
+{
+	static const int good = false;
+};
 
 struct make_balanced_interval
 {

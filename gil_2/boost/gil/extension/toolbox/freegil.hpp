@@ -26,6 +26,29 @@
 namespace boost {
 namespace gil {
 
+struct glyph
+{
+	char ch;
+	FT_Face face;
+	boost::gil::rgb8_pixel_t color;
+};
+
+template <typename clr = rgb<0,0,0> >
+struct make_glyph
+{
+	FT_Face face;
+	make_glyph(FT_Face face) : face(face) {}
+
+	boost::shared_ptr<glyph> operator()(char ch)
+	{
+		glyph* u = new glyph();
+		u->ch = ch;
+		u->color = clr::rgb8_pixel();
+		u->face = face;
+		return boost::shared_ptr<glyph>(u);
+	}
+};
+
 struct make_metric
 {
 	template <typename glyph_t>
