@@ -26,26 +26,38 @@ enum
 template <int h, int s, int v> 
 struct hsv 
 {
-	static const boost::gil::hsv32f_pixel_t hsv32f_pixel()
+	BOOST_STATIC_ASSERT(h >= 0 && h <= 360);
+	BOOST_STATIC_ASSERT(s >= 0 && s <= 100);
+	BOOST_STATIC_ASSERT(v >= 0 && v <= 100);
+
+	void operator()(boost::gil::hsv32f_pixel_t& out)
 	{
-		return boost::gil::hsv32f_pixel_t(h/360.0,s/100.0,v/100.0);
+		out = boost::gil::hsv32f_pixel_t(h/360.0,s/100.0,v/100.0);
 	}
 
-	static const boost::gil::rgb8_pixel_t rgb8_pixel()
+	void operator()(boost::gil::rgb8_pixel_t& out)
 	{
 		boost::gil::hsv32f_pixel_t frm(h,s,v);
-		boost::gil::rgb8_pixel_t to;
-		boost::gil::color_convert(frm,to);
-		return to;
+		boost::gil::color_convert(frm,out);
 	}
 };
 
 template <int r, int g, int b> 
 struct rgb
 {
-	static const boost::gil::rgb8_pixel_t rgb8_pixel()
+	BOOST_STATIC_ASSERT(r >= 0 && r <= 255);
+	BOOST_STATIC_ASSERT(g >= 0 && g <= 255);
+	BOOST_STATIC_ASSERT(b >= 0 && b <= 255);
+
+	void operator()(boost::gil::hsv32f_pixel_t& out)
 	{
-		return boost::gil::rgb8_pixel_t(r,g,b);
+		boost::gil::rgb8_pixel_t frm(r,g,b);
+		boost::gil::color_convert(frm,out);
+	}
+
+	void operator()(boost::gil::rgb8_pixel_t& out)
+	{
+		out = boost::gil::rgb8_pixel_t(r,g,b);
 	}
 };
 
