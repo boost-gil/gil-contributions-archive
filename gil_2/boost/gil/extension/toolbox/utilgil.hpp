@@ -348,4 +348,34 @@ void diagonal_gradient(const view_t& view, const pixel_t& start, const pixel_t& 
     } 
 }
 
+template <typename view_t>
+struct blend_corners
+{	
+	typedef typename view_t::value_type value_type;
+	const view_t& view;
+	const value_type& pixel;
+ 
+	blend_corners(const view_t& view, const value_type& pixel) : 
+		view(view),pixel(pixel) {}
+
+	void operator()(int x, int y, int alpha)
+	{
+		value_type clr = view(x,y);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(x,y) = clr;
+
+		clr = view(view.width()-x-1,view.height()-y-1);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(view.width()-x-1,view.height()-y-1) = clr;
+
+		clr = view(view.width()-x-1,y);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(view.width()-x-1,y) = clr;
+
+		clr = view(x,view.height()-y-1);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(x,view.height()-y-1) = clr;
+	}
+};
+
 #endif
