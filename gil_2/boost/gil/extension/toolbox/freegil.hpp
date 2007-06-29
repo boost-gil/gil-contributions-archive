@@ -42,11 +42,11 @@ struct make_glyph
 	boost::shared_ptr<glyph> operator()(char ch)
 	{
 		glyph* u = new glyph();
-		u->ch = ch;
 
 		boost::gil::rgb8_pixel_t pixel;
-		clr_t()(pixel);
-		u->color = pixel;
+		clr_t()(u->color);
+
+		u->ch = ch;
 		u->face = face;
 		return boost::shared_ptr<glyph>(u);
 	}

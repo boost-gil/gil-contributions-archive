@@ -63,6 +63,7 @@ struct rgb
 
 typedef rgb<0,0,-1> rgb_invalid_t;
 typedef rgb<0,0,0> rgb_black_t;
+typedef rgb<255,255,255> rgb_white_t;
 
 template <typename T>
 struct is_valid_color
@@ -387,6 +388,88 @@ struct blend_corners
 		clr = view(x,view.height()-y-1);
 		static_for_each(clr, pixel, make_alpha_blend(alpha));
 		view(x,view.height()-y-1) = clr;
+	}
+};
+
+template <int percentage=50>
+struct make_relative_gradient
+{
+	BOOST_STATIC_ASSERT(percentage >= 0 && percentage <= 100);
+	
+	template <typename out_t>
+	void operator()(int size, out_t out)
+	{
+		int front = boost::numeric_cast<int>(size * percentage/100.0);
+		for (int n = 0; n < front; n++)
+			*out = 0.0;
+
+		int back = size - front;
+		for (int n = 0; n < back; n++)
+			*out = n/boost::numeric_cast<double>(back);
+	}
+};
+
+template <int interval_size> 
+struct make_balanced_gradient
+{
+	template <typename out_t>
+	void operator()(int size, out_t out)
+	{
+		bool up = true;
+		int a = 0;
+		for (int n = 0; n < size; n++)
+		{
+			*out = a/boost::numeric_cast<double>(interval_size);
+
+			if (up)
+			{
+				a++;
+				if (a == interval_size)
+					up = false;
+			}
+			else
+			{
+				a--;
+				if (a < 0)
+				{
+					a = 0;
+					up = true;
+				}
+			}
+		}
+	}
+};
+
+struct make_simple_gradient
+{
+	template <typename out_t>
+	void operator()(int size, out_t out)
+	{
+		for (int n = 0; n < size; n++)
+			*out = n/boost::numeric_cast<double>(size);
+	}
+};
+
+template <int gradient_size>
+struct make_fixed_gradient
+{
+	template <typename out_t>
+	void operator()(int size, out_t out)
+	{
+	    int start = size - gradient_size;
+        if (start >= 0)
+		{
+			for (int n = 0; n < start; n++)
+				*out = 0.0;
+
+			for (int n = 0; n < gradient_size; n++)
+				*out = n/boost::numeric_cast<double>(gradient_size);
+		}
+		else
+		{
+			for (int n = (gradient_size-size); n < gradient_size; n++)
+				*out = n/boost::numeric_cast<double>(gradient_size);    
+		}	
 	}
 };
 
