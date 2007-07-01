@@ -33,7 +33,7 @@ struct glyph
 	boost::gil::rgb8_pixel_t color;
 };
 
-template <typename clr_t = rgb<0,0,0> >
+template <typename clr_t = rgb_black_t>
 struct make_glyph
 {
 	FT_Face face;
