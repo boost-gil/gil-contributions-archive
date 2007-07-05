@@ -7,6 +7,7 @@
 
 #include <boost/cast.hpp>
 #include <boost/gil/image.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include <hsv.hpp>
 #include <hsl.hpp>
@@ -42,7 +43,7 @@ typedef rgb<0,0,-1> rgb_invalid_t;
 typedef rgb<0,0,0> rgb_black_t;
 typedef rgb<255,255,255> rgb_white_t;
 
-template <typename T>
+template <typename type_t>
 struct is_valid_color
 {
 	static const int good = true;
@@ -56,15 +57,18 @@ struct is_valid_color<rgb_invalid_t>
 
 struct make_balanced_interval
 {
-	int size,r,adj,pos;
-	make_balanced_interval(int width, int size) : 
-		size(size), r((width-1)%size),
-			adj((width-1)/size), pos(0){}
+	int r,adj,pos;
+	make_balanced_interval(int width, int size)  : pos(0)
+	{
+		BOOST_ASSERT(size >= 1);
+		r = (width-1)%size,
+		adj = (width-1)/size;
+	}
 		
 	int operator()(int in)
 	{
 		int out = pos;
-		pos+=adj;
+		pos += adj;
 
 		if (r)
 		{
@@ -103,8 +107,9 @@ struct make_gradient
 };
 
 template <typename view_t, typename pixel_t> inline
-void horizontal_gradient(const std::vector<double>& gradients,
-	const view_t& view, const pixel_t& start, const pixel_t& finish)
+void horizontal_gradient(const view_t& view, 
+	const pixel_t& start, const pixel_t& finish,
+	const std::vector<double>& gradients)
 {
 	using namespace boost::gil;
 	BOOST_ASSERT(gradients.size() == view.width());
@@ -121,8 +126,9 @@ void horizontal_gradient(const std::vector<double>& gradients,
 }
 
 template <typename view_t, typename pixel_t> inline
-void vertical_gradient(const std::vector<double>& gradients, const view_t& view, 
-	const pixel_t& start, const pixel_t& finish)
+void vertical_gradient(const view_t& view, 
+	const pixel_t& start, const pixel_t& finish,
+	const std::vector<double>& gradients)
 {
 	using namespace boost::gil;
 	BOOST_ASSERT(gradients.size() == view.height());
@@ -338,6 +344,45 @@ void diagonal_gradient(const view_t& view, const pixel_t& start, const pixel_t& 
     } 
 }
 
+struct alpha_corner_def
+{
+	int x;
+	int y;
+	int alpha;
+};
+
+template <typename view_t, typename pixel_t>
+inline void draw_alpha_corners(const view_t& view, const pixel_t pixel, alpha_corner_def* def, int size)
+{
+	using namespace boost::gil;
+	typedef typename view_t::value_type value_type;
+	BOOST_ASSERT(def);
+	
+	for (int n = 0; n < size; ++n)
+	{
+		int x = def[n].x;
+		int y = def[n].y;
+		int alpha = def[n].alpha;
+		
+		value_type clr = view(x,y);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(x,y) = clr;
+
+		clr = view(view.width()-x-1,view.height()-y-1);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(view.width()-x-1,view.height()-y-1) = clr;
+
+		clr = view(view.width()-x-1,y);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(view.width()-x-1,y) = clr;
+
+		clr = view(x,view.height()-y-1);
+		static_for_each(clr, pixel, make_alpha_blend(alpha));
+		view(x,view.height()-y-1) = clr;
+	}
+}
+
+/*
 template <typename view_t>
 struct blend_corners
 {	
@@ -367,6 +412,7 @@ struct blend_corners
 		view(x,view.height()-y-1) = clr;
 	}
 };
+*/
 
 template <int percentage=50>
 struct make_relative_gradient
