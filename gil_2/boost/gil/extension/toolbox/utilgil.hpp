@@ -496,4 +496,23 @@ struct make_fixed_gradient
 	}
 };
 
+template <typename view_t>
+struct set_pixel
+{
+	typedef typename view_t::value_type value_type;
+	value_type pixel;
+	const view_t& view;
+	int alpha;
+	set_pixel(const view_t& view, value_type pixel, int alpha) : 
+			view(view), pixel(pixel), alpha(alpha) {}
+
+	void operator()(int x, int y)
+	{
+		value_type dst = pixel;
+		boost::gil::static_for_each(dst, view(x,y), 
+			make_alpha_blend(alpha));
+		view(x,y) = dst;
+	}
+};
+
 #endif
