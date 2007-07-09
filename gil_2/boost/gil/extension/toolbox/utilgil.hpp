@@ -27,14 +27,21 @@ enum
 template <int r, int g, int b> 
 struct rgb
 {
-	BOOST_STATIC_ASSERT(r >= 0 && r <= 255);
-	BOOST_STATIC_ASSERT(g >= 0 && g <= 255);
-	BOOST_STATIC_ASSERT(b >= 0 && b <= 255);
-
 	template <typename type_t>
 	void operator()(type_t& out)
 	{
 		boost::gil::rgb8_pixel_t pix(r,g,b);
+		boost::gil::color_convert(pix,out);
+	}
+};
+
+template <int r, int g, int b, int a> 
+struct rgba
+{
+	template <typename type_t>
+	void operator()(type_t& out)
+	{
+		boost::gil::rgba8_pixel_t pix(r,g,b,a);
 		boost::gil::color_convert(pix,out);
 	}
 };
@@ -173,8 +180,12 @@ inline void wuline(
 
 	if (Y0 > Y1) 
 	{
-  		Temp = Y0; Y0 = Y1; Y1 = Temp;
-  		Temp = X0; X0 = X1; X1 = Temp;
+  		Temp = Y0; 
+		Y0 = Y1; 
+		Y1 = Temp;
+  		Temp = X0; 
+		X0 = X1; 
+		X1 = Temp;
 	}
 
 	view(X0,Y0) = pixel;
@@ -288,7 +299,7 @@ inline void wuline(
 }
 
 template <typename view_t>
-struct draw_line
+struct draw_wuline
 {
 	typedef typename view_t::value_type value_type;
 	const view_t& view;
@@ -296,7 +307,7 @@ struct draw_line
 	short NumLevels;
 	unsigned short IntensityBits;
 
-	draw_line(const view_t& view, const value_type& pixel, 
+	draw_wuline(const view_t& view, const value_type& pixel, 
 		int NumLevels = 256, int IntensityBits=8) :
 		view(view), pixel(pixel), NumLevels(NumLevels),
 		IntensityBits(IntensityBits){}
@@ -382,38 +393,6 @@ inline void draw_alpha_corners(const view_t& view, const pixel_t pixel, alpha_co
 	}
 }
 
-/*
-template <typename view_t>
-struct blend_corners
-{	
-	typedef typename view_t::value_type value_type;
-	const view_t& view;
-	const value_type& pixel;
- 
-	blend_corners(const view_t& view, const value_type& pixel) : 
-		view(view),pixel(pixel) {}
-
-	void operator()(int x, int y, int alpha)
-	{
-		value_type clr = view(x,y);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(x,y) = clr;
-
-		clr = view(view.width()-x-1,view.height()-y-1);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(view.width()-x-1,view.height()-y-1) = clr;
-
-		clr = view(view.width()-x-1,y);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(view.width()-x-1,y) = clr;
-
-		clr = view(x,view.height()-y-1);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(x,view.height()-y-1) = clr;
-	}
-};
-*/
-
 template <int percentage=50>
 struct make_relative_gradient
 {
@@ -495,23 +474,36 @@ struct make_fixed_gradient
 		}	
 	}
 };
-
-template <typename view_t>
-struct set_pixel
+ 
+template <typename T>
+struct point_in_polygon
 {
-	typedef typename view_t::value_type value_type;
-	value_type pixel;
-	const view_t& view;
-	int alpha;
-	set_pixel(const view_t& view, value_type pixel, int alpha) : 
-			view(view), pixel(pixel), alpha(alpha) {}
-
-	void operator()(int x, int y)
+	typedef std::vector<boost::gil::point2<T> > polygon_t;
+	const std::vector<boost::gil::point2<T> >& polygon;
+	point_in_polygon(const polygon_t& polygon) : polygon(polygon) {}
+	bool operator()(const T& px, const T& py)
 	{
-		value_type dst = pixel;
-		boost::gil::static_for_each(dst, view(x,y), 
-			make_alpha_blend(alpha));
-		view(x,y) = dst;
+	      bool result = false;
+	      if (polygon.size() < 3) 
+		      return false;
+	      
+	      std::size_t j = polygon.size() - 1;
+	      for (std::size_t i = 0; i < polygon.size(); ++i)
+	      {
+			if (((polygon[i].y <= py) && (py < polygon[j].y)) || 
+				((polygon[j].y <= py) && (py < polygon[i].y)))   
+			{
+				if (px - polygon[i].x < ((polygon[j].x - polygon[i].x) * 
+					(py - polygon[i].y) / (polygon[j].y - polygon[i].y)))
+				{
+					result = !result;
+				}
+			}
+			
+			j = i;
+	      }
+	      
+	      return result;
 	}
 };
 
