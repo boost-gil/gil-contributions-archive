@@ -113,44 +113,6 @@ struct make_gradient
 	}
 };
 
-template <typename view_t, typename pixel_t> inline
-void horizontal_gradient(const view_t& view, 
-	const pixel_t& start, const pixel_t& finish,
-	const std::vector<double>& gradients)
-{
-	using namespace boost::gil;
-	BOOST_ASSERT(gradients.size() == view.width());
-
-	std::vector<double>::const_iterator it = gradients.begin();
-	for (; it != gradients.end(); it++)
-	{
-		int x = std::distance(gradients.begin(),it);
-		pixel_t dst = start;
-		static_for_each(dst, finish, 
-			make_gradient(*it));
-		fill_pixels(subimage_view(view,x,0,1,view.height()),dst);
-	}
-}
-
-template <typename view_t, typename pixel_t> inline
-void vertical_gradient(const view_t& view, 
-	const pixel_t& start, const pixel_t& finish,
-	const std::vector<double>& gradients)
-{
-	using namespace boost::gil;
-	BOOST_ASSERT(gradients.size() == view.height());
-
-	std::vector<double>::const_iterator it = gradients.begin();
-	for (; it != gradients.end(); it++)
-	{
-		int y = std::distance(gradients.begin(),it);
-		pixel_t dst = start;
-		static_for_each(dst, finish, 
-			make_gradient(*it));
-		fill_pixels(subimage_view(view,0,y,view.width(),1),dst);
-	}
-}
-
 template <typename gview_t, typename view_t, typename pixel_t> inline
 void alpha_blend(const gview_t& grayview, const view_t& view, const pixel_t& color)
 {
@@ -166,9 +128,8 @@ void alpha_blend(const gview_t& grayview, const view_t& view, const pixel_t& col
 		}
 }
 
-template <typename view_t, typename value_type>
-inline void wuline(
-	const view_t& view, const value_type& pixel, 
+template <typename view_t, typename pixel_t>
+inline void wuline(const view_t& view, const pixel_t& pixel, 
 	int X0, int Y0, int X1, int Y1,
 	int NumLevels, int IntensityBits)
 {
@@ -256,7 +217,7 @@ inline void wuline(
 
 			Weighting = ErrorAcc >> IntensityShift;
 	
-			value_type dst = pixel;
+			pixel_t dst = pixel;
 			static_for_each(dst,view(X0,Y0),
 				make_alpha_blend((Weighting ^ WeightingComplementMask)));
 			view(X0,Y0) = dst;
@@ -284,7 +245,7 @@ inline void wuline(
       		
 		Weighting = ErrorAcc >> IntensityShift;
 
-		value_type dst = pixel;
+		pixel_t dst = pixel;
 		static_for_each(dst,view(X0,Y0),
 			make_alpha_blend(Weighting ^ WeightingComplementMask));
 		view(X0,Y0) = dst;
@@ -298,22 +259,24 @@ inline void wuline(
 	view(X1,Y1) = pixel;
 }
 
-template <typename view_t>
+template <typename view_t, typename pixel_t>
 struct draw_wuline
 {
 	typedef typename view_t::value_type value_type;
 	const view_t& view;
-	const value_type& pixel;
 	short NumLevels;
 	unsigned short IntensityBits;
 
-	draw_wuline(const view_t& view, const value_type& pixel, 
+	draw_wuline(const view_t& view, 
 		int NumLevels = 256, int IntensityBits=8) :
-		view(view), pixel(pixel), NumLevels(NumLevels),
+		view(view), NumLevels(NumLevels),
 		IntensityBits(IntensityBits){}
 
 	void operator()(int x, int y, int x1, int y1)
 	{
+		value_type pixel;
+		pixel_t()(pixel);
+		
 		wuline(view,pixel,
 			x,y,x1,y1,
 			NumLevels,IntensityBits);
@@ -322,6 +285,9 @@ struct draw_wuline
 	template <typename point_t>
 	void operator()(point_t pt0, point_t pt1)
 	{
+		value_type pixel;
+		pixel_t()(pixel);
+
 		wuline(view,pixel,
 			pt0.x,pt0.y,pt1.x,pt1.y,
 			NumLevels,IntensityBits);
@@ -362,12 +328,15 @@ struct alpha_corner_def
 	int alpha;
 };
 
-template <typename view_t, typename pixel_t>
-inline void draw_alpha_corners(const view_t& view, const pixel_t pixel, alpha_corner_def* def, int size)
+template <typename pixel_t, typename view_t>
+inline void draw_alpha_corners(const view_t& view, alpha_corner_def* def, int size)
 {
 	using namespace boost::gil;
 	typedef typename view_t::value_type value_type;
 	BOOST_ASSERT(def);
+	
+	value_type pixel;
+	pixel_t()(pixel);
 	
 	for (int n = 0; n < size; ++n)
 	{
@@ -506,5 +475,223 @@ struct point_in_polygon
 	      return result;
 	}
 };
+
+template <typename pixel_t>
+struct set_alpha_blended_pixel
+{
+	int alpha;
+	boost::gil::rgb8_pixel_t pixel;
+
+	set_alpha_blended_pixel()
+	{
+		using namespace boost::gil;
+		
+		rgba8_pixel_t apixel;
+		pixel_t()(apixel);
+		
+		pixel = rgb8_pixel_t(
+			get_color(apixel,red_t()),
+			get_color(apixel,green_t()),
+			get_color(apixel,blue_t()));
+		
+		alpha = get_color(apixel,alpha_t());
+	}
+
+	template <typename view_t>
+	void operator()(view_t& view)
+	{
+		using namespace boost::gil;
+		rgb8_pixel_t dst = pixel;
+		static_for_each(dst, view, 
+			make_alpha_blend(alpha));
+		view = dst;
+	}
+};
+
+template <typename pixel_t>
+struct set_pixel
+{
+	boost::gil::rgb8_pixel_t pixel;
+
+	set_pixel()
+	{
+		pixel_t()(pixel);
+	}
+
+	template <typename view_t>
+	void operator()(view_t& view)
+	{
+		view = pixel;
+	}
+};
+
+inline bool not_equal(const double& val1, const double& val2, const double& epsilon = 1.0E-07)
+{
+      double diff = val1 - val2;
+      assert(((-epsilon > diff) || (diff > epsilon)) == ((std::abs)(val1 - val2) > epsilon));
+      return ((-epsilon > diff) || (diff > epsilon));
+}
+
+inline bool is_equal(const double& val1, const double& val2, const double& epsilon = 1.0E-07)
+{
+    double diff = val1 - val2;
+    assert(((-epsilon <= diff) && (diff <= epsilon)) == ((std::abs)(diff) <= epsilon));
+    return ((-epsilon <= diff) && (diff <= epsilon));
+}
+
+template<typename T>
+inline bool intersect(
+	const boost::gil::point2<T>& p1,
+	const boost::gil::point2<T>& p2,
+	const boost::gil::point2<T>& p3,
+	const boost::gil::point2<T>& p4,
+			boost::gil::point2<T>& out)
+{
+	double x1 = p1.x;
+	double y1 = p1.y;
+	double x2 = p2.x;
+	double y2 = p2.y;
+	double x3 = p3.x;
+	double y3 = p3.y;
+	double x4 = p4.x;
+	double y4 = p4.y;
+      
+	double ax = x2 - x1;
+    double bx = x3 - x4;
+
+    double lowerx;
+    double upperx;
+    double uppery;
+    double lowery;
+
+    if (ax < 0.0)
+    {
+    	lowerx = x2;
+        upperx = x1;
+    }
+    else
+    {
+    	upperx = x2;
+        lowerx = x1;
+    }
+
+    if (bx > 0.0)
+    {
+    	if ((upperx < x4) || (x3 < lowerx))
+        	return false;
+    }
+    else if ((upperx < x3) || (x4 < lowerx))
+	{
+         return false;
+	}
+
+    double ay = y2 - y1;
+    double by = y3 - y4;
+
+    if (ay < 0.0)
+    {
+	    lowery = y2;
+        uppery = y1;
+    }
+    else
+    {
+    	uppery = y2;
+        lowery = y1;
+    }
+
+    if (by > 0.0)
+    {
+    	if ((uppery < y4) || (y3 < lowery))
+        	return false;
+    }
+	else if ((uppery < y3) || (y4 < lowery))
+	{
+    	return false;
+	}
+
+	double cx = x1 - x3;
+    double cy = y1 - y3;
+    double d  = (by * cx) - (bx * cy);
+    double f  = (ay * bx) - (ax * by);
+
+    if (f > 0.0)
+    {
+	    if ((d < 0.0) || (d > f))
+            return false;
+    }
+    else if ((d > 0.0) || (d < f))
+	{
+         return false;
+	}
+
+    double e = (ax * cy) - (ay * cx);
+
+    if (f > 0.0)
+    {
+    	if ((e < 0.0) || (e > f))
+	        return false;
+    }
+    else if ((e > 0.0) || (e < f))
+	{
+         return false;
+	}
+
+    double ratio = (ax * -by) - (ay * -bx);
+	double ix,iy;
+
+    if (not_equal(ratio,0.0))
+    {
+         ratio = ((cy * -bx) - (cx * -by)) / ratio;
+         ix = x1 + (ratio * ax);
+         iy = y1 + (ratio * ay);
+    }
+    else
+    {
+         if (is_equal((ax * -cy),(-cx * ay)))
+         {
+            ix = x3;
+            iy = y3;
+         }
+         else
+         {
+            ix = x4;
+			iy = y4;
+         }
+    }
+
+	//TODO: round up or down
+	out.x = boost::numeric_cast<int>(ix);
+	out.y = boost::numeric_cast<int>(iy);
+   	return true;
+}
+
+template <typename set_t, typename view_t, typename type_t>
+inline void for_each_point(const view_t& view, 
+	std::vector<boost::gil::point2<type_t> >& polygon)
+{
+	int left = view.width();
+	int bottom = view.height();
+	int top = 0;
+	int right = 0;
+	
+	for(std::size_t i = 0; i < polygon.size(); ++i)
+	{
+		if (polygon[i].x < left)
+			left = polygon[i].x;
+		if (polygon[i].x > right)
+			right = polygon[i].x;
+		if (polygon[i].y < bottom)
+			bottom = polygon[i].y;
+		if (polygon[i].y > top)
+			top = polygon[i].y;
+	}
+
+	set_t set;
+	point_in_polygon<int> in(polygon);
+	for (int x = left; x <= right; ++x)
+		for (int y = bottom; y <= top; ++y)
+			if (in(x,y))
+				set(view(x,y));	
+}
 
 #endif
