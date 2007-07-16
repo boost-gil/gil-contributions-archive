@@ -450,6 +450,7 @@ struct point_in_polygon
 	typedef std::vector<boost::gil::point2<T> > polygon_t;
 	const std::vector<boost::gil::point2<T> >& polygon;
 	point_in_polygon(const polygon_t& polygon) : polygon(polygon) {}
+		
 	bool operator()(const T& px, const T& py)
 	{
 	      bool result = false;
@@ -497,14 +498,14 @@ struct set_alpha_blended_pixel
 		alpha = get_color(apixel,alpha_t());
 	}
 
-	template <typename view_t>
-	void operator()(view_t& view)
+	template <typename point_t>
+	void operator()(point_t& point)
 	{
 		using namespace boost::gil;
 		rgb8_pixel_t dst = pixel;
-		static_for_each(dst, view, 
+		static_for_each(dst, point, 
 			make_alpha_blend(alpha));
-		view = dst;
+		point = dst;
 	}
 };
 
@@ -665,33 +666,66 @@ inline bool intersect(
    	return true;
 }
 
-template <typename set_t, typename view_t, typename type_t>
-inline void for_each_point(const view_t& view, 
-	std::vector<boost::gil::point2<type_t> >& polygon)
+struct make_interval 
 {
-	int left = view.width();
-	int bottom = view.height();
-	int top = 0;
-	int right = 0;
+	int n;
+	double interval,minvalue,maxvalue;
 	
-	for(std::size_t i = 0; i < polygon.size(); ++i)
+	make_interval(int levels, double minvalue, double maxvalue) : 
+		n(0), minvalue(minvalue), maxvalue(maxvalue)
 	{
-		if (polygon[i].x < left)
-			left = polygon[i].x;
-		if (polygon[i].x > right)
-			right = polygon[i].x;
-		if (polygon[i].y < bottom)
-			bottom = polygon[i].y;
-		if (polygon[i].y > top)
-			top = polygon[i].y;
+		interval = (maxvalue-minvalue)/levels;
 	}
 
-	set_t set;
-	point_in_polygon<int> in(polygon);
-	for (int x = left; x <= right; ++x)
-		for (int y = bottom; y <= top; ++y)
-			if (in(x,y))
-				set(view(x,y));	
-}
+	double operator()(double in)
+	{
+		return n++*interval;
+	}
+};
+
+template <typename minimum_t, typename maximum_t>
+struct make_minmax
+{
+	double& minimum;
+	double& maximum;
+	make_minmax(double& minimum, double& maximum) : 
+		minimum(minimum), maximum(maximum)
+	{
+		minimum = LONG_MAX;
+		maximum = LONG_MIN;
+	}
+
+	template <typename type_t>
+	void operator()(const type_t& type)
+	{
+		double minimum2 = minimum_t()(type);
+		double maximum2 = maximum_t()(type);
+
+		if (maximum2 > maximum)
+			maximum = maximum2;
+		if (minimum2 < minimum)
+			minimum = minimum2;
+	}
+};
+
+template <typename actor_t>
+struct make_point
+{
+	int day,days,height;
+	make_point(const int days, int height) : 
+		day(1),days(days),height(height) {}
+
+	boost::gil::point2<int> operator()(int x)
+	{
+		int index = days-day++;
+		double val,minvalue, maxvalue;
+		actor_t()(index, val, minvalue, maxvalue);
+		
+		double rval = 1-((val-minvalue)/(maxvalue-minvalue));
+		int y = (int)(rval*(height-1));
+		
+		return boost::gil::point2<int>(x,y);
+	}
+};
 
 #endif
