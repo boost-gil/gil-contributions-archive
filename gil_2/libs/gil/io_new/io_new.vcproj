@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\boost_1.34"
+				AdditionalIncludeDirectories="c:\boost_1.34;C:\gil\repos;C:\Program Files\GnuWin32\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -32,8 +32,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libtiff.lib"
 				OutputFile="$(OutDir)/io_new.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/io_new.pdb"
 				SubSystem="1"
@@ -137,10 +139,22 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\base.hpp">
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io_private.hpp">
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\png_io_private.hpp">
+			</File>
+			<File
 				RelativePath=".\stdafx.h">
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io.hpp">
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io_private.hpp">
 			</File>
 		</Filter>
 		<Filter

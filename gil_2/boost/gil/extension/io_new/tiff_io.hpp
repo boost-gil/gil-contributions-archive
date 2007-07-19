@@ -6,21 +6,24 @@
 
 /*************************************************************************************************/
 
-#ifndef GIL_TIFF_IO_HPP
-#define GIL_TIFF_IO_HPP
+#ifndef GIL_TIFF_IO_PRIVATE_HPP
+#define GIL_TIFF_IO_PRIVATE_HPP
 
 /// \file
-/// \brief  Support for reading and writing TIFF files
+/// \brief 
 //
 /// \author Christian Henning
 ///         
 
-#include <cstdio>
 #include <algorithm>
 #include <string>
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/gil/extension/io/io_base.hpp>
+
+#include <boost/fusion/sequence/container/vector.hpp>
+#include <boost/fusion/sequence/intrinsic/at.hpp>
+
+#include <boost/gil/extension/io_new/base.hpp>
 
 namespace boost { namespace gil {
 
@@ -37,6 +40,14 @@ struct basic_tiff_image_read_info
    std::size_t _samples_per_pixel;
 };
 
+typedef boost::fusion::vector2< bool, boost::uint32_t > ulong_tag_t;
+typedef boost::fusion::vector2< bool, boost::uint16_t > ushort_tag_t;
+typedef boost::fusion::vector2< bool, float >           float_tag_t;
+typedef boost::fusion::vector2< bool, std::string >     string_tag_t;
+typedef boost::fusion::vector2< bool, boost::shared_ptr< std::vector< unsigned long  > > > ulong_vec_tag_t;
+typedef boost::fusion::vector2< bool, boost::shared_ptr< std::vector< unsigned short > > > ushort_vec_tag_t;
+
+
 /// \ingroup TIFF_IO
 /// Ths file-format specific struct should contain all information the file-format offers. Obviously
 /// it will vary quite a bit from format to format.
@@ -45,58 +56,60 @@ struct tiff_image_read_info
    // Baseline TIFF tags as listed in the core TIFF spec.
    // See: http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
 
-   unsigned long  _NewSubfileType;
-   unsigned short _SubfileType;
+   ulong_tag_t  _NewSubfileType;
+   ushort_tag_t _SubfileType;
    
-   unsigned short _Compression;
+   ushort_tag_t _Compression;
 
-   unsigned short _PhotometricInterpretation;
+   ushort_tag_t _PhotometricInterpretation;
 
-   unsigned short _Threshholding;
+   ushort_tag_t _Threshholding;
+
+   ushort_tag_t _CellWidth;
+   ushort_tag_t _CellLength;
+
+   ushort_tag_t _FillOrder;
+
+   string_tag_t _ImageDescription;
+
+   string_tag_t _Make;
+   string_tag_t _Model;
+
+   ulong_vec_tag_t _StripOffsets;
+
+   ushort_tag_t _Orientation;
+
+   ulong_tag_t     _RowsPerStrip;
+   ulong_vec_tag_t _StripByteCounts;
+
+   ushort_vec_tag_t _MinSampleValue;
+   ushort_vec_tag_t _MaxSampleValue;
+
+   float_tag_t _XResolution;
+   float_tag_t _YResolution;
+
+   ushort_tag_t _PlanarConfiguration;
+
+   ulong_vec_tag_t _FreeOffsets;
+   ulong_vec_tag_t _FreeByteCounts;
+
+   ushort_tag_t     _GrayResponseUnit;
+   ushort_vec_tag_t _GrayResponseCurve;
    
-   unsigned short _CellWidth;
-   unsigned short _CellLength;
+   ushort_tag_t _ResolutionUnit;
 
-   unsigned short _FillOrder;
+   string_tag_t _Software;
+   string_tag_t _DateTime;
+   string_tag_t _Artist;
+   string_tag_t _HostComputer;
 
-   std::string _ImageDescription;
+   ushort_vec_tag_t _ColorMap;
 
-   std::string _Make;
-   std::string _Model;
+   ushort_vec_tag_t _ExtraSamples;
 
-   unsigned long* _StripOffsets;
+   string_tag_t _Copyright;
 
-   unsigned short _Orientation;
-
-   unsigned long _RowsPerStrip;
-   unsigned long* _StripByteCounts;
-
-   unsigned short* _MinSampleValue;
-   unsigned short* _MaxSampleValue;
-
-   float _XResolution;
-   float _YResolution;
-
-   unsigned short _PlanarConfiguration;
-
-   unsigned long* _FreeOffsets;
-   unsigned long* _FreeByteCounts;
-
-   unsigned short _GrayResponseUnit;
-   unsigned short* _GrayResponseCurve;
-   
-   unsigned short _ResolutionUnit;
-
-   std::string _Software;
-   std::string _DateTime;
-   std::string _Artist;
-   std::string _HostComputer;
-
-   unsigned short* ColorMap;
-
-   unsigned short* ExtraSamples;
-
-   std::string _Copyright;
+   static const unsigned int _version = 0;
 };
 
 /// \ingroup TIFF_IO
@@ -173,4 +186,4 @@ template< typename View > void write_view( const std::wstring& file_name, const 
 } // namespace gil
 } // namespace boost
 
-#endif // GIL_TIFF_IO_HPP
+#endif // GIL_TIFF_IO_PRIVATE_HPP
