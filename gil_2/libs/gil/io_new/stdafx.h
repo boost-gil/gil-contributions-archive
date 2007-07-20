@@ -15,6 +15,10 @@
 #include <vector>
 
 
+#include <boost/bind.hpp>
+
 #include <boost/shared_ptr.hpp>
 
 #include <boost/gil/gil_all.hpp>
+
+#include <boost/fusion/sequence/intrinsic/value_at.hpp>

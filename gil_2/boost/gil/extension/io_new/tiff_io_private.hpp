@@ -16,6 +16,8 @@
 ///         
 
 /// see http://www.remotesensing.org/libtiff/
+/// or http://www.libtiff.org/man/
+
 
 #include <fstream>
 #include <algorithm>

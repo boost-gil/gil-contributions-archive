@@ -29,24 +29,27 @@ namespace boost { namespace gil {
 
 struct tiff_tag {};
 
+typedef boost::fusion::vector2< bool, boost::uint32_t > ulong_tag_t;
+typedef boost::fusion::vector2< bool, boost::uint16_t > ushort_tag_t;
+typedef boost::fusion::vector2< bool, float >           float_tag_t;
+typedef boost::fusion::vector2< bool, std::string >     string_tag_t;
+typedef boost::fusion::vector2< bool, std::vector< unsigned long  > > ulong_vec_tag_t;
+typedef boost::fusion::vector2< bool, std::vector< unsigned short > > ushort_vec_tag_t;
+
+
 /// \ingroup TIFF_IO
 /// This struct has all the information that gil needs to create the appropriate image type.
 /// It should be a little different from file format to file format.
 struct basic_tiff_image_read_info
 {
-   std::size_t _width;
-   std::size_t _height;
-   std::size_t _bits_per_sample;
-   std::size_t _samples_per_pixel;
+   ulong_tag_t  _width;
+   ulong_tag_t  _height;
+   ushort_tag_t _samples_per_pixel;
+
+   // Apparently, this item is not an array of ushorts. 
+   // see http://www.libtiff.org/man/TIFFGetField.3t.html
+   ushort_tag_t _bits_per_sample;
 };
-
-typedef boost::fusion::vector2< bool, boost::uint32_t > ulong_tag_t;
-typedef boost::fusion::vector2< bool, boost::uint16_t > ushort_tag_t;
-typedef boost::fusion::vector2< bool, float >           float_tag_t;
-typedef boost::fusion::vector2< bool, std::string >     string_tag_t;
-typedef boost::fusion::vector2< bool, boost::shared_ptr< std::vector< unsigned long  > > > ulong_vec_tag_t;
-typedef boost::fusion::vector2< bool, boost::shared_ptr< std::vector< unsigned short > > > ushort_vec_tag_t;
-
 
 /// \ingroup TIFF_IO
 /// Ths file-format specific struct should contain all information the file-format offers. Obviously
