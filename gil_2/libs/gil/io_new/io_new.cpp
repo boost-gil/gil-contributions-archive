@@ -64,11 +64,41 @@ struct tiff_bits_per_sample
    static const tag = TIFFTAG_BITSPERSAMPLE;
 };
 
+struct tiff_planar_configuration
+{
+   typedef boost::uint16_t type;
+   static const tag = TIFFTAG_PLANARCONFIG;
+};
+
+struct tiff_compression
+{
+   typedef boost::uint16_t type;
+   static const tag = TIFFTAG_COMPRESSION;
+};
+
+struct tiff_rows_per_strip
+{
+   typedef boost::uint32_t type;
+   static const tag = TIFFTAG_ROWSPERSTRIP;
+};
+
 
 template <typename Property>
-bool get_property( const std::string& file, Property, typename Property::type& value, 
-tiff_tag());
+bool get_property( const std::string& file
+                 , typename Property::type& value
+                 , tiff_tag                        )
+{
+   TIFF* img = TIFFOpen( file.c_str(), "r" );
 
+   if( TIFFGetField( img, Property::tag, &value ) == 1 )
+   {
+      return true;
+   }
+
+   return false;
+
+   TIFFClose( img );
+}
 
 int main()
 {
@@ -77,8 +107,90 @@ int main()
 
    // caspian.tif	279x220 64-bit floating point (deflate) Caspian Sea from space
 
-   TIFF* img = TIFFOpen( ".\\test_images\\tiff\\libtiffpic\\caspian.tif", "r" );
-  
+   string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
+
+   tiff_image_width::type          image_width;
+   tiff_image_height::type         image_height;
+   tiff_samples_per_pixel::type    samples_per_pixel;
+   tiff_bits_per_sample::type      bits_per_sample;
+   tiff_planar_configuration::type planar_configuration;
+   tiff_compression::type          compression;
+   tiff_rows_per_strip::type       rows_per_strip;
+
+
+   get_property<tiff_image_width>( file_name
+                                 , image_width
+                                 , tiff_tag()   );
+
+   get_property<tiff_image_height>( file_name
+                                 , image_height
+                                 , tiff_tag()   );
+
+   get_property<tiff_samples_per_pixel>( file_name
+                                       , samples_per_pixel
+                                       , tiff_tag()         );
+
+   get_property<tiff_bits_per_sample>( file_name
+                                     , bits_per_sample
+                                     , tiff_tag()       );
+
+   get_property<tiff_planar_configuration>( file_name
+                                          , planar_configuration
+                                          , tiff_tag()            );
+
+   get_property<tiff_compression>( file_name
+                                 , compression
+                                 , tiff_tag()  );
+
+   get_property<tiff_rows_per_strip>( file_name
+                                    , rows_per_strip
+                                    , tiff_tag()      );
+
+
+   typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
+   typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
+   typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
+
+
+   TIFF* img = TIFFOpen( file_name.c_str(), "r" );
+   tsize_t scanline_size = TIFFScanlineSize( img );
+   tsize_t raster_scanline_size = TIFFRasterScanlineSize( img );
+
+   tsize_t strip_size = TIFFStripSize( img );
+   tsize_t max_strips = TIFFNumberOfStrips( img );
+
+   // a buffer represents three planes for each rows_per_strip
+   std::vector< double > buffer( raster_scanline_size );
+   tsize_t size = TIFFReadEncodedStrip( img, 0, &buffer.front(), -1 );
+
+   rgb64f_planar_image_t gil_image( 279, 220 );
+
+   for( int stripCount = 0; stripCount < max_strips; stripCount++ )
+   {
+      if( TIFFReadEncodedStrip( img
+                              , stripCount
+                              , &buffer.front()
+                              , -1 ) == -1 )
+      {
+         cout << "error" << endl;
+
+         break;
+      }
+
+
+      rgb64f_planar_view_t v = planar_rgb_view( image_width
+                                              , rows_per_strip
+                                              , &buffer[ 0 ]
+                                              , &buffer[ scanline_size ]
+                                              , &buffer[ 2 * scanline_size ]
+                                              , image_width              );
+
+      copy_pixels( v
+                 , subimage_view( view( gil_image )
+                                , point_t( 0, stripCount * rows_per_strip )
+                                , point_t( image_width, rows_per_strip      )));
+
+  }
 
    return 0;
 }
