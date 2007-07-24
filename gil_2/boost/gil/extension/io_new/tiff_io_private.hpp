@@ -27,13 +27,82 @@ extern "C" {
 #include "tiff.h"
 }
 
-namespace boost { namespace gil {
+namespace boost { namespace gil { 
 
 
-void read_tiff_image_info( tiff_image_read_info& info )
+template <typename Property>
+bool get_property( const std::string& file
+                 , typename Property::type& value
+                 , tiff_tag                        )
 {
+   TIFF* img = NULL;
+   if(( img = TIFFOpen( file.c_str(), "r" )) == NULL )
+   {
+      throw std::runtime_error( "File doesn't exist." );
+   }
+
+   if( TIFFGetFieldDefaulted( img, Property::tag, &value ) == 1 )
+   {
+      return true;
+   }
+
+   TIFFClose( img );
+
+   return false;
 }
 
+/*
+/todo This specialization wont compile on VS7.1.
+
+template <>
+bool get_property<std::string&>( const std::string& file
+                               , std::string& value
+                               , tiff_tag                 )
+{
+   if( TIFF* img = TIFFOpen( file.c_str(), "r" ) == NULL )
+   {
+      throw std::runtime_error( "File doesn't exist." );
+   }
+
+   char* buffer = NULL;
+   if( TIFFGetFieldDefaulted( img, Property::tag, &buffer ) == 1 )
+   {
+      return true;
+   }
+
+   TIFFClose( img );
+
+   return false;
+}
+*/
+
+namespace detail {
+
+template< typename String >
+void read_image_info( const String& file_name, basic_tiff_image_read_info& info )
+{
+   get_property<tiff_image_width>( file_name
+                                 , info._width
+                                 , tiff_tag()   );
+
+   get_property<tiff_image_height>( file_name
+                                 , info._height
+                                 , tiff_tag()   );
+
+   get_property<tiff_samples_per_pixel>( file_name
+                                       , info._samples_per_pixel
+                                       , tiff_tag()         );
+
+   get_property<tiff_bits_per_sample>( file_name
+                                     , info._bits_per_sample
+                                     , tiff_tag()       );
+
+   get_property<tiff_planar_configuration>( file_name
+                                          , info._planar_configuration
+                                          , tiff_tag()                );
+}
+
+} // detail
 } // namespace gil
 } // namespace boost
 

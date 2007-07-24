@@ -40,66 +40,6 @@ static void tiff_warning_handler(const char *s1, const char *s2, va_list ap)
    cout << ss.str() << endl;
 }
 
-struct tiff_image_width
-{
-   typedef boost::uint32_t type;
-   static const tag = TIFFTAG_IMAGEWIDTH;
-};
-
-struct tiff_image_height
-{
-   typedef boost::uint32_t type;
-   static const tag = TIFFTAG_IMAGELENGTH;
-};
-
-struct tiff_samples_per_pixel
-{
-   typedef boost::uint16_t type;
-   static const tag = TIFFTAG_SAMPLESPERPIXEL;
-};
-
-struct tiff_bits_per_sample
-{
-   typedef boost::uint16_t type;
-   static const tag = TIFFTAG_BITSPERSAMPLE;
-};
-
-struct tiff_planar_configuration
-{
-   typedef boost::uint16_t type;
-   static const tag = TIFFTAG_PLANARCONFIG;
-};
-
-struct tiff_compression
-{
-   typedef boost::uint16_t type;
-   static const tag = TIFFTAG_COMPRESSION;
-};
-
-struct tiff_rows_per_strip
-{
-   typedef boost::uint32_t type;
-   static const tag = TIFFTAG_ROWSPERSTRIP;
-};
-
-
-template <typename Property>
-bool get_property( const std::string& file
-                 , typename Property::type& value
-                 , tiff_tag                        )
-{
-   TIFF* img = TIFFOpen( file.c_str(), "r" );
-
-   if( TIFFGetField( img, Property::tag, &value ) == 1 )
-   {
-      return true;
-   }
-
-   return false;
-
-   TIFFClose( img );
-}
-
 int main()
 {
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
@@ -109,48 +49,11 @@ int main()
 
    string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
 
-   tiff_image_width::type          image_width;
-   tiff_image_height::type         image_height;
-   tiff_samples_per_pixel::type    samples_per_pixel;
-   tiff_bits_per_sample::type      bits_per_sample;
-   tiff_planar_configuration::type planar_configuration;
-   tiff_compression::type          compression;
-   tiff_rows_per_strip::type       rows_per_strip;
-
-
-   get_property<tiff_image_width>( file_name
-                                 , image_width
-                                 , tiff_tag()   );
-
-   get_property<tiff_image_height>( file_name
-                                 , image_height
-                                 , tiff_tag()   );
-
-   get_property<tiff_samples_per_pixel>( file_name
-                                       , samples_per_pixel
-                                       , tiff_tag()         );
-
-   get_property<tiff_bits_per_sample>( file_name
-                                     , bits_per_sample
-                                     , tiff_tag()       );
-
-   get_property<tiff_planar_configuration>( file_name
-                                          , planar_configuration
-                                          , tiff_tag()            );
-
-   get_property<tiff_compression>( file_name
-                                 , compression
-                                 , tiff_tag()  );
-
-   get_property<tiff_rows_per_strip>( file_name
-                                    , rows_per_strip
-                                    , tiff_tag()      );
-
+   basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
 
    typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
    typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
    typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
-
 
    TIFF* img = TIFFOpen( file_name.c_str(), "r" );
    tsize_t scanline_size = TIFFScanlineSize( img );
@@ -159,12 +62,45 @@ int main()
    tsize_t strip_size = TIFFStripSize( img );
    tsize_t max_strips = TIFFNumberOfStrips( img );
 
+   toff_t* stripbytecounts;
+   TIFFGetField(img, TIFFTAG_STRIPBYTECOUNTS, &stripbytecounts);
+
    // a buffer represents three planes for each rows_per_strip
-   std::vector< double > buffer( raster_scanline_size );
-   tsize_t size = TIFFReadEncodedStrip( img, 0, &buffer.front(), -1 );
+   typedef std::vector< std::vector< double > > vec_t;
+   vec_t image( max_strips );
+   vec_t::iterator it  = image.begin();
+   vec_t::iterator end = image.end();
 
-   rgb64f_planar_image_t gil_image( 279, 220 );
+   for( ; it != end; ++it )
+   {
+      it->resize( scanline_size );
+   }
 
+   for( int stripCount = 0; stripCount < max_strips; stripCount++ )
+   {
+      if( TIFFReadEncodedStrip( img
+                              , stripCount
+                              , &image[stripCount].front()
+                              , scanline_size ) == -1 )
+      {
+         cout << "error" << endl;
+
+         break;
+      }
+   }
+
+   double max = 0;
+   double min = 0;
+   
+   for( int i = 0; i < max_strips; ++i )
+   {
+      max = std::max( max, *max_element( image[i].begin(), image[i].end() ));
+      min = std::min( min, *min_element( image[i].begin(), image[i].end() ));
+   }
+
+   return 0;
+   
+/*
    for( int stripCount = 0; stripCount < max_strips; stripCount++ )
    {
       if( TIFFReadEncodedStrip( img
@@ -184,13 +120,44 @@ int main()
                                               , &buffer[ scanline_size ]
                                               , &buffer[ 2 * scanline_size ]
                                               , image_width              );
+      
+
+      const rgb64f_pixel_t& p = v( 0,0 );
 
       copy_pixels( v
                  , subimage_view( view( gil_image )
                                 , point_t( 0, stripCount * rows_per_strip )
                                 , point_t( image_width, rows_per_strip      )));
 
-  }
+
+      const rgb64f_pixel_t& p2 = view( gil_image )( 0,4 );
+      int i = 9;
+
+   }
+
+   double max = 0.0;
+   double min = 0.0;
+
+   for (int y=0; y<gil_image.height(); ++y)
+   {
+      rgb64f_planar_view_t::x_iterator src_it = view( gil_image ).row_begin(y);
+
+      for( int x=1; x<gil_image.width()-1; ++x )
+      {
+         double red = gil::at_c<0>( *src_it );
+         double blue = gil::at_c<1>( *src_it );
+         double green = gil::at_c<2>( *src_it );
+
+         max = std::max( max, gil::at_c<0>( *src_it ) );
+         max = std::max( max, gil::at_c<1>( *src_it ) );
+         max = std::max( max, gil::at_c<2>( *src_it ) );
+
+         min = std::min( min, gil::at_c<0>( *src_it ) );
+         min = std::min( min, gil::at_c<1>( *src_it ) );
+         min = std::min( min, gil::at_c<2>( *src_it ) );
+      }
+    }
+*/
 
    return 0;
 }

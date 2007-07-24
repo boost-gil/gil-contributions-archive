@@ -156,6 +156,9 @@
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io_private.hpp">
 			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_tags.hpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
