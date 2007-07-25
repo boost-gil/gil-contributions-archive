@@ -51,6 +51,18 @@ int main()
 
    basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
 
+   tiff_min_sample_value::type min;
+   tiff_max_sample_value::type max;
+
+   get_property<string,tiff_min_sample_value>( file_name, min, tiff_tag() );
+   get_property<string,tiff_max_sample_value>( file_name, max, tiff_tag() );
+
+   // basic algorithm outline
+
+
+   return 0;
+
+/*
    typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
    typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
    typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
@@ -99,7 +111,8 @@ int main()
    }
 
    return 0;
-   
+*/
+
 /*
    for( int stripCount = 0; stripCount < max_strips; stripCount++ )
    {

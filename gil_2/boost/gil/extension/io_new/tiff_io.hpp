@@ -59,6 +59,15 @@ struct tiff_image_write_info
 namespace boost { namespace gil {
 
 /// \ingroup TIFF_IO
+/// \brief Returns the a tiff property.
+/// Will throw when file_name is invalid.
+template< typename String, typename Property>
+bool get_property( const String& file_name, typename Property::type& value, tiff_tag )
+{
+   return detail::get_property<Property>( file_name, value, tiff_tag() );
+}
+
+/// \ingroup TIFF_IO
 /// \brief Returns the image info for generating a gil image type.
 template< typename String >
 basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
@@ -72,7 +81,10 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 /// \ingroup TIFF_IO
 /// \brief Reads the image and convert when necessary.
 template < typename String, typename Image > 
-void read_image( const String& file_name, Image& img, tiff_tag );
+void read_image( const String& file_name, Image& img, tiff_tag )
+{
+   
+}
 
 /// \ingroup TIFF_IO
 /// \brief Reads the image and convert when necessary.
