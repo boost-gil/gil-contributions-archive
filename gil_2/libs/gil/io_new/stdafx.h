@@ -20,5 +20,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include <boost/gil/gil_all.hpp>
+#include <boost/gil/extension/io/bmp_io.hpp>
 
 #include <boost/fusion/sequence/intrinsic/value_at.hpp>
