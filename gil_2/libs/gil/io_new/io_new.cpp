@@ -40,6 +40,42 @@ static void tiff_warning_handler(const char *s1, const char *s2, va_list ap)
    cout << ss.str() << endl;
 }
 
+typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
+typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
+typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
+
+struct my_color_converter {
+
+   my_color_converter( const rgb64f_pixel_t& min
+                     , const rgb64f_pixel_t& max ) 
+   : _red_range  ( get_color( max, red_t()   ) - get_color( min, red_t()   ))
+   , _green_range( get_color( max, green_t() ) - get_color( min, green_t() ))
+   , _blue_range ( get_color( max, blue_t()  ) - get_color( min, blue_t()  ))
+   {}
+
+   template <typename P1, typename P2>
+   void operator()(const P1& src, P2& dst) const
+   {
+      const double& red   = get_color( src, red_t()   );
+      const double& green = get_color( src, green_t() );
+      const double& blue  = get_color( src, blue_t()  );
+
+      double red_dst   = red   / _red_range * 255.0;
+      double green_dst = green / _green_range * 255.0;
+      double blue_dst  = blue  / _blue_range * 255.0;
+
+      get_color( dst, red_t() )   = static_cast<unsigned char>( red_dst   );
+      get_color( dst, green_t() ) = static_cast<unsigned char>( green_dst );
+      get_color( dst, blue_t() )  = static_cast<unsigned char>( blue_dst  );
+   }
+
+private:
+
+   double _red_range;
+   double _green_range;
+   double _blue_range;
+};
+
 int main()
 {
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
@@ -51,16 +87,89 @@ int main()
 
    basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
 
-   tiff_min_sample_value::type min;
-   tiff_max_sample_value::type max;
+   TIFF* tiff = TIFFOpen( file_name.c_str(), "r" );
+   tsize_t scanline_size = TIFFScanlineSize( tiff );
+   tsize_t strip_size = TIFFStripSize( tiff );
+   tsize_t max_strips = TIFFNumberOfStrips( tiff );
 
-   get_property<string,tiff_min_sample_value>( file_name, min, tiff_tag() );
-   get_property<string,tiff_max_sample_value>( file_name, max, tiff_tag() );
+   typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
+   typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
+   typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
 
-   // basic algorithm outline
+   unsigned int offset = 0;
 
+   std::vector<unsigned char> buffer( strip_size * max_strips );
+
+   for( int stripCount = 0; stripCount < max_strips; ++stripCount )
+   {
+
+      int size = TIFFReadEncodedStrip( tiff
+                                     , stripCount
+                                     , &buffer.front() + offset
+                                     , strip_size );
+
+      offset += size;
+   }
+
+   size_t row_size_in_bytes   = info._width * sizeof( double );
+   size_t plane_size_in_bytes = info._width * info._height * sizeof( double );
+
+   size_t img_size = info._width * info._height;
+
+   double* red_plane_begin   = reinterpret_cast<double*>( &buffer[ 0 ] );
+   double* green_plane_begin = reinterpret_cast<double*>( &buffer[ plane_size_in_bytes ] );
+   double* blue_plane_begin  = reinterpret_cast<double*>( &buffer[ 2* plane_size_in_bytes ] );
+
+   rgb64f_planar_view_t v = planar_rgb_view( info._width
+                                           , info._height
+                                           , red_plane_begin
+                                           , green_plane_begin
+                                           , blue_plane_begin
+                                           , row_size_in_bytes  );
+
+   double* red_plane_end   = red_plane_begin   + img_size;
+   double* green_plane_end = green_plane_begin + img_size;
+   double* blue_plane_end  = blue_plane_begin  + img_size;
+
+
+   rgb64f_pixel_t min( *min_element( red_plane_begin  , red_plane_end   )
+                     , *min_element( green_plane_begin, green_plane_end )
+                     , *min_element( blue_plane_begin , blue_plane_end  ));
+
+   rgb64f_pixel_t max( *max_element( red_plane_begin  , red_plane_end   )
+                     , *max_element( green_plane_begin, green_plane_end )
+                     , *max_element( blue_plane_begin , blue_plane_end  ));
+
+   rgb8_image_t dst( v.dimensions() );
+
+   copy_and_convert_pixels( v, view( dst ), my_color_converter( min, max ) );
+
+   bmp_write_view( ".\\test.bmp", const_view( dst ));
 
    return 0;
+
+/*
+   for( int stripCount = 0; stripCount < 220; stripCount += 3 )
+   {
+
+      int size = TIFFReadEncodedStrip( tiff
+                                     , stripCount
+                                     , red_plane + offset
+                                     , scanline_size );
+
+      size = TIFFReadEncodedStrip( tiff
+                                 , stripCount + 1
+                                 , green_plane + offset
+                                 , scanline_size );
+
+      size = TIFFReadEncodedStrip( tiff
+                                 , stripCount + 2
+                                 , blue_plane + offset
+                                 , scanline_size );
+
+      offset += size;
+   }
+*/
 
 /*
    typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
