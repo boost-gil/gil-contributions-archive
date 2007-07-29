@@ -478,12 +478,12 @@ struct point_in_polygon
 };
 
 template <typename pixel_t>
-struct set_alpha_blended_pixel
+struct set_alpha_pixel
 {
 	int alpha;
 	boost::gil::rgb8_pixel_t pixel;
 
-	set_alpha_blended_pixel()
+	set_alpha_pixel()
 	{
 		using namespace boost::gil;
 		
@@ -680,31 +680,6 @@ struct make_interval
 	double operator()(double in)
 	{
 		return n++*interval;
-	}
-};
-
-template <typename minimum_t, typename maximum_t>
-struct make_minmax
-{
-	double& minimum;
-	double& maximum;
-	make_minmax(double& minimum, double& maximum) : 
-		minimum(minimum), maximum(maximum)
-	{
-		minimum = LONG_MAX;
-		maximum = LONG_MIN;
-	}
-
-	template <typename type_t>
-	void operator()(const type_t& type)
-	{
-		double minimum2 = minimum_t()(type);
-		double maximum2 = maximum_t()(type);
-
-		if (maximum2 > maximum)
-			maximum = maximum2;
-		if (minimum2 < minimum)
-			minimum = minimum2;
 	}
 };
 
