@@ -76,19 +76,94 @@ private:
    double _blue_range;
 };
 
+struct invert
+{
+   template < typename Channel> void operator()( const Channel& src 
+                                               , Channel&       dst )
+   const
+   {
+      dst = channel_traits< Channel >::max_value() - src;
+   }
+};
+
+struct invert_pixel
+{
+   template < typename Pixel >
+   Pixel operator()(const Pixel& src ) const
+   {
+      Pixel dst;
+      static_for_each( src, dst, invert() );
+
+      return dst;
+   }
+};
+
 int main()
 {
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
-   // caspian.tif	279x220 64-bit floating point (deflate) Caspian Sea from space
+/*
+   {
+      // caspian.tif	279x220 64-bit floating point (deflate) Caspian Sea from space
 
-   string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
 
+      typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
+      typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
+      rgb64f_planar_image_t src;
+
+      read_image( file_name, src, tiff_tag() );
+
+
+      double* red_plane   = planar_view_get_raw_data( view( src ), 0 );
+      double* green_plane = planar_view_get_raw_data( view( src ), 1 );
+      double* blue_plane  = planar_view_get_raw_data( view( src ), 2 );
+
+      size_t img_size = src.width() * src.height();
+
+      rgb64f_pixel_t min( *min_element( red_plane  , red_plane   + img_size )
+                        , *min_element( green_plane, green_plane + img_size )
+                        , *min_element( blue_plane , blue_plane  + img_size ));
+
+      rgb64f_pixel_t max( *max_element( red_plane  , red_plane   + img_size )
+                        , *max_element( green_plane, green_plane + img_size )
+                        , *max_element( blue_plane , blue_plane  + img_size ));
+
+      rgb8_image_t dst( view( src ).dimensions() );
+      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
+   
+      bmp_write_view( ".\\caspian.bmp", const_view( dst ));
+   }
+*/
+   {
+      // cramps.tif	800x607 8-bit b&w (packbits) "cramps poster"
+
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\cramps.tif" );
+
+      gray8_image_t src;
+      read_image( file_name, src, tiff_tag() );
+
+      tiff_photometric_interpretation::type value;
+      get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
+
+      if( value == PHOTOMETRIC_MINISWHITE )
+      {
+         gray8_image_t dst( view( src ).dimensions() );
+         transform_pixels( const_view( src ), view( dst ), invert_pixel() );
+
+         bmp_write_view( ".\\cramps.bmp", const_view( dst ));
+      }
+      else
+      {
+         bmp_write_view( ".\\cramps.bmp", const_view( src ));
+      }
+   }
+
+/*
    basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
 
    TIFF* tiff = TIFFOpen( file_name.c_str(), "r" );
-   tsize_t scanline_size = TIFFScanlineSize( tiff );
    tsize_t strip_size = TIFFStripSize( tiff );
    tsize_t max_strips = TIFFNumberOfStrips( tiff );
 
@@ -96,13 +171,79 @@ int main()
    typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
    typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
 
-   unsigned int offset = 0;
+   rgb64f_planar_image_t image( info._width, info._height );
+   unsigned char* red   = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( view( image ), 0 ));
+   unsigned char* green = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( view( image ), 1 ));
+   unsigned char* blue  = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( view( image ), 2 ));
 
+   int red_strip_count   = 0;
+   int red_last_strip    = max_strips / 3;
+   int green_strip_count = red_last_strip;
+   int green_last_strip  = 2 * max_strips / 3;
+   int blue_strip_count  = green_last_strip;
+   int blue_last_strip   = max_strips;
+
+   unsigned int offset = 0;
+   for( ; red_strip_count < red_last_strip; ++red_strip_count )
+   {
+      int size = TIFFReadEncodedStrip( tiff
+                                     , red_strip_count
+                                     , red + offset
+                                     , strip_size );
+
+      offset += size;
+   }
+
+   offset = 0;
+   for( ; green_strip_count < green_last_strip; ++green_strip_count )
+   {
+      int size = TIFFReadEncodedStrip( tiff
+                                     , green_strip_count
+                                     , green + offset
+                                     , strip_size         );
+
+      offset += size;
+   }
+
+
+   offset = 0;
+   for( ; blue_strip_count < blue_last_strip; ++blue_strip_count )
+   {
+      int size = TIFFReadEncodedStrip( tiff
+                                     , blue_strip_count
+                                     , blue + offset
+                                     , strip_size         );
+
+      offset += size;
+   }
+
+   double* red_plane   = planar_view_get_raw_data( view( image ), 0 );
+   double* green_plane = planar_view_get_raw_data( view( image ), 1 );
+   double* blue_plane  = planar_view_get_raw_data( view( image ), 2 );
+
+   size_t img_size = info._width * info._height;
+
+   rgb64f_pixel_t min( *min_element( red_plane  , red_plane   + img_size )
+                     , *min_element( green_plane, green_plane + img_size )
+                     , *min_element( blue_plane , blue_plane  + img_size ));
+
+   rgb64f_pixel_t max( *max_element( red_plane  , red_plane   + img_size )
+                     , *max_element( green_plane, green_plane + img_size )
+                     , *max_element( blue_plane , blue_plane  + img_size ));
+
+   rgb8_image_t dst( view( image ).dimensions() );
+
+   copy_and_convert_pixels( view( image ), view( dst ), my_color_converter( min, max ) );
+
+   bmp_write_view( ".\\test.bmp", const_view( dst ));
+*/
+
+/*
+   unsigned int offset = 0;
    std::vector<unsigned char> buffer( strip_size * max_strips );
 
    for( int stripCount = 0; stripCount < max_strips; ++stripCount )
    {
-
       int size = TIFFReadEncodedStrip( tiff
                                      , stripCount
                                      , &buffer.front() + offset
@@ -147,6 +288,7 @@ int main()
    bmp_write_view( ".\\test.bmp", const_view( dst ));
 
    return 0;
+*/
 
 /*
    for( int stripCount = 0; stripCount < 220; stripCount += 3 )
