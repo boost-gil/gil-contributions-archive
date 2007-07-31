@@ -43,6 +43,7 @@ struct basic_tiff_image_read_info
 
    tiff_bits_per_sample::type   _bits_per_sample;
    tiff_samples_per_pixel::type _samples_per_pixel;
+   tiff_sample_format::type     _sample_format;
 
    tiff_planar_configuration::type _planar_configuration;
 };
@@ -73,7 +74,9 @@ template< typename String >
 basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 {
    basic_tiff_image_read_info info;
-   detail::read_image_info( file_name, info );
+   detail::read_image_info( detail::tiff_file_mgr( file_name
+                                                 , true       )
+                          , info );
    
    return info;
 }
@@ -83,7 +86,9 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 template < typename String, typename Image > 
 void read_image( const String& file_name, Image& img, tiff_tag )
 {
-   
+   detail::tiff_reader reader( detail::tiff_file_mgr( file_name
+                                                    , true       ));
+   reader.read( img );
 }
 
 /// \ingroup TIFF_IO

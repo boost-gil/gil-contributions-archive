@@ -21,6 +21,25 @@ namespace boost { namespace gil {
 
 typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
+namespace detail {
+
+template < typename View
+         , typename IsPlanar > struct num_planes
+{};
+
+template <typename View > struct num_planes< View, boost::mpl::false_ >
+{
+   typedef boost::mpl::int_<1> type;
+};
+
+template <typename View > struct num_planes< View, boost::mpl::true_  > 
+{
+   typedef typename View::value_type pixel_t;
+   typedef boost::mpl::int_< num_channels<pixel_t>::value > type;
+};
+
+
+} // namespace details
 } // namespace gil
 } // namespace boost
 

@@ -219,6 +219,15 @@ struct tiff_copyright
    static const unsigned int tag = TIFFTAG_COPYRIGHT;
 };
 
+// non-baseline tags
+
+struct tiff_sample_format
+{
+   typedef boost::uint16_t type;
+   static const unsigned int tag = TIFFTAG_SAMPLEFORMAT;
+};
+
+
 } // namespace gil
 } // namespace boost
 
