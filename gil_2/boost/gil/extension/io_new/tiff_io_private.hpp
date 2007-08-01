@@ -172,7 +172,7 @@ public:
    {
       img.recreate( _info._width, _info._height );
 
-      _read( view( img ));
+      _read_2( view( img ));
    }
 
 private:

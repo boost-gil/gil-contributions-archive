@@ -158,3 +158,4 @@ int main()
          bmp_write_view( ".\\cramps.bmp", const_view( src ));
       }
    }
+}
