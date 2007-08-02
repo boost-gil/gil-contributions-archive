@@ -23,10 +23,7 @@
 #include <algorithm>
 #include <string>
 
-extern "C" {
-#include "tiff.h"
-#include "tiffio.h"
-}
+#include <boost/static_assert.hpp>
 
 #include <boost/shared_ptr.hpp>
 
@@ -34,54 +31,28 @@ namespace boost { namespace gil {
 
 namespace detail {
 
-inline void io_error(const char* descr)
+template< typename String >
+tiff_file_t tiff_open_for_read( const String& file_name )
 {
-   throw std::ios_base::failure( descr );
+   BOOST_STATIC_ASSERT( false );
 }
 
-inline void io_error_if( bool expr, const char* descr="" )
+template<>
+tiff_file_t tiff_open_for_read<std::string>( const std::string& file_name )
 {
-   if( expr ) 
-      io_error( descr );
+   TIFF* tiff;
+   io_error_if((tiff = TIFFOpen( file_name.c_str(), "r" ) ) == NULL, "file_mgr: failed to open file" );
+
+   return tiff_file_t( tiff, TIFFClose );
 }
 
-class tiff_file_mgr
-{
-public:
-   TIFF* get() { return _tiff.get(); }
-   const TIFF* get() const { return _tiff.get(); }
-
-   tiff_file_mgr( const std::string& file_name, bool read )
-   {
-      TIFF* tiff;
-
-      if( read )
-      {
-         io_error_if((tiff = TIFFOpen( file_name.c_str(), "r" ) ) == NULL, "file_mgr: failed to open file" );
-      }
-      else
-      {
-         io_error_if((tiff = TIFFOpen( file_name.c_str(), "w" ) ) == NULL, "file_mgr: failed to open file" );
-      }
-
-      _tiff = boost::shared_ptr<TIFF>( tiff, TIFFClose );
-   }
-
-   ~tiff_file_mgr() {  }
-
-private:
-
-   boost::shared_ptr<TIFF> _tiff;
-};
-
+//shared_ptr<TIFF> tiff_open_for_write(file_name);
 
 template <typename Property>
-bool get_property( const std::string& file_name
+bool get_property( tiff_file_t              file
                  , typename Property::type& value
                  , tiff_tag                        )
 {
-   tiff_file_mgr file( file_name, true );
-
    if( TIFFGetFieldDefaulted( file.get(), Property::tag, &value ) == 1 )
    {
       return true;
@@ -91,45 +62,17 @@ bool get_property( const std::string& file_name
 }
 
 template <typename Property>
-bool get_property( tiff_file_mgr&           file
+bool get_property( const std::string& file_name
                  , typename Property::type& value
                  , tiff_tag                        )
 {
-   if( TIFFGetFieldDefaulted( file.get(), Property::tag, &value ) == 1 )
-   {
-      return true;
-   }
+   return get_property<Property>( tiff_open_for_read( file_name )
+                                , value
+                                , tiff_tag()                        );
 
-   return false;
 }
 
-
-/*
-/todo This specialization wont compile on VS7.1.
-
-template <>
-bool get_property<std::string&>( const std::string& file
-                               , std::string& value
-                               , tiff_tag                 )
-{
-   if( TIFF* img = TIFFOpen( file.c_str(), "r" ) == NULL )
-   {
-      throw std::runtime_error( "File doesn't exist." );
-   }
-
-   char* buffer = NULL;
-   if( TIFFGetFieldDefaulted( img, Property::tag, &buffer ) == 1 )
-   {
-      return true;
-   }
-
-   TIFFClose( img );
-
-   return false;
-}
-*/
-
-void read_image_info( tiff_file_mgr&              file
+void read_image_info( tiff_file_t                 file
                     , basic_tiff_image_read_info& info )
 {
    get_property<tiff_image_width>( file
@@ -161,7 +104,7 @@ class tiff_reader
 {
 public:
 
-   tiff_reader( tiff_file_mgr& file )
+   tiff_reader( tiff_file_t file )
    : _tiff( file )
    {
       read_image_info( file, _info );
@@ -172,31 +115,10 @@ public:
    {
       img.recreate( _info._width, _info._height );
 
-      _read_2( view( img ));
+      _read( view( img ));
    }
 
 private:
-
-   template< typename View >
-   void _read_2( View& v )
-   {
-      typedef num_planes< View, is_planar<View>::type >::type num_plane_t;
-
-      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
-      {
-         // interleave image
-         _read_data( v, is_planar<View>::type(), num_plane_t() );
-      }
-      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
-      {
-         // planar image
-         _read_data( v, is_planar<View>::type(), num_plane_t() );
-      }
-      else
-      {
-         // something is wrong.
-      }
-   }
 
    template< typename View >
    void _read( const View& v )
@@ -231,12 +153,36 @@ private:
                            typedef image_t::view_t view_t;
                            typedef num_planes< view_t, is_planar<view_t>::type >::type num_plane_t;
 
-                           image_t src( _info._width, _info._height );
-                           _read_data( view( src )
-                                     , is_planar<view_t>::type()
-                                     , num_plane_t() );
+                           tsize_t strip_size     = TIFFStripSize     ( _tiff.get() );
+                           tsize_t max_strips     = TIFFNumberOfStrips( _tiff.get() );
+                           tsize_t rows_per_strip = strip_size / _info._width;
 
-                           copy_pixels( view( src ), v );
+                           tsize_t element_size     = sizeof( View::value_type );
+                           tsize_t size_to_allocate = strip_size / element_size;
+
+                           std::vector< View::value_type > buffer( size_to_allocate );
+
+                           std::size_t y = 0;
+                           for( tsize_t strip_count = 0; strip_count < max_strips; ++strip_count )
+                           {
+                              _read_strip( buffer
+                                         , strip_count
+                                         , strip_size
+                                         , _tiff      );
+
+                              // copy into view
+                              for( tsize_t y = 0; y < rows_per_strip; ++y )
+                              {
+                                 tsize_t row = ( strip_count * rows_per_strip ) + y;
+
+                                 if( row < ( tsize_t ) _info._height )
+                                 {
+                                    std::copy( buffer.begin() +    ( y * _info._width )
+                                             , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
+                                             , v.row_begin( row ));
+                                 }
+                              }
+                           }
 
                            break;
                         }
@@ -1050,8 +996,32 @@ private:
       }
    }
 
+   // Reads directly into the view.
    template< typename View >
-   void _read_data( const View& v, boost::mpl::false_, boost::mpl::int_<1> )
+   void _read_2( const View& v )
+   {
+      typedef num_planes< View, is_planar<View>::type >::type num_plane_t;
+
+      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
+      {
+         // interleave image
+         _read_data( v, is_planar<View>::type(), num_plane_t() );
+      }
+      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
+      {
+         // planar image
+         _read_data( v, is_planar<View>::type(), num_plane_t() );
+      }
+      else
+      {
+         // something is wrong.
+      }
+   }
+
+
+   template< typename View >
+
+   void read_interleaved_data( std::vector<unsigned char>& buffer )
    {
       tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
       tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
@@ -1070,10 +1040,10 @@ private:
 
          offset += size;
       }
-   }   
+   }
 
    template< typename View >
-   void _read_data( const View& v, boost::mpl::true_, boost::mpl::int_<3> )
+   void read_planar_data( const View& v, boost::mpl::int_<3> )
    {
       tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
       tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
@@ -1131,9 +1101,10 @@ private:
       }
    }
 
-   template< typename View >
-   void _read_data( const View& v, boost::mpl::true_, boost::mpl::int_<4> )
+   template< typename Buffer >
+   void read_planar_data( Buffer& buffer, boost::mpl::int_<4> )
    {
+/*
       tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
       tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
 
@@ -1146,10 +1117,6 @@ private:
       int alpha_strip_count  = blue_last_strip;
       int alpha_last_strip   = max_strips;
 
-      unsigned char* red   = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( v, 0 ));
-      unsigned char* green = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( v, 1 ));
-      unsigned char* blue  = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( v, 2 ));
-      unsigned char* alpha = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( v, 3 ));
 
       unsigned int offset = 0;
       for( ; red_strip_count < red_last_strip; ++red_strip_count )
@@ -1194,21 +1161,53 @@ private:
       offset = 0;
       for( ; alpha_strip_count < alpha_last_strip; ++alpha_strip_count )
       {
+         _read_strip(  )
+
+         offset += size;
+      }
+*/
+   }
+
+/*   inline
+   void _read_strips( std::vector<unsigned char>& buffer
+                    , std::size_t                 first_strip_number
+                    , std::size_t                 last_strip_number
+                    , std::size_t                 strip_size
+                    , tiff_file_t                 file             )
+   {
+      std::size_t offset = 0;
+      for( ; first_strip_number < last_strip_number; ++first_strip_number )
+      {
          int size = TIFFReadEncodedStrip( _tiff.get()
-                                       , alpha_strip_count
-                                       , alpha + offset
-                                       , strip_size         );
+                                        , first_strip_number
+                                        , &buffer.front() + offset
+                                        , strip_size                );
 
          io_error_if( size == -1, "Read error." );
 
          offset += size;
       }
+   }
+*/
 
+   template< typename Buffer >
+   inline 
+   void _read_strip( Buffer&     buffer
+                   , tstrip_t    number_of_strip
+                   , tsize_t     strip_size
+                   , tiff_file_t file             )
+   {
+      int size = TIFFReadEncodedStrip( file.get()
+                                     , number_of_strip
+                                     , &buffer.front()
+                                     , strip_size      );
+
+      io_error_if( size == -1, "Read error." );
    }
 
 private:
 
-   tiff_file_mgr _tiff;
+   tiff_file_t _tiff;
 
    basic_tiff_image_read_info _info;
 };
