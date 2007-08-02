@@ -23,6 +23,18 @@ typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
 namespace detail {
 
+inline void io_error(const char* descr)
+{
+   throw std::ios_base::failure( descr );
+}
+
+inline void io_error_if( bool expr, const char* descr="" )
+{
+   if( expr ) 
+      io_error( descr );
+}
+
+
 template < typename View
          , typename IsPlanar > struct num_planes
 {};
