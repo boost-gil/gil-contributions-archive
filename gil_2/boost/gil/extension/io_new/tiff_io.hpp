@@ -13,7 +13,12 @@
 /// \brief 
 //
 /// \author Christian Henning
-///         
+/// 
+
+extern "C" {
+#include "tiff.h"
+#include "tiffio.h"
+}
 
 #include <algorithm>
 #include <string>
@@ -26,6 +31,8 @@
 namespace boost { namespace gil {
 
 struct tiff_tag {};
+
+typedef boost::shared_ptr<TIFF> tiff_file_t;
 
 } // namespace gil
 } // namespace boost
@@ -74,9 +81,8 @@ template< typename String >
 basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 {
    basic_tiff_image_read_info info;
-   detail::read_image_info( detail::tiff_file_mgr( file_name
-                                                 , true       )
-                          , info );
+   detail::read_image_info( detail::tiff_open_for_read( file_name )
+                          , info                                     );
    
    return info;
 }
@@ -86,8 +92,7 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 template < typename String, typename Image > 
 void read_image( const String& file_name, Image& img, tiff_tag )
 {
-   detail::tiff_reader reader( detail::tiff_file_mgr( file_name
-                                                    , true       ));
+   detail::tiff_reader reader( detail::tiff_open_for_read( file_name ));
    reader.read( img );
 }
 
