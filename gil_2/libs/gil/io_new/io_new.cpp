@@ -121,13 +121,13 @@ int main()
 
       size_t img_size = src.width() * src.height();
 
-      rgb64f_pixel_t min( *min_element( red_plane  , red_plane   + img_size )
-                        , *min_element( green_plane, green_plane + img_size )
-                        , *min_element( blue_plane , blue_plane  + img_size ));
+      rgb64f_pixel_t min( 0.0
+                        , 0.0
+                        , 0.0 );
 
-      rgb64f_pixel_t max( *max_element( red_plane  , red_plane   + img_size )
-                        , *max_element( green_plane, green_plane + img_size )
-                        , *max_element( blue_plane , blue_plane  + img_size ));
+      rgb64f_pixel_t max( 1000.0
+                        , 1000.0
+                        , 1000.0 );
 
       rgb8_image_t dst( view( src ).dimensions() );
       copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
@@ -157,5 +157,70 @@ int main()
       {
          bmp_write_view( ".\\cramps.bmp", const_view( src ));
       }
+   }
+
+   {
+      // cramps-tile.tif 256x256 tiled version of cramps.tif (no compression)
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\cramps_tile.tif" );
+
+      TIFF* file = TIFFOpen( file_name.c_str(), "r" );
+      //ttile_t number_of_tiles = TIFFNumberOfTiles( file );
+   }
+
+   {
+      // dscf0013.tif	640x480 YCbCr digital camera image which lacks Reference
+		// Black/White values. Contains EXIF SubIFD. No compression.
+
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\dscf0013.tif" );
+      TIFF* file = TIFFOpen( file_name.c_str(), "r" );
+   }
+
+   {
+      // fax2d.tif	1728x1082 1-bit b&w (G3/2D) facsimile
+
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
+      tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
+
+      basic_tiff_image_read_info info;
+      boost::gil::detail::read_image_info( file, info );
+
+      tsize_t strip_size = TIFFStripSize     ( file.get() );
+      tsize_t max_strips = TIFFNumberOfStrips( file.get() );
+
+      std::size_t image_size_in_bytes = ( info._width / 8 ) * info._height;
+
+      std::vector<unsigned char> buffer( image_size_in_bytes );
+
+      unsigned int offset = 0;
+      for( tsize_t strip_count = 0; strip_count < max_strips; ++strip_count )
+      {
+         int size = TIFFReadEncodedStrip( file.get()
+                                        , strip_count
+                                        , ( &buffer.front() ) + offset
+                                        , strip_size                    );
+
+         io_error_if( size == -1, "Read error." );
+
+         offset += size;
+      }
+
+      unsigned char* first_byte = &buffer.front();
+      unsigned char* last_byte  = &buffer.front() + ( image_size_in_bytes - 1 );
+
+      typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
+      typedef image_t::view_t view_t;
+
+      tsize_t element_size     = sizeof( view_t::value_type );
+
+      view_t::x_iterator begin( first_byte, 0 );
+      view_t::x_iterator end  ( last_byte , 7 );
+
+      image_t src( info._width, info._height );
+      std::copy( begin, end, view( src ).begin() );
+
+      gray8_image_t dst( info._width, info._height );
+      copy_and_convert_pixels( view( src ), view( dst ) );
+
+      bmp_write_view( ".\\fax2d.bmp", view( dst ));
    }
 }

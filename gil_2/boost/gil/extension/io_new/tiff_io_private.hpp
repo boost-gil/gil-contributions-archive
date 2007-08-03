@@ -115,7 +115,7 @@ public:
    {
       img.recreate( _info._width, _info._height );
 
-      _read( view( img ));
+      _read_3( view( img ));
    }
 
 private:
@@ -137,8 +137,10 @@ private:
                {
                   case 1:
                   {
-                     // 1 bit grayscale interleaved image
-                     // @todo
+                     tsize_t strip_size = TIFFStripSize     ( file.get() );
+                     tsize_t max_strips = TIFFNumberOfStrips( file.get() );
+                     tsize_t rows_per_strip = strip_size / _info._width;
+
                      break;
                   }
 
@@ -149,10 +151,6 @@ private:
                         case SAMPLEFORMAT_UINT:
                         {
                            // 8 bit unsigned integer grayscale interleaved image
-                           typedef gray8_image_t   image_t;
-                           typedef image_t::view_t view_t;
-                           typedef num_planes< view_t, is_planar<view_t>::type >::type num_plane_t;
-
                            tsize_t strip_size     = TIFFStripSize     ( _tiff.get() );
                            tsize_t max_strips     = TIFFNumberOfStrips( _tiff.get() );
                            tsize_t rows_per_strip = strip_size / _info._width;
@@ -1017,6 +1015,180 @@ private:
          // something is wrong.
       }
    }
+
+   template < typename View >
+   void _read_3( const View& v )
+   {
+      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
+      {
+         // Assumes gil view type is interleaved.
+
+         tsize_t strip_size     = TIFFStripSize     ( _tiff.get() );
+         tsize_t max_strips     = TIFFNumberOfStrips( _tiff.get() );
+         tsize_t rows_per_strip = strip_size / _info._width;
+
+         tsize_t element_size     = sizeof( View::value_type );
+         tsize_t size_to_allocate = strip_size / element_size;
+
+         std::vector< View::value_type > buffer( size_to_allocate );
+
+         View vv = interleaved_view( _info._width
+                                   , rows_per_strip
+                                   , (View::x_iterator) &buffer.front()
+                                   , strip_size / rows_per_strip        );
+
+         std::size_t y = 0;
+         for( tsize_t strip_count = 0; strip_count < max_strips; ++strip_count )
+         {
+            _read_strip( buffer
+                        , strip_count
+                        , strip_size
+                        , _tiff      );
+
+            // copy into view
+
+            tsize_t row = ( strip_count * rows_per_strip );
+
+            if(( row + rows_per_strip )< ( tsize_t ) _info._height )
+            {
+               copy_pixels( vv
+                          , subimage_view( v
+                                         , point_t( 0
+                                                  , row )
+                                         , point_t( _info._width
+                                                  , rows_per_strip )));
+            }
+            else
+            {
+               tsize_t remainder_rows = _info._height - row;
+
+               copy_pixels( subimage_view( vv
+                                         , point_t( 0
+                                                  , 0 )
+                                         , point_t( _info._width
+                                                  , remainder_rows ))
+                          , subimage_view( v
+                                         , point_t( 0
+                                                  , row )
+                                         , point_t( _info._width
+                                                  , remainder_rows )));
+            }
+
+/*
+            for( tsize_t y = 0; y < rows_per_strip; ++y )
+            {
+               tsize_t row = ( strip_count * rows_per_strip ) + y;
+
+               if( row < ( tsize_t ) _info._height )
+               {
+                  std::copy( buffer.begin() +    ( y * _info._width )
+                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
+                           , v.row_begin( row ));
+               }
+            }
+*/
+         }
+      }
+      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
+      {
+         // Assume a planar gil view type is given.
+
+         tsize_t strip_size     = TIFFStripSize     ( _tiff.get() );
+         tsize_t max_strips     = TIFFNumberOfStrips( _tiff.get() );
+
+         tiff_rows_per_strip::type rows_per_strip;
+         io_error_if( get_property<tiff_rows_per_strip>( _tiff, rows_per_strip, tiff_tag() ) 
+                    == false, "Read error." );
+
+         tsize_t element_size     = sizeof( nth_channel_view_type<View>::type::value_type );
+         tsize_t size_to_allocate = strip_size / element_size;
+
+         std::vector< nth_channel_view_type<View>::type::value_type > buffer( size_to_allocate );
+
+         std::size_t y = 0;
+
+         int red_strip_count   = 0;
+         int red_last_strip    = max_strips / 3;
+         int green_strip_count = red_last_strip;
+         int green_last_strip  = 2 * max_strips / 3;
+         int blue_strip_count  = green_last_strip;
+         int blue_last_strip   = max_strips;
+         
+         for( ; red_strip_count < red_last_strip; ++red_strip_count )
+         {
+            _read_strip( buffer
+                       , red_strip_count
+                       , strip_size
+                       , _tiff      );
+
+            // copy into view
+            for( tiff_rows_per_strip::type y = 0; y < rows_per_strip; ++y )
+            {
+               tsize_t row = ( red_strip_count * rows_per_strip ) + y;
+
+               if( row < ( tsize_t ) _info._height )
+               {
+                  std::copy( buffer.begin() +    ( y * _info._width )
+                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
+                           , nth_channel_view( v, 0 ).row_begin( row ));
+               }
+               else
+               {
+                  int i  =9 ;
+               }
+            }
+         }
+
+         for( int i = 0; green_strip_count < green_last_strip; ++green_strip_count, ++i )
+         {
+            _read_strip( buffer
+                       , green_strip_count
+                       , strip_size
+                       , _tiff                );
+
+            // copy into view
+            for( tiff_rows_per_strip::type y = 0; y < rows_per_strip; ++y )
+            {
+               tsize_t row = ( i * rows_per_strip ) + y;
+
+               if( row < ( tsize_t ) _info._height )
+               {
+                  std::copy( buffer.begin() +    ( y * _info._width )
+                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
+                           , nth_channel_view( v, 1 ).row_begin( row ));
+               }
+            }
+         }
+
+         for( int i = 0; blue_strip_count < blue_last_strip; ++blue_strip_count, ++i )
+         {
+            _read_strip( buffer
+                       , blue_strip_count
+                       , strip_size
+                       , _tiff                );
+
+            // copy into view
+            for( tiff_rows_per_strip::type y = 0; y < rows_per_strip; ++y )
+            {
+               tsize_t row = ( i * rows_per_strip ) + y;
+
+               if( row < ( tsize_t ) _info._height )
+               {
+                  std::copy( buffer.begin() +    ( y * _info._width )
+                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
+                           , nth_channel_view( v, 2 ).row_begin( row ));
+               }
+            }
+         }
+      }
+      else
+      {
+         throw std::runtime_error( "Wrong planar configuration setting." );
+      }
+
+   }
+
+
 
 
    template< typename View >
