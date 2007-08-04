@@ -24,44 +24,6 @@ enum
  	FBottom = (0x1 << 7), 
 }; 
 
-//TODO: delete this
-template <int r, int g, int b> 
-struct rgb
-{
-	boost::gil::rgb8_pixel_t pixel;
-	rgb(boost::gil::rgb8_pixel_t pixel = 
-		boost::gil::rgb8_pixel_t(r,g,b)) : 
-		pixel(pixel) {}
-	
-	template <typename type_t>
-	void operator()(type_t& out)
-	{
-		boost::gil::rgb8_pixel_t pix(r,g,b);
-		boost::gil::color_convert(pix,out);
-	}
-};
-
-//TODO: delete this
-template <typename rgb_t, int a> 
-struct rgba
-{
-	template <typename type_t>
-	void operator()(type_t& out)
-	{
-		using namespace boost::gil;
-
-		rgb8_pixel_t rpix;
-		rgb_t()(rpix);
-
-		rgba8_pixel_t pix(
-			get_color(rpix,red_t()),
-			get_color(rpix,green_t()),
-			get_color(rpix,blue_t()),a);
-		
-		color_convert(pix,out);
-	}
-};
-
 template <int r, int g, int b> 
 struct rgb8
 {
@@ -85,20 +47,6 @@ struct make_alpha_blend
 	void operator()(type_t& dst, const type_t& src)
 	{
 		double dbl = (dst * alpha - src * alpha + src * 255.0) / 255.0;
-		dst = boost::numeric_cast<type_t>(dbl);
-	}
-};
-
-//TODO: same as make_alpha_blend?
-struct make_gradient
-{
-	double adj,adj2;
-	make_gradient(double adj) : adj(adj),adj2(1-adj){}
-
-	template <typename type_t>
-	void operator()(type_t& dst, const type_t& src)
-	{
-		double dbl = (double)src * adj  + (double)dst * adj2;
 		dst = boost::numeric_cast<type_t>(dbl);
 	}
 };
@@ -137,25 +85,56 @@ struct simple_horizontal_gradient
 	}
 };
 
-typedef rgb<0,0,-1> rgb_invalid_t;
-typedef rgb<0,0,0> rgb_black_t;
-typedef rgb<255,255,255> rgb_white_t;
-typedef rgb<0,0,255> rgb_blue_t;
-typedef rgb<255,0,0> rgb_red_t;
-typedef rgb<0,255,0> rgb_green_t;
-typedef rgb<200,200,200> rgb_lightgray_t;
-typedef rgb<150,150,150> rgb_mediumgray_t;
-
-template <typename type_t>
-struct is_valid_color
+template <typename fpix, typename tpix>
+struct simple_vertical_gradient
 {
-	static const int good = true;
+	template <typename view_t>
+	void operator()(const view_t& view, int x, int y)
+	{
+		double perc = boost::numeric_cast<double>(y+1) / view.height();
+		int alpha = boost::numeric_cast<int>(perc*255);
+
+		boost::gil::rgb8_pixel_t dst = fpix().pixel;
+		boost::gil::rgb8_pixel_t finish = tpix().pixel;
+		boost::gil::static_for_each(dst, finish, make_alpha_blend(alpha));
+		view(x,y) = dst;
+	}
 };
 
-template<>
-struct is_valid_color<rgb_invalid_t>
+template <typename fpix, typename tpix, int interval_size>
+struct balanced_gradient
 {
-	static const int good = false;
+	bool up;
+	int a;
+	balanced_gradient() : up(true) , a(0){}
+		
+	template <typename view_t>
+	void operator()(const view_t& view, int x, int y)
+	{
+		double perc = a/boost::numeric_cast<double>(interval_size);
+		int alpha = boost::numeric_cast<int>(perc*255);
+
+		boost::gil::rgb8_pixel_t dst = fpix().pixel;
+		boost::gil::rgb8_pixel_t finish = tpix().pixel;
+		boost::gil::static_for_each(dst, finish, make_alpha_blend(alpha));
+		view(x,y) = dst;
+		
+		if (up)
+		{
+			a++;
+			if (a == interval_size)
+				up = false;
+		}
+		else
+		{
+			a--;
+			if (a < 0)
+			{
+				a = 0;
+				up = true;
+			}
+		}
+	}
 };
 
 struct make_balanced_interval
@@ -350,38 +329,6 @@ struct draw_wuline
 	}
 };
 
-template <typename view_t, typename pixel_t> inline
-void diagonal_gradient(const view_t& view, const pixel_t& start, const pixel_t& finish)
-{
-	int x1=0,y1=0;
-    int x2=0,y2=0;
-
-    while(x1 < view.width() && y1 < view.height())
-    {
-        if(y1 < view.height()-1)
-            y1++;
-        else
-            x1++;
-
-        if(x2 < view.width()-1)
-            x2++;
-        else
-            y2++;
-
-        double adj = (x1+y1)/((double)view.width()+view.height());
-	pixel_t dst = start;
-	static_for_each(dst, finish, make_gradient(adj));
-	wuline(view,dst,x1,y1,x2,y2);
-    } 
-}
-
-struct alpha_corner_def
-{
-	int x;
-	int y;
-	int alpha;
-};
-
 struct defin
 {
 	int x;
@@ -406,122 +353,6 @@ struct translate_coordinates
 	}
 };
 
-template <typename pixel_t, typename view_t>
-inline void draw_alpha_corners(const view_t& view, alpha_corner_def* def, int size)
-{
-	using namespace boost::gil;
-	typedef typename view_t::value_type value_type;
-	BOOST_ASSERT(def);
-	
-	value_type pixel;
-	pixel_t()(pixel);
-	
-	for (int n = 0; n < size; ++n)
-	{
-		int x = def[n].x;
-		int y = def[n].y;
-		int alpha = def[n].alpha;
-		
-		value_type clr = view(x,y);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(x,y) = clr;
-
-		clr = view(view.width()-x-1,view.height()-y-1);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(view.width()-x-1,view.height()-y-1) = clr;
-
-		clr = view(view.width()-x-1,y);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(view.width()-x-1,y) = clr;
-
-		clr = view(x,view.height()-y-1);
-		static_for_each(clr, pixel, make_alpha_blend(alpha));
-		view(x,view.height()-y-1) = clr;
-	}
-}
-
-template <int percentage=50>
-struct make_relative_gradient
-{
-	BOOST_STATIC_ASSERT(percentage >= 0 && percentage <= 100);
-	
-	template <typename out_t>
-	void operator()(int size, out_t out)
-	{
-		int front = boost::numeric_cast<int>(size * percentage/100.0);
-		for (int n = 0; n < front; n++)
-			*out = 0.0;
-
-		int back = size - front;
-		for (int n = 0; n < back; n++)
-			*out = n/boost::numeric_cast<double>(back);
-	}
-};
-
-template <int interval_size> 
-struct make_balanced_gradient
-{
-	template <typename out_t>
-	void operator()(int size, out_t out)
-	{
-		bool up = true;
-		int a = 0;
-		for (int n = 0; n < size; n++)
-		{
-			*out = a/boost::numeric_cast<double>(interval_size);
-
-			if (up)
-			{
-				a++;
-				if (a == interval_size)
-					up = false;
-			}
-			else
-			{
-				a--;
-				if (a < 0)
-				{
-					a = 0;
-					up = true;
-				}
-			}
-		}
-	}
-};
-
-struct make_simple_gradient
-{
-	template <typename out_t>
-	void operator()(int size, out_t out)
-	{
-		for (int n = 0; n < size; n++)
-			*out = n/boost::numeric_cast<double>(size);
-	}
-};
-
-template <int gradient_size>
-struct make_fixed_gradient
-{
-	template <typename out_t>
-	void operator()(int size, out_t out)
-	{
-	    int start = size - gradient_size;
-        if (start >= 0)
-		{
-			for (int n = 0; n < start; n++)
-				*out = 0.0;
-
-			for (int n = 0; n < gradient_size; n++)
-				*out = n/boost::numeric_cast<double>(gradient_size);
-		}
-		else
-		{
-			for (int n = (gradient_size-size); n < gradient_size; n++)
-				*out = n/boost::numeric_cast<double>(gradient_size);    
-		}	
-	}
-};
- 
 template <typename T>
 struct point_in_polygon
 {
@@ -552,47 +383,6 @@ struct point_in_polygon
 	      }
 	      
 	      return result;
-	}
-};
-
-//TODO: delete this
-template <typename pixel_t>
-struct set_alpha_pixel
-{
-	template <typename point_t>
-	void operator()(point_t& point)
-	{
-		using namespace boost::gil;
-
-		int alpha;
-		boost::gil::rgb8_pixel_t pixel;
-			rgba8_pixel_t apixel;
-			pixel_t()(apixel);
-		
-		pixel = rgb8_pixel_t(
-			get_color(apixel,red_t()),
-			get_color(apixel,green_t()),
-			get_color(apixel,blue_t()));
-		
-		alpha = get_color(apixel,alpha_t());
-
-		rgb8_pixel_t dst = pixel;
-		static_for_each(dst, point, 
-			make_alpha_blend(alpha));
-		point = dst;
-	}
-};
-
-//TODO: delete this
-template <typename pixel_t>
-struct set_pixel
-{
-	template <typename point_t>
-	void operator()(point_t& point)
-	{
-		boost::gil::rgb8_pixel_t pixel;
-		pixel_t()(pixel);
-		point = pixel;
 	}
 };
 
@@ -737,7 +527,7 @@ inline bool intersect(
 }
 
 template <typename out_t> inline
-void make_polygon(int lines, double radius, int cx, int cy, out_t out)
+void make_circle(int lines, double radius, int cx, int cy, out_t out)
 {
 	double pie = 3.1415926535;		
 	int fx,fy;
@@ -759,7 +549,7 @@ void make_polygon(int lines, double radius, int cx, int cy, out_t out)
 }
 
 template <typename out_t> inline
-void make_polygon(int lines, double radius, double radius2, int cx, int cy, out_t out)
+void make_star(int lines, double radius, double radius2, int cx, int cy, out_t out)
 {
 	double pie = 3.1415926535;		
 	int fx,fy;
@@ -783,50 +573,78 @@ void make_polygon(int lines, double radius, double radius2, int cx, int cy, out_
 	*out = boost::gil::point2<int>(fx,fy);
 }
 
-template <typename view_t>
-struct make_polygon_subview
+template <typename out_t> inline
+void make_rectangle(int width, int height, out_t out)
 {
-	const view_t& view;
-	int top,left,right,bottom;
-	make_polygon_subview(const view_t& view) : view(view)
+	*out = boost::gil::point2<int>(0,0);
+	*out = boost::gil::point2<int>(0,height-1);
+	*out = boost::gil::point2<int>(width-1,height-1);
+	*out = boost::gil::point2<int>(width-1,0);
+	*out = boost::gil::point2<int>(0,0);
+}
+
+struct make_extents
+{
+	int& top;
+	int& left;
+	int& right;
+	int& bottom;
+	make_extents(int& left, int& top, int& right, int& bottom) : 
+		left(left), top(top), right(right), bottom(bottom)
 	{
-		top = (std::numeric_limits<int>::min)();
 		left = (std::numeric_limits<int>::max)();
-		right = top;
-		bottom = left;
+		top = (std::numeric_limits<int>::max)();
+		right = (std::numeric_limits<int>::min)();
+		bottom = (std::numeric_limits<int>::min)();
 	}
 
-	operator view_t()
-	{
-		return boost::gil::subimage_view(view,left,top,right-left,top-bottom);
-	}
-	
 	void operator()(const boost::gil::point2<int>& point)
 	{
 		if (point.x < left)
 			left = point.x;
-		if (point.y < bottom)
-			bottom = point.y;
+		if (point.y < top)
+			top = point.y;
 		if (point.x > right)
 			right = point.x;
-		if (point.y > top)
-			top = point.y;
+		if (point.y > bottom)
+			bottom = point.y;
+	}	
+};
+
+struct shift_polygon
+{
+	int left, top;
+	shift_polygon(int left, int top) : left(left), top(top) {}
+
+	boost::gil::point2<int> operator()(const boost::gil::point2<int>& point)
+	{
+		boost::gil::point2<int> opoint = point;
+		opoint.x -= left;
+		opoint.y -= top;
+		return opoint;
 	}	
 };
 
 template <typename fill_pixels_t, typename view_t, typename polygon_t>
 void fill_polygon(const view_t& view, const polygon_t& polygon)
 {
-	view_t view2 = std::for_each(polygon.begin(),polygon.end(),
-		make_polygon_subview<view_t>(view));       
-
-	fill_pixels_t fill_pixels;
+	int left,right,top,bottom;
+	std::for_each(polygon.begin(),polygon.end(),
+		make_extents(left,top,right,bottom));       
 	
-	point_in_polygon<int> point_in(polygon);
+	polygon_t polygon2;
+	std::transform(polygon.begin(),polygon.end(),
+		std::back_inserter(polygon2) , shift_polygon(left,top));       
+
+	view_t view2 = boost::gil::subimage_view(
+		view,left,top,right-left,bottom-top);
+
+	fill_pixels_t fill_pixels;	
+	point_in_polygon<int> point_in(polygon2);
 	for (int x = 0; x < view2.width(); ++x)
 		for (int y = 0; y < view2.height(); ++y)
 			if (point_in(x,y))
-				fill_pixels(view,x,y);
+				fill_pixels(view2,x,y);
 }
 
 #endif
