@@ -210,17 +210,33 @@ int main()
       typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
       typedef image_t::view_t view_t;
 
-      tsize_t element_size     = sizeof( view_t::value_type );
-
       view_t::x_iterator begin( first_byte, 0 );
       view_t::x_iterator end  ( last_byte , 7 );
 
       image_t src( info._width, info._height );
       std::copy( begin, end, view( src ).begin() );
 
-      gray8_image_t dst( info._width, info._height );
-      copy_and_convert_pixels( view( src ), view( dst ) );
+      tiff_photometric_interpretation::type value;
+      get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
 
-      bmp_write_view( ".\\fax2d.bmp", view( dst ));
+      if( value == PHOTOMETRIC_MINISWHITE )
+      {
+         image_t inv_src( info._width, info._height );
+         // @todo How to invert 1 bit image?
+         // transform_pixels( const_view( src ), view( inv_src ), invert_pixel() );
+
+         gray8_image_t dst( info._width, info._height );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\fax2d.bmp", view( dst ));
+      }
+      else
+      {
+         gray8_image_t dst( info._width, info._height );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\fax2d.bmp", view( dst ));
+      }
+
    }
 }

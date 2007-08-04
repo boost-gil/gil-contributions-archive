@@ -1023,9 +1023,12 @@ private:
       {
          // Assumes gil view type is interleaved.
 
-         tsize_t strip_size     = TIFFStripSize     ( _tiff.get() );
-         tsize_t max_strips     = TIFFNumberOfStrips( _tiff.get() );
-         tsize_t rows_per_strip = strip_size / _info._width;
+         tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
+         tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
+
+         tiff_rows_per_strip::type rows_per_strip;
+         io_error_if( get_property<tiff_rows_per_strip>( _tiff, rows_per_strip, tiff_tag() ) 
+                    == false, "Read error." );
 
          tsize_t element_size     = sizeof( View::value_type );
          tsize_t size_to_allocate = strip_size / element_size;
@@ -1047,7 +1050,7 @@ private:
 
             // copy into view
 
-            tsize_t row = ( strip_count * rows_per_strip );
+            tsize_t row = strip_count * rows_per_strip;
 
             if(( row + rows_per_strip )< ( tsize_t ) _info._height )
             {
@@ -1073,20 +1076,6 @@ private:
                                          , point_t( _info._width
                                                   , remainder_rows )));
             }
-
-/*
-            for( tsize_t y = 0; y < rows_per_strip; ++y )
-            {
-               tsize_t row = ( strip_count * rows_per_strip ) + y;
-
-               if( row < ( tsize_t ) _info._height )
-               {
-                  std::copy( buffer.begin() +    ( y * _info._width )
-                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
-                           , v.row_begin( row ));
-               }
-            }
-*/
          }
       }
       else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
@@ -1131,10 +1120,6 @@ private:
                   std::copy( buffer.begin() +    ( y * _info._width )
                            , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
                            , nth_channel_view( v, 0 ).row_begin( row ));
-               }
-               else
-               {
-                  int i  =9 ;
                }
             }
          }
@@ -1185,7 +1170,6 @@ private:
       {
          throw std::runtime_error( "Wrong planar configuration setting." );
       }
-
    }
 
 
