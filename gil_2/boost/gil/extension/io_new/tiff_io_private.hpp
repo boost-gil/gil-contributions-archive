@@ -115,7 +115,7 @@ public:
    {
       img.recreate( _info._width, _info._height );
 
-      _read_3( view( img ));
+      _read_4( view( img ));
    }
 
 private:
@@ -1172,179 +1172,137 @@ private:
       }
    }
 
-
-
-
+   // Read planar tiff data using an interleaved gil image.
    template< typename View >
-
-   void read_interleaved_data( std::vector<unsigned char>& buffer )
+   void _read_planar_tiff_data( const View& v, mpl::false_ )
    {
-      tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
-      tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
-
-      unsigned char* buffer = reinterpret_cast<unsigned char*>( interleaved_view_get_raw_data( v ));
-
-      unsigned int offset = 0;
-      for( tsize_t strip_count = 0; strip_count < max_strips; ++strip_count )
-      {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                        , strip_count
-                                        , buffer + offset
-                                        , strip_size      );
-
-         io_error_if( size == -1, "Read error." );
-
-         offset += size;
-      }
+      
    }
 
+   // Read planar tiff data using an planar gil image.
    template< typename View >
-   void read_planar_data( const View& v, boost::mpl::int_<3> )
+   void _read_planar_tiff_data( const View& v, mpl::true_ )
    {
-      tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
-      tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
+         tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
+         std::size_t element_size = sizeof( View::value_type );
+         std::size_t dd = ((std::size_t) scanline_size + element_size - 1 ) / element_size;
 
-      int red_strip_count   = 0;
-      int red_last_strip    = max_strips / 3;
-      int green_strip_count = red_last_strip;
-      int green_last_strip  = 2 * max_strips / 3;
-      int blue_strip_count  = green_last_strip;
-      int blue_last_strip   = max_strips;
+         std::size_t size_to_allocate = std::max( (std::size_t) _info._width
+                                                , dd                          );
 
-      unsigned char* red   = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( v, 0 ));
-      unsigned char* green = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( v, 1 ));
-      unsigned char* blue  = reinterpret_cast<unsigned char*>( planar_view_get_raw_data( v, 2 ));
+         std::vector< View::value_type > buffer( size_to_allocate );
+
+         View vv = interleaved_view( _info._width
+                                   , 1
+                                   , (View::x_iterator) &buffer.front()
+                                   , size_to_allocate * element_size     );
+
+         for( tsample_t sample = 0; sample < num_channel<View>::value; ++sample )
+         {
+            for( uint32 row = 0; row < _info._height; ++row )
+            {
+               _read_scaline( buffer
+                            , row
+                            , sample
+                            , _tiff );
+
+               // copy into view
+               std::copy( buffer.begin()
+                        , buffer.begin() + _info._width
+                        , nth_channel_view( v, sample ).row_begin( row ));
+            }
+         }
 
 
-      unsigned int offset = 0;
-      for( ; red_strip_count < red_last_strip; ++red_strip_count )
+   }
+   
+
+   template < typename View >
+   void _read_4( const View& v )
+   {
+      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
       {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                       , red_strip_count
-                                       , red + offset
-                                       , strip_size );
+         // Assuming interleaved gil type
+         tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
+         
+         std::size_t element_size = sizeof( View::value_type );
 
-         io_error_if( size == -1, "Read error." );
+         std::size_t dd = ((std::size_t) scanline_size + element_size - 1 ) / element_size;
 
-         offset += size;
+         std::size_t size_to_allocate = std::max( (std::size_t) _info._width
+                                                , dd                          );
+
+
+
+         std::vector< View::value_type > buffer( size_to_allocate );
+
+         View vv = interleaved_view( _info._width
+                                   , 1
+                                   , (View::x_iterator) &buffer.front()
+                                   , size_to_allocate * element_size     );
+
+         for( uint32 row = 0; row < _info._height; ++row )
+         {
+            _read_scaline( buffer
+                         , row
+                         , 0
+                         , _tiff );
+
+            // copy into view
+            copy_pixels( vv
+                       , subimage_view( v
+                                      , point_t( 0
+                                               , row )
+                                      , point_t( _info._width
+                                               , 1              )));
+         }
       }
-
-      offset = 0;
-      for( ; green_strip_count < green_last_strip; ++green_strip_count )
+      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
       {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                       , green_strip_count
-                                       , green + offset
-                                       , strip_size         );
+         // Assuming planar gil type
 
-         io_error_if( size == -1, "Read error." );
+         typedef nth_channel_view_type<View>::type plane_t;
 
-         offset += size;
+         tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
+         std::vector< plane_t::value_type > buffer( scanline_size );
+
+         for( tsample_t sample = 0; sample < 3; ++sample )
+         {
+            for( uint32 row = 0; row < _info._height; ++row )
+            {
+               _read_scaline( buffer
+                            , row
+                            , sample
+                            , _tiff );
+
+               // copy into view
+               std::copy( buffer.begin()
+                        , buffer.begin() + _info._width
+                        , nth_channel_view( v, sample ).row_begin( row ));
+            }
+         }
       }
-
-
-      offset = 0;
-      for( ; blue_strip_count < blue_last_strip; ++blue_strip_count )
+      else
       {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                       , blue_strip_count
-                                       , blue + offset
-                                       , strip_size         );
-
-         io_error_if( size == -1, "Read error." );
-
-         offset += size;
+         throw std::runtime_error( "Wrong planar configuration setting." );
       }
    }
 
    template< typename Buffer >
-   void read_planar_data( Buffer& buffer, boost::mpl::int_<4> )
+   inline 
+   void _read_scaline( Buffer&     buffer
+                     , uint32      row
+                     , tsample_t   plane
+                     , tiff_file_t file             )
    {
-/*
-      tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
-      tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
+      int size = TIFFReadScanline( file.get()
+                                 , &buffer.front()
+                                 , row
+                                 , plane           );
 
-      int red_strip_count   = 0;
-      int red_last_strip    = max_strips / 4;
-      int green_strip_count = red_last_strip;
-      int green_last_strip  = 2 * max_strips / 4;
-      int blue_strip_count  = green_last_strip;
-      int blue_last_strip   = 3 * max_strips / 4;
-      int alpha_strip_count  = blue_last_strip;
-      int alpha_last_strip   = max_strips;
-
-
-      unsigned int offset = 0;
-      for( ; red_strip_count < red_last_strip; ++red_strip_count )
-      {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                       , red_strip_count
-                                       , red + offset
-                                       , strip_size );
-
-         io_error_if( size == -1, "Read error." );
-
-         offset += size;
-      }
-
-      offset = 0;
-      for( ; green_strip_count < green_last_strip; ++green_strip_count )
-      {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                       , green_strip_count
-                                       , green + offset
-                                       , strip_size         );
-
-         io_error_if( size == -1, "Read error." );
-
-         offset += size;
-      }
-
-
-      offset = 0;
-      for( ; blue_strip_count < blue_last_strip; ++blue_strip_count )
-      {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                       , blue_strip_count
-                                       , blue + offset
-                                       , strip_size         );
-
-         io_error_if( size == -1, "Read error." );
-
-         offset += size;
-      }
-
-      offset = 0;
-      for( ; alpha_strip_count < alpha_last_strip; ++alpha_strip_count )
-      {
-         _read_strip(  )
-
-         offset += size;
-      }
-*/
+      io_error_if( size == -1, "Read error." );
    }
 
-/*   inline
-   void _read_strips( std::vector<unsigned char>& buffer
-                    , std::size_t                 first_strip_number
-                    , std::size_t                 last_strip_number
-                    , std::size_t                 strip_size
-                    , tiff_file_t                 file             )
-   {
-      std::size_t offset = 0;
-      for( ; first_strip_number < last_strip_number; ++first_strip_number )
-      {
-         int size = TIFFReadEncodedStrip( _tiff.get()
-                                        , first_strip_number
-                                        , &buffer.front() + offset
-                                        , strip_size                );
-
-         io_error_if( size == -1, "Read error." );
-
-         offset += size;
-      }
-   }
-*/
 
    template< typename Buffer >
    inline 
