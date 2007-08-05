@@ -110,86 +110,10 @@ int main()
       tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
 
       typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
-      typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
-
-      basic_tiff_image_read_info info;
-      boost::gil::detail::read_image_info( file, info );
-
-      rgb64f_planar_image_t src( info._width, info._height );
-
-      tsize_t scanline_size = TIFFScanlineSize( file.get() );
-
-      std::vector< nth_channel_view_type<rgb64f_planar_image_t::view_t>::type::value_type > buffer( scanline_size );
-
-      for( tsample_t sample = 0; sample < 3; ++sample )
-      {
-         for( uint32 row = 0; row < info._height; ++row )
-         {
-            int ret = TIFFReadScanline( file.get()
-                                      , &buffer.front()
-                                      , row
-                                      , sample             );
-
-            assert( ret == 1 );
-
-            // copy into view
-            std::copy( buffer.begin()
-                     , buffer.begin() + info._width
-                     , nth_channel_view( view( src ), sample ).row_begin( row ));
-         }
-      }
-
-      rgb64f_pixel_t min( 0.0
-                        , 0.0
-                        , 0.0 );
-
-      rgb64f_pixel_t max( 1000.0
-                        , 1000.0
-                        , 1000.0 );
-
-      rgb8_image_t dst( view( src ).dimensions() );
-      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
-   
-      bmp_write_view( ".\\caspian_3.bmp", const_view( dst ));
-
-   }
-
-   {
-      // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
-
-      string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
-      tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
-
-      typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
       typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
+      rgb64f_image_t src;
 
-      basic_tiff_image_read_info info;
-      boost::gil::detail::read_image_info( file, info );
-
-      rgb64f_image_t src( info._width, info._height );
-
-      tsize_t scanline_size = TIFFScanlineSize( file.get() );
-      std::vector< nth_channel_view_type<rgb64f_image_t::view_t>::type::value_type > buffer( scanline_size );
-
-      for( tsample_t sample = 0
-         ; sample < num_channels<rgb64f_pixel_t>::value
-         ; ++sample                                      )
-      {
-         for( uint32 row = 0; row < info._height; ++row )
-         {
-            int ret = TIFFReadScanline( file.get()
-                                      , &buffer.front()
-                                      , row
-                                      , sample             );
-
-            assert( ret == 1 );
-
-            // copy into view
-            std::copy( buffer.begin()
-                     , buffer.begin() + info._width
-                     , nth_channel_view( view( src ), sample ).row_begin( row ));
-         }
-      }
+      read_image( file_name, src, tiff_tag() );
 
       rgb64f_pixel_t min( 0.0
                         , 0.0
