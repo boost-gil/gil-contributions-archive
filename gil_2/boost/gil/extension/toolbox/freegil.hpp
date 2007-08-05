@@ -43,8 +43,7 @@ struct make_glyph
 	{
 		glyph* u = new glyph();
 
-		pixel_t pix;
-		u->color = pix.pixel;
+		u->color = (boost::gil::rgb8_pixel_t)pixel_t();
 		u->ch = ch;
 		u->face = face;
 		return boost::shared_ptr<glyph>(u);
