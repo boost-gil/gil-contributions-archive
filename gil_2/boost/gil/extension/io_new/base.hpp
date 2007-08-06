@@ -34,22 +34,19 @@ inline void io_error_if( bool expr, const char* descr="" )
       io_error( descr );
 }
 
-
-template < typename View
-         , typename IsPlanar > struct num_planes
-{};
-
-template <typename View > struct num_planes< View, boost::mpl::false_ >
+template< typename View >
+struct is_bit_aligned
 {
-   typedef boost::mpl::int_<1> type;
+   typedef boost::mpl::false_ type;
+   static const bool value = false;
 };
 
-template <typename View > struct num_planes< View, boost::mpl::true_  > 
+template<>
+struct is_bit_aligned< bit_aligned_image1_type<1, gray_layout_t>::type::view_t >
 {
-   typedef typename View::value_type pixel_t;
-   typedef boost::mpl::int_< num_channels<pixel_t>::value > type;
+   typedef boost::mpl::true_ type;
+   static const bool value = true;
 };
-
 
 } // namespace details
 } // namespace gil

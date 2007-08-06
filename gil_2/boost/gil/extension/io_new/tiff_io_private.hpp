@@ -115,7 +115,7 @@ public:
    {
       img.recreate( _info._width, _info._height );
 
-      _read_4( view( img ));
+      _read( view( img ));
    }
 
 private:
@@ -163,8 +163,13 @@ private:
                {
                   case 1:
                   {
-                     if( v. )
-                                          
+                     // 1 bit black and white interleaved image
+                     typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
+
+                     io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                     _read_bit_aligned_view( v, boost::is_same<image_t::view_t, View >() );
 
                      break;
                   }
@@ -176,36 +181,12 @@ private:
                         case SAMPLEFORMAT_UINT:
                         {
                            // 8 bit unsigned integer grayscale interleaved image
-                           tsize_t strip_size     = TIFFStripSize     ( _tiff.get() );
-                           tsize_t max_strips     = TIFFNumberOfStrips( _tiff.get() );
-                           tsize_t rows_per_strip = strip_size / _info._width;
+                           typedef gray8_image_t image_t;
 
-                           tsize_t element_size     = sizeof( View::value_type );
-                           tsize_t size_to_allocate = strip_size / element_size;
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           std::vector< View::value_type > buffer( size_to_allocate );
-
-                           std::size_t y = 0;
-                           for( tsize_t strip_count = 0; strip_count < max_strips; ++strip_count )
-                           {
-                              _read_strip( buffer
-                                         , strip_count
-                                         , strip_size
-                                         , _tiff      );
-
-                              // copy into view
-                              for( tsize_t y = 0; y < rows_per_strip; ++y )
-                              {
-                                 tsize_t row = ( strip_count * rows_per_strip ) + y;
-
-                                 if( row < ( tsize_t ) _info._height )
-                                 {
-                                    std::copy( buffer.begin() +    ( y * _info._width )
-                                             , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
-                                             , v.row_begin( row ));
-                                 }
-                              }
-                           }
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -214,6 +195,11 @@ private:
                         {
                            // 8 bit signed integer grayscale interleaved image
                            typedef gray8s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -231,6 +217,11 @@ private:
                            // 16 bit unsigned integer grayscale interleaved image
                            typedef gray16_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -238,6 +229,11 @@ private:
                         {
                            // 16 bit signed integer grayscale interleaved image
                            typedef gray16s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -277,6 +273,11 @@ private:
                            // 32 bit unsigned int grayscale interleaved image
                            typedef gray32_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -285,6 +286,11 @@ private:
                            // 32 bit signed int grayscale interleaved image
                            typedef gray32s_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -292,6 +298,11 @@ private:
                         {
                            // 32 bit floating point grayscale interleaved image
                            typedef gray32f_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -310,6 +321,11 @@ private:
                            typedef pixel<double, gray_layout_t>    gray64f_pixel_t;
                            typedef image< gray64f_pixel_t, false > gray64f_image_t;
                            typedef gray64f_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -344,6 +360,11 @@ private:
                            // 8 bit unsigned integer rgb interleaved image
                            typedef rgb8_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -351,6 +372,11 @@ private:
                         {
                            // 8 bit signed integer rgb interleaved image
                            typedef rgb8s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -368,6 +394,11 @@ private:
                            // 16 bit unsigned integer rgb interleaved image
                            typedef rgb16_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -375,6 +406,11 @@ private:
                         {
                            // 16 bit signed integer rgb interleaved image
                            typedef rgb16s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -414,6 +450,11 @@ private:
                            // 32 bit unsigned int rgb interleaved image
                            typedef rgb32_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -422,6 +463,11 @@ private:
                            // 32 bit signed int rgb interleaved image
                            typedef rgb32s_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -429,6 +475,11 @@ private:
                         {
                            // 32 bit floating point rgb interleaved image
                            typedef rgb32f_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -447,6 +498,11 @@ private:
                            typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
                            typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
                            typedef rgb64f_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -480,6 +536,11 @@ private:
                            // 8 bit unsigned integer grayscale interleaved image
                            typedef rgba8_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -487,6 +548,11 @@ private:
                         {
                            // 8 bit signed integer grayscale interleaved image
                            typedef rgba8s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -504,6 +570,11 @@ private:
                            // 16 bit unsigned integer rgba interleaved image
                            typedef rgba16_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -511,6 +582,11 @@ private:
                         {
                            // 16 bit signed integer rgba interleaved image
                            typedef rgba16s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -550,6 +626,11 @@ private:
                            // 32 bit unsigned int rgb interleaved image
                            typedef rgba32_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -558,6 +639,11 @@ private:
                            // 32 bit signed int rgb interleaved image
                            typedef rgba32s_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -565,6 +651,11 @@ private:
                         {
                            // 32 bit floating point rgb interleaved image
                            typedef rgba32f_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -583,6 +674,11 @@ private:
                            typedef pixel<double, rgb_layout_t> rgba64f_pixel_t;
                            typedef image< rgba64f_pixel_t, false > rgba64f_image_t;
                            typedef rgba64f_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -626,6 +722,11 @@ private:
                            // 8 bit unsigned integer grayscale image
                            typedef gray8_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -633,6 +734,11 @@ private:
                         {
                            // 8 bit signed integer grayscale image
                            typedef gray8s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -650,6 +756,11 @@ private:
                            // 16 bit unsigned integer grayscale image
                            typedef gray16_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -657,6 +768,11 @@ private:
                         {
                            // 16 bit signed integer grayscale image
                            typedef gray16s_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -696,6 +812,11 @@ private:
                            // 32 bit unsigned int grayscale image
                            typedef gray32_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -704,6 +825,11 @@ private:
                            // 32 bit signed int grayscale image
                            typedef gray32s_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -711,6 +837,11 @@ private:
                         {
                            // 32 bit floating point grayscale image
                            typedef gray32f_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -729,6 +860,11 @@ private:
                            typedef pixel<double, gray_layout_t>    gray64f_pixel_t;
                            typedef image< gray64f_pixel_t, false > gray64f_planar_image_t;
                            typedef gray64f_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_interleaved_view( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -763,6 +899,11 @@ private:
                            // 8 bit unsigned integer rgb planar image
                            typedef rgb8_planar_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -770,6 +911,11 @@ private:
                         {
                            // 8 bit signed integer rgb planar image
                            typedef rgb8s_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -787,6 +933,11 @@ private:
                            // 16 bit unsigned integer rgb planar image
                            typedef rgb16_planar_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -794,6 +945,11 @@ private:
                         {
                            // 16 bit signed integer rgb planar image
                            typedef rgb16s_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -833,6 +989,11 @@ private:
                            // 32 bit unsigned int rgb planar image
                            typedef rgb32_planar_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -841,6 +1002,11 @@ private:
                            // 32 bit signed int rgb planar image
                            typedef rgb32s_planar_image_t image_t;
 
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -848,6 +1014,11 @@ private:
                         {
                            // 32 bit floating point rgb planar image
                            typedef rgb32f_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -866,6 +1037,11 @@ private:
                            typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
                            typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
                            typedef rgb64f_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<3>( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -898,6 +1074,12 @@ private:
                         {
                            // 8 bit unsigned integer grayscale planar image
                            typedef rgba8_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -905,6 +1087,12 @@ private:
                         {
                            // 8 bit signed integer grayscale planar image
                            typedef rgba8s_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
                      }
@@ -920,6 +1108,12 @@ private:
                         {
                            // 16 bit unsigned integer rgba planar image
                            typedef rgba16_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -927,6 +1121,12 @@ private:
                         {
                            // 16 bit signed integer rgba planar image
                            typedef rgba16s_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
                      }
@@ -964,6 +1164,12 @@ private:
                         {
                            // 32 bit unsigned int rgb planar image
                            typedef rgba32_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -971,6 +1177,12 @@ private:
                         {
                            // 32 bit signed int rgb planar image
                            typedef rgba32s_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
 
@@ -978,6 +1190,12 @@ private:
                         {
                            // 32 bit floating point rgb planar image
                            typedef rgba32f_planar_image_t image_t;
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
+
                            break;
                         }
                      }
@@ -996,7 +1214,11 @@ private:
                            typedef image< rgba64f_pixel_t, true > rgba64f_planar_image_t;
                            typedef rgba64f_planar_image_t image_t;
 
-                           _read_planar_image( view );
+
+                           io_error_if( views_are_compatible<View, image_t::view_t>::value != true
+                                      , "Views are incompatible. You might want to use read_and_convert_image()" );
+
+                           _read_planar_view<4>( v, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1008,8 +1230,6 @@ private:
 
                break; // samples per pixel == 4
             }
-
-
          }
       }
       else
@@ -1019,201 +1239,9 @@ private:
       }
    }
 
-   // Reads directly into the view.
-   template< typename View >
-   void _read_2( const View& v )
-   {
-      typedef num_planes< View, is_planar<View>::type >::type num_plane_t;
-
-      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
-      {
-         // interleave image
-         _read_data( v, is_planar<View>::type(), num_plane_t() );
-      }
-      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
-      {
-         // planar image
-         _read_data( v, is_planar<View>::type(), num_plane_t() );
-      }
-      else
-      {
-         // something is wrong.
-      }
-   }
-
-   template < typename View >
-   void _read_3( const View& v )
-   {
-      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
-      {
-         // Assumes gil view type is interleaved.
-
-         tsize_t strip_size = TIFFStripSize     ( _tiff.get() );
-         tsize_t max_strips = TIFFNumberOfStrips( _tiff.get() );
-
-         tiff_rows_per_strip::type rows_per_strip;
-         io_error_if( get_property<tiff_rows_per_strip>( _tiff, rows_per_strip, tiff_tag() ) 
-                    == false, "Read error." );
-
-         tsize_t element_size     = sizeof( View::value_type );
-         tsize_t size_to_allocate = strip_size / element_size;
-
-         std::vector< View::value_type > buffer( size_to_allocate );
-
-         View vv = interleaved_view( _info._width
-                                   , rows_per_strip
-                                   , (View::x_iterator) &buffer.front()
-                                   , strip_size / rows_per_strip        );
-
-         std::size_t y = 0;
-         for( tsize_t strip_count = 0; strip_count < max_strips; ++strip_count )
-         {
-            _read_strip( buffer
-                        , strip_count
-                        , strip_size
-                        , _tiff      );
-
-            // copy into view
-
-            tsize_t row = strip_count * rows_per_strip;
-
-            if(( row + rows_per_strip )< ( tsize_t ) _info._height )
-            {
-               copy_pixels( vv
-                          , subimage_view( v
-                                         , point_t( 0
-                                                  , row )
-                                         , point_t( _info._width
-                                                  , rows_per_strip )));
-            }
-            else
-            {
-               tsize_t remainder_rows = _info._height - row;
-
-               copy_pixels( subimage_view( vv
-                                         , point_t( 0
-                                                  , 0 )
-                                         , point_t( _info._width
-                                                  , remainder_rows ))
-                          , subimage_view( v
-                                         , point_t( 0
-                                                  , row )
-                                         , point_t( _info._width
-                                                  , remainder_rows )));
-            }
-         }
-      }
-      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
-      {
-         // Assume a planar gil view type is given.
-
-         tsize_t strip_size     = TIFFStripSize     ( _tiff.get() );
-         tsize_t max_strips     = TIFFNumberOfStrips( _tiff.get() );
-
-         tiff_rows_per_strip::type rows_per_strip;
-         io_error_if( get_property<tiff_rows_per_strip>( _tiff, rows_per_strip, tiff_tag() ) 
-                    == false, "Read error." );
-
-         tsize_t element_size     = sizeof( nth_channel_view_type<View>::type::value_type );
-         tsize_t size_to_allocate = strip_size / element_size;
-
-         std::vector< nth_channel_view_type<View>::type::value_type > buffer( size_to_allocate );
-
-         std::size_t y = 0;
-
-         int red_strip_count   = 0;
-         int red_last_strip    = max_strips / 3;
-         int green_strip_count = red_last_strip;
-         int green_last_strip  = 2 * max_strips / 3;
-         int blue_strip_count  = green_last_strip;
-         int blue_last_strip   = max_strips;
-         
-         for( ; red_strip_count < red_last_strip; ++red_strip_count )
-         {
-            _read_strip( buffer
-                       , red_strip_count
-                       , strip_size
-                       , _tiff      );
-
-            // copy into view
-            for( tiff_rows_per_strip::type y = 0; y < rows_per_strip; ++y )
-            {
-               tsize_t row = ( red_strip_count * rows_per_strip ) + y;
-
-               if( row < ( tsize_t ) _info._height )
-               {
-                  std::copy( buffer.begin() +    ( y * _info._width )
-                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
-                           , nth_channel_view( v, 0 ).row_begin( row ));
-               }
-            }
-         }
-
-         for( int i = 0; green_strip_count < green_last_strip; ++green_strip_count, ++i )
-         {
-            _read_strip( buffer
-                       , green_strip_count
-                       , strip_size
-                       , _tiff                );
-
-            // copy into view
-            for( tiff_rows_per_strip::type y = 0; y < rows_per_strip; ++y )
-            {
-               tsize_t row = ( i * rows_per_strip ) + y;
-
-               if( row < ( tsize_t ) _info._height )
-               {
-                  std::copy( buffer.begin() +    ( y * _info._width )
-                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
-                           , nth_channel_view( v, 1 ).row_begin( row ));
-               }
-            }
-         }
-
-         for( int i = 0; blue_strip_count < blue_last_strip; ++blue_strip_count, ++i )
-         {
-            _read_strip( buffer
-                       , blue_strip_count
-                       , strip_size
-                       , _tiff                );
-
-            // copy into view
-            for( tiff_rows_per_strip::type y = 0; y < rows_per_strip; ++y )
-            {
-               tsize_t row = ( i * rows_per_strip ) + y;
-
-               if( row < ( tsize_t ) _info._height )
-               {
-                  std::copy( buffer.begin() +    ( y * _info._width )
-                           , buffer.begin() + ((( y + 1 ) * _info._width ) - 1 )
-                           , nth_channel_view( v, 2 ).row_begin( row ));
-               }
-            }
-         }
-      }
-      else
-      {
-         throw std::runtime_error( "Wrong planar configuration setting." );
-      }
-   }
-
-   template < typename View >
-   void _read_4( const View& v )
-   {
-      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
-      {
-      }
-      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
-      {
-      }
-      else
-      {
-      }
-   }
-
    template< typename View >
    inline
-   void _read_interleave_image( const View v )
+   void _read_interleaved_view( const View v, boost::mpl::false_ )
    {
       tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
 
@@ -1224,14 +1252,12 @@ private:
       std::size_t size_to_allocate = std::max( (std::size_t) _info._width
                                              , dd                          );
 
-
-
       std::vector< View::value_type > buffer( size_to_allocate );
 
       View vv = interleaved_view( _info._width
                                 , 1
-                                , (View::x_iterator) &buffer.front()
-                                , size_to_allocate * element_size     );
+                                , reinterpret_cast<View::x_iterator>( &buffer.front() )
+                                , size_to_allocate * element_size                         );
 
       for( uint32 row = 0; row < _info._height; ++row )
       {
@@ -1252,14 +1278,24 @@ private:
 
    template< typename View >
    inline
-   void _read_planar_image( const View v )
+   void _read_interleaved_view( const View v, boost::mpl::true_ )
+   {
+   }
+
+   template< int Number_Of_Samples
+           , typename View
+           >
+   inline
+   void _read_planar_view( const View v, boost::mpl::false_ )
    {
       typedef nth_channel_view_type<View>::type plane_t;
 
       tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
       std::vector< plane_t::value_type > buffer( scanline_size );
 
-      for( tsample_t sample = 0; sample < 3; ++sample )
+      for( tsample_t sample = 0
+         ; sample < Number_Of_Samples
+         ; ++sample                    )
       {
          for( uint32 row = 0; row < _info._height; ++row )
          {
@@ -1276,6 +1312,44 @@ private:
       }
    }
 
+   template< int Number_Of_Samples
+           , typename View
+           >
+   inline
+   void _read_planar_view( const View v, boost::mpl::true_ )
+   {
+   }
+
+   template< typename View >
+   inline
+   void _read_bit_aligned_view( const View& v, boost::mpl::true_ )
+   {
+      tsize_t scanline_size_in_bytes = TIFFScanlineSize( _tiff.get() );
+      std::vector<unsigned char> buffer( scanline_size_in_bytes );
+
+      unsigned char* first_byte = &buffer.front();
+      unsigned char* last_byte  = &buffer.front() + ( scanline_size_in_bytes - 1 );
+   
+      View::x_iterator begin( first_byte, 0 );
+      View::x_iterator end  ( last_byte , 7 );
+
+      for( uint32 row = 0; row < _info._height; ++row )
+      {
+         _read_scaline( buffer
+                      , row
+                      , 0
+                      , _tiff   );
+
+         std::copy( begin, end, v.row_begin( row ) );
+      }
+
+   }
+
+   template< typename View >
+   inline
+   void _read_bit_aligned_view( const View& v, boost::mpl::false_ )
+   {
+   }
 
    template< typename Buffer >
    inline 

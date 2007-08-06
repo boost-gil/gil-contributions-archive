@@ -100,7 +100,6 @@ struct invert_pixel
 
 int main()
 {
-/*
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
@@ -127,10 +126,8 @@ int main()
       rgb8_image_t dst( view( src ).dimensions() );
       copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
    
-      bmp_write_view( ".\\caspian_4.bmp", const_view( dst ));
-
+      bmp_write_view( ".\\caspian_interleaved.bmp", const_view( dst ));
    }
-
 
    {
       // caspian.tif	279x220 64-bit floating point (deflate) Caspian Sea from space
@@ -154,7 +151,7 @@ int main()
       rgb8_image_t dst( view( src ).dimensions() );
       copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
    
-      bmp_write_view( ".\\caspian.bmp", const_view( dst ));
+      bmp_write_view( ".\\caspian_planar.bmp", const_view( dst ));
    }
 
    {
@@ -197,134 +194,68 @@ int main()
       TIFF* file = TIFFOpen( file_name.c_str(), "r" );
    }
 
+/*
    {
-      // fax2d.tif	1728x1082 1-bit b&w (G3/2D) facsimile
-
       string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
-      tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
-
-      basic_tiff_image_read_info info;
-      boost::gil::detail::read_image_info( file, info );
-
-      tsize_t strip_size = TIFFStripSize     ( file.get() );
-      tsize_t max_strips = TIFFNumberOfStrips( file.get() );
-
-      std::size_t image_size_in_bytes = ( info._width / 8 ) * info._height;
-
-      std::vector<unsigned char> buffer( image_size_in_bytes );
-
-      unsigned int offset = 0;
-      for( tsize_t strip_count = 0; strip_count < max_strips; ++strip_count )
-      {
-         int size = TIFFReadEncodedStrip( file.get()
-                                        , strip_count
-                                        , ( &buffer.front() ) + offset
-                                        , strip_size                    );
-
-         io_error_if( size == -1, "Read error." );
-
-         offset += size;
-      }
-
-      unsigned char* first_byte = &buffer.front();
-      unsigned char* last_byte  = &buffer.front() + ( image_size_in_bytes - 1 );
 
       typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
-      typedef image_t::view_t view_t;
 
-      view_t::x_iterator begin( first_byte, 0 );
-      view_t::x_iterator end  ( last_byte , 7 );
-
-      image_t src( info._width, info._height );
-      std::copy( begin, end, view( src ).begin() );
+      image_t src;
+      read_image( file_name, src, tiff_tag() );
 
       tiff_photometric_interpretation::type value;
       get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
 
       if( value == PHOTOMETRIC_MINISWHITE )
       {
-         image_t inv_src( info._width, info._height );
+         image_t inv_src( view( src ).dimensions() );
          // @todo How to invert 1 bit image?
          // transform_pixels( const_view( src ), view( inv_src ), invert_pixel() );
 
-         gray8_image_t dst( info._width, info._height );
-         copy_and_convert_pixels( view( src ), view( dst ) );
-
-         bmp_write_view( ".\\fax2d.bmp", view( dst ));
-      }
-      else
-      {
-         gray8_image_t dst( info._width, info._height );
-         copy_and_convert_pixels( view( src ), view( dst ) );
-
-         bmp_write_view( ".\\fax2d.bmp", view( dst ));
-      }
-   }
-
-   {
-      // fax2d.tif	1728x1082 1-bit b&w (G3/2D) facsimile
-
-      typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
-      typedef image_t::view_t view_t;
-
-      string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
-      tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
-
-      basic_tiff_image_read_info info;
-      boost::gil::detail::read_image_info( file, info );
-
-      image_t src( info._width, info._height );
-
-      tsize_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
-      std::vector<unsigned char> buffer( scanline_size_in_bytes );
-
-      unsigned char* first_byte = &buffer.front();
-      unsigned char* last_byte  = &buffer.front() + ( scanline_size_in_bytes - 1 );
-
-      view_t::x_iterator begin( first_byte, 0 );
-      view_t::x_iterator end  ( last_byte , 7 );
-
-      for( uint32 row = 0; row < info._height; ++row )
-      {
-         int size = TIFFReadScanline( file.get()
-                                    , &buffer.front()
-                                    , row
-                                    , 0               );
-
-         assert( size != -1 );
-
-         std::copy( begin, end, view( src ).row_begin( row ) );
-      }
-
-      tiff_photometric_interpretation::type value;
-      get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
-
-      if( value == PHOTOMETRIC_MINISWHITE )
-      {
-         image_t inv_src( info._width, info._height );
-         // @todo How to invert 1 bit image?
-         // transform_pixels( const_view( src ), view( inv_src ), invert_pixel() );
-
-         gray8_image_t dst( info._width, info._height );
+         gray8_image_t dst( view( src ).dimensions() );
          copy_and_convert_pixels( view( src ), view( dst ) );
 
          bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
       }
       else
       {
-         gray8_image_t dst( info._width, info._height );
+         gray8_image_t dst( view( src ).dimensions() );
          copy_and_convert_pixels( view( src ), view( dst ) );
 
          bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
       }
    }
 */
-
    {
-      string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
+      //g3test.tif	TIFF equivalent of g3test.g3 created by fax2tiff
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\g3test.tif" );
 
-      gray8_image_t src;
+      typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
+
+      image_t src;
       read_image( file_name, src, tiff_tag() );
-   }
 
+      tiff_photometric_interpretation::type value;
+      get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
+
+      if( value == PHOTOMETRIC_MINISWHITE )
+      {
+         image_t inv_src( view( src ).dimensions() );
+         // @todo How to invert 1 bit image?
+         // transform_pixels( const_view( src ), view( inv_src ), invert_pixel() );
+
+         gray8_image_t dst( view( src ).dimensions() );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\g3test.bmp", view( dst ));
+      }
+      else
+      {
+         gray8_image_t dst( view( src ).dimensions() );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\g3test.bmp", view( dst ));
+      }
+
+   }
 }
