@@ -100,6 +100,7 @@ struct invert_pixel
 
 int main()
 {
+/*
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
@@ -259,4 +260,71 @@ int main()
          bmp_write_view( ".\\fax2d.bmp", view( dst ));
       }
    }
+
+   {
+      // fax2d.tif	1728x1082 1-bit b&w (G3/2D) facsimile
+
+      typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
+      typedef image_t::view_t view_t;
+
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
+      tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
+
+      basic_tiff_image_read_info info;
+      boost::gil::detail::read_image_info( file, info );
+
+      image_t src( info._width, info._height );
+
+      tsize_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
+      std::vector<unsigned char> buffer( scanline_size_in_bytes );
+
+      unsigned char* first_byte = &buffer.front();
+      unsigned char* last_byte  = &buffer.front() + ( scanline_size_in_bytes - 1 );
+
+      view_t::x_iterator begin( first_byte, 0 );
+      view_t::x_iterator end  ( last_byte , 7 );
+
+      for( uint32 row = 0; row < info._height; ++row )
+      {
+         int size = TIFFReadScanline( file.get()
+                                    , &buffer.front()
+                                    , row
+                                    , 0               );
+
+         assert( size != -1 );
+
+         std::copy( begin, end, view( src ).row_begin( row ) );
+      }
+
+      tiff_photometric_interpretation::type value;
+      get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
+
+      if( value == PHOTOMETRIC_MINISWHITE )
+      {
+         image_t inv_src( info._width, info._height );
+         // @todo How to invert 1 bit image?
+         // transform_pixels( const_view( src ), view( inv_src ), invert_pixel() );
+
+         gray8_image_t dst( info._width, info._height );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
+      }
+      else
+      {
+         gray8_image_t dst( info._width, info._height );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
+      }
+   }
+*/
+
+   {
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
+
+      gray8_image_t src;
+      read_image( file_name, src, tiff_tag() );
+   }
+
 }

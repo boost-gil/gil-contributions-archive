@@ -120,6 +120,32 @@ public:
 
 private:
 
+   /*
+      This goes back to consistency with GIL.
+      GIL allows standard binary operations (assignment, equality comparison,
+      copy construction) only between compatible constructs. They must have
+      the same color space and pairwise compatible channels. Thus standard
+      operations are lossless.
+
+      We don't want to have a silent lossy operation, similar to the implicit
+      conversion in C++ - this is a source of numerous hard to find bugs. Alex
+      Stepanov, in fact, thinks the standard binary operations should only be
+      defined when both arguments are the same type, but in GIL we relax this
+      requirement slightly, as long as the types are compatible.
+
+      Then there is a set of operations that explicitly converts one type to
+      the other, such as copy_and_convert_pixels. These are lossy and the way
+      to convert from one to the other is specified by a color conversion
+      object. (A default is provided if left unspecified)
+
+      Since we can think of the image on file as an elaborate virtual image,
+      we need to provide the equivalent read_and_convert operation (actually
+      two, one taking an optional color conversion object and the other using
+      the default).
+      Also, the read operations (with no conversion) should throw an exception
+      if the image on file is not compatible.   
+   */
+
    template< typename View >
    void _read( const View& v )
    {
@@ -137,9 +163,8 @@ private:
                {
                   case 1:
                   {
-                     tsize_t strip_size = TIFFStripSize     ( file.get() );
-                     tsize_t max_strips = TIFFNumberOfStrips( file.get() );
-                     tsize_t rows_per_strip = strip_size / _info._width;
+                     if( v. )
+                                          
 
                      break;
                   }
@@ -971,6 +996,7 @@ private:
                            typedef image< rgba64f_pixel_t, true > rgba64f_planar_image_t;
                            typedef rgba64f_planar_image_t image_t;
 
+                           _read_planar_image( view );
 
                            break;
                         }
@@ -989,8 +1015,7 @@ private:
       else
       {
          // planar_configuration value is incorrect.
-
-         io_error( "Read error." );
+         io_error( "Wrong planar configuration setting." );
       }
    }
 
@@ -1172,121 +1197,85 @@ private:
       }
    }
 
-   // Read planar tiff data using an interleaved gil image.
-   template< typename View >
-   void _read_planar_tiff_data( const View& v, mpl::false_ )
-   {
-      
-   }
-
-   // Read planar tiff data using an planar gil image.
-   template< typename View >
-   void _read_planar_tiff_data( const View& v, mpl::true_ )
-   {
-         tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
-         std::size_t element_size = sizeof( View::value_type );
-         std::size_t dd = ((std::size_t) scanline_size + element_size - 1 ) / element_size;
-
-         std::size_t size_to_allocate = std::max( (std::size_t) _info._width
-                                                , dd                          );
-
-         std::vector< View::value_type > buffer( size_to_allocate );
-
-         View vv = interleaved_view( _info._width
-                                   , 1
-                                   , (View::x_iterator) &buffer.front()
-                                   , size_to_allocate * element_size     );
-
-         for( tsample_t sample = 0; sample < num_channel<View>::value; ++sample )
-         {
-            for( uint32 row = 0; row < _info._height; ++row )
-            {
-               _read_scaline( buffer
-                            , row
-                            , sample
-                            , _tiff );
-
-               // copy into view
-               std::copy( buffer.begin()
-                        , buffer.begin() + _info._width
-                        , nth_channel_view( v, sample ).row_begin( row ));
-            }
-         }
-
-
-   }
-   
-
    template < typename View >
    void _read_4( const View& v )
    {
       if( _info._planar_configuration == PLANARCONFIG_CONTIG )
       {
-         // Assuming interleaved gil type
-         tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
-         
-         std::size_t element_size = sizeof( View::value_type );
+      }
+      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
+      {
+      }
+      else
+      {
+      }
+   }
 
-         std::size_t dd = ((std::size_t) scanline_size + element_size - 1 ) / element_size;
+   template< typename View >
+   inline
+   void _read_interleave_image( const View v )
+   {
+      tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
 
-         std::size_t size_to_allocate = std::max( (std::size_t) _info._width
-                                                , dd                          );
+      std::size_t element_size = sizeof( View::value_type );
+
+      std::size_t dd = ((std::size_t) scanline_size + element_size - 1 ) / element_size;
+
+      std::size_t size_to_allocate = std::max( (std::size_t) _info._width
+                                             , dd                          );
 
 
 
-         std::vector< View::value_type > buffer( size_to_allocate );
+      std::vector< View::value_type > buffer( size_to_allocate );
 
-         View vv = interleaved_view( _info._width
-                                   , 1
-                                   , (View::x_iterator) &buffer.front()
-                                   , size_to_allocate * element_size     );
+      View vv = interleaved_view( _info._width
+                                , 1
+                                , (View::x_iterator) &buffer.front()
+                                , size_to_allocate * element_size     );
 
+      for( uint32 row = 0; row < _info._height; ++row )
+      {
+         _read_scaline( buffer
+                      , row
+                      , 0
+                      , _tiff );
+
+         // copy into view
+         copy_pixels( vv
+                    , subimage_view( v
+                                   , point_t( 0
+                                            , row )
+                                   , point_t( _info._width
+                                            , 1              )));
+      }
+   }
+
+   template< typename View >
+   inline
+   void _read_planar_image( const View v )
+   {
+      typedef nth_channel_view_type<View>::type plane_t;
+
+      tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
+      std::vector< plane_t::value_type > buffer( scanline_size );
+
+      for( tsample_t sample = 0; sample < 3; ++sample )
+      {
          for( uint32 row = 0; row < _info._height; ++row )
          {
             _read_scaline( buffer
                          , row
-                         , 0
+                         , sample
                          , _tiff );
 
             // copy into view
-            copy_pixels( vv
-                       , subimage_view( v
-                                      , point_t( 0
-                                               , row )
-                                      , point_t( _info._width
-                                               , 1              )));
+            std::copy( buffer.begin()
+                     , buffer.begin() + _info._width
+                     , nth_channel_view( v, sample ).row_begin( row ));
          }
-      }
-      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
-      {
-         // Assuming planar gil type
-
-         typedef nth_channel_view_type<View>::type plane_t;
-
-         tsize_t scanline_size = TIFFScanlineSize( _tiff.get() );
-         std::vector< plane_t::value_type > buffer( scanline_size );
-
-         for( tsample_t sample = 0; sample < 3; ++sample )
-         {
-            for( uint32 row = 0; row < _info._height; ++row )
-            {
-               _read_scaline( buffer
-                            , row
-                            , sample
-                            , _tiff );
-
-               // copy into view
-               std::copy( buffer.begin()
-                        , buffer.begin() + _info._width
-                        , nth_channel_view( v, sample ).row_begin( row ));
-            }
-         }
-      }
-      else
-      {
-         throw std::runtime_error( "Wrong planar configuration setting." );
       }
    }
+
 
    template< typename Buffer >
    inline 
