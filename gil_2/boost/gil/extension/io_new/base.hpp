@@ -48,6 +48,20 @@ struct is_bit_aligned< bit_aligned_image1_type<1, gray_layout_t>::type::view_t >
    static const bool value = true;
 };
 
+unsigned char swap_bits( unsigned char c )
+{
+   unsigned char result = 0;
+   for( int i = 0; i < 8; ++i )
+   {
+      result = result << 1;
+      result |= ( c & 1 );
+      c = c >> 1;
+   }
+
+   return result;
+}
+
+
 } // namespace details
 } // namespace gil
 } // namespace boost

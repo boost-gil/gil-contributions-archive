@@ -1256,7 +1256,7 @@ private:
 
       View vv = interleaved_view( _info._width
                                 , 1
-                                , reinterpret_cast<View::x_iterator>( &buffer.front() )
+                                , static_cast<View::x_iterator>( &buffer.front() )
                                 , size_to_allocate * element_size                         );
 
       for( uint32 row = 0; row < _info._height; ++row )
@@ -1339,6 +1339,8 @@ private:
                       , row
                       , 0
                       , _tiff   );
+
+         std::transform( buffer.begin(), buffer.end(), buffer.begin(), swap_bits );
 
          std::copy( begin, end, v.row_begin( row ) );
       }

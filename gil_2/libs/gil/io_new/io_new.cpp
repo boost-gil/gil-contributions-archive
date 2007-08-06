@@ -194,7 +194,6 @@ int main()
       TIFF* file = TIFFOpen( file_name.c_str(), "r" );
    }
 
-/*
    {
       string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
 
@@ -225,7 +224,7 @@ int main()
          bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
       }
    }
-*/
+
    {
       //g3test.tif	TIFF equivalent of g3test.g3 created by fax2tiff
       string file_name( ".\\test_images\\tiff\\libtiffpic\\g3test.tif" );
