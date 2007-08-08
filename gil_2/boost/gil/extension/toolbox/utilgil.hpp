@@ -88,8 +88,8 @@ struct horizontal_gradient
 	{
 		double perc = boost::numeric_cast<double>(x+1) / view.width();
 		int alpha = boost::numeric_cast<int>(perc*255);
-		pixel_t dst = fpix;
-		boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
+		pixel_t dst = tpix;
+		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
 		view(x,y) = dst;
 	}
 };
@@ -111,8 +111,8 @@ struct vertical_gradient
 	{
 		double perc = boost::numeric_cast<double>(y+1) / view.height();
 		int alpha = boost::numeric_cast<int>(perc*255);
-		pixel_t dst = fpix;
-		boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
+		pixel_t dst = tpix;
+		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
 		view(x,y) = dst;
 	}
 };
@@ -177,8 +177,8 @@ struct diagonal_gradient
 		double aperc = (xperc + yperc) / 2;
 
 		int alpha = boost::numeric_cast<int>(aperc*255);
-		pixel_t dst = fpix;
-		boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
+		pixel_t dst = tpix;
+		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
 		view(x,y) = dst;
 	}
 };
@@ -692,5 +692,12 @@ void fill_polygon(const view_t& view, const polygon_t& polygon)
 			if (point_in(x,y))
 				fill_pixels(view2,x,y);
 }
+
+typedef rgb8<255,255,255> white_t;
+typedef rgb8<219,219,112> goldenrod_t;
+typedef rgb8<235,240,240> yellowgreen_t;
+
+typedef vertical_gradient<white_t, goldenrod_t> bannana_gradient_t;
+typedef diagonal_gradient<white_t, yellowgreen_t> apple_gradient_t;
 
 #endif
