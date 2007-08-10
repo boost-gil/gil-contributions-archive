@@ -154,6 +154,9 @@
 				RelativePath=".\stdafx.h">
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_base.hpp">
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io.hpp">
 			</File>
 			<File
@@ -167,6 +170,40 @@
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+		</Filter>
+		<Filter
+			Name="old io"
+			Filter="">
+			<File
+				RelativePath=".\old_io\dynamic_io.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\io_error.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\jpeg_dynamic_io.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\jpeg_io.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\jpeg_io_private.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\png_dynamic_io.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\png_io.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\png_io_private.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\tiff_dynamic_io.hpp">
+			</File>
+			<File
+				RelativePath=".\old_io\tiff_io.hpp">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\test_images\tiff\libtiffpic\README">

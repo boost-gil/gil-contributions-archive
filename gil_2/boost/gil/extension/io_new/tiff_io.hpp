@@ -53,6 +53,8 @@ struct basic_tiff_image_read_info
    tiff_sample_format::type     _sample_format;
 
    tiff_planar_configuration::type _planar_configuration;
+
+   tiff_photometric_interpretation::type _photometric_interpretation;
 };
 
 struct tiff_image_write_info
@@ -134,7 +136,10 @@ void read_and_convert_view( const String& file_name, const View& view, Color_Con
 /// \ingroup TIFF_IO
 /// \brief Writes the view into an image.
 template< typename String, typename View > 
-void write_view( const String& file_name, const View& v, tiff_tag );
+void write_view( const String& file_name, const View& v, tiff_tag )
+{
+   detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
+}
 
 /// \ingroup TIFF_IO
 /// \brief Writes the view into an image and also add some additional informations.

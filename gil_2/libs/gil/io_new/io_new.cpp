@@ -102,7 +102,7 @@ int main()
 {
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
-/*
+
    {
       // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
 
@@ -256,16 +256,26 @@ int main()
          bmp_write_view( ".\\g3test.bmp", view( dst ));
       }
    }
-*/
+
    {
       //jello.tif	256x192 8-bit RGB (lzw palette) Paul Heckbert "jello"
       string file_name( ".\\test_images\\tiff\\libtiffpic\\jello.tif" );
-      boost::gil::detail::tiff_reader reader( boost::gil::detail::tiff_open_for_read( file_name ));
-
-      tiff_indexed::type value = 0;
-      bool set = get_property<string, tiff_indexed>( file_name, value, tiff_tag() );
+      /*
+      image_t src;
+      read_image( file_name, src, tiff_tag() );
 
       rgb8_image_t src;
       bmp_write_view( ".\\jello.bmp", view( src ));
+      */
+   }
+
+
+   ////////////////////
+   //
+   // Write test
+   //
+   ///////////////////
+
+   {
    }
 }
