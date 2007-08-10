@@ -227,6 +227,12 @@ struct tiff_sample_format
    static const unsigned int tag = TIFFTAG_SAMPLEFORMAT;
 };
 
+struct tiff_indexed
+{
+   typedef boost::uint16_t type;
+   static const unsigned int tag = TIFFTAG_INDEXED;
+};
+
 
 } // namespace gil
 } // namespace boost
