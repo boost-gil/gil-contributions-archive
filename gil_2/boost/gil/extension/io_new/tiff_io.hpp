@@ -139,6 +139,7 @@ template< typename String, typename View >
 void write_view( const String& file_name, const View& v, tiff_tag )
 {
    detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
+   writer.apply( v );
 }
 
 /// \ingroup TIFF_IO

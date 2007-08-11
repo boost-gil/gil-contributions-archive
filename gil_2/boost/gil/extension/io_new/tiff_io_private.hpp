@@ -149,7 +149,7 @@ private:
                      io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                 , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                     _read_bit_aligned_view( v, boost::is_same<image_t::view_t, View >() );
+                     read_bit_aligned_view( v, _tiff, boost::is_same<image_t::view_t, View >() );
 
                      break;
                   }
@@ -166,7 +166,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -179,7 +179,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -200,7 +200,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -213,7 +213,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -256,7 +256,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -269,7 +269,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -282,7 +282,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -305,7 +305,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -343,7 +343,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -356,7 +356,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -377,7 +377,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -390,7 +390,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -433,7 +433,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -446,7 +446,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -459,7 +459,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -482,7 +482,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -519,7 +519,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -532,7 +532,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -553,7 +553,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -566,7 +566,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -609,7 +609,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -622,7 +622,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -635,7 +635,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -658,7 +658,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -705,7 +705,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -718,7 +718,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -739,7 +739,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -752,7 +752,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -795,7 +795,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -808,7 +808,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -821,7 +821,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -844,7 +844,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_interleaved_view( v, is_bit_aligned<View>::type() );
+                           read_interleaved_view( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -882,7 +882,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -895,7 +895,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -916,7 +916,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -929,7 +929,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -972,7 +972,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -985,7 +985,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -998,7 +998,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1021,7 +1021,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<3>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<3>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1058,7 +1058,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1071,7 +1071,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1092,7 +1092,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1105,7 +1105,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1148,7 +1148,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1161,7 +1161,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1174,7 +1174,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1198,7 +1198,7 @@ private:
                            io_error_if( views_are_compatible<View, image_t::view_t>::value != true
                                       , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-                           read_planar_view<4>( v, is_bit_aligned<View>::type() );
+                           read_planar_view<4>( v, _tiff, is_bit_aligned<View>::type() );
 
                            break;
                         }
@@ -1227,6 +1227,8 @@ private:
 };
 
 
+
+
 class tiff_writer
 {
 public:
@@ -1237,25 +1239,76 @@ public:
    }
 
    template< typename View >
-   void write( const View& v )
+   void apply( const View& v )
    {
       typedef typename View::value_type pixel_t;
       typedef channel_type<pixel_t>::type channel_t;
 
-      set_property<tiff_image_width >( file, v.width() , tiff_tag() );
-      set_property<tiff_image_height>( file, v.height(), tiff_tag() );
+      tiff_image_width::type width   = v.width();
+      tiff_image_height::type height = v.height();
+
+      set_property<tiff_image_width >( _tiff, width, tiff_tag() );
+      set_property<tiff_image_height>( _tiff, height, tiff_tag() );
 
       if( is_planar<rgb8_planar_view_t>::value )
       {
-         set_property<tiff_planar_configuration>( file, PLANARCONFIG_SEPARATE, tiff_tag() );
+         tiff_planar_configuration::type planar_config = PLANARCONFIG_SEPARATE;
+         set_property<tiff_planar_configuration>( _tiff, planar_config, tiff_tag() );
       }
       else
       {
-         set_property<tiff_planar_configuration>( file, PLANARCONFIG_CONTIG, tiff_tag() );
+         tiff_planar_configuration::type planar_config = PLANARCONFIG_CONTIG;
+         set_property<tiff_planar_configuration>( _tiff, planar_config, tiff_tag() );
       }
 
-      set_property<tiff_samples_per_pixel>( file, num_channels< pixel_t >::value, tiff_tag() );
-      set_property<tiff_bits_per_sample>( file, sizeof( channel_t ), tiff_tag() );
+      tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
+      set_property<tiff_samples_per_pixel>( _tiff, samples_per_pixel, tiff_tag() );
+
+
+      tiff_bits_per_sample::type bits_per_sample = boost::mpl::at< bits_per_samples_map
+                                                                  , channel_t
+                                                                  >::type::value;
+      set_property<tiff_bits_per_sample>( _tiff, bits_per_sample, tiff_tag() );
+
+      tiff_sample_format::type sample_format = sample_format = boost::mpl::at< sample_format_map
+                                                                             , channel_t 
+                                                                             >::type::value;
+      set_property<tiff_sample_format>( _tiff, sample_format, tiff_tag() );
+
+
+      tiff_orientation::type orientation = ORIENTATION_TOPLEFT;
+      set_property<tiff_orientation>( _tiff, orientation, tiff_tag() );
+
+      tiff_rows_per_strip::type rows_per_strip = TIFFDefaultStripSize( _tiff.get(), 0 );
+      set_property<tiff_rows_per_strip>( _tiff, rows_per_strip, tiff_tag() );
+
+      if( is_planar<rgb8_planar_view_t>::value )
+      {
+         std::vector< channel_t > row( v.width() );
+
+         for( int c = 0; c < num_channels<pixel_t>::value; ++c )
+         {
+            for( View::y_coord_t y = 0; y < v.height(); ++y )
+            {
+               std::copy( nth_channel_view( v, c ).row_begin( y )
+                        , nth_channel_view( v, c ).row_end( y )
+                        , row.begin()                              );
+
+               write_scaline( row, y, c, _tiff );
+            }
+         }
+      }
+      else
+      {
+         std::vector< pixel_t > row( v.width() );
+
+         for( View::y_coord_t y = 0; y < v.height(); ++y )
+         {
+            std::copy( v.row_begin( y ), v.row_end( y ), row.begin() );
+            write_scaline( row, y, 0, _tiff );
+         }
+      }
+
    }
 
 private:

@@ -98,11 +98,21 @@ struct invert_pixel
    }
 };
 
+void read_test();
+void write_test();
+
 int main()
 {
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
+   read_test();
+   write_test();
+
+}
+
+void read_test()
+{
    {
       // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
 
@@ -268,14 +278,12 @@ int main()
       bmp_write_view( ".\\jello.bmp", view( src ));
       */
    }
+}
 
-
-   ////////////////////
-   //
-   // Write test
-   //
-   ///////////////////
-
+void write_test()
+{
    {
+      rgb8_image_t src( 100, 100 );
+      write_view( std::string( ".\\test.tiff" ), const_view( src ), tiff_tag() );
    }
 }
