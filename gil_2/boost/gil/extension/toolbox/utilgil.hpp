@@ -5,6 +5,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.)
 
+#include <iostream> //REMOVE
 #include <boost/cast.hpp>
 #include <boost/gil/image.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -27,7 +28,10 @@ enum
 struct make_alpha_blend
 {
 	short alpha;
-	make_alpha_blend(short alpha) : alpha(alpha){}
+	make_alpha_blend(short alpha) : alpha(alpha)
+	{
+		//TODO: BOOST_ASSERT(alpha >= 0 && alpha <= 255);
+	}
 
 	template <typename type_t>
 	void operator()(type_t& dst, const type_t& src)
@@ -59,7 +63,7 @@ struct rgba8
 	int alpha;
 	pixel_t pixel;
 	rgba8(pixel_t pixel = pixel_t(r,g,b), int alpha = a) : 
-			pixel(pixel), alpha(alpha) {}
+		pixel(pixel), alpha(alpha) {}
 	operator pixel_t(){return pixel;}
 
 	template <typename view_t>
@@ -117,6 +121,67 @@ struct vertical_gradient
 	}
 };
 
+template <typename fpix_t, typename tpix_t, int stop>
+struct vertical_gradient_stop
+{
+	BOOST_STATIC_ASSERT(stop > 0);
+	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t fpix;
+	pixel_t tpix;
+
+	vertical_gradient_stop() :
+		fpix(fpix_t()), tpix(tpix_t()){}
+
+	operator pixel_t(){return fpix;}
+
+	template <typename view_t>
+	void operator()(const view_t& view, int x, int y)
+	{
+		BOOST_ASSERT(stop*4 < view.height());
+		
+		if (y <= stop)
+		{
+			double perc = boost::numeric_cast<double>(y+1) / stop;
+			int alpha = boost::numeric_cast<int>(perc*255);
+			pixel_t dst = tpix;
+			boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
+		}
+		else if (y > view.height()/2-stop && 
+			y <= view.height()/2)
+		{
+			int yy = y-view.height()/2+stop;
+			double perc = boost::numeric_cast<double>(yy+1) / stop;
+			int alpha = boost::numeric_cast<int>(perc*255);
+			pixel_t dst = fpix;
+			boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
+		}
+		else if (y > view.height()/2 && 
+			y <= view.height()/2+stop)
+		{
+			int yy = y-view.height()/2;
+			double perc = boost::numeric_cast<double>(yy+1) / stop;
+			int alpha = boost::numeric_cast<int>(perc*255);
+			pixel_t dst = tpix;
+			boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
+		}
+		else if (y > view.height()-stop)
+		{
+			int yy = view.height()-y;
+			double perc = boost::numeric_cast<double>(yy+1) / stop;
+			int alpha = boost::numeric_cast<int>(perc*255);
+			pixel_t dst = tpix;
+			boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
+		}
+		else
+		{
+			view(x,y) = tpix;
+		}
+	}
+};
 
 template <typename fpix_t, typename tpix_t, std::size_t size>
 struct balanced_gradient
@@ -693,6 +758,7 @@ void fill_polygon(const view_t& view, const polygon_t& polygon)
 				fill_pixels(view2,x,y);
 }
 
+typedef rgb8<0,0,0> black_t;
 typedef rgb8<255,255,255> white_t;
 typedef rgb8<219,219,112> goldenrod_t;
 typedef rgb8<235,240,240> yellowgreen_t;
