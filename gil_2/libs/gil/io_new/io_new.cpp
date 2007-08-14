@@ -44,7 +44,15 @@ typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
 typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
 typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
 
+
+/*
 struct my_color_converter {
+
+   my_color_converter()
+   : _red_range  ( 0.0 )
+   , _green_range( 0.0 )
+   , _blue_range ( 0.0 )
+   {}
 
    my_color_converter( const rgb64f_pixel_t& min
                      , const rgb64f_pixel_t& max ) 
@@ -56,17 +64,91 @@ struct my_color_converter {
    template <typename P1, typename P2>
    void operator()(const P1& src, P2& dst) const
    {
-      const double& red   = get_color( src, red_t()   );
-      const double& green = get_color( src, green_t() );
-      const double& blue  = get_color( src, blue_t()  );
+      const double& red   = at_c<0>( src );
+      const double& green = at_c<1>( src );
+      const double& blue  = at_c<2>( src );
 
       double red_dst   = red   / _red_range * 255.0;
       double green_dst = green / _green_range * 255.0;
       double blue_dst  = blue  / _blue_range * 255.0;
 
-      get_color( dst, red_t() )   = static_cast<unsigned char>( red_dst   );
-      get_color( dst, green_t() ) = static_cast<unsigned char>( green_dst );
-      get_color( dst, blue_t() )  = static_cast<unsigned char>( blue_dst  );
+      at_c<0>( dst ) = static_cast<unsigned char>( red_dst   );
+      at_c<1>( dst ) = static_cast<unsigned char>( green_dst );
+      at_c<2>( dst ) = static_cast<unsigned char>( blue_dst  );
+   }
+
+private:
+
+   double _red_range;
+   double _green_range;
+   double _blue_range;
+};
+*/
+
+template < typename Pixel1
+         , typename Pixel2
+         >
+struct my_color_converter_impl
+{
+    void operator()( const Pixel1& src
+                   , Pixel2&       dst
+                   , double red_range
+                   , double green_range
+                   , double blue_range ) const
+    {
+    }
+};
+
+template <>
+struct my_color_converter_impl< rgb64f_pixel_t
+                              , rgb8_pixel_t
+                              >
+{
+    void operator()( const rgb64f_pixel_t& src
+                   , rgb8_pixel_t&         dst
+                   , double red_range
+                   , double green_range
+                   , double blue_range ) const
+    {
+      typedef channel_type< rgb8_pixel_t >::type channel_t;
+      double max = static_cast<double>( channel_traits<channel_t>::max_value() );
+
+      const double& red   = get_color( src, red_t()   );
+      const double& green = get_color( src, green_t() );
+      const double& blue  = get_color( src, blue_t()  );
+
+      double red_dst   = red   / red_range * max;
+      double green_dst = green / green_range * max;
+      double blue_dst  = blue  / blue_range * max;
+
+      get_color( dst, red_t()   ) = static_cast<channel_t>( red_dst   );
+      get_color( dst, green_t() ) = static_cast<channel_t>( green_dst );
+      get_color( dst, blue_t()  ) = static_cast<channel_t>( blue_dst  );
+    }
+};
+
+struct my_color_converter {
+
+   my_color_converter() {}
+
+   my_color_converter( const rgb64f_pixel_t& min
+                     , const rgb64f_pixel_t& max ) 
+   : _red_range  ( get_color( max, red_t()   ) - get_color( min, red_t()   ))
+   , _green_range( get_color( max, green_t() ) - get_color( min, green_t() ))
+   , _blue_range ( get_color( max, blue_t()  ) - get_color( min, blue_t()  ))
+   {}
+
+   template< typename SrcP
+           , typename DstP
+           >
+   void operator()(const SrcP& src,DstP& dst) const
+   { 
+      my_color_converter_impl< SrcP
+                             , DstP >()( src
+                                       , dst
+                                       , _red_range
+                                       , _green_range
+                                       , _blue_range   );
    }
 
 private:
@@ -99,6 +181,7 @@ struct invert_pixel
 };
 
 void read_test();
+void read_and_convert_test();
 void write_test();
 
 int main()
@@ -106,8 +189,9 @@ int main()
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
-   read_test();
-   write_test();
+   //read_test();
+   read_and_convert_test();
+   //write_test();
 
 }
 
@@ -278,6 +362,30 @@ void read_test()
       bmp_write_view( ".\\jello.bmp", view( src ));
       */
    }
+}
+
+void read_and_convert_test()
+{
+   {
+      // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
+
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
+      tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
+
+      rgb64f_pixel_t min( 0.0
+                        , 0.0
+                        , 0.0 );
+
+      rgb64f_pixel_t max( 1000.0
+                        , 1000.0
+                        , 1000.0 );
+
+      rgb8_image_t src;
+      read_and_convert_image( file_name, src, my_color_converter( min, max ), tiff_tag() );
+
+      bmp_write_view( ".\\caspian_interleaved.bmp", const_view( src ));
+   }
+
 }
 
 void write_test()

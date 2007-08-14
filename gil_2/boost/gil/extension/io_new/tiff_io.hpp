@@ -94,7 +94,7 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 template < typename String, typename Image > 
 void read_image( const String& file_name, Image& img, tiff_tag )
 {
-   detail::tiff_reader<detail::reader_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
+   detail::tiff_reader<detail::read_and_no_converter> reader( detail::tiff_open_for_read( file_name ));
    reader.apply( img );
 }
 
@@ -114,12 +114,28 @@ void read_view( const String& file_name, const View& v, point_t top_left, tiff_t
 /// \brief Allocates a new image whose dimensions are determined by the given tiff image file, loads and color-converts the pixels into it.
 /// Throws std::ios_base::failure if the file is not a valid TIFF file
 template <typename String, typename Image>
-void read_and_convert_image( const String& file_name, Image& im, tiff_tag );
+void read_and_convert_image( const String& file_name, Image& img, tiff_tag )
+{
+   typedef detail::read_and_convert< default_color_converter > reader_color_convert;
+
+   detail::tiff_reader<reader_color_convert> reader( detail::tiff_open_for_read( file_name ));
+   reader.set_color_converter( default_color_converter() );
+
+   reader.apply( img );
+}
 
 /// \ingroup TIFF_IO
 /// \brief Allocates a new image whose dimensions are determined by the given tiff image file, loads and color-converts the pixels into it.
 template< typename String, typename Image, typename Color_Converter >
-void read_and_convert_image(const String& file_name, Image& im, Color_Converter cc, tiff_tag );
+void read_and_convert_image(const String& file_name, Image& img, Color_Converter cc, tiff_tag )
+{
+   typedef detail::read_and_convert< Color_Converter > reader_color_convert;
+
+   detail::tiff_reader<reader_color_convert> reader( detail::tiff_open_for_read( file_name ));
+   reader.set_color_converter( cc );
+
+   reader.apply( img );
+}
 
 /// \ingroup TIFF_IO
 /// \brief Loads and color-converts the image specified by the given tiff image file name into the given view.
