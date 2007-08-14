@@ -44,47 +44,6 @@ typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
 typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
 typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
 
-
-/*
-struct my_color_converter {
-
-   my_color_converter()
-   : _red_range  ( 0.0 )
-   , _green_range( 0.0 )
-   , _blue_range ( 0.0 )
-   {}
-
-   my_color_converter( const rgb64f_pixel_t& min
-                     , const rgb64f_pixel_t& max ) 
-   : _red_range  ( get_color( max, red_t()   ) - get_color( min, red_t()   ))
-   , _green_range( get_color( max, green_t() ) - get_color( min, green_t() ))
-   , _blue_range ( get_color( max, blue_t()  ) - get_color( min, blue_t()  ))
-   {}
-
-   template <typename P1, typename P2>
-   void operator()(const P1& src, P2& dst) const
-   {
-      const double& red   = at_c<0>( src );
-      const double& green = at_c<1>( src );
-      const double& blue  = at_c<2>( src );
-
-      double red_dst   = red   / _red_range * 255.0;
-      double green_dst = green / _green_range * 255.0;
-      double blue_dst  = blue  / _blue_range * 255.0;
-
-      at_c<0>( dst ) = static_cast<unsigned char>( red_dst   );
-      at_c<1>( dst ) = static_cast<unsigned char>( green_dst );
-      at_c<2>( dst ) = static_cast<unsigned char>( blue_dst  );
-   }
-
-private:
-
-   double _red_range;
-   double _green_range;
-   double _blue_range;
-};
-*/
-
 template < typename Pixel1
          , typename Pixel2
          >
@@ -189,7 +148,7 @@ int main()
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
-   //read_test();
+   read_test();
    read_and_convert_test();
    //write_test();
 
@@ -197,6 +156,34 @@ int main()
 
 void read_test()
 {
+   {
+      // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
+
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
+
+      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
+
+      typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
+      typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
+      rgb64f_image_t src( info._width, info._height );
+
+      read_view( file_name, view( src ), tiff_tag() );
+
+      rgb64f_pixel_t min( 0.0
+                        , 0.0
+                        , 0.0 );
+
+      rgb64f_pixel_t max( 1000.0
+                        , 1000.0
+                        , 1000.0 );
+
+      rgb8_image_t dst( view( src ).dimensions() );
+      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
+   
+      bmp_write_view( ".\\read_view_test.bmp", const_view( dst ));
+   }
+
+
    {
       // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
 
@@ -367,10 +354,22 @@ void read_test()
 void read_and_convert_test()
 {
    {
+      // test default color converter
+
+      string file_name( ".\\test_images\\tiff\\found online\\flower.tif" );
+
+      gray8_image_t src;
+      read_and_convert_image( file_name, src, tiff_tag() );
+
+      bmp_write_view( ".\\default_cc_test.bmp", const_view( src ));
+   }
+
+   {
+      // test own color converter
+
       // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
 
       string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
-      tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
 
       rgb64f_pixel_t min( 0.0
                         , 0.0
@@ -383,9 +382,8 @@ void read_and_convert_test()
       rgb8_image_t src;
       read_and_convert_image( file_name, src, my_color_converter( min, max ), tiff_tag() );
 
-      bmp_write_view( ".\\caspian_interleaved.bmp", const_view( src ));
+      bmp_write_view( ".\\own_cc_test.bmp.bmp", const_view( src ));
    }
-
 }
 
 void write_test()

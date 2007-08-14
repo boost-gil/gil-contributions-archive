@@ -44,6 +44,7 @@ gil_2/libs/gil/io_new/Release/librle3.dll svn_mime_002dtype=application%2Foctet-
 gil_2/libs/gil/io_new/Release/libtiff3.dll svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io_new/Release/zlib1.dll svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io_new/test_images/tiff/GraphicsMagick/64K-colormap.tiff svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/io_new/test_images/tiff/found[!!-~]online/flower.tif svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io_new/test_images/tiff/libtiffpic/caspian.tif svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io_new/test_images/tiff/libtiffpic/cramps-tile.tif svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io_new/test_images/tiff/libtiffpic/cramps.tif svn_mime_002dtype=application%2Foctet-stream

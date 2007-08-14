@@ -247,12 +247,22 @@ public:
    }
 
    template< typename Image >
-   void apply( Image& img )
+   void read_image( Image& img )
    {
       img.recreate( _info._width, _info._height );
 
       _apply( view( img ));
    }
+
+   template< typename View >
+   void read_view( View& v )
+   {
+      io_error_if( v.dimensions() != point_t( _info._width, _info._height )
+                 , "User provided view has incorrect size."                  );
+
+      _apply( v );
+   }
+
 
 private:
 
@@ -1232,6 +1242,7 @@ private:
          io_error( "Wrong planar configuration setting." );
       }
    }
+
 
 private:
 
