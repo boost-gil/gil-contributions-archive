@@ -110,30 +110,47 @@ void read_interleaved_view( const View&    v
 {
 }
 
+template< typename Pixel >
+inline
+std::size_t buffer_size( std::size_t width
+                       , tiff_file_t file   )
+{
+   std::size_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
+
+   std::size_t element_size = sizeof( Pixel );
+
+   return  std::max( width
+                   , (( scanline_size_in_bytes + element_size - 1 ) / element_size ));
+}
+
 template< typename View >
 inline
 void read_interleaved_view( const View     v
                           , tiff_file_t    file
                           , const point_t& top_left 
-                          , boost::mpl::false_ )
+                          , boost::mpl::false_      )
 {
-   tsize_t scanline_size = TIFFScanlineSize( file.get() );
-
-   std::size_t element_size = sizeof( View::value_type );
-
-   std::size_t dd = ((std::size_t) scanline_size + element_size - 1 ) / element_size;
-
-   std::size_t size_to_allocate = std::max( (std::size_t) v.width()
-                                          , dd        );
+   std::size_t size_to_allocate = buffer_size< View::value_type >( v.width()
+                                                                 , file      );
 
    std::vector< View::value_type > buffer( size_to_allocate );
 
-   View vv = interleaved_view( v.width()
-                              , 1
-                              , static_cast<View::x_iterator>( &buffer.front() )
-                              , size_to_allocate * element_size                         );
+   View vv = interleaved_view( size_to_allocate
+                             , 1
+                             , static_cast<View::x_iterator>( &buffer.front() )
+                             , TIFFScanlineSize( file.get() )                   );
 
-   for( uint32 row = 0; row < (uint32) v.height(); ++row )
+   // Skip over rows since for compressed images no random access is possible.
+   for( uint32 row = 0; row < (uint32) top_left.y; ++row )
+   {
+      read_scaline( buffer
+                  , row
+                  , 0
+                  , file   );
+   }
+
+
+   for( uint32 row = top_left.y; row < (uint32) v.height() + top_left.y; ++row )
    {
       read_scaline( buffer
                   , row
@@ -141,10 +158,14 @@ void read_interleaved_view( const View     v
                   , file );
 
       // copy into view
-      copy_pixels( vv
+      copy_pixels( subimage_view( vv
+                                , point_t( top_left.x
+                                         , 0               )
+                                , point_t( v.width()
+                                         , 1               ))
                   , subimage_view( v
                                  , point_t( 0
-                                          , row )
+                                          , row - top_left.y )
                                  , point_t( v.width()
                                           , 1          )));
    }
@@ -172,14 +193,25 @@ void read_planar_view( const View&    v
 {
    typedef nth_channel_view_type<View>::type plane_t;
 
-   tsize_t scanline_size = TIFFScanlineSize( file.get() );
-   std::vector< plane_t::value_type > buffer( scanline_size );
+   std::size_t size_to_allocate = buffer_size<plane_t::value_type>( v.width()
+                                                                  , file      );
+   std::vector< plane_t::value_type > buffer( size_to_allocate );
 
    for( tsample_t sample = 0
       ; sample < Number_Of_Samples
       ; ++sample                    )
    {
-      for( uint32 row = 0; row < (uint32) v.height(); ++row )
+
+      // Skip over rows since for compressed images no random access is possible.
+      for( uint32 row = 0; row < (uint32) top_left.y; ++row )
+      {
+         read_scaline( buffer
+                     , row
+                     , sample
+                     , file   );
+      }
+
+      for( uint32 row = top_left.y; row < (uint32) v.height() + top_left.y; ++row )
       {
          read_scaline( buffer
                      , row
@@ -187,9 +219,9 @@ void read_planar_view( const View&    v
                      , file   );
 
          // copy into view
-         std::copy( buffer.begin()
-                  , buffer.begin() + v.width()
-                  , nth_channel_view( v, sample ).row_begin( row ));
+         std::copy( buffer.begin() + top_left.x
+                  , buffer.begin() + v.width() + top_left.x
+                  , nth_channel_view( v, sample ).row_begin( row - top_left.y ));
       }
    }
 }
@@ -232,6 +264,114 @@ void read_bit_aligned_view( const View&    v
       std::copy( begin, end, v.row_begin( row ) );
    }
 
+}
+
+template< typename Image_TIFF
+        , typename View_User
+        >
+void read_interleaved_view_and_convert( const View_User& v
+                                      , tiff_file_t      file
+                                      , const point_t&   top_left
+                                      , boost::mpl::true_         )
+{
+}
+
+template< typename Image_TIFF
+        , typename View_User
+        , typename Color_Converter
+        >
+void read_interleaved_view_and_convert( const View_User& v
+                                      , tiff_file_t      file
+                                      , const point_t&   top_left
+                                      , Color_Converter  cc
+                                      , boost::mpl::false_        )
+{
+   typedef Image_TIFF::view_t View_TIFF;
+
+   std::size_t size_to_allocate = buffer_size<View_TIFF::value_type>( v.width()
+                                                                    , file       );
+
+   std::vector< View_TIFF::value_type > buffer( size_to_allocate );
+
+   View_TIFF vv = interleaved_view( v.width()
+                                  , 1
+                                  , static_cast<typename View_TIFF::x_iterator>( &buffer.front() )
+                                  , TIFFScanlineSize( file.get() )                                  );
+
+   for( uint32 row = 0; row < (uint32) v.height(); ++row )
+   {
+      read_scaline( buffer
+                  , row
+                  , 0
+                  , file );
+
+      // convert data
+      transform_pixels( vv
+                        , subimage_view( v
+                                       , point_t( 0
+                                                , row )
+                                       , point_t( v.width()
+                                                , 1          ))
+                     , color_convert_deref_fn< typename View_TIFF::value_type
+                                             , typename View_User::value_type
+                                             , Color_Converter
+                                             >( cc ));
+   }
+}
+
+template< int Number_Of_Samples
+        , typename Image_TIFF
+        , typename View_User
+        >
+void read_planar_view_and_convert( const View_User& v
+                                 , tiff_file_t      file
+                                 , const point_t&   top_left
+                                 , boost::mpl::true_          )
+{}
+
+template< int Number_Of_Samples
+        , typename Image_TIFF
+        , typename View_User
+        , typename Color_Converter
+        >
+void read_planar_view_and_convert( const View_User& v
+                                 , tiff_file_t      file
+                                 , const point_t&   top_left
+                                 , Color_Converter  cc
+                                 , boost::mpl::false_        )
+{
+   typedef typename Image_TIFF::view_t View_TIFF;
+   Image_TIFF tiff_img( v.dimensions() );
+
+   typedef nth_channel_view_type<View_TIFF>::type plane_t;
+
+   tsize_t scanline_size = TIFFScanlineSize( file.get() );
+   std::vector< plane_t::value_type > buffer( scanline_size );
+
+   for( tsample_t sample = 0
+      ; sample < Number_Of_Samples
+      ; ++sample                    )
+   {
+      for( uint32 row = 0; row < (uint32) v.height(); ++row )
+      {
+         read_scaline( buffer
+                     , row
+                     , sample
+                     , file   );
+
+         // copy into view
+         std::copy( buffer.begin()
+                  , buffer.begin() + v.width()
+                  , nth_channel_view( view( tiff_img ), sample ).row_begin( row ));
+      }
+   }
+
+   transform_pixels( view( tiff_img )
+                   , v
+                   , color_convert_deref_fn< typename View_TIFF::value_type
+                                           , typename View_User::value_type
+                                           , Color_Converter
+                                           >( cc ));
 }
 
 template< typename Buffer >

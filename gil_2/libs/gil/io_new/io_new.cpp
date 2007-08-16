@@ -44,6 +44,10 @@ typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
 typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
 typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
 
+typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
+typedef rgb64f_image_t::view_t rgb64f_view_t;
+
+
 template < typename Pixel1
          , typename Pixel2
          >
@@ -149,13 +153,42 @@ int main()
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
    read_test();
-   read_and_convert_test();
+   //read_and_convert_test();
    //write_test();
 
 }
 
 void read_test()
 {
+   // read view tests
+
+   {
+      // basic read view test
+
+      string file_name( ".\\test_images\\tiff\\found online\\flower.tif" );
+      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
+
+      rgb8_image_t src( info._width, info._height );
+      read_view( file_name, view( src ), tiff_tag() );
+
+      bmp_write_view( ".\\basic_read_view_test.bmp", const_view( src ));
+   }
+
+   {
+      // partial read view test
+
+      string file_name( ".\\test_images\\tiff\\found online\\flower.tif" );
+      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
+
+      point_t top_left( 19, 88 );
+
+      rgb8_image_t src( point_t( info._width, info._height ) - top_left );
+      read_view( file_name, view( src ), top_left, tiff_tag() );
+
+      bmp_write_view( ".\\partial_read_view_test.bmp", const_view( src ));
+   }
+
+
    {
       // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
 
@@ -163,8 +196,31 @@ void read_test()
 
       basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
 
-      typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
-      typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
+      rgb64f_image_t src( info._width - 20, info._height - 20 );
+
+      read_view( file_name, view( src ), point_t( 20, 20 ), tiff_tag() );
+
+      rgb64f_pixel_t min( 0.0
+                        , 0.0
+                        , 0.0 );
+
+      rgb64f_pixel_t max( 1000.0
+                        , 1000.0
+                        , 1000.0 );
+
+      rgb8_image_t dst( view( src ).dimensions() );
+      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
+   
+      bmp_write_view( ".\\read_view_test.bmp", const_view( dst ));
+   }
+
+   {
+      // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
+
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
+
+      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
+
       rgb64f_image_t src( info._width, info._height );
 
       read_view( file_name, view( src ), tiff_tag() );
@@ -183,15 +239,12 @@ void read_test()
       bmp_write_view( ".\\read_view_test.bmp", const_view( dst ));
    }
 
-
    {
       // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
 
       string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
       tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
 
-      typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
-      typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
       rgb64f_image_t src;
 
       read_image( file_name, src, tiff_tag() );
@@ -215,8 +268,6 @@ void read_test()
 
       string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
 
-      typedef pixel<double, rgb_layout_t> rgb64f_pixel_t;
-      typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
       rgb64f_planar_image_t src;
 
       read_image( file_name, src, tiff_tag() );

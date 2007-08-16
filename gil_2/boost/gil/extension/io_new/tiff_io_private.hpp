@@ -89,11 +89,12 @@ struct read_and_no_converter
       typedef Image_TIFF::view_t View_TIFF;
 
       io_error_if( views_are_compatible<View_User, View_TIFF>::value != true
-                  , "Views are incompatible. You might want to use read_and_convert_image()" );
+                 , "Views are incompatible. You might want to use read_and_convert_image()" );
 
       boost::gil::detail::read_bit_aligned_view( v
+                                               , _file
                                                , top_left
-                                               , _file, boost::is_same<View_TIFF, View_User >() );
+                                               , boost::is_same<View_TIFF, View_User >() );
    }
 
    template< typename Image_TIFF
@@ -105,7 +106,7 @@ struct read_and_no_converter
       typedef Image_TIFF::view_t View_TIFF;
 
       io_error_if( views_are_compatible<View_User, View_TIFF>::value != true
-                  , "Views are incompatible. You might want to use read_and_convert_image()" );
+                 , "Views are incompatible. You might want to use read_and_convert_image()" );
 
       boost::gil::detail::read_interleaved_view( v
                                                , _file
@@ -163,43 +164,13 @@ struct read_and_convert
    void read_interleaved_view( const View_User& v
                              , const point_t&   top_left )
    {
-      typedef Image_TIFF::view_t View_TIFF;
+      using boost::gil::detail::read_interleaved_view_and_convert;
 
-      tsize_t scanline_size = TIFFScanlineSize( _file.get() );
-
-      std::size_t element_size = sizeof( View_TIFF::value_type );
-
-      std::size_t dd = ((std::size_t) scanline_size + element_size - 1 ) / element_size;
-
-      std::size_t size_to_allocate = std::max( (std::size_t) v.width()
-                                             , dd        );
-
-      std::vector< View_TIFF::value_type > buffer( size_to_allocate );
-
-      View_TIFF vv = interleaved_view( v.width()
-                                     , 1
-                                     , static_cast<typename View_TIFF::x_iterator>( &buffer.front() )
-                                     , size_to_allocate * element_size                        );
-
-      for( uint32 row = 0; row < (uint32) v.height(); ++row )
-      {
-         read_scaline( buffer
-                     , row
-                     , 0
-                     , _file );
-
-         // convert data
-         transform_pixels( vv
-                         , subimage_view( v
-                                        , point_t( 0
-                                                 , row )
-                                        , point_t( v.width()
-                                                 , 1          ))
-                        , color_convert_deref_fn< typename View_TIFF::value_type
-                                                , typename View_User::value_type
-                                                , Color_Converter
-                                                >( _cc ));
-      }
+      read_interleaved_view_and_convert< Image_TIFF >( v
+                                                     , _file
+                                                     , top_left
+                                                     , _cc
+                                                     , is_bit_aligned<View_User>::type() );
    }
 
    template< int Number_Of_Samples
@@ -209,38 +180,14 @@ struct read_and_convert
    void read_planar_view( const View_User& v
                         , const point_t&   top_left )
    {
-      typedef typename Image_TIFF::view_t View_TIFF;
-      Image_TIFF tiff_img( v.dimensions() );
+      using boost::gil::detail::read_planar_view_and_convert;
 
-      typedef nth_channel_view_type<View_TIFF>::type plane_t;
-
-      tsize_t scanline_size = TIFFScanlineSize( _file.get() );
-      std::vector< plane_t::value_type > buffer( scanline_size );
-
-      for( tsample_t sample = 0
-         ; sample < Number_Of_Samples
-         ; ++sample                    )
-      {
-         for( uint32 row = 0; row < (uint32) v.height(); ++row )
-         {
-            read_scaline( buffer
-                        , row
-                        , sample
-                        , _file   );
-
-            // copy into view
-            std::copy( buffer.begin()
-                     , buffer.begin() + v.width()
-                     , nth_channel_view( view( tiff_img ), sample ).row_begin( row ));
-         }
-      }
-
-      transform_pixels( view( tiff_img )
-                      , v
-                      , color_convert_deref_fn< typename View_TIFF::value_type
-                                              , typename View_User::value_type
-                                              , Color_Converter
-                                              >( _cc ));
+      read_planar_view_and_convert< Number_Of_Samples
+                                  , Image_TIFF >( v
+                                                , _file
+                                                , top_left
+                                                , _cc
+                                                , is_bit_aligned<View_User>::type() );
    }
 
 protected:
@@ -275,9 +222,11 @@ public:
    void read_view( const View&    v
                  , const point_t& top_left )
    {
-      io_error_if( v.dimensions() != point_t( _info._width, _info._height )
-                 , "User provided view has incorrect size."                  );
 
+      io_error_if( v.dimensions() != point_t( _info._width  - top_left.x
+                                            , _info._height - top_left.y )
+                 , "User provided view has incorrect size."                 );
+      
       _apply( v, top_left );
    }
 
