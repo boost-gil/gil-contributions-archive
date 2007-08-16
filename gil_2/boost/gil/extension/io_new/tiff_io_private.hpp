@@ -80,28 +80,36 @@ struct read_and_no_converter
    : _file( file )
    {}
 
-   template< typename View_TIFF
+   template< typename Image_TIFF
            , typename View_User
            >
-   void read_bit_aligned_view( const View_User& v )
+   void read_bit_aligned_view( const View_User& v
+                             , const point_t&   top_left )
    {
+      typedef Image_TIFF::view_t View_TIFF;
+
       io_error_if( views_are_compatible<View_User, View_TIFF>::value != true
                   , "Views are incompatible. You might want to use read_and_convert_image()" );
 
       boost::gil::detail::read_bit_aligned_view( v
+                                               , top_left
                                                , _file, boost::is_same<View_TIFF, View_User >() );
    }
 
-   template< typename View_TIFF
+   template< typename Image_TIFF
            , typename View_User
            >
-   void read_interleaved_view( const View_User& v )
+   void read_interleaved_view( const View_User& v
+                             , const point_t&   top_left )
    {
+      typedef Image_TIFF::view_t View_TIFF;
+
       io_error_if( views_are_compatible<View_User, View_TIFF>::value != true
                   , "Views are incompatible. You might want to use read_and_convert_image()" );
 
       boost::gil::detail::read_interleaved_view( v
                                                , _file
+                                               , top_left
                                                , is_bit_aligned<View_User>::type() );
    }
 
@@ -109,14 +117,18 @@ struct read_and_no_converter
            , typename Image_TIFF
            , typename View_User
            >
-   void read_planar_view( const View_User& v )
+   void read_planar_view( const View_User& v
+                        , const point_t&   top_left )
    {
+      typedef Image_TIFF::view_t View_TIFF;
+
       io_error_if( views_are_compatible< View_User
-                                       , typename Image_TIFF::view_t>::value != true
+                                       , View_TIFF >::value != true
                   , "Views are incompatible. You might want to use read_and_convert_image()" );
 
       boost::gil::detail::read_planar_view<Number_Of_Samples>( v
                                                              , _file
+                                                             , top_left
                                                              , is_bit_aligned<View_User>::type() );
    }
 
@@ -140,15 +152,19 @@ struct read_and_convert
    template< typename View_TIFF
            , typename View_User
            >
-   void read_bit_aligned_view( const View_User& v )
+   void read_bit_aligned_view( const View_User& v
+                             , const point_t&   top_left )
    {
    }
 
-   template< typename View_TIFF
+   template< typename Image_TIFF
            , typename View_User
            >
-   void read_interleaved_view( const View_User& v )
+   void read_interleaved_view( const View_User& v
+                             , const point_t&   top_left )
    {
+      typedef Image_TIFF::view_t View_TIFF;
+
       tsize_t scanline_size = TIFFScanlineSize( _file.get() );
 
       std::size_t element_size = sizeof( View_TIFF::value_type );
@@ -190,7 +206,8 @@ struct read_and_convert
            , typename Image_TIFF
            , typename View_User
            >
-   void read_planar_view( const View_User& v )
+   void read_planar_view( const View_User& v
+                        , const point_t&   top_left )
    {
       typedef typename Image_TIFF::view_t View_TIFF;
       Image_TIFF tiff_img( v.dimensions() );
@@ -251,16 +268,17 @@ public:
    {
       img.recreate( _info._width, _info._height );
 
-      _apply( view( img ));
+      _apply( view( img ), point_t( 0, 0 ));
    }
 
    template< typename View >
-   void read_view( View& v )
+   void read_view( const View&    v
+                 , const point_t& top_left )
    {
       io_error_if( v.dimensions() != point_t( _info._width, _info._height )
                  , "User provided view has incorrect size."                  );
 
-      _apply( v );
+      _apply( v, top_left );
    }
 
 
@@ -293,7 +311,8 @@ private:
    */
 
    template< typename View >
-   void _apply( const View& v )
+   void _apply( const View&    v
+              , const point_t& top_left )
    {
       if( _info._photometric_interpretation == PHOTOMETRIC_PALETTE )
       {
@@ -318,7 +337,7 @@ private:
                      // 1 bit black and white interleaved image
                      typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
 
-                     read_bit_aligned_view<image_t::view_t>( v );
+                     read_bit_aligned_view< image_t >( v, top_left );
 
                      break;
                   }
@@ -332,7 +351,7 @@ private:
                            // 8 bit unsigned integer grayscale interleaved image
                            typedef gray8_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -342,7 +361,7 @@ private:
                            // 8 bit signed integer grayscale interleaved image
                            typedef gray8s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -360,7 +379,7 @@ private:
                            // 16 bit unsigned integer grayscale interleaved image
                            typedef gray16_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -370,7 +389,7 @@ private:
                            // 16 bit signed integer grayscale interleaved image
                            typedef gray16s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -410,7 +429,7 @@ private:
                            // 32 bit unsigned int grayscale interleaved image
                            typedef gray32_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -420,7 +439,7 @@ private:
                            // 32 bit signed int grayscale interleaved image
                            typedef gray32s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -430,7 +449,7 @@ private:
                            // 32 bit floating point grayscale interleaved image
                            typedef gray32f_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -450,7 +469,7 @@ private:
                            typedef image< gray64f_pixel_t, false > gray64f_image_t;
                            typedef gray64f_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -485,7 +504,7 @@ private:
                            // 8 bit unsigned integer rgb interleaved image
                            typedef rgb8_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -495,7 +514,7 @@ private:
                            // 8 bit signed integer rgb interleaved image
                            typedef rgb8s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -513,7 +532,7 @@ private:
                            // 16 bit unsigned integer rgb interleaved image
                            typedef rgb16_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -523,7 +542,7 @@ private:
                            // 16 bit signed integer rgb interleaved image
                            typedef rgb16s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -563,7 +582,7 @@ private:
                            // 32 bit unsigned int rgb interleaved image
                            typedef rgb32_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -573,7 +592,7 @@ private:
                            // 32 bit signed int rgb interleaved image
                            typedef rgb32s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -583,7 +602,7 @@ private:
                            // 32 bit floating point rgb interleaved image
                            typedef rgb32f_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -603,7 +622,7 @@ private:
                            typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
                            typedef rgb64f_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -637,7 +656,7 @@ private:
                            // 8 bit unsigned integer grayscale interleaved image
                            typedef rgba8_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -647,7 +666,7 @@ private:
                            // 8 bit signed integer grayscale interleaved image
                            typedef rgba8s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -665,7 +684,7 @@ private:
                            // 16 bit unsigned integer rgba interleaved image
                            typedef rgba16_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -675,7 +694,7 @@ private:
                            // 16 bit signed integer rgba interleaved image
                            typedef rgba16s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -715,7 +734,7 @@ private:
                            // 32 bit unsigned int rgb interleaved image
                            typedef rgba32_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -725,7 +744,7 @@ private:
                            // 32 bit signed int rgb interleaved image
                            typedef rgba32s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -735,7 +754,7 @@ private:
                            // 32 bit floating point rgb interleaved image
                            typedef rgba32f_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -755,7 +774,7 @@ private:
                            typedef image< rgba64f_pixel_t, false > rgba64f_image_t;
                            typedef rgba64f_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -799,7 +818,7 @@ private:
                            // 8 bit unsigned integer grayscale image
                            typedef gray8_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -809,7 +828,7 @@ private:
                            // 8 bit signed integer grayscale image
                            typedef gray8s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -827,7 +846,7 @@ private:
                            // 16 bit unsigned integer grayscale image
                            typedef gray16_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -837,7 +856,7 @@ private:
                            // 16 bit signed integer grayscale image
                            typedef gray16s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -877,7 +896,7 @@ private:
                            // 32 bit unsigned int grayscale image
                            typedef gray32_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -887,7 +906,7 @@ private:
                            // 32 bit signed int grayscale image
                            typedef gray32s_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -897,7 +916,7 @@ private:
                            // 32 bit floating point grayscale image
                            typedef gray32f_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -917,7 +936,7 @@ private:
                            typedef image< gray64f_pixel_t, false > gray64f_planar_image_t;
                            typedef gray64f_planar_image_t image_t;
 
-                           read_interleaved_view< image_t::view_t >( v );
+                           read_interleaved_view< image_t >( v, top_left );
 
                            break;
                         }
@@ -952,7 +971,7 @@ private:
                            // 8 bit unsigned integer rgb planar image
                            typedef rgb8_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -962,7 +981,7 @@ private:
                            // 8 bit signed integer rgb planar image
                            typedef rgb8s_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -980,7 +999,7 @@ private:
                            // 16 bit unsigned integer rgb planar image
                            typedef rgb16_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -990,7 +1009,7 @@ private:
                            // 16 bit signed integer rgb planar image
                            typedef rgb16s_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -1030,7 +1049,7 @@ private:
                            // 32 bit unsigned int rgb planar image
                            typedef rgb32_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -1040,7 +1059,7 @@ private:
                            // 32 bit signed int rgb planar image
                            typedef rgb32s_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -1050,7 +1069,7 @@ private:
                            // 32 bit floating point rgb planar image
                            typedef rgb32f_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -1070,7 +1089,7 @@ private:
                            typedef image< rgb64f_pixel_t, true > rgb64f_planar_image_t;
                            typedef rgb64f_planar_image_t image_t;
 
-                           read_planar_view< 3, image_t >( v );
+                           read_planar_view< 3, image_t >( v, top_left );
 
                            break;
                         }
@@ -1104,7 +1123,7 @@ private:
                            // 8 bit unsigned integer grayscale planar image
                            typedef rgba8_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }
@@ -1114,7 +1133,7 @@ private:
                            // 8 bit signed integer grayscale planar image
                            typedef rgba8s_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }
@@ -1132,7 +1151,7 @@ private:
                            // 16 bit unsigned integer rgba planar image
                            typedef rgba16_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }
@@ -1142,7 +1161,7 @@ private:
                            // 16 bit signed integer rgba planar image
                            typedef rgba16s_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }
@@ -1182,7 +1201,7 @@ private:
                            // 32 bit unsigned int rgb planar image
                            typedef rgba32_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }
@@ -1192,7 +1211,7 @@ private:
                            // 32 bit signed int rgb planar image
                            typedef rgba32s_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }
@@ -1202,7 +1221,7 @@ private:
                            // 32 bit floating point rgb planar image
                            typedef rgba32f_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }
@@ -1222,7 +1241,7 @@ private:
                            typedef image< rgba64f_pixel_t, true > rgba64f_planar_image_t;
                            typedef rgba64f_planar_image_t image_t;
 
-                           read_planar_view< 4, image_t >( v );
+                           read_planar_view< 4, image_t >( v, top_left );
 
                            break;
                         }

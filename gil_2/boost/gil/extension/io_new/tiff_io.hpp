@@ -98,19 +98,20 @@ void read_image( const String& file_name, Image& img, tiff_tag )
 }
 
 /// \ingroup TIFF_IO
+template< typename String, typename View > 
+void read_view( const String& file_name, const View& v, point_t top_left, tiff_tag )
+{
+   detail::tiff_reader<detail::read_and_no_converter> reader( detail::tiff_open_for_read( file_name ));
+   reader.read_view( v, top_left );
+}
+
+/// \ingroup TIFF_IO
 /// \brief Loads the image specified by the given tiff image file name into the given view.
 template< typename String, typename View > 
 void read_view( const String&  file_name, const View& v, tiff_tag )
 {
-   detail::tiff_reader<detail::read_and_no_converter> reader( detail::tiff_open_for_read( file_name ));
-   reader.read_view( v );
+   read_view( file_name, v, point_t( 0, 0 ), tiff_tag() );
 }
-
-
-/// \ingroup TIFF_IO
-template< typename String, typename View > 
-void read_view( const String& file_name, const View& v, point_t top_left, tiff_tag );
-
 
 /// \ingroup TIFF_IO
 template< typename String, typename Image, typename Color_Converter >

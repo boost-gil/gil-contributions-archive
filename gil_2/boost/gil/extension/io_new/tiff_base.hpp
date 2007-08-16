@@ -103,16 +103,18 @@ bool set_property( tiff_file_t              file
 
 template< typename View >
 inline
-void read_interleaved_view( const View& v
-                          , tiff_file_t file
-                          , boost::mpl::true_ )
+void read_interleaved_view( const View&    v
+                          , tiff_file_t    file
+                          , const point_t& top_left 
+                          , boost::mpl::true_       )
 {
 }
 
 template< typename View >
 inline
-void read_interleaved_view( const View  v
-                          , tiff_file_t file
+void read_interleaved_view( const View     v
+                          , tiff_file_t    file
+                          , const point_t& top_left 
                           , boost::mpl::false_ )
 {
    tsize_t scanline_size = TIFFScanlineSize( file.get() );
@@ -154,7 +156,8 @@ template< int Number_Of_Samples
 inline
 void read_planar_view( const View& v
                      , tiff_file_t file
-                     , boost::mpl::true_ )
+                     , const point_t& top_left 
+                     , boost::mpl::true_       )
 {
 }
 
@@ -162,9 +165,10 @@ template< int Number_Of_Samples
         , typename View
         >
 inline
-void read_planar_view( const View& v
-                     , tiff_file_t file
-                     , boost::mpl::false_ )
+void read_planar_view( const View&    v
+                     , tiff_file_t    file
+                     , const point_t& top_left 
+                     , boost::mpl::false_      )
 {
    typedef nth_channel_view_type<View>::type plane_t;
 
@@ -193,17 +197,19 @@ void read_planar_view( const View& v
 
 template< typename View >
 inline
-void read_bit_aligned_view( const View& v
-                          , tiff_file_t file
-                          , boost::mpl::false_ )
+void read_bit_aligned_view( const View&    v
+                          , tiff_file_t    file
+                          , const point_t& top_left 
+                          , boost::mpl::false_      )
 {
 }
 
 template< typename View >
 inline
-void read_bit_aligned_view( const View& v
-                          , tiff_file_t file
-                          , boost::mpl::true_ )
+void read_bit_aligned_view( const View&    v
+                          , tiff_file_t    file
+                          , const point_t& top_left 
+                          , boost::mpl::true_       )
 {
    tsize_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
    std::vector<unsigned char> buffer( scanline_size_in_bytes );
