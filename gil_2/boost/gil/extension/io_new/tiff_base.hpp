@@ -42,6 +42,11 @@ typedef boost::mpl::map< boost::mpl::pair<boost::gil::bits8  , boost::mpl::int_<
                        , boost::mpl::pair<boost::gil::bits32s, boost::mpl::int_< SAMPLEFORMAT_INT    > >
                        > sample_format_map;
 
+typedef boost::mpl::map< boost::mpl::pair<boost::gil::gray_t , boost::mpl::int_< PHOTOMETRIC_MINISBLACK > >
+                       , boost::mpl::pair<boost::gil::rgb_t  , boost::mpl::int_< PHOTOMETRIC_RGB        > >
+                       , boost::mpl::pair<boost::gil::rgba_t , boost::mpl::int_< PHOTOMETRIC_RGB        > >
+                       > photometric_map;
+
 
 template< typename String >
 tiff_file_t tiff_open_for_read( const String& file_name )
@@ -93,7 +98,7 @@ bool set_property( tiff_file_t              file
                  , typename Property::type& value
                  , tiff_tag                        )
 {
-   if( TIFFSetField( file.get(), Property::tag, &value ) == 1 )
+   if( TIFFSetField( file.get(), Property::tag, value ) == 1 )
    {
       return true;
    }

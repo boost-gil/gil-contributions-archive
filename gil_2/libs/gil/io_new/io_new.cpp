@@ -152,15 +152,28 @@ int main()
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
-   read_test();
+   //read_test();
    //read_and_convert_test();
-   //write_test();
+   write_test();
 
 }
 
 void read_test()
 {
    // read view tests
+
+   {
+      // basic read view test
+
+      string file_name( ".\\test.tiff" );
+      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
+
+      rgb8_image_t src( info._width, info._height );
+      read_view( file_name, view( src ), tiff_tag() );
+
+      bmp_write_view( ".\\basic_read_view_test.bmp", const_view( src ));
+   }
+
 
    {
       // basic read view test
@@ -441,6 +454,16 @@ void write_test()
 {
    {
       rgb8_image_t src( 100, 100 );
-      write_view( std::string( ".\\test.tiff" ), const_view( src ), tiff_tag() );
+      fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
+
+      write_view( std::string( ".\\write_interleaved_image.tiff" ), const_view( src ), tiff_tag() );
    }
+
+   {
+      rgb8_planar_image_t src( 1000, 1000 );
+      fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
+
+      write_view( std::string( ".\\write_planar_image.tiff" ), const_view( src ), tiff_tag() );
+   }
+
 }
