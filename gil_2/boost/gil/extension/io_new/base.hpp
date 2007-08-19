@@ -61,6 +61,14 @@ unsigned char swap_bits( unsigned char c )
    return result;
 }
 
+std::string convert_to_string( const std::wstring& s )
+{
+	std::size_t len = wcslen( s.c_str() );
+	char* c = reinterpret_cast<char*>( alloca( len ));
+	wcstombs( c, s.c_str(), len );
+
+   return std::string( c, c + len );
+}
 
 } // namespace details
 } // namespace gil

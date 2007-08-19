@@ -64,6 +64,13 @@ tiff_file_t tiff_open_for_read< std::string >( const std::string& file_name )
    return tiff_file_t( tiff, TIFFClose );
 }
 
+template<>
+tiff_file_t tiff_open_for_read< std::wstring >( const std::wstring& file_name )
+{
+   return tiff_open_for_read( convert_to_string( file_name ));
+}
+
+
 template< typename String >
 tiff_file_t tiff_open_for_write( const String& file_name )
 {
@@ -78,6 +85,12 @@ tiff_file_t tiff_open_for_write< std::string >( const std::string& file_name )
               , "file_mgr: failed to open file" );
 
    return tiff_file_t( tiff, TIFFClose );
+}
+
+template<>
+tiff_file_t tiff_open_for_write< std::wstring >( const std::wstring& file_name )
+{
+   return tiff_open_for_write( convert_to_string( file_name ));
 }
 
 template <typename Property>

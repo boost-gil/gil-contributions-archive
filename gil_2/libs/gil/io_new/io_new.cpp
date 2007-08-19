@@ -174,7 +174,6 @@ void read_test()
       bmp_write_view( ".\\basic_read_view_test.bmp", const_view( src ));
    }
 
-
    {
       // basic read view test
 
@@ -185,6 +184,13 @@ void read_test()
       read_view( file_name, view( src ), tiff_tag() );
 
       bmp_write_view( ".\\basic_read_view_test.bmp", const_view( src ));
+   }
+
+   {
+      // basic read test using wstring
+
+      wstring file_name( L".\\test.tiff" );
+      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
    }
 
    {
@@ -464,6 +470,15 @@ void write_test()
       fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
 
       write_view( std::string( ".\\write_planar_image.tiff" ), const_view( src ), tiff_tag() );
+   }
+
+   {
+      // write test using wstring
+
+      rgb8_image_t src( 100, 100 );
+      fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
+
+      write_view( std::wstring( L".\\write_interleaved_image.tiff" ), const_view( src ), tiff_tag() );
    }
 
 }
