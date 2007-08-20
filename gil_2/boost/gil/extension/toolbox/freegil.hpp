@@ -28,25 +28,25 @@ namespace gil {
 
 struct glyph
 {
+	glyph(char ch, FT_Face face, boost::gil::rgb8_pixel_t color) :
+			ch(ch), face(face), color(color) {}
+
 	char ch;
 	FT_Face face;
 	boost::gil::rgb8_pixel_t color;
 };
 
-template <typename pixel_t = rgb8<0,0,0> >
 struct make_glyph
 {
 	FT_Face face;
-	make_glyph(FT_Face face) : face(face) {}
+	boost::gil::rgb8_pixel_t pixel;
+
+	make_glyph(FT_Face face, boost::gil::rgb8_pixel_t pixel) : 
+		face(face), pixel(pixel) {}
 
 	boost::shared_ptr<glyph> operator()(char ch)
 	{
-		glyph* u = new glyph();
-
-		u->color = (boost::gil::rgb8_pixel_t)pixel_t();
-		u->ch = ch;
-		u->face = face;
-		return boost::shared_ptr<glyph>(u);
+		return boost::shared_ptr<glyph>(new glyph(ch,face,pixel));
 	}
 };
 
