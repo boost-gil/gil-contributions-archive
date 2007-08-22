@@ -459,6 +459,8 @@ void read_and_convert_test()
 void write_test()
 {
    {
+      // Write an interleaved rgb image.
+
       rgb8_image_t src( 100, 100 );
       fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
 
@@ -466,6 +468,8 @@ void write_test()
    }
 
    {
+      // Write an planar rgb image.
+
       rgb8_planar_image_t src( 1000, 1000 );
       fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
 
@@ -473,7 +477,7 @@ void write_test()
    }
 
    {
-      // write test using wstring
+      // Write test using wstring.
 
       rgb8_image_t src( 100, 100 );
       fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));

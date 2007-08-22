@@ -34,18 +34,33 @@ inline void io_error_if( bool expr, const std::string& descr )
       io_error( descr );
 }
 
-template< typename View >
-struct is_bit_aligned
+template< int N >
+struct is_bit_aligned_impl
 {
-   typedef boost::mpl::false_ type;
-   static const bool value = false;
+   BOOST_STATIC_ASSERT( false );
 };
 
 template<>
-struct is_bit_aligned< bit_aligned_image1_type<1, gray_layout_t>::type::view_t >
+struct is_bit_aligned_impl< 1 >
+{
+   typedef boost::mpl::false_ type;
+   static const int value = false;
+};
+
+template<>
+struct is_bit_aligned_impl< 8 >
 {
    typedef boost::mpl::true_ type;
    static const bool value = true;
+};
+
+template< typename View >
+struct is_bit_aligned
+{
+   static const int v = byte_to_memunit< typename View::x_iterator >::value;
+
+   typedef typename is_bit_aligned_impl< v >::type type;
+   static const bool value = is_bit_aligned_impl< v >::value;
 };
 
 unsigned char swap_bits( unsigned char c )
