@@ -59,11 +59,13 @@ struct rgb8
 	}
 };
 
+//TODO: add default alpha parameter
 template <int r, int g, int b, int a> 
 struct rgba8
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
 
+	//TODO: this could be a static
 	bool operator()(pixel_t& pixel)
 	{
 		pixel = pixel_t(r,g,b);
@@ -707,16 +709,6 @@ void make_star(int lines, double radius, double radius2, int cx, int cy, out_t o
 	}
 
 	*out = boost::gil::point2<int>(fx,fy);
-}
-
-template <typename out_t> inline
-void make_rectangle(int width, int height, out_t out)
-{
-	*out = boost::gil::point2<int>(0,0);
-	*out = boost::gil::point2<int>(0,height-1);
-	*out = boost::gil::point2<int>(width-1,height-1);
-	*out = boost::gil::point2<int>(width-1,0);
-	*out = boost::gil::point2<int>(0,0);
 }
 
 struct make_extents
