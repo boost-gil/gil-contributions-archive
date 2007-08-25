@@ -107,8 +107,8 @@ bool get_property( tiff_file_t              file
 }
 
 template <typename Property>
-bool set_property( tiff_file_t              file
-                 , typename Property::type& value
+bool set_property( tiff_file_t                    file
+                 , const typename Property::type& value
                  , tiff_tag                        )
 {
    if( TIFFSetField( file.get(), Property::tag, value ) == 1 )

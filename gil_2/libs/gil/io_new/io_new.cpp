@@ -464,7 +464,7 @@ void write_test()
       rgb8_image_t src( 100, 100 );
       fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
 
-      write_view( std::string( ".\\write_interleaved_image.tiff" ), const_view( src ), tiff_tag() );
+      write_view( std::string( ".\\write_interleaved_image.tiff" ), view( src ), tiff_tag() );
    }
 
    {
@@ -473,7 +473,7 @@ void write_test()
       rgb8_planar_image_t src( 1000, 1000 );
       fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
 
-      write_view( std::string( ".\\write_planar_image.tiff" ), const_view( src ), tiff_tag() );
+      write_view( std::string( ".\\write_planar_image.tiff" ), view( src ), tiff_tag() );
    }
 
    {
@@ -482,7 +482,27 @@ void write_test()
       rgb8_image_t src( 100, 100 );
       fill_pixels( view( src ), rgb8_pixel_t( 255, 0, 0 ));
 
-      write_view( std::wstring( L".\\write_interleaved_image.tiff" ), const_view( src ), tiff_tag() );
+      write_view( std::wstring( L".\\write_interleaved_image_using_wstring.tiff" ), const_view( src ), tiff_tag() );
+   }
+
+   {
+      // Write test bit_aligned image.
+      typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
+      typedef gray1_image_t::view_t gray1_view_t;
+      typedef gray1_view_t::value_type gray1_pixel_t;
+
+      gray1_image_t src( 800, 100 );
+      fill_pixels( view( src ), gray1_pixel_t( 1 ));
+
+      tiff_image_write_info info;
+      info._photometric_interpretation = PHOTOMETRIC_MINISBLACK;
+      info._compression                = COMPRESSION_LZW;
+      info._orientation                = ORIENTATION_TOPLEFT;
+
+      write_view( std::string( ".\\write_bit_aligned_image.tiff" )
+                , view( src )
+                , info
+                , tiff_tag()                                         );
    }
 
 }

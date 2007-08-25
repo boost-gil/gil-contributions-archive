@@ -28,6 +28,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <boost/gil/extension/io_new/tiff_base.hpp>
+#include <boost/gil/extension/io_new/tiff_io_private_write.hpp>
 
 namespace boost { namespace gil { namespace detail {
 
@@ -1215,93 +1216,6 @@ private:
 private:
 
    basic_tiff_image_read_info _info;
-};
-
-
-
-// Right now only gray_t and rgb_t images are supported. See comment below
-// for the photometric interpretation.
-class tiff_writer
-{
-public:
-
-   tiff_writer( tiff_file_t file )
-   : _file( file )
-   {
-   }
-
-   template< typename View >
-   void apply( const View& v )
-   {
-      typedef typename View::value_type pixel_t;
-      typedef channel_type<pixel_t>::type channel_t;
-      typedef typename color_space_type<View>::type color_space_t;
-
-      // write dimensions
-      tiff_image_width::type width   = v.width();
-      tiff_image_height::type height = v.height();
-
-      set_property<tiff_image_width >( _file, width, tiff_tag() );
-      set_property<tiff_image_height>( _file, height, tiff_tag() );
-
-      // write planar configuration
-      tiff_planar_configuration::type planar_config = PLANARCONFIG_CONTIG;
-      set_property<tiff_planar_configuration>( _file, planar_config, tiff_tag() );
-
-      // write samples per pixel
-      tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
-      set_property<tiff_samples_per_pixel>( _file, samples_per_pixel, tiff_tag() );
-
-      // write bits per sample
-      tiff_bits_per_sample::type bits_per_sample = boost::mpl::at< bits_per_samples_map
-                                                                  , channel_t
-                                                                  >::type::value;
-      set_property<tiff_bits_per_sample>( _file, bits_per_sample, tiff_tag() );
-
-      // write photometric interpretion - Warning: This value is rather subjective.
-      // The user should better set this value itself. There is no way to decide if
-      // a image is PHOTOMETRIC_MINISWHITE or PHOTOMETRIC_MINISBLACK. This writer
-      // will assume PHOTOMETRIC_MINISBLACK for gray_t images and PHOTOMETRIC_RGB
-      // for rgb_t images.
-      tiff_photometric_interpretation::type photometric = boost::mpl::at< photometric_map
-                                                                        , color_space_t
-                                                                        >::type::value;
-
-      set_property<tiff_photometric_interpretation>( _file, photometric, tiff_tag() );
-
-
-      // write sample format
-      tiff_sample_format::type sample_format = sample_format = boost::mpl::at< sample_format_map
-                                                                             , channel_t 
-                                                                             >::type::value;
-      set_property<tiff_sample_format>( _file, sample_format, tiff_tag() );
-
-      // write compression
-      tiff_compression::type compression = COMPRESSION_LZW;
-      set_property<tiff_compression>( _file, compression, tiff_tag() );
-
-      // write orientation
-      tiff_orientation::type orientation = ORIENTATION_TOPLEFT;
-      set_property<tiff_orientation>( _file, orientation, tiff_tag() );
-
-      // write rows per strip
-      tiff_rows_per_strip::type rows_per_strip = TIFFDefaultStripSize( _file.get(), 0 );
-      set_property<tiff_rows_per_strip>( _file, rows_per_strip, tiff_tag() );
-
-      // write the data
-      std::vector< pixel_t > row( v.width() );
-
-      for( View::y_coord_t y = 0; y < v.height(); ++y )
-      {
-         std::copy( v.row_begin( y ), v.row_end( y ), row.begin() );
-         write_scaline( row, y, 0, _file );
-      }
-   }
-
-private:
-
-   tiff_file_t _file;
-
 };
 
 } // detail

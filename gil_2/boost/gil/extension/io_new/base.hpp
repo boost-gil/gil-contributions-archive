@@ -57,10 +57,10 @@ struct is_bit_aligned_impl< 8 >
 template< typename View >
 struct is_bit_aligned
 {
-   static const int v = byte_to_memunit< typename View::x_iterator >::value;
+   static const int memunit_per_byte = byte_to_memunit< typename View::x_iterator >::value;
 
-   typedef typename is_bit_aligned_impl< v >::type type;
-   static const bool value = is_bit_aligned_impl< v >::value;
+   typedef typename is_bit_aligned_impl< memunit_per_byte >::type type;
+   static const bool value = is_bit_aligned_impl< memunit_per_byte >::value;
 };
 
 unsigned char swap_bits( unsigned char c )

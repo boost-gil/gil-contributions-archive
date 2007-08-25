@@ -59,6 +59,9 @@ struct basic_tiff_image_read_info
 
 struct tiff_image_write_info
 {
+   tiff_photometric_interpretation::type _photometric_interpretation;
+   tiff_compression::type                _compression;
+   tiff_orientation::type                _orientation;
 };
 
 } // namespace gil
@@ -150,7 +153,23 @@ void write_view( const String& file_name, const View& v, tiff_tag )
 
 /// \ingroup TIFF_IO
 template< typename String, typename View > 
-void write_view( const String& file_name, const View& v, const tiff_image_write_info& write_info, tiff_tag );
+void write_view( const String& file_name, const View& v, const tiff_image_write_info& info, tiff_tag )
+{
+   detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
+   writer.apply( v, info );
+}
+
+/// \ingroup TIFF_IO
+template< typename String, typename View, typename Writer > 
+void write_view( const String&                file_name
+               , const View&                  v
+               , const tiff_image_write_info& info
+               , Writer                       writer
+               , tiff_tag                                    )
+{
+   detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
+   writer.apply( v, info, writer );
+}
 
 } // namespace gil
 } // namespace boost
