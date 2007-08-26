@@ -209,11 +209,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_base.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io_private.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io_private_write.hpp"
 				>
 			</File>
 			<File
