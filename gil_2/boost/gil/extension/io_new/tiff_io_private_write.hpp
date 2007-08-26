@@ -150,8 +150,23 @@ struct specific_writer_impl< gray1_view_t >
             row[ x / 8 ] = byte;
          }
 
-         // @todo: take care of remainder pixels
-         gray1_image_t::x_coord_t remainder = x - v.width();
+         {
+            // take care of remainder pixels
+
+            byte = 0;
+            unsigned char or_value = 0x80;
+
+            gray1_image_t::x_coord_t remainder = v.width() - ( x - 8 );
+
+            for( int i = remainder; i > 0; --i )
+            {
+               _set_value( it[v.width() - i], byte, or_value );
+
+               or_value = or_value >> 1;
+            }
+
+            row[ ( v.width() / 8 ) + 1 ] = byte;
+         }
 
          write_scaline( row, y, 0, file );
       }

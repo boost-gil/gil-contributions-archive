@@ -491,7 +491,7 @@ void write_test()
       typedef gray1_image_t::view_t gray1_view_t;
       typedef gray1_view_t::value_type gray1_pixel_t;
 
-      gray1_image_t src( 800, 100 );
+      gray1_image_t src( 35, 100 );
       fill_pixels( view( src ), gray1_pixel_t( 1 ));
 
       tiff_image_write_info info;
