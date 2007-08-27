@@ -28,7 +28,7 @@ struct specific_writer_impl
                    , tiff_file_t                  file )
    {
       typedef typename View::value_type pixel_t;
-      typedef channel_type< pixel_t >::type channel_t;
+      typedef typename channel_type< pixel_t >::type channel_t;
       typedef typename color_space_type<View>::type color_space_t;
 
       // write dimensions
@@ -47,18 +47,12 @@ struct specific_writer_impl
       set_property<tiff_samples_per_pixel>( file, samples_per_pixel, tiff_tag() );
 
       // write bits per sample
-      tiff_bits_per_sample::type bits_per_sample = boost::mpl::at< bits_per_samples_map
-                                                                  , channel_t
-                                                                  >::type::value;
-      set_property<tiff_bits_per_sample>( file, bits_per_sample, tiff_tag() );
+      tiff_bits_per_sample::type bits_per_sample_value = bits_per_sample< channel_t >::value;
+      set_property<tiff_bits_per_sample>( file, bits_per_sample_value, tiff_tag() );
 
       // write sample format
-      tiff_sample_format::type sample_format = boost::mpl::at< sample_format_map
-                                                             , channel_t 
-                                                             >::type::value;
-
-      set_property<tiff_sample_format>( file, sample_format, tiff_tag() );
-
+      tiff_sample_format::type sample_format_value = sample_format< channel_t >::value;
+      set_property<tiff_sample_format>( file, sample_format_value, tiff_tag() );
 
       // write photometric format
       set_property<tiff_photometric_interpretation>( file, info._photometric_interpretation, tiff_tag() );
@@ -221,9 +215,7 @@ public:
       // a image is PHOTOMETRIC_MINISWHITE or PHOTOMETRIC_MINISBLACK. This writer
       // will assume PHOTOMETRIC_MINISBLACK for gray_t images and PHOTOMETRIC_RGB
       // for rgb_t images.
-      info._photometric_interpretation = boost::mpl::at< photometric_map
-                                                       , color_space_t
-                                                       >::type::value;
+      info._photometric_interpretation = photometric_interpretation< color_space_t >::value;
 
       info._compression = COMPRESSION_LZW;
       info._orientation = ORIENTATION_TOPLEFT;

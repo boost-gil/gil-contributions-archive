@@ -87,7 +87,7 @@ struct read_and_no_converter
    void read_bit_aligned_view( const View_User& v
                              , const point_t&   top_left )
    {
-      typedef Image_TIFF::view_t View_TIFF;
+      typedef typename Image_TIFF::view_t View_TIFF;
 
       io_error_if( views_are_compatible<View_User, View_TIFF>::value != true
                  , "Views are incompatible. You might want to use read_and_convert_image()" );
@@ -104,7 +104,7 @@ struct read_and_no_converter
    void read_interleaved_view( const View_User& v
                              , const point_t&   top_left )
    {
-      typedef Image_TIFF::view_t View_TIFF;
+      typedef typename Image_TIFF::view_t View_TIFF;
 
       io_error_if( views_are_compatible<View_User, View_TIFF>::value != true
                  , "Views are incompatible. You might want to use read_and_convert_image()" );
@@ -122,7 +122,7 @@ struct read_and_no_converter
    void read_planar_view( const View_User& v
                         , const point_t&   top_left )
    {
-      typedef Image_TIFF::view_t View_TIFF;
+      typedef typename Image_TIFF::view_t View_TIFF;
 
       io_error_if( views_are_compatible< View_User
                                        , View_TIFF >::value != true

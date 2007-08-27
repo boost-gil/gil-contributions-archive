@@ -15,47 +15,31 @@
 /// \author Christian Henning
 ///         
 
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/at.hpp>
-
 #include <boost/gil/utilities.hpp>
 
 namespace boost { namespace gil { namespace detail {
 
-typedef boost::mpl::map< boost::mpl::pair<boost::gil::bits8	 , boost::mpl::int_< 8  > >
-                       , boost::mpl::pair<boost::gil::bits16 , boost::mpl::int_< 16 > >
-                       , boost::mpl::pair<boost::gil::bits32 , boost::mpl::int_< 16 > >
-                       , boost::mpl::pair<boost::gil::bits32f, boost::mpl::int_< 32 > >
-                       , boost::mpl::pair<double             , boost::mpl::int_< 64 > >
-                       , boost::mpl::pair<boost::gil::bits8s , boost::mpl::int_< 8  > >
-                       , boost::mpl::pair<boost::gil::bits16s, boost::mpl::int_< 16 > >
-                       , boost::mpl::pair<boost::gil::bits32s, boost::mpl::int_< 32 > >
-                       > bits_per_samples_map;
+template <typename Channel>
+struct bits_per_sample : public mpl::int_< sizeof( Channel ) > {};
 
-typedef boost::mpl::map< boost::mpl::pair<boost::gil::bits8  , boost::mpl::int_< SAMPLEFORMAT_UINT   > >
-                       , boost::mpl::pair<boost::gil::bits16 , boost::mpl::int_< SAMPLEFORMAT_UINT   > >
-                       , boost::mpl::pair<boost::gil::bits32 , boost::mpl::int_< SAMPLEFORMAT_UINT   > >
-                       , boost::mpl::pair<boost::gil::bits32f, boost::mpl::int_< SAMPLEFORMAT_IEEEFP > >
-                       , boost::mpl::pair<double             , boost::mpl::int_< SAMPLEFORMAT_IEEEFP > >
-                       , boost::mpl::pair<boost::gil::bits8s , boost::mpl::int_< SAMPLEFORMAT_INT    > >
-                       , boost::mpl::pair<boost::gil::bits16s, boost::mpl::int_< SAMPLEFORMAT_INT    > >
-                       , boost::mpl::pair<boost::gil::bits32s, boost::mpl::int_< SAMPLEFORMAT_INT    > >
-                       > sample_format_map;
+template < typename Channel > struct sample_format {};
+template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32f> : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<double>  : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<bits8s>  : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits16s> : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits32s> : public mpl::int_<SAMPLEFORMAT_INT> {};
 
-typedef boost::mpl::map< boost::mpl::pair<boost::gil::gray_t , boost::mpl::int_< PHOTOMETRIC_MINISBLACK > >
-                       , boost::mpl::pair<boost::gil::rgb_t  , boost::mpl::int_< PHOTOMETRIC_RGB        > >
-                       , boost::mpl::pair<boost::gil::rgba_t , boost::mpl::int_< PHOTOMETRIC_RGB        > >
-                       > photometric_map;
+template <typename Channel> struct photometric_interpretation {};
+template<> struct photometric_interpretation< gray_t > : public boost::mpl::int_< PHOTOMETRIC_MINISBLACK > {};
+template<> struct photometric_interpretation< rgb_t  > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
 
 
-template< typename String >
-tiff_file_t tiff_open_for_read( const String& file_name )
-{
-   BOOST_STATIC_ASSERT( false );
-}
-
-template<>
-tiff_file_t tiff_open_for_read< std::string >( const std::string& file_name )
+tiff_file_t tiff_open_for_read( const std::string& file_name )
 {
    TIFF* tiff;
    io_error_if( ( tiff = TIFFOpen( file_name.c_str(), "r" )) == NULL
@@ -64,21 +48,12 @@ tiff_file_t tiff_open_for_read< std::string >( const std::string& file_name )
    return tiff_file_t( tiff, TIFFClose );
 }
 
-template<>
-tiff_file_t tiff_open_for_read< std::wstring >( const std::wstring& file_name )
+tiff_file_t tiff_open_for_read( const std::wstring& file_name )
 {
    return tiff_open_for_read( convert_to_string( file_name ));
 }
 
-
-template< typename String >
-tiff_file_t tiff_open_for_write( const String& file_name )
-{
-   BOOST_STATIC_ASSERT( false );
-}
-
-template<>
-tiff_file_t tiff_open_for_write< std::string >( const std::string& file_name )
+tiff_file_t tiff_open_for_write( const std::string& file_name )
 {
    TIFF* tiff;
    io_error_if( ( tiff = TIFFOpen( file_name.c_str(), "w" )) == NULL
@@ -87,11 +62,11 @@ tiff_file_t tiff_open_for_write< std::string >( const std::string& file_name )
    return tiff_file_t( tiff, TIFFClose );
 }
 
-template<>
-tiff_file_t tiff_open_for_write< std::wstring >( const std::wstring& file_name )
+tiff_file_t tiff_open_for_write( const std::wstring& file_name )
 {
    return tiff_open_for_write( convert_to_string( file_name ));
 }
+
 
 template <typename Property>
 bool get_property( tiff_file_t              file
@@ -143,22 +118,24 @@ std::size_t buffer_size( std::size_t width
 
 template< typename View >
 inline
-void read_interleaved_view( const View     v
+void read_interleaved_view( const View&    src_view
                           , tiff_file_t    file
                           , const point_t& top_left 
                           , boost::mpl::false_      )
 {
-   std::size_t size_to_allocate = buffer_size< View::value_type >( v.width()
-                                                                 , file      );
+   std::size_t size_to_allocate = buffer_size< View::value_type >( src_view.width()
+                                                                 , file             );
 
    std::vector< View::value_type > buffer( size_to_allocate );
 
-   View vv = interleaved_view( size_to_allocate
-                             , 1
-                             , static_cast<View::x_iterator>( &buffer.front() )
-                             , TIFFScanlineSize( file.get() )                   );
+   View buffer_view = interleaved_view( size_to_allocate
+                                      , 1
+                                      , static_cast<View::x_iterator>( &buffer.front() )
+                                      , TIFFScanlineSize( file.get() )                   );
 
-   // Skip over rows since for compressed images no random access is possible.
+
+   // Skip over rows since for compressed images no random access is possible. See man
+   // page ( diagnostics section ) for more information.
    for( uint32 row = 0; row < (uint32) top_left.y; ++row )
    {
       read_scaline( buffer
@@ -168,24 +145,30 @@ void read_interleaved_view( const View     v
    }
 
 
-   for( uint32 row = top_left.y; row < (uint32) v.height() + top_left.y; ++row )
+   for( uint32 row = top_left.y; row < (uint32) src_view.height() + top_left.y; ++row )
    {
       read_scaline( buffer
                   , row
                   , 0
                   , file );
 
+      std::copy( buffer_view.begin() + top_left.x
+               , buffer_view.begin() + src_view.width()
+               , src_view.row_begin( row - top_left.y   ));
+
+/*
       // copy into view
-      copy_pixels( subimage_view( vv
+      copy_pixels( subimage_view( buffer_view
                                 , point_t( top_left.x
-                                         , 0               )
-                                , point_t( v.width()
-                                         , 1               ))
-                  , subimage_view( v
+                                         , 0                )
+                                , point_t( src_view.width()
+                                         , 1                ))
+                  , subimage_view( src_view
                                  , point_t( 0
                                           , row - top_left.y )
-                                 , point_t( v.width()
-                                          , 1          )));
+                                 , point_t( src_view.width()
+                                          , 1                )));
+*/
    }
 }
 
@@ -209,7 +192,7 @@ void read_planar_view( const View&    v
                      , const point_t& top_left 
                      , boost::mpl::false_      )
 {
-   typedef nth_channel_view_type<View>::type plane_t;
+   typedef typename nth_channel_view_type< View >::type plane_t;
 
    std::size_t size_to_allocate = buffer_size<plane_t::value_type>( v.width()
                                                                   , file      );
@@ -261,8 +244,17 @@ void read_bit_aligned_view( const View&    v
                           , const point_t& top_left 
                           , boost::mpl::true_       )
 {
+   typedef std::vector<unsigned char> buffer_t;
+
+   // create a lookup table for swapping bits.
+   buffer_t lookup( 256 );
+   for( int i = 0; i < 256; ++i )
+   {
+      lookup[i] = 255 - i;
+   }
+
    tsize_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
-   std::vector<unsigned char> buffer( scanline_size_in_bytes );
+   buffer_t buffer( scanline_size_in_bytes );
 
    unsigned char* first_byte = &buffer.front();
    unsigned char* last_byte  = &buffer.front() + ( scanline_size_in_bytes - 1 );
@@ -270,6 +262,9 @@ void read_bit_aligned_view( const View&    v
    View::x_iterator begin( first_byte, 0 );
    View::x_iterator end  ( last_byte , 7 );
 
+   buffer_t::iterator buffer_it  = buffer.begin();
+   buffer_t::iterator buffer_end = buffer.end();
+   
    for( uint32 row = 0; row < (uint32) v.height(); ++row )
    {
       read_scaline( buffer
@@ -277,7 +272,10 @@ void read_bit_aligned_view( const View&    v
                   , 0
                   , file   );
 
-      std::transform( buffer.begin(), buffer.end(), buffer.begin(), swap_bits );
+      for( ; buffer_it != buffer_end; ++buffer_it  )
+      {
+         *buffer_it = lookup[ *buffer_it ];
+      }
 
       std::copy( begin, end, v.row_begin( row ) );
    }
@@ -304,7 +302,7 @@ void read_interleaved_view_and_convert( const View_User& v
                                       , Color_Converter  cc
                                       , boost::mpl::false_        )
 {
-   typedef Image_TIFF::view_t View_TIFF;
+   typedef typename Image_TIFF::view_t View_TIFF;
 
    std::size_t size_to_allocate = buffer_size<View_TIFF::value_type>( v.width()
                                                                     , file       );
@@ -361,7 +359,7 @@ void read_planar_view_and_convert( const View_User& v
    typedef typename Image_TIFF::view_t View_TIFF;
    Image_TIFF tiff_img( v.dimensions() );
 
-   typedef nth_channel_view_type<View_TIFF>::type plane_t;
+   typedef typename nth_channel_view_type<View_TIFF>::type plane_t;
 
    tsize_t scanline_size = TIFFScanlineSize( file.get() );
    std::vector< plane_t::value_type > buffer( scanline_size );
