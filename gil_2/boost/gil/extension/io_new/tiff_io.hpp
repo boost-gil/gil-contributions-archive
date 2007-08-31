@@ -96,7 +96,7 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 template < typename String, typename Image > 
 void read_image( const String& file_name, Image& img, tiff_tag )
 {
-   detail::tiff_reader<detail::read_and_no_converter> reader( detail::tiff_open_for_read( file_name ));
+   detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
    reader.read_image( img );
 }
 
@@ -104,7 +104,7 @@ void read_image( const String& file_name, Image& img, tiff_tag )
 template< typename String, typename View > 
 void read_view( const String& file_name, const View& v, point_t top_left, tiff_tag )
 {
-   detail::tiff_reader<detail::read_and_no_converter> reader( detail::tiff_open_for_read( file_name ));
+   detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
    reader.read_view( v, top_left );
 }
 

@@ -17,9 +17,6 @@
 
 namespace boost { namespace gil { namespace detail {
 
-typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
-typedef gray1_image_t::view_t gray1_view_t;
-
 template< typename View >
 struct specific_writer_impl
 {
@@ -35,37 +32,37 @@ struct specific_writer_impl
       tiff_image_width::type width   = v.width();
       tiff_image_height::type height = v.height();
 
-      set_property<tiff_image_width >( file, width, tiff_tag() );
-      set_property<tiff_image_height>( file, height, tiff_tag() );
+      set_property<tiff_image_width >( file, width );
+      set_property<tiff_image_height>( file, height );
 
       // write planar configuration
       tiff_planar_configuration::type planar_config = PLANARCONFIG_CONTIG;
-      set_property<tiff_planar_configuration>( file, planar_config, tiff_tag() );
+      set_property<tiff_planar_configuration>( file, planar_config );
 
       // write samples per pixel
       tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
-      set_property<tiff_samples_per_pixel>( file, samples_per_pixel, tiff_tag() );
+      set_property<tiff_samples_per_pixel>( file, samples_per_pixel );
 
       // write bits per sample
       tiff_bits_per_sample::type bits_per_sample_value = bits_per_sample< channel_t >::value;
-      set_property<tiff_bits_per_sample>( file, bits_per_sample_value, tiff_tag() );
+      set_property<tiff_bits_per_sample>( file, bits_per_sample_value );
 
       // write sample format
       tiff_sample_format::type sample_format_value = sample_format< channel_t >::value;
-      set_property<tiff_sample_format>( file, sample_format_value, tiff_tag() );
+      set_property<tiff_sample_format>( file, sample_format_value );
 
       // write photometric format
-      set_property<tiff_photometric_interpretation>( file, info._photometric_interpretation, tiff_tag() );
+      set_property<tiff_photometric_interpretation>( file, info._photometric_interpretation );
 
       // write compression
-      set_property<tiff_compression>( file, info._compression, tiff_tag() );
+      set_property<tiff_compression>( file, info._compression );
 
       // write orientation
-      set_property<tiff_orientation>( file, info._orientation, tiff_tag() );
+      set_property<tiff_orientation>( file, info._orientation );
 
       // write rows per strip
       tiff_rows_per_strip::type rows_per_strip = TIFFDefaultStripSize( file.get(), 0 );
-      set_property<tiff_rows_per_strip>( file, rows_per_strip, tiff_tag() );
+      set_property<tiff_rows_per_strip>( file, rows_per_strip );
 
       // write the data
       std::vector< pixel_t > row( v.width() );
@@ -92,33 +89,33 @@ struct specific_writer_impl< gray1_view_t >
       tiff_image_width::type width   = v.width();
       tiff_image_height::type height = v.height();
 
-      set_property<tiff_image_width >( file, width, tiff_tag() );
-      set_property<tiff_image_height>( file, height, tiff_tag() );
+      set_property<tiff_image_width >( file, width );
+      set_property<tiff_image_height>( file, height );
 
       // write planar configuration
       tiff_planar_configuration::type planar_config = PLANARCONFIG_CONTIG;
-      set_property<tiff_planar_configuration>( file, planar_config, tiff_tag() );
+      set_property<tiff_planar_configuration>( file, planar_config );
 
       // write samples per pixel
       tiff_samples_per_pixel::type samples_per_pixel = 1;
-      set_property<tiff_samples_per_pixel>( file, samples_per_pixel, tiff_tag() );
+      set_property<tiff_samples_per_pixel>( file, samples_per_pixel );
 
       // write bits per sample
       tiff_bits_per_sample::type bits_per_sample = 1;
-      set_property<tiff_bits_per_sample>( file, bits_per_sample, tiff_tag() );
+      set_property<tiff_bits_per_sample>( file, bits_per_sample );
 
       // write photometric format
-      set_property<tiff_photometric_interpretation>( file, info._photometric_interpretation, tiff_tag() );
+      set_property<tiff_photometric_interpretation>( file, info._photometric_interpretation );
 
       // write compression
-      set_property<tiff_compression>( file, info._compression, tiff_tag() );
+      set_property<tiff_compression>( file, info._compression );
 
       // write orientation
-      set_property<tiff_orientation>( file, info._orientation, tiff_tag() );
+      set_property<tiff_orientation>( file, info._orientation );
 
       // write rows per strip
       tiff_rows_per_strip::type rows_per_strip = TIFFDefaultStripSize( file.get(), 0 );
-      set_property<tiff_rows_per_strip>( file, rows_per_strip, tiff_tag() );
+      set_property<tiff_rows_per_strip>( file, rows_per_strip );
 
       std::vector< unsigned char > row( v.width() / 8 + 1 );
 

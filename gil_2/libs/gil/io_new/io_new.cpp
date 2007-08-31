@@ -47,6 +47,10 @@ typedef rgb64f_planar_image_t::view_t rgb64f_planar_view_t;
 typedef image< rgb64f_pixel_t, false > rgb64f_image_t;
 typedef rgb64f_image_t::view_t rgb64f_view_t;
 
+typedef bit_aligned_image1_type<1, gray_layout_t>::type gray1_image_t;
+typedef gray1_image_t::view_t gray1_view_t;
+typedef gray1_view_t::value_type gray1_pixel_t;
+
 
 template < typename Pixel1
          , typename Pixel2
@@ -106,8 +110,8 @@ struct my_color_converter {
            >
    void operator()(const SrcP& src,DstP& dst) const
    { 
-      my_color_converter_impl< SrcP
-                             , DstP >()( src
+      my_color_converter_impl< rgb64f_pixel_t
+                             , rgb8_pixel_t >()( src
                                        , dst
                                        , _red_range
                                        , _green_range
@@ -121,25 +125,13 @@ private:
    double _blue_range;
 };
 
-struct invert
-{
-   template < typename Channel> void operator()( const Channel& src 
-                                               , Channel&       dst )
-   const
-   {
-      dst = channel_traits< Channel >::max_value() - src;
-   }
-};
-
 struct invert_pixel
 {
-   template < typename Pixel >
-   Pixel operator()(const Pixel& src ) const
+   gray8_pixel_t operator() ( const gray8_pixel_t& src )
    {
-      Pixel dst;
-      static_for_each( src, dst, invert() );
+      unsigned char v = src.at( boost::mpl::int_<0>() );
 
-      return dst;
+      return gray8_pixel_t( ~v );
    }
 };
 
@@ -161,18 +153,6 @@ int main()
 void read_test()
 {
    // read view tests
-
-   {
-      // basic read view test
-
-      string file_name( ".\\test.tiff" );
-      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
-
-      rgb8_image_t src( info._width, info._height );
-      read_view( file_name, view( src ), tiff_tag() );
-
-      bmp_write_view( ".\\basic_read_view_test.bmp", const_view( src ));
-   }
 
    {
       // basic read view test
@@ -207,64 +187,68 @@ void read_test()
       bmp_write_view( ".\\partial_read_view_test.bmp", const_view( src ));
    }
 
-
    {
-      // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
+      // read 1-bit file. ( very slow )
+      /*
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
 
-      string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
+      typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
 
-      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
+      image_t src;
+      read_image( file_name, src, tiff_tag() );
 
-      rgb64f_image_t src( info._width - 20, info._height - 20 );
+      tiff_photometric_interpretation::type value;
+      get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
 
-      read_view( file_name, view( src ), point_t( 20, 20 ), tiff_tag() );
+      if( value == PHOTOMETRIC_MINISWHITE )
+      {
+         typedef channel_traits< element_type<gray1_pixel_t>::type >::value_type channel_t;
+         gray1_pixel_t zero( channel_t( 0 ));
+         gray1_pixel_t one ( channel_t( 1 ));
 
-      rgb64f_pixel_t min( 0.0
-                        , 0.0
-                        , 0.0 );
+         for( gray1_view_t::y_coord_t y = 0
+            ; y < view( src ).height()
+            ; ++y )
+         {
+            gray1_view_t::x_iterator it  = view( src ).row_begin( y );
+            gray1_view_t::x_iterator end = view( src ).row_end( y );
 
-      rgb64f_pixel_t max( 1000.0
-                        , 1000.0
-                        , 1000.0 );
+            for( ; it != end; ++it )
+            {
+               if( *it == gray1_pixel_t( zero ) )
+               {
+                  *it = one;
+               }
+               else
+               {
+                  *it = zero;
+               }
+            }
+         }
 
-      rgb8_image_t dst( view( src ).dimensions() );
-      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
-   
-      bmp_write_view( ".\\read_view_test.bmp", const_view( dst ));
+         gray8_image_t dst( view( src ).dimensions() );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
+      }
+      else
+      {
+         gray8_image_t dst( view( src ).dimensions() );
+         copy_and_convert_pixels( view( src ), view( dst ) );
+
+         bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
+      }
+   */
    }
 
    {
+      // Read 64-bit floating point image.
+
       // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
-
-      string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
-
-      basic_tiff_image_read_info info = read_image_info( file_name, tiff_tag() );
-
-      rgb64f_image_t src( info._width, info._height );
-
-      read_view( file_name, view( src ), tiff_tag() );
-
-      rgb64f_pixel_t min( 0.0
-                        , 0.0
-                        , 0.0 );
-
-      rgb64f_pixel_t max( 1000.0
-                        , 1000.0
-                        , 1000.0 );
-
-      rgb8_image_t dst( view( src ).dimensions() );
-      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
-   
-      bmp_write_view( ".\\read_view_test.bmp", const_view( dst ));
-   }
-
-   {
-      // caspian.tif 279x220 64-bit floating point (deflate) Caspian Sea from space
-
       string file_name( ".\\test_images\\tiff\\libtiffpic\\caspian.tif" );
       tiff_file_t file = boost::gil::detail::tiff_open_for_read( file_name );
 
-      rgb64f_image_t src;
+      rgb64f_planar_image_t src;
 
       read_image( file_name, src, tiff_tag() );
 
@@ -343,37 +327,6 @@ void read_test()
 
       string file_name( ".\\test_images\\tiff\\libtiffpic\\dscf0013.tif" );
       TIFF* file = TIFFOpen( file_name.c_str(), "r" );
-   }
-
-   {
-      string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
-
-      typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
-
-      image_t src;
-      read_image( file_name, src, tiff_tag() );
-
-      tiff_photometric_interpretation::type value;
-      get_property<string, tiff_photometric_interpretation>( file_name, value, tiff_tag() );
-
-      if( value == PHOTOMETRIC_MINISWHITE )
-      {
-         image_t inv_src( view( src ).dimensions() );
-         // @todo How to invert 1 bit image?
-         // transform_pixels( const_view( src ), view( inv_src ), invert_pixel() );
-
-         gray8_image_t dst( view( src ).dimensions() );
-         copy_and_convert_pixels( view( src ), view( dst ) );
-
-         bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
-      }
-      else
-      {
-         gray8_image_t dst( view( src ).dimensions() );
-         copy_and_convert_pixels( view( src ), view( dst ) );
-
-         bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
-      }
    }
 
    {
@@ -487,10 +440,6 @@ void write_test()
 
    {
       // Write test bit_aligned image.
-      typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
-      typedef gray1_image_t::view_t gray1_view_t;
-      typedef gray1_view_t::value_type gray1_pixel_t;
-
       gray1_image_t src( 35, 100 );
       fill_pixels( view( src ), gray1_pixel_t( 1 ));
 
