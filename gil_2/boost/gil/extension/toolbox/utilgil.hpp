@@ -42,40 +42,50 @@ struct make_alpha_blend
 };
 
 template <int r, int g, int b> 
-struct rgb8
+struct rgb
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t pixel;
+	rgb(pixel_t pixel = pixel_t(r,g,b)) : pixel(pixel) {}
 	
-	bool operator()(pixel_t& pixel)
+	bool operator()(pixel_t& out)
 	{
-		pixel = pixel_t(r,g,b);
+		out = pixel;
 		return true;
 	}	
 
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
-		view(x,y) = pixel_t(r,g,b);
+		view(x,y) = pixel;
 	}
 };
 
 //TODO: add default alpha parameter
-template <int r, int g, int b, int a> 
-struct rgba8
+//TODO: this could be a static
+
+template <typename rgb_t, int a> 
+struct rgba
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
-
-	//TODO: this could be a static
-	bool operator()(pixel_t& pixel)
+	pixel_t pixel;
+	
+	rgba()
 	{
-		pixel = pixel_t(r,g,b);
+		pixel_t pixel;
+		rgb_t()(pixel);
+	}
+
+	bool operator()(pixel_t& out)
+	{
+		out = pixel;
 		return true;
 	}
 
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
-		pixel_t dst = pixel_t(r,g,b);
+		pixel_t dst = pixel;
 		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(a));
 		view(x,y) = dst;
 	}
@@ -85,10 +95,17 @@ template <typename fpix_t, typename tpix_t>
 struct horizontal_gradient
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t tpix,fpix;
 
-	bool operator()(pixel_t& pixel)
+	horizontal_gradient()
 	{
-		fpix_t()(pixel);
+	   	tpix_t()(tpix);
+		fpix_t()(fpix);
+	}
+
+	bool operator()(pixel_t& out)
+	{
+		out = fpix;
 		return true;
 	}
 
@@ -97,13 +114,9 @@ struct horizontal_gradient
 	{
 		double perc = boost::numeric_cast<double>(x+1) / view.width();
 		int alpha = boost::numeric_cast<int>(perc*255);
-		
-		pixel_t tpix,fpix;
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-
-		boost::gil::static_for_each(tpix, fpix, make_alpha_blend(alpha));
-		view(x,y) = tpix;
+		pixel_t dst = tpix;
+		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+		view(x,y) = dst;
 	}
 };
 
@@ -111,10 +124,17 @@ template <typename fpix_t, typename tpix_t>
 struct vertical_gradient
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t tpix,fpix;
 
-	bool operator()(pixel_t& pixel)
+	vertical_gradient()
 	{
-		fpix_t()(pixel);
+	   	tpix_t()(tpix);
+		fpix_t()(fpix);
+	}
+
+	bool operator()(pixel_t& out)
+	{
+		out = fpix;
 		return true;
 	}
 
@@ -123,13 +143,9 @@ struct vertical_gradient
 	{
 		double perc = boost::numeric_cast<double>(y+1) / view.height();
 		int alpha = boost::numeric_cast<int>(perc*255);
-		
-		pixel_t tpix,fpix;
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-
-		boost::gil::static_for_each(tpix, fpix, make_alpha_blend(alpha));
-		view(x,y) = tpix;
+		pixel_t dst = tpix;
+		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+		view(x,y) = dst;
 	}
 };
 
@@ -138,10 +154,17 @@ struct vertical_gradient_stop
 {
 	BOOST_STATIC_ASSERT(stop > 0);
 	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t tpix,fpix;
 
-	bool operator()(pixel_t& pixel)
+	vertical_gradient_stop()
 	{
-		fpix_t()(pixel);
+	   	tpix_t()(tpix);
+		fpix_t()(fpix);
+	}
+
+	bool operator()(pixel_t& out)
+	{
+		out = fpix;
 		return true;
 	}
 
@@ -150,17 +173,14 @@ struct vertical_gradient_stop
 	{
 		BOOST_ASSERT(stop*4 < view.height());
 
-		pixel_t tpix,fpix;
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-
 		if (y <= stop)
 		{
 			double perc = boost::numeric_cast<double>(y+1) / stop;
 			int alpha = boost::numeric_cast<int>(perc*255);
 
-			boost::gil::static_for_each(tpix, fpix, make_alpha_blend(alpha));
-			view(x,y) = tpix;
+			pixel_t dst = tpix;
+			boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
 		}
 		else if (y > view.height()/2-stop && 
 			y <= view.height()/2)
@@ -169,8 +189,9 @@ struct vertical_gradient_stop
 			double perc = boost::numeric_cast<double>(yy+1) / stop;
 			int alpha = boost::numeric_cast<int>(perc*255);
 	
-			boost::gil::static_for_each(fpix, tpix, make_alpha_blend(alpha));
-			view(x,y) = fpix;
+			pixel_t dst = fpix;
+			boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
 		}
 		else if (y > view.height()/2 && 
 			y <= view.height()/2+stop)
@@ -179,17 +200,18 @@ struct vertical_gradient_stop
 			double perc = boost::numeric_cast<double>(yy+1) / stop;
 			int alpha = boost::numeric_cast<int>(perc*255);
 		
-			boost::gil::static_for_each(tpix, fpix, make_alpha_blend(alpha));
-			view(x,y) = tpix;
+			pixel_t dst = tpix;
+			boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
 		}
 		else if (y > view.height()-stop)
 		{
 			int yy = view.height()-y;
 			double perc = boost::numeric_cast<double>(yy+1) / stop;
 			int alpha = boost::numeric_cast<int>(perc*255);
-			
-			boost::gil::static_for_each(tpix, fpix, make_alpha_blend(alpha));
-			view(x,y) = tpix;
+			pixel_t dst = tpix;
+			boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+			view(x,y) = dst;
 		}
 		else
 		{
@@ -202,15 +224,20 @@ template <typename fpix_t, typename tpix_t, std::size_t size>
 struct balanced_gradient
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t tpix,fpix;
 	bool up;
 	int a;
 
 	balanced_gradient() :
-		up(true), a(0){}
-
-	bool operator()(pixel_t& pixel)
+		up(true), a(0)
 	{
-		fpix_t()(pixel);
+	   	tpix_t()(tpix);
+		fpix_t()(fpix);
+	}
+
+	bool operator()(pixel_t& out)
+	{
+		out = fpix;
 		return true;
 	}	
 
@@ -219,13 +246,9 @@ struct balanced_gradient
 	{
 		double perc = a/boost::numeric_cast<double>(size);
 		int alpha = boost::numeric_cast<int>(perc*255);
-
-		pixel_t tpix,fpix;
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-
-		boost::gil::static_for_each(fpix, tpix, make_alpha_blend(alpha));
-		view(x,y) = fpix;
+		pixel_t dst = fpix;
+		boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
+		view(x,y) = dst;
 		
 		if (up)
 		{
@@ -249,10 +272,17 @@ template <typename fpix_t, typename tpix_t>
 struct diagonal_gradient
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t tpix,fpix;
 	
-	bool operator()(pixel_t& pixel)
+	diagonal_gradient() 
 	{
-		fpix_t()(pixel);
+	   	tpix_t()(tpix);
+		fpix_t()(fpix);
+	}
+
+	bool operator()(pixel_t& out)
+	{
+		out = fpix;
 		return true;
 	}	
 
@@ -263,13 +293,10 @@ struct diagonal_gradient
 		double yperc = boost::numeric_cast<double>(y+1) / view.height();
 		double aperc = (xperc + yperc) / 2;
 
-		pixel_t tpix,fpix;
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-
 		int alpha = boost::numeric_cast<int>(aperc*255);
-		boost::gil::static_for_each(tpix, fpix, make_alpha_blend(alpha));
-		view(x,y) = tpix;
+		pixel_t dst = tpix;
+		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
+		view(x,y) = dst;
 	}
 };
 
@@ -313,8 +340,8 @@ void alpha_blend(const gview_t& grayview, const view_t& view, const pixel_t& col
 		}
 }
 
-template <typename pixel_t, typename view_t>
-inline void wuline(const view_t& view, 
+template <typename view_t, typename pixel_t>
+inline void wuline(const view_t& view, pixel_t pixel,
 	int X0, int Y0, int X1, int Y1,
 	int NumLevels = 256, int IntensityBits=8)
 {
@@ -323,7 +350,8 @@ inline void wuline(const view_t& view,
 	unsigned short IntensityShift, ErrorAdj, ErrorAcc;
 	unsigned short ErrorAccTemp, Weighting, WeightingComplementMask;
 	short DeltaX, DeltaY, Temp, XDir;
-
+	pixel_t pixel_saved = pixel;
+	
 	if (Y0 > Y1) 
 	{
   		Temp = Y0; 
@@ -333,9 +361,6 @@ inline void wuline(const view_t& view,
 		X0 = X1; 
 		X1 = Temp;
 	}
-
-	boost::gil::rgb8_pixel_t pixel;
-	pixel_t()(pixel);
 
 	view(X0,Y0) = pixel;
 
@@ -405,14 +430,12 @@ inline void wuline(const view_t& view,
 
 			Weighting = ErrorAcc >> IntensityShift;
 	
-			pixel_t()(pixel);
-			static_for_each(pixel,view(X0,Y0),
-				make_alpha_blend((Weighting ^ WeightingComplementMask)));
+			pixel = pixel_saved;
+			static_for_each(pixel,view(X0,Y0), make_alpha_blend((Weighting ^ WeightingComplementMask)));
 			view(X0,Y0) = pixel;
 
-			pixel_t()(pixel);
-			static_for_each(pixel,view(X0 + XDir, Y0),
-				make_alpha_blend(Weighting));
+			pixel = pixel_saved;
+			static_for_each(pixel,view(X0 + XDir, Y0), make_alpha_blend(Weighting));
 			view(X0 + XDir, Y0) = pixel;
   		}
 
@@ -433,37 +456,36 @@ inline void wuline(const view_t& view,
       		
 		Weighting = ErrorAcc >> IntensityShift;
 
-		pixel_t()(pixel);
-		static_for_each(pixel,view(X0,Y0),
-			make_alpha_blend(Weighting ^ WeightingComplementMask));
+		pixel = pixel_saved;
+		static_for_each(pixel,view(X0,Y0), make_alpha_blend(Weighting ^ WeightingComplementMask));
 		view(X0,Y0) = pixel;
 	
-		pixel_t()(pixel);
-		static_for_each(pixel,view(X0, Y0 + 1),
-			make_alpha_blend(Weighting));
+		pixel = pixel_saved;
+		static_for_each(pixel,view(X0, Y0 + 1), make_alpha_blend(Weighting));
 		view(X0,Y0+1) = pixel;
 	}
 
-	pixel_t()(pixel);
-	view(X1,Y1) = pixel;
+	view(X1,Y1) = pixel_saved;
 }
 
-template <typename view_t, typename pixel_t>
+template <typename view_t>
 struct draw_wuline
 {
 	typedef typename view_t::value_type value_type;
 	const view_t& view;
-	draw_wuline(const view_t& view) : view(view) {}
+	value_type pixel;
+	draw_wuline(const view_t& view, const value_type& pixel) : 
+		view(view),pixel(pixel) {}
 
 	void operator()(int x, int y, int x1, int y1)
 	{
-		wuline<pixel_t>(view,x,y,x1,y1);
+		wuline(view,pixel,x,y,x1,y1);
 	}
 
 	template <typename point_t>
 	void operator()(point_t pt0, point_t pt1)
 	{
-		wuline<pixel_t>(view,pt0.x,pt0.y,pt1.x,pt1.y);
+		wuline(view,pixel,pt0.x,pt0.y,pt1.x,pt1.y);
 	}
 };
 
@@ -767,7 +789,7 @@ void fill_polygon(const view_t& view, const polygon_t& polygon)
 	view_t view2 = boost::gil::subimage_view(
 		view,left,top,right-left,bottom-top);
 
-	pixel_t pixel;	
+	pixel_t pixel;
 	point_in_polygon<int> point_in(polygon2);
 	for (int x = 0; x < view2.width(); ++x)
 		for (int y = 0; y < view2.height(); ++y)
@@ -775,10 +797,10 @@ void fill_polygon(const view_t& view, const polygon_t& polygon)
 				pixel(view2,x,y);
 }
 
-typedef rgb8<0,0,0> black_t;
-typedef rgb8<255,255,255> white_t;
-typedef rgb8<219,219,112> goldenrod_t;
-typedef rgb8<235,240,240> yellowgreen_t;
+typedef rgb<0,0,0> black_t;
+typedef rgb<255,255,255> white_t;
+typedef rgb<219,219,112> goldenrod_t;
+typedef rgb<235,240,240> yellowgreen_t;
 
 typedef vertical_gradient<white_t, goldenrod_t> bannana_gradient_t;
 typedef diagonal_gradient<white_t, yellowgreen_t> apple_gradient_t;
