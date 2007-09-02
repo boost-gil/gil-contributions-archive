@@ -20,9 +20,9 @@
 namespace boost { namespace gil { namespace detail {
 
 template <typename Channel>
-struct bits_per_sample : public mpl::int_< sizeof( Channel ) > {};
+struct bits_per_sample : public mpl::int_< sizeof( Channel )* 8 / byte_to_memunit< Channel >::value > {};
 
-template < typename Channel > struct sample_format {};
+template < typename Channel > struct sample_format : public mpl::int_<SAMPLEFORMAT_UINT> {};
 template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
 template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
 template<> struct sample_format<bits32>  : public mpl::int_<SAMPLEFORMAT_UINT> {};

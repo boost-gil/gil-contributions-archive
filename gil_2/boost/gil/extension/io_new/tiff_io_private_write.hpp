@@ -17,177 +17,33 @@
 
 namespace boost { namespace gil { namespace detail {
 
-template< typename View >
-struct specific_writer_impl
+template <typename PixelReference>
+struct my_interleaved_pixel_iterator_type_from_pixel_reference
 {
-   void operator() ( const View&                  v
-                   , const tiff_image_write_info& info
-                   , tiff_file_t                  file )
-   {
-      typedef typename View::value_type pixel_t;
-      typedef typename channel_type< pixel_t >::type channel_t;
-      typedef typename color_space_type<View>::type color_space_t;
-
-      // write dimensions
-      tiff_image_width::type width   = v.width();
-      tiff_image_height::type height = v.height();
-
-      set_property<tiff_image_width >( file, width );
-      set_property<tiff_image_height>( file, height );
-
-      // write planar configuration
-      tiff_planar_configuration::type planar_config = PLANARCONFIG_CONTIG;
-      set_property<tiff_planar_configuration>( file, planar_config );
-
-      // write samples per pixel
-      tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
-      set_property<tiff_samples_per_pixel>( file, samples_per_pixel );
-
-      // write bits per sample
-      tiff_bits_per_sample::type bits_per_sample_value = bits_per_sample< channel_t >::value;
-      set_property<tiff_bits_per_sample>( file, bits_per_sample_value );
-
-      // write sample format
-      tiff_sample_format::type sample_format_value = sample_format< channel_t >::value;
-      set_property<tiff_sample_format>( file, sample_format_value );
-
-      // write photometric format
-      set_property<tiff_photometric_interpretation>( file, info._photometric_interpretation );
-
-      // write compression
-      set_property<tiff_compression>( file, info._compression );
-
-      // write orientation
-      set_property<tiff_orientation>( file, info._orientation );
-
-      // write rows per strip
-      tiff_rows_per_strip::type rows_per_strip = TIFFDefaultStripSize( file.get(), 0 );
-      set_property<tiff_rows_per_strip>( file, rows_per_strip );
-
-      // write the data
-      std::vector< pixel_t > row( v.width() );
-
-      for( View::y_coord_t y = 0; y < v.height(); ++y )
-      {
-         std::copy( v.row_begin( y ), v.row_end( y ), row.begin() );
-         write_scaline( row, y, 0, file );
-      }
-   }
-};
-
-template<>
-struct specific_writer_impl< gray1_view_t >
-{
-   typedef gray1_view_t::value_type gray1_pixel_t;
-   typedef gray1_view_t::reference  gray1_reference_t;
-
-   void operator() ( const gray1_view_t&          v
-                   , const tiff_image_write_info& info
-                   , tiff_file_t                  file )
-   {
-      // write dimensions
-      tiff_image_width::type width   = v.width();
-      tiff_image_height::type height = v.height();
-
-      set_property<tiff_image_width >( file, width );
-      set_property<tiff_image_height>( file, height );
-
-      // write planar configuration
-      tiff_planar_configuration::type planar_config = PLANARCONFIG_CONTIG;
-      set_property<tiff_planar_configuration>( file, planar_config );
-
-      // write samples per pixel
-      tiff_samples_per_pixel::type samples_per_pixel = 1;
-      set_property<tiff_samples_per_pixel>( file, samples_per_pixel );
-
-      // write bits per sample
-      tiff_bits_per_sample::type bits_per_sample = 1;
-      set_property<tiff_bits_per_sample>( file, bits_per_sample );
-
-      // write photometric format
-      set_property<tiff_photometric_interpretation>( file, info._photometric_interpretation );
-
-      // write compression
-      set_property<tiff_compression>( file, info._compression );
-
-      // write orientation
-      set_property<tiff_orientation>( file, info._orientation );
-
-      // write rows per strip
-      tiff_rows_per_strip::type rows_per_strip = TIFFDefaultStripSize( file.get(), 0 );
-      set_property<tiff_rows_per_strip>( file, rows_per_strip );
-
-      std::vector< unsigned char > row( v.width() / 8 + 1 );
-
-      for( gray1_view_t::y_coord_t y = 0; y < v.height(); ++y )
-      {
-         gray1_view_t::x_iterator it  = v.row_begin( y );
-         gray1_view_t::x_iterator end = v.row_begin( y );
-
-         unsigned char byte = 0;
-
-         gray1_image_t::x_coord_t x = 0;
-         for( ; x < v.width(); x += 8 )
-         {
-            _set_value( it[x]    , byte, 0x80 );
-            _set_value( it[x + 1], byte, 0x40 );
-            _set_value( it[x + 2], byte, 0x20 );
-            _set_value( it[x + 3], byte, 0x10 );
-            _set_value( it[x + 4], byte, 0x8  );
-            _set_value( it[x + 5], byte, 0x4  );
-            _set_value( it[x + 6], byte, 0x2  );
-            _set_value( it[x + 7], byte, 0x1  );
-
-            row[ x / 8 ] = byte;
-         }
-
-         {
-            // take care of remainder pixels
-
-            byte = 0;
-            unsigned char or_value = 0x80;
-
-            gray1_image_t::x_coord_t remainder = v.width() - ( x - 8 );
-
-            for( int i = remainder; i > 0; --i )
-            {
-               _set_value( it[v.width() - i], byte, or_value );
-
-               or_value = or_value >> 1;
-            }
-
-            row[ ( v.width() / 8 ) + 1 ] = byte;
-         }
-
-         write_scaline( row, y, 0, file );
-      }
-   }
-
 private:
-
-   void _set_value( const gray1_reference_t value
-                  , unsigned char&          byte
-                  , unsigned char           or_value )
-   {
-      if( value != gray1_pixel_t( 0 ) )
-      {
-         byte |= or_value;
-      }
-   }
+	typedef typename boost::remove_reference<PixelReference>::type::value_type pixel_value_t;
+public:
+	typedef typename iterator_type_from_pixel<pixel_value_t,false,false,true>::type type;
 };
 
-template< typename View >
-struct specific_writer
-{
-   void operator() ( const View&                  v
-                   , const tiff_image_write_info& info
-                   , tiff_file_t                  file )
-   {
-      specific_writer_impl<View> w;
-      w( v, info, file );
-   }
-};
 
+template< typename Channels
+        , typename Layout
+        , bool Mutable
+        >
+struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< Channels
+                                                                                                 ,Layout
+                                                                                                 ,Mutable
+                                                                                                 > >
+	: public iterator_type_from_pixel< const bit_aligned_pixel_reference< Channels
+	                                                                    , Layout
+	                                                                    , Mutable
+	                                                                    > 
+	                                 ,false
+	                                 ,false
+	                                 ,true
+	                                 >
+{};
 
 // Right now only gray_t and rgb_t images are supported. See comment below
 // for the photometric interpretation.
@@ -217,6 +73,8 @@ public:
       info._compression = COMPRESSION_LZW;
       info._orientation = ORIENTATION_TOPLEFT;
 
+      info._planar_configuration = PLANARCONFIG_CONTIG;
+
       apply( v, info );
    }
 
@@ -224,18 +82,59 @@ public:
    void apply( const View&                  v
              , const tiff_image_write_info& info )
    {
-      specific_writer<View> writer;
-      writer( v, info, _file );
-   }
+      typedef typename View::value_type pixel_t;
 
-   template< typename View
-           , typename Writer
-           >
-   void apply( const View&                  v
-             , const tiff_image_write_info& info
-             , Writer                       writer )
-   {
-      writer( v, info, _file );
+      // get the type of the first channel (heterogeneous pixels might be broken for now!)
+      typedef typename channel_traits<typename element_type< pixel_t >::type >::value_type channel_t;
+      typedef my_interleaved_pixel_iterator_type_from_pixel_reference<typename View::reference>::type x_iterator;
+
+      // write dimensions
+      tiff_image_width::type width   = v.width();
+      tiff_image_height::type height = v.height();
+
+      set_property<tiff_image_width >( _file, width );
+      set_property<tiff_image_height>( _file, height );
+
+      // write planar configuration
+      set_property<tiff_planar_configuration>( _file, info._planar_configuration );
+
+      // write samples per pixel
+      tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
+      set_property<tiff_samples_per_pixel>( _file, samples_per_pixel );
+
+      // write bits per sample
+      tiff_bits_per_sample::type bits_per_sample = unsigned_integral_num_bits<channel_t>::value;
+      set_property<tiff_bits_per_sample>( _file, bits_per_sample );
+
+      // write sample format
+      tiff_sample_format::type sampl_format = sample_format< channel_t >::type::value;
+      set_property<tiff_sample_format>( _file, sampl_format );
+
+      // write photometric format
+      set_property<tiff_photometric_interpretation>( _file, info._photometric_interpretation );
+
+      // write compression
+      set_property<tiff_compression>( _file, info._compression );
+
+      // write orientation
+      set_property<tiff_orientation>( _file, info._orientation );
+
+      // write rows per strip
+      tiff_rows_per_strip::type rows_per_strip = TIFFDefaultStripSize( _file.get(), 0 );
+      set_property<tiff_rows_per_strip>( _file, rows_per_strip );
+
+      // write the data
+      std::vector< unsigned char > row( (v.width() * samples_per_pixel * bits_per_sample + 7) / 8);
+
+      x_iterator row_it=x_iterator(&*row.begin());
+
+      for( View::y_coord_t y = 0; y < v.height(); ++y )
+      {
+         std::copy( v.row_begin( y ), v.row_end( y ), row_it );
+         write_scaline( row, y, 0, _file );
+
+	      // @todo: do optional bit swapping here if you need to...
+      }
    }
 
 private:

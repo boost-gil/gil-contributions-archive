@@ -27,6 +27,8 @@ namespace detail {
 
 typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
 typedef gray1_image_t::view_t gray1_view_t;
+typedef gray1_image_t::view_t gray1_pixel_t;
+
 
 inline void io_error( const std::string& descr )
 {
