@@ -106,6 +106,8 @@ public:
       set_property<tiff_samples_per_pixel>( _file, samples_per_pixel );
 
       // write bits per sample
+      // @todo: Settings this value usually requires to write for each sample the bit
+      // value seperately in case they are different, like rgb556.
       tiff_bits_per_sample::type bits_per_sample = unsigned_integral_num_bits<channel_t>::value;
       set_property<tiff_bits_per_sample>( _file, bits_per_sample );
 
