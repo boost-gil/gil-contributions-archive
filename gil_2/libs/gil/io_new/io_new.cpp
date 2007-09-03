@@ -440,8 +440,8 @@ void write_test()
 
    {
       // Write test bit_aligned image.
-      gray1_image_t src( 35, 100 );
-      fill_pixels( view( src ), gray1_pixel_t( 1 ));
+      gray1_image_t src( 100, 100 );
+      fill_pixels( view( src ), gray1_pixel_t( 0 ));
 
       tiff_image_write_info info;
       info._photometric_interpretation = PHOTOMETRIC_MINISBLACK;

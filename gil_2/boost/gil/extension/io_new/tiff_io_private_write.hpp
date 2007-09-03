@@ -96,7 +96,10 @@ public:
       set_property<tiff_image_height>( _file, height );
 
       // write planar configuration
-      set_property<tiff_planar_configuration>( _file, info._planar_configuration );
+      if( is_bit_aligned<View>::value == false )
+      {
+         set_property<tiff_planar_configuration>( _file, info._planar_configuration );
+      }
 
       // write samples per pixel
       tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
