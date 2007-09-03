@@ -347,6 +347,13 @@ private:
    {
       if( _info._photometric_interpretation == PHOTOMETRIC_PALETTE )
       {
+         // Steps:
+         // 1. Read palette. It's an array of rgb16_pixel_t.
+         // 2. Read indices. It's an array of grayX_pixel_t.
+         // 3. ??? Create virtual image or transform the two arrays
+         //    into a normal gil image object. The latter might
+         //    be a good first solution.
+
          io_error( "Palette images aren't supported, yet." );
          return;
       }
