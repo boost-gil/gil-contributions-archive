@@ -41,11 +41,12 @@ struct make_alpha_blend
 	}
 };
 
-template <int r, int g, int b> 
+template <int r=0, int g=0, int b=0> 
 struct rgb
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
 	pixel_t pixel;
+	
 	rgb(pixel_t pixel = pixel_t(r,g,b)) : pixel(pixel) {}
 	
 	bool operator()(pixel_t& out)
@@ -61,20 +62,21 @@ struct rgb
 	}
 };
 
-//TODO: add default alpha parameter
-//TODO: this could be a static
-
-template <typename rgb_t, int a> 
+template <typename rgb_t=rgb<>, int a=100> 
 struct rgba
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
 	pixel_t pixel;
-	
-	rgba()
+	int alpha;
+		
+	rgba() : alpha(a)
 	{
 		pixel_t pixel;
 		rgb_t()(pixel);
 	}
+
+	rgba(pixel_t pixel, int alpha) : 
+		pixel(pixel), alpha(alpha){}
 
 	bool operator()(pixel_t& out)
 	{
@@ -86,7 +88,7 @@ struct rgba
 	void operator()(const view_t& view, int x, int y)
 	{
 		pixel_t dst = pixel;
-		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(a));
+		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(alpha));
 		view(x,y) = dst;
 	}
 };
@@ -801,8 +803,17 @@ typedef rgb<0,0,0> black_t;
 typedef rgb<255,255,255> white_t;
 typedef rgb<219,219,112> goldenrod_t;
 typedef rgb<235,240,240> yellowgreen_t;
+typedef rgb<80,80,80> dark_gray_t;
+typedef rgb<150,150,150> medium_gray_t;
+typedef rgb<225,225,225> light_gray_t;
+typedef rgb<145,155,118> army_green_t;
+typedef rgb<40,40,40> black_gray_t;
 
+typedef vertical_gradient<army_green_t,white_t> army_barracks_gradient_t;
 typedef vertical_gradient<white_t, goldenrod_t> bannana_gradient_t;
 typedef diagonal_gradient<white_t, yellowgreen_t> apple_gradient_t;
+typedef vertical_gradient_stop<black_gray_t,army_green_t,350> army_fatigue_gradient_t;
+typedef diagonal_gradient<white_t,army_green_t> army_wash_gradient_t;
+typedef horizontal_gradient<black_t,black_gray_t> acid_rain_gradient_t;
 
 #endif

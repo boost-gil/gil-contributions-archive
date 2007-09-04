@@ -39,14 +39,17 @@ struct glyph
 template <typename face_t, typename pixel_t>
 struct make_glyph
 {
+	FT_Face face;
+	boost::gil::rgb8_pixel_t pixel;
+	
+	make_glyph()
+	{
+		face_t()(face);
+		pixel_t()(pixel);
+	}
+	
 	boost::shared_ptr<glyph> operator()(char ch)
 	{
-		FT_Face face;
-		face_t()(face);
-		
-		boost::gil::rgb8_pixel_t pixel;
-		pixel_t()(pixel);
-		
 		return boost::shared_ptr<glyph>(new glyph(ch,face,pixel));
 	}
 };
