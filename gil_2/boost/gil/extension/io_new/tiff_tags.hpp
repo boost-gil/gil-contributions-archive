@@ -203,7 +203,10 @@ struct tiff_host_computer
 
 struct tiff_color_map
 {
-   typedef boost::uint16_t* type;
+   typedef boost::uint16_t* red;
+   typedef boost::uint16_t* green;
+   typedef boost::uint16_t* blue;
+
    static const unsigned int tag = TIFFTAG_COLORMAP;
 };
 

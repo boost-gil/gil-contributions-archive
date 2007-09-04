@@ -144,9 +144,9 @@ int main()
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
-   //read_test();
+   read_test();
    //read_and_convert_test();
-   write_test();
+   //write_test();
 
 }
 
@@ -154,6 +154,17 @@ void read_test()
 {
    // read view tests
 
+   {
+      // read palette image test
+
+      //jello.tif	256x192 8-bit RGB (lzw palette) Paul Heckbert "jello"
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\jello.tif" );
+
+      rgb16_image_t src;
+      read_image( file_name, src, tiff_tag() );
+
+      write_view( std::string( ".\\read_palette_image_test.tiff" ), const_view( src ), tiff_tag() );
+   }
    {
       // basic read view test
 
@@ -189,7 +200,6 @@ void read_test()
 
    {
       // read 1-bit file. ( very slow )
-      /*
       string file_name( ".\\test_images\\tiff\\libtiffpic\\fax2d.tif" );
 
       typedef bit_aligned_image1_type<1, gray_layout_t>::type image_t;
@@ -238,7 +248,6 @@ void read_test()
 
          bmp_write_view( ".\\fax2d_2.bmp", view( dst ));
       }
-   */
    }
 
    {

@@ -354,7 +354,43 @@ private:
          //    into a normal gil image object. The latter might
          //    be a good first solution.
 
-         io_error( "Palette images aren't supported, yet." );
+         tiff_color_map::red   red;
+         tiff_color_map::green green;
+         tiff_color_map::blue  blue;
+
+         TIFFGetFieldDefaulted( _file.get(), tiff_color_map::tag, &red, &green, &blue );
+
+         unsigned int num_colors = channel_traits< bits8 >::max_value();
+         rgb16_planar_view_t palette = planar_rgb_view( num_colors
+                                                      , 1
+                                                      , red
+                                                      , blue
+                                                      , green
+                                                      , 3 * num_colors );
+
+         rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
+
+
+         gray8_image_t indices( src_view.dimensions() );
+         _read_planar< 8, 1, gray_layout_t >( view( indices ));
+
+         for( View::y_coord_t y = 0; y < src_view.height(); ++y )
+         {
+            View::x_iterator it  = src_view.row_begin( y );
+            View::x_iterator end = src_view.row_end( y );
+
+            gray8_view_t::x_iterator indices_it = view( indices ).row_begin( y );
+
+            for( ; it != end; ++it, ++indices_it )
+            {
+               unsigned char i = at_c<0>( *indices_it );
+
+               rgb16_planar_view_t::locator color = palette.xy_at( i, 1 );
+               //*it = rgb16_pixel_t( red[i], green[i], blue[i] );
+               *it = palette_it[ i ];
+            }
+         }
+
          return;
       }
 
