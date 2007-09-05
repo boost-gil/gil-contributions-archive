@@ -39,14 +39,18 @@ template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_
 namespace types
 {
    struct bits1 {};
+   struct bits4 {};
    struct gray1_pixel_t {};
    struct rgb1_pixel_t {};
    struct rgba1_pixel_t {};
+   struct gray4_pixel_t {};
+   struct rgb4_pixel_t {};
+   struct rgba4_pixel_t {};
 }
 
 template< int BitsPerSample, int SampleFormat > struct channel_type_factory { typedef bits8 type; };
 template<> struct channel_type_factory< 1, SAMPLEFORMAT_UINT > { typedef types::bits1  type; };
-template<> struct channel_type_factory< 8, SAMPLEFORMAT_UINT > { typedef bits8  type; };
+template<> struct channel_type_factory< 4, SAMPLEFORMAT_UINT > { typedef types::bits4  type; };
 template<> struct channel_type_factory< 8, SAMPLEFORMAT_INT >  { typedef bits8s type; };
 template<> struct channel_type_factory< 16, SAMPLEFORMAT_UINT > { typedef bits16  type; };
 template<> struct channel_type_factory< 16, SAMPLEFORMAT_INT >  { typedef bits16s type; };
@@ -63,11 +67,19 @@ template< typename Channel > struct pixel_type_factory< Channel, rgba_layout_t >
 template<> struct pixel_type_factory< types::bits1, gray_layout_t > { typedef types::gray1_pixel_t type; };
 template<> struct pixel_type_factory< types::bits1, rgb_layout_t  > { typedef types::rgb1_pixel_t  type; };
 template<> struct pixel_type_factory< types::bits1, rgba_layout_t > { typedef types::rgba1_pixel_t type; };
+template<> struct pixel_type_factory< types::bits4, gray_layout_t > { typedef types::gray4_pixel_t type; };
+template<> struct pixel_type_factory< types::bits4, rgb_layout_t  > { typedef types::rgb4_pixel_t  type; };
+template<> struct pixel_type_factory< types::bits4, rgba_layout_t > { typedef types::rgba4_pixel_t type; };
 
 template< bool IsPlanar, typename Pixel > struct image_type_factory { typedef image< Pixel, IsPlanar > type; };
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray1_pixel_t> { typedef bit_aligned_image1_type<1, gray_layout_t>::type type; };
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb1_pixel_t> { typedef bit_aligned_image1_type<1, rgb_layout_t>::type type; };
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba1_pixel_t> { typedef bit_aligned_image1_type<1, rgba_layout_t>::type type; };
+
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray4_pixel_t> { typedef bit_aligned_image1_type<4, gray_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb4_pixel_t> { typedef bit_aligned_image1_type<4, rgb_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba4_pixel_t> { typedef bit_aligned_image1_type<4, rgba_layout_t>::type type; };
+
 
 template< bool IsPlanar > struct image_type_factory<IsPlanar, void> { typedef void type; };
 
@@ -187,7 +199,7 @@ void read_data( const View&    src_view
 
 template< typename View >
 inline
-void read_bit_aligned_view( const View&    v
+void read_bit_aligned_data( const View&    v
                           , const point_t& top_left 
                           , tiff_file_t    file     )
 {
@@ -196,11 +208,8 @@ void read_bit_aligned_view( const View&    v
    tsize_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
    buffer_t buffer( scanline_size_in_bytes );
 
-   unsigned char* first_byte = &buffer.front();
-   unsigned char* last_byte  = &buffer.front() + ( scanline_size_in_bytes - 1 );
-
-   View::x_iterator begin( first_byte, 0 );
-   View::x_iterator end  ( last_byte , 7 );
+   View::x_iterator begin( &buffer.front()    , 0 );
+   View::x_iterator end  ( &buffer.back() + 1 , 0 );
 
    ///@todo: What about top_left?
 

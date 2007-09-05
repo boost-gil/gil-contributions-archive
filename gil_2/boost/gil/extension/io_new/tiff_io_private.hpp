@@ -98,7 +98,7 @@ struct read_and_no_convert_impl< boost::mpl::bool_< true >
                    , const point_t&   top_left
                    , tiff_file_t      file      )
    {
-      read_bit_aligned_view( v, top_left, file );
+      read_bit_aligned_data( v, top_left, file );
    }
 };
 
@@ -302,6 +302,74 @@ protected:
    Color_Converter _cc;
 };
 
+template< typename View >
+struct read_palette_image
+{
+   read_palette_image( tiff_file_t file ) : _file( file ) {}
+
+   template< typename Indices_View >
+   void operator() ( const View&         src_view
+                   , const Indices_View& indices_view ) {}
+
+private:
+
+   tiff_file_t _file;
+};
+
+template<>
+struct read_palette_image< rgb16_view_t >
+{
+   read_palette_image< rgb16_view_t >( tiff_file_t file ) : _file( file ) {}
+
+   template< typename Indices_View >
+   void operator() ( const rgb16_view_t& src_view
+                   , const Indices_View& indices_view )
+                   
+   {
+      tiff_color_map::red   red;
+      tiff_color_map::green green;
+      tiff_color_map::blue  blue;
+
+      TIFFGetFieldDefaulted( _file.get()
+                           , tiff_color_map::tag
+                           , &red
+                           , &green
+                           , &blue                 );
+
+      typedef channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
+      int num_colors = channel_traits< channel_t >::max_value();
+
+      rgb16_planar_view_t palette = planar_rgb_view( num_colors
+                                                   , 1
+                                                   , red
+                                                   , green
+                                                   , blue
+                                                   , sizeof( bits16 ) * num_colors );
+
+      rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
+
+
+      for( rgb16_view_t::y_coord_t y = 0; y < src_view.height(); ++y )
+      {
+         rgb16_view_t::x_iterator it  = src_view.row_begin( y );
+         rgb16_view_t::x_iterator end = src_view.row_end( y );
+
+         typename Indices_View::x_iterator indices_it = indices_view.row_begin( y );
+
+         for( ; it != end; ++it, ++indices_it )
+         {
+            unsigned char i = at_c<0>( *indices_it );
+
+            *it = *palette.xy_at( i, 0 );
+         }
+      }
+   }
+
+private:
+
+   tiff_file_t _file;
+};
+
 
 template< typename Reader >
 class tiff_reader : public Reader
@@ -313,6 +381,12 @@ public:
    {
       read_image_info( file, _info );
    }
+
+   tiff_reader( tiff_file_t                file
+              , basic_tiff_image_read_info info )
+   : Reader( file )
+   , _info( info )
+   {}
 
    template< typename Image >
    void read_image( Image& src_img )
@@ -348,46 +422,75 @@ private:
       if( _info._photometric_interpretation == PHOTOMETRIC_PALETTE )
       {
          // Steps:
-         // 1. Read palette. It's an array of rgb16_pixel_t.
-         // 2. Read indices. It's an array of grayX_pixel_t.
+         // 1. Read indices. It's an array of grayX_pixel_t.
+         // 2. Read palette. It's an array of rgb16_pixel_t.
          // 3. ??? Create virtual image or transform the two arrays
-         //    into a normal gil image object. The latter might
+         //    into a rgb16_image_t object. The latter might
          //    be a good first solution.
 
-         tiff_color_map::red   red;
-         tiff_color_map::green green;
-         tiff_color_map::blue  blue;
+         read_palette_image< View > rpi( _file );
 
-         TIFFGetFieldDefaulted( _file.get(), tiff_color_map::tag, &red, &green, &blue );
-
-         unsigned int num_colors = channel_traits< bits8 >::max_value();
-         rgb16_planar_view_t palette = planar_rgb_view( num_colors
-                                                      , 1
-                                                      , red
-                                                      , blue
-                                                      , green
-                                                      , 3 * num_colors );
-
-         rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
-
-
-         gray8_image_t indices( src_view.dimensions() );
-         _read_planar< 8, 1, gray_layout_t >( view( indices ));
-
-         for( View::y_coord_t y = 0; y < src_view.height(); ++y )
+         unsigned int num_colors = 0;
+         switch( _info._bits_per_sample )
          {
-            View::x_iterator it  = src_view.row_begin( y );
-            View::x_iterator end = src_view.row_end( y );
-
-            gray8_view_t::x_iterator indices_it = view( indices ).row_begin( y );
-
-            for( ; it != end; ++it, ++indices_it )
+            case 1:
             {
-               unsigned char i = at_c<0>( *indices_it );
+               gray1_image_t indices( _info._width, _info._height );
+               _read_samples_per_pixel( view( indices ));
 
-               rgb16_planar_view_t::locator color = palette.xy_at( i, 1 );
-               //*it = rgb16_pixel_t( red[i], green[i], blue[i] );
-               *it = palette_it[ i ];
+               rpi( src_view
+                  , view( indices ));
+
+               break;
+            }
+
+            case 2:
+            {
+               gray2_image_t indices( _info._width, _info._height );
+               _read_samples_per_pixel( view( indices ));
+
+               rpi( src_view
+                  , view( indices ));
+
+               break;
+            }
+
+            case 4:
+            {
+               gray4_image_t indices( _info._width, _info._height );
+               _read_samples_per_pixel( view( indices ));
+
+               rpi( src_view
+                  , view( indices ));
+
+               break;
+            }
+
+            case 8:
+            {
+               gray8_image_t indices( _info._width, _info._height );
+               _read_samples_per_pixel( view( indices ));
+
+               rpi( src_view
+                  , view( indices ));
+
+               break;
+            }
+
+            case 16:
+            {
+               gray16_image_t indices( _info._width, _info._height );
+               _read_samples_per_pixel( view( indices ));
+
+               rpi( src_view
+                  , view( indices ));
+
+               break;
+            }
+
+            default:
+            {
+               io_error( "Not supported palette " );
             }
          }
 
@@ -437,6 +540,12 @@ private:
          case 1:
          {
             _read_sample_format< 1, Layout >( src_view );
+            break;
+         }
+
+         case 4:
+         {
+            _read_sample_format< 4, Layout >( src_view );
             break;
          }
 

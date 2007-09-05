@@ -26,8 +26,9 @@ typedef boost::gil::point2< std::ptrdiff_t > point_t;
 namespace detail {
 
 typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
-typedef gray1_image_t::view_t gray1_view_t;
-typedef gray1_image_t::view_t gray1_pixel_t;
+typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
+typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;
+
 
 template < typename Channel >
 struct bits_per_sample : public mpl::int_< sizeof( Channel )* 8 / byte_to_memunit< Channel >::value > {};
