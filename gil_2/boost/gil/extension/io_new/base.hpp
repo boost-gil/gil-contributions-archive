@@ -25,6 +25,19 @@ typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
 namespace detail {
 
+// - performance specialization double
+// - to eliminate compiler warning 4244
+template <typename GrayChannelValue>
+struct rgb_to_luminance_fn< double, double, double, GrayChannelValue > {
+    GrayChannelValue operator()( const double& red
+                               , const double& green
+                               , const double& blue    ) const
+   {
+      return channel_convert<GrayChannelValue>( red * 0.30 + green * 0.59 + blue * 0.11 );
+   }
+};
+
+
 typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
 typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
 typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;

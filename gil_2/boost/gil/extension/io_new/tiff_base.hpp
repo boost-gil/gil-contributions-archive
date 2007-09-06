@@ -19,7 +19,6 @@
 
 namespace boost { namespace gil { namespace detail {
 
-
 template < typename Channel > struct sample_format : public mpl::int_<SAMPLEFORMAT_UINT> {};
 template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
 template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
@@ -39,10 +38,17 @@ template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_
 namespace types
 {
    struct bits1 {};
+   struct bits2 {};
    struct bits4 {};
+
    struct gray1_pixel_t {};
    struct rgb1_pixel_t {};
    struct rgba1_pixel_t {};
+
+   struct gray2_pixel_t {};
+   struct rgb2_pixel_t {};
+   struct rgba2_pixel_t {};
+
    struct gray4_pixel_t {};
    struct rgb4_pixel_t {};
    struct rgba4_pixel_t {};
@@ -50,6 +56,7 @@ namespace types
 
 template< int BitsPerSample, int SampleFormat > struct channel_type_factory { typedef bits8 type; };
 template<> struct channel_type_factory< 1, SAMPLEFORMAT_UINT > { typedef types::bits1  type; };
+template<> struct channel_type_factory< 2, SAMPLEFORMAT_UINT > { typedef types::bits2  type; };
 template<> struct channel_type_factory< 4, SAMPLEFORMAT_UINT > { typedef types::bits4  type; };
 template<> struct channel_type_factory< 8, SAMPLEFORMAT_INT >  { typedef bits8s type; };
 template<> struct channel_type_factory< 16, SAMPLEFORMAT_UINT > { typedef bits16  type; };
@@ -67,6 +74,11 @@ template< typename Channel > struct pixel_type_factory< Channel, rgba_layout_t >
 template<> struct pixel_type_factory< types::bits1, gray_layout_t > { typedef types::gray1_pixel_t type; };
 template<> struct pixel_type_factory< types::bits1, rgb_layout_t  > { typedef types::rgb1_pixel_t  type; };
 template<> struct pixel_type_factory< types::bits1, rgba_layout_t > { typedef types::rgba1_pixel_t type; };
+
+template<> struct pixel_type_factory< types::bits2, gray_layout_t > { typedef types::gray2_pixel_t type; };
+template<> struct pixel_type_factory< types::bits2, rgb_layout_t  > { typedef types::rgb2_pixel_t  type; };
+template<> struct pixel_type_factory< types::bits2, rgba_layout_t > { typedef types::rgba2_pixel_t type; };
+
 template<> struct pixel_type_factory< types::bits4, gray_layout_t > { typedef types::gray4_pixel_t type; };
 template<> struct pixel_type_factory< types::bits4, rgb_layout_t  > { typedef types::rgb4_pixel_t  type; };
 template<> struct pixel_type_factory< types::bits4, rgba_layout_t > { typedef types::rgba4_pixel_t type; };
@@ -76,13 +88,16 @@ template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray1_pixel
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb1_pixel_t> { typedef bit_aligned_image1_type<1, rgb_layout_t>::type type; };
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba1_pixel_t> { typedef bit_aligned_image1_type<1, rgba_layout_t>::type type; };
 
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray2_pixel_t> { typedef bit_aligned_image1_type<2, gray_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb2_pixel_t> { typedef bit_aligned_image1_type<2, rgb_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba2_pixel_t> { typedef bit_aligned_image1_type<2, rgba_layout_t>::type type; };
+
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray4_pixel_t> { typedef bit_aligned_image1_type<4, gray_layout_t>::type type; };
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb4_pixel_t> { typedef bit_aligned_image1_type<4, rgb_layout_t>::type type; };
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba4_pixel_t> { typedef bit_aligned_image1_type<4, rgba_layout_t>::type type; };
 
 
 template< bool IsPlanar > struct image_type_factory<IsPlanar, void> { typedef void type; };
-
 template<> struct image_type_factory< true, gray8_pixel_t > { typedef void type; };
 template<> struct image_type_factory< true, gray16_pixel_t > { typedef void type; };
 template<> struct image_type_factory< true, gray32_pixel_t > { typedef void type; };
@@ -159,12 +174,35 @@ std::size_t buffer_size( std::size_t width
                    , (( scanline_size_in_bytes + element_size - 1 ) / element_size ));
 }
 
+template< typename Buffer >
+inline
+void skip_over_rows( uint32                            end
+                   , uint32                            plane
+                   , Buffer&                           buffer
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file   )
+{
+   if( info._compression != COMPRESSION_NONE )
+   {
+      // Skip over rows since for compressed images no random access is possible. See man
+      // page ( diagnostics section ) for more information.
+      for( uint32 row = 0; row < end; ++row )
+      {
+         read_scaline( buffer
+                     , row
+                     , plane
+                     , file   );
+      }
+   }
+}
+
 template< typename View >
 inline
-void read_data( const View&    src_view
-              , const point_t& top_left
-              , unsigned int   plane
-              , tiff_file_t    file     )
+void read_data( const View&                       src_view
+              , const point_t&                    top_left
+              , unsigned int                      plane
+              , const basic_tiff_image_read_info& info
+              , tiff_file_t                       file     )
 {
    typedef typename View::value_type pixel_t;
 
@@ -172,15 +210,7 @@ void read_data( const View&    src_view
                                                         , file             );
    std::vector< pixel_t > buffer( size_to_allocate );
 
-   // Skip over rows since for compressed images no random access is possible. See man
-   // page ( diagnostics section ) for more information.
-   for( uint32 row = 0; row < (uint32) top_left.y; ++row )
-   {
-      read_scaline( buffer
-                  , row
-                  , plane
-                  , file   );
-   }
+   skip_over_rows( (uint32) top_left.y, plane, buffer, info, file );
 
    for( uint32 row = top_left.y; row < (uint32) src_view.height() + top_left.y; ++row )
    {
@@ -199,19 +229,19 @@ void read_data( const View&    src_view
 
 template< typename View >
 inline
-void read_bit_aligned_data( const View&    v
-                          , const point_t& top_left 
-                          , tiff_file_t    file     )
+void read_bit_aligned_data( const View&                       src_view
+                          , const point_t&                    top_left 
+                          , const basic_tiff_image_read_info& info
+                          , tiff_file_t                       file     )
 {
    typedef std::vector<unsigned char> buffer_t;
 
    tsize_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
    buffer_t buffer( scanline_size_in_bytes );
 
+   /// @todo: This wont work for bits3 or bits5, etc.
    View::x_iterator begin( &buffer.front()    , 0 );
    View::x_iterator end  ( &buffer.back() + 1 , 0 );
-
-   ///@todo: What about top_left?
 
    if( TIFFIsByteSwapped( file.get() ) > 0 )
    {
@@ -222,7 +252,9 @@ void read_bit_aligned_data( const View&    v
          lookup[i] = swap_bits( i );
       }
 
-      for( uint32 row = 0; row < (uint32) v.height(); ++row )
+      skip_over_rows( (uint32) top_left.y, 0, buffer, info, file );
+
+      for( uint32 row = 0; row < (uint32) src_view.height(); ++row )
       {
          read_scaline( buffer
                      , row
@@ -238,7 +270,9 @@ void read_bit_aligned_data( const View&    v
             *buffer_it = lookup[ *buffer_it ];
          }
 
-         std::copy( begin, end, v.row_begin( row ) );
+         std::copy( begin + top_left.x
+                  , end   + src_view.width() + top_left.x
+                  , src_view.row_begin( row - top_left.y  ));
       }
    }
    else
@@ -248,37 +282,31 @@ void read_bit_aligned_data( const View&    v
       buffer_t::iterator buffer_it  = buffer.begin();
       buffer_t::iterator buffer_end = buffer.end();
 
-      for( uint32 row = 0; row < (uint32) v.height(); ++row )
+      skip_over_rows( (uint32) top_left.y, 0, buffer, info, file );
+
+      for( uint32 row = 0; row < (uint32) src_view.height(); ++row )
       {
          read_scaline( buffer
                      , row
                      , 0
                      , file   );
 
-         std::copy( begin, end, v.row_begin( row ) );
+         std::copy( begin + top_left.x
+                  , end   + src_view.width() + top_left.x
+                  , src_view.row_begin( row - top_left.y  ));
       }
    }
 }
 
 template< typename Image_TIFF
         , typename View_User
-        >
-void read_interleaved_view_and_convert( const View_User& v
-                                      , tiff_file_t      file
-                                      , const point_t&   top_left
-                                      , boost::mpl::true_         )
-{
-}
-
-template< typename Image_TIFF
-        , typename View_User
         , typename Color_Converter
         >
-void read_interleaved_view_and_convert( const View_User& src_view
-                                      , tiff_file_t      file
-                                      , const point_t&   top_left
-                                      , Color_Converter  cc
-                                      , boost::mpl::false_        )
+void read_interleaved_data_and_convert( const View_User&                  src_view
+                                      , const point_t&                    top_left
+                                      , Color_Converter                   cc
+                                      , const basic_tiff_image_read_info& info
+                                      , tiff_file_t                       file        )
 {
    typedef typename Image_TIFF::view_t View_TIFF;
 
@@ -295,70 +323,73 @@ void read_interleaved_view_and_convert( const View_User& src_view
                   , file );
 
       // convert data
-      std::transform( buffer.begin()
-                    , buffer.begin() + src_view.width()
-                    , src_view.row_begin( row )
+      std::transform( buffer.begin() + top_left.x
+                    , buffer.begin() + src_view.width() + top_left.x
+                    , src_view.row_begin( row - top_left.y )
                     , color_convert_deref_fn< typename View_TIFF::value_type
-                                             , typename View_User::value_type
-                                             , Color_Converter
-                                             >( cc ));
+                                            , typename View_User::value_type
+                                            , Color_Converter
+                                            >( cc ));
    }
 }
 
-template< int Number_Of_Samples
-        , typename Image_TIFF
-        , typename View_User
+template< typename View
+        , typename Indices_View
         >
-void read_planar_view_and_convert( const View_User& v
-                                 , tiff_file_t      file
-                                 , const point_t&   top_left
-                                 , boost::mpl::true_          )
-{}
-
-template< int Number_Of_Samples
-        , typename Image_TIFF
-        , typename View_User
-        , typename Color_Converter
-        >
-void read_planar_view_and_convert( const View_User& v
-                                 , tiff_file_t      file
-                                 , const point_t&   top_left
-                                 , Color_Converter  cc
-                                 , boost::mpl::false_        )
+void read_palette_image( const View&                       src_view
+                       , const Indices_View&               indices_view
+                       , const basic_tiff_image_read_info& info
+                       , tiff_file_t                       file
+                       , boost::mpl::true_                                )
 {
-   typedef typename Image_TIFF::view_t View_TIFF;
-   Image_TIFF tiff_img( v.dimensions() );
+   tiff_color_map::red   red;
+   tiff_color_map::green green;
+   tiff_color_map::blue  blue;
 
-   typedef typename nth_channel_view_type<View_TIFF>::type plane_t;
+   TIFFGetFieldDefaulted( file.get()
+                        , tiff_color_map::tag
+                        , &red
+                        , &green
+                        , &blue                 );
 
-   tsize_t scanline_size = TIFFScanlineSize( file.get() );
-   std::vector< plane_t::value_type > buffer( scanline_size );
+   typedef channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
+   int num_colors = channel_traits< channel_t >::max_value();
 
-   for( tsample_t sample = 0
-      ; sample < Number_Of_Samples
-      ; ++sample                    )
+   rgb16_planar_view_t palette = planar_rgb_view( num_colors
+                                                , 1
+                                                , red
+                                                , green
+                                                , blue
+                                                , sizeof( bits16 ) * num_colors );
+
+   rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
+
+
+   for( rgb16_view_t::y_coord_t y = 0; y < src_view.height(); ++y )
    {
-      for( uint32 row = 0; row < (uint32) v.height(); ++row )
-      {
-         read_scaline( buffer
-                     , row
-                     , sample
-                     , file   );
+      rgb16_view_t::x_iterator it  = src_view.row_begin( y );
+      rgb16_view_t::x_iterator end = src_view.row_end( y );
 
-         // copy into view
-         std::copy( buffer.begin()
-                  , buffer.begin() + v.width()
-                  , nth_channel_view( view( tiff_img ), sample ).row_begin( row ));
+      typename Indices_View::x_iterator indices_it = indices_view.row_begin( y );
+
+      for( ; it != end; ++it, ++indices_it )
+      {
+         unsigned char i = at_c<0>( *indices_it );
+
+         *it = *palette.xy_at( i, 0 );
       }
    }
-
-   transform_pixels( view( tiff_img )
-                   , v
-                   , color_convert_deref_fn< typename View_TIFF::value_type
-                                           , typename View_User::value_type
-                                           , Color_Converter
-                                           >( cc ));
 }
+
+template< typename View
+        , typename Indices_View
+        >
+void read_palette_image( const View&                       src_view
+                       , const Indices_View&               indices_view
+                       , const basic_tiff_image_read_info& info
+                       , tiff_file_t                       file
+                       , boost::mpl::false_                                 ) {}
+
 
 template< typename Buffer >
 inline 

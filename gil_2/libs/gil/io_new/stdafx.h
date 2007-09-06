@@ -14,6 +14,10 @@
 #include <sstream>
 #include <vector>
 
+extern "C" {
+#include "tiff.h"
+#include "tiffio.h"
+}
 
 #include <boost/bind.hpp>
 

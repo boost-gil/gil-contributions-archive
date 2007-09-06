@@ -48,6 +48,8 @@ struct basic_tiff_image_read_info
    tiff_image_width::type  _width;
    tiff_image_height::type _height;
 
+   tiff_compression::type _compression;
+
    tiff_bits_per_sample::type   _bits_per_sample;
    tiff_samples_per_pixel::type _samples_per_pixel;
    tiff_sample_format::type     _sample_format;
@@ -93,13 +95,20 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
    return info;
 }
 
+template < typename String, typename Image > 
+void read_image( const String& file_name, Image& img, point_t top_left, tiff_tag )
+{
+   detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
+   reader.read_image( img, top_left );
+}
+
 /// \ingroup TIFF_IO
 template < typename String, typename Image > 
 void read_image( const String& file_name, Image& img, tiff_tag )
 {
-   detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
-   reader.read_image( img );
+   read_image( file_name, img, point_t( 0, 0 ), tiff_tag() );
 }
+
 
 /// \ingroup TIFF_IO
 template< typename String, typename View > 
@@ -126,7 +135,7 @@ void read_and_convert_image(const String& file_name, Image& img, Color_Converter
    detail::tiff_reader<reader_color_convert> reader( detail::tiff_open_for_read( file_name ));
    reader.set_color_converter( cc );
 
-   reader.read_image( img );
+   reader.read_image( img, point_t( 0, 0 ));
 }
 
 /// \ingroup TIFF_IO

@@ -51,6 +51,9 @@ void read_image_info( tiff_file_t                 file
    get_property<tiff_image_height>( file
                                  , info._height );
 
+   get_property<tiff_compression>( file
+                                 , info._compression );
+
    get_property<tiff_samples_per_pixel>( file
                                        , info._samples_per_pixel );
 
@@ -70,17 +73,16 @@ void read_image_info( tiff_file_t                 file
 template< typename SrcImageIsBitAligned
         , typename UserImageIsBitAligned
         , typename SrcImageIsPlanar
-        , typename UserImageIsPlanar
         >
 struct read_and_no_convert_impl
 {
    template< typename Image_TIFF
            , typename View_User
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      )
-   {}
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file      ) {}
 
 };
 
@@ -88,17 +90,17 @@ struct read_and_no_convert_impl
 template<>
 struct read_and_no_convert_impl< boost::mpl::bool_< true >
                                , boost::mpl::bool_< true >
-                               , boost::mpl::bool_< false >
                                , boost::mpl::bool_< false > >
 {
    template< typename Image_TIFF
            , typename View_User
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      )
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file      )
    {
-      read_bit_aligned_data( v, top_left, file );
+      read_bit_aligned_data( src_view, top_left, info, file );
    }
 };
 
@@ -106,21 +108,21 @@ struct read_and_no_convert_impl< boost::mpl::bool_< true >
 template<>
 struct read_and_no_convert_impl< boost::mpl::bool_< false >
                                , boost::mpl::bool_< false >
-                               , boost::mpl::bool_< false >
                                , boost::mpl::bool_< false > >
 {
    template< typename Image_TIFF
            , typename View_User
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      )
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file      )
    {
       io_error_if( views_are_compatible< View_User
                                        , typename Image_TIFF::view_t >::value != true
                  , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-      read_data( v, top_left, 0, file );
+      read_data( src_view, top_left, 0, info, file );
    }
 };
 
@@ -129,15 +131,15 @@ template<>
 struct read_and_no_convert_impl< boost::mpl::bool_< false >
                                , boost::mpl::bool_< false >
                                , boost::mpl::bool_< true >
-                               , boost::mpl::bool_< true >
                                >
 {
    template< typename Image_TIFF
            , typename View_User
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      )
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file      )
    {
       typedef typename Image_TIFF::view_t      view_tiff_t;
       typedef typename view_tiff_t::value_type pixel_tiff_t;
@@ -150,8 +152,8 @@ struct read_and_no_convert_impl< boost::mpl::bool_< false >
          ; ++sample                                     )
       {
          typedef typename nth_channel_view_type< View_User >::type plane_t;
-         plane_t plane = nth_channel_view( v, sample );
-         read_data( plane, top_left, sample, file );
+         plane_t plane = nth_channel_view( src_view, sample );
+         read_data( plane, top_left, sample, info, file );
       }
    }
 };
@@ -166,17 +168,19 @@ struct read_and_no_convert
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User& v
-            , const point_t&   top_left
-            , boost::mpl::true_         ) {}
+   void read( const View_User&                  src_view
+            , const point_t&                    top_left
+            , const basic_tiff_image_read_info& info
+            , boost::mpl::true_                            ) {}
 
    // To be called by real image types.
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User& v
-            , const point_t&   top_left
-            , boost::mpl::false_         )
+   void read( const View_User&                  src_view
+            , const point_t&                    top_left
+            , const basic_tiff_image_read_info& info
+            , boost::mpl::false_                          )
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
@@ -184,15 +188,13 @@ struct read_and_no_convert
       typedef is_bit_aligned< View_User >::type user_image_is_bit_aligned_t;
 
       typedef is_planar< View_TIFF >::type src_image_is_planar_t;
-      typedef is_planar< View_User >::type user_image_is_planar_t;
 
       read_and_no_convert_impl< src_image_is_bit_aligned_t
                               , user_image_is_bit_aligned_t
                               , src_image_is_planar_t
-                              , user_image_is_planar_t
                               > impl;
 
-      impl.operator()< Image_TIFF >( v, top_left, _file );
+      impl.operator()< Image_TIFF >( src_view, top_left, info, _file );
    }
 
 protected:
@@ -201,61 +203,104 @@ protected:
 };
 
 
-template< typename IsBitAligned
-        , typename IsPlanar
+template< typename SrcImageIsBitAligned
+        , typename UserImageIsBitAligned
+        , typename SrcImageIsPlanar
         >
 struct read_and_convert_impl
 {
    template< typename Image_TIFF
            , typename View_User
+           , typename Color_Converter
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      ) {}
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , Color_Converter                   cc
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file      ) {}
 };
 
 // Specialization for reading and converting bit aligned images.
 template<>
 struct read_and_convert_impl< boost::mpl::bool_< true >
-                            , boost::mpl::bool_< false > >
+                            , boost::mpl::bool_< true >
+                            , boost::mpl::bool_< false >
+                            >
 {
    template< typename Image_TIFF
            , typename View_User
+           , typename Color_Converter
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      )
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , Color_Converter                   cc
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file      )
    {
+      /// @todo: to be implemented soon.
    }
 };
 
 // Specialization for reading and converting interleaved images.
 template<>
 struct read_and_convert_impl< boost::mpl::bool_< false >
-                            , boost::mpl::bool_< false > >
+                            , boost::mpl::bool_< false >
+                            , boost::mpl::bool_< false >
+                            >
 {
    template< typename Image_TIFF
            , typename View_User
+           , typename Color_Converter
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      )
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , Color_Converter                   cc
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file       )
    {
+      read_interleaved_data_and_convert< Image_TIFF >( src_view, top_left, cc, info, file );
    }
 };
 
 // Specialization for reading and converting planar images.
 template<>
 struct read_and_convert_impl< boost::mpl::bool_< false >
-                            , boost::mpl::bool_< true > >
+                            , boost::mpl::bool_< false >
+                            , boost::mpl::bool_< true >
+                            >
 {
    template< typename Image_TIFF
            , typename View_User
+           , typename Color_Converter
            >
-   void operator() ( const View_User& v
-                   , const point_t&   top_left
-                   , tiff_file_t      file      )
+   void operator() ( const View_User&                  src_view
+                   , const point_t&                    top_left
+                   , Color_Converter                   cc
+                   , const basic_tiff_image_read_info& info
+                   , tiff_file_t                       file      )
    {
+      typedef typename Image_TIFF::view_t      view_tiff_t;
+      typedef typename view_tiff_t::value_type pixel_tiff_t;
+
+      BOOST_STATIC_ASSERT(( is_planar< view_tiff_t >::value ));
+
+      Image_TIFF tiff_img( src_view.dimensions() );
+
+      for( tsample_t sample = 0
+         ; sample < num_channels< pixel_tiff_t >::value
+         ; ++sample                                     )
+      {
+         typedef typename nth_channel_view_type< view_tiff_t >::type plane_t;
+         plane_t plane = nth_channel_view( view( tiff_img ), sample );
+         read_data< view_tiff_t >( plane, top_left, sample, info, file );
+      }
+
+      transform_pixels( view( tiff_img )
+                      , src_view
+                      , color_convert_deref_fn< typename view_tiff_t::value_type
+                                             , typename View_User::value_type
+                                             , Color_Converter
+                                             >( cc ));
    }
 };
 
@@ -276,23 +321,33 @@ struct read_and_convert
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User& v
-            , const point_t&   top_left
-            , boost::mpl::true_         ) {}
+   void read( const View_User&                  src_view
+            , const point_t&                    top_left
+            , const basic_tiff_image_read_info& info
+            , boost::mpl::true_                          ) {}
 
    // To be called by real image types.
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User& v
-            , const point_t&   top_left
-            , boost::mpl::false_         )
+   void read( const View_User&                  src_view
+            , const point_t&                    top_left
+            , const basic_tiff_image_read_info& info
+            , boost::mpl::false_                         )
    {
-      typedef is_bit_aligned< View_User >::type is_bit_aligned_t;
-      typedef is_planar     < View_User >::type is_planar_t;
+      typedef typename Image_TIFF::view_t View_TIFF;
 
-      read_and_convert_impl< is_bit_aligned_t, is_planar_t> impl;
-      impl.operator()< Image_TIFF >( v, top_left, _file );
+      typedef is_bit_aligned< View_TIFF >::type src_image_is_bit_aligned_t;
+      typedef is_bit_aligned< View_User >::type user_image_is_bit_aligned_t;
+
+      typedef is_planar< View_TIFF >::type src_image_is_planar_t;
+
+      read_and_convert_impl< src_image_is_bit_aligned_t
+                           , user_image_is_bit_aligned_t
+                           , src_image_is_planar_t
+                           > impl;
+
+      impl.operator()< Image_TIFF >( src_view, top_left, _cc, info, _file );
    }
 
 protected:
@@ -301,75 +356,6 @@ protected:
 
    Color_Converter _cc;
 };
-
-template< typename View >
-struct read_palette_image
-{
-   read_palette_image( tiff_file_t file ) : _file( file ) {}
-
-   template< typename Indices_View >
-   void operator() ( const View&         src_view
-                   , const Indices_View& indices_view ) {}
-
-private:
-
-   tiff_file_t _file;
-};
-
-template<>
-struct read_palette_image< rgb16_view_t >
-{
-   read_palette_image< rgb16_view_t >( tiff_file_t file ) : _file( file ) {}
-
-   template< typename Indices_View >
-   void operator() ( const rgb16_view_t& src_view
-                   , const Indices_View& indices_view )
-                   
-   {
-      tiff_color_map::red   red;
-      tiff_color_map::green green;
-      tiff_color_map::blue  blue;
-
-      TIFFGetFieldDefaulted( _file.get()
-                           , tiff_color_map::tag
-                           , &red
-                           , &green
-                           , &blue                 );
-
-      typedef channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
-      int num_colors = channel_traits< channel_t >::max_value();
-
-      rgb16_planar_view_t palette = planar_rgb_view( num_colors
-                                                   , 1
-                                                   , red
-                                                   , green
-                                                   , blue
-                                                   , sizeof( bits16 ) * num_colors );
-
-      rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
-
-
-      for( rgb16_view_t::y_coord_t y = 0; y < src_view.height(); ++y )
-      {
-         rgb16_view_t::x_iterator it  = src_view.row_begin( y );
-         rgb16_view_t::x_iterator end = src_view.row_end( y );
-
-         typename Indices_View::x_iterator indices_it = indices_view.row_begin( y );
-
-         for( ; it != end; ++it, ++indices_it )
-         {
-            unsigned char i = at_c<0>( *indices_it );
-
-            *it = *palette.xy_at( i, 0 );
-         }
-      }
-   }
-
-private:
-
-   tiff_file_t _file;
-};
-
 
 template< typename Reader >
 class tiff_reader : public Reader
@@ -382,19 +368,14 @@ public:
       read_image_info( file, _info );
    }
 
-   tiff_reader( tiff_file_t                file
-              , basic_tiff_image_read_info info )
-   : Reader( file )
-   , _info( info )
-   {}
-
    template< typename Image >
-   void read_image( Image& src_img )
+   void read_image( Image&         src_img
+                  , const point_t& top_left )
    {
-      src_img.recreate( _info._width
-                      , _info._height );
+      src_img.recreate( _info._width  - top_left.x
+                      , _info._height - top_left.y );
 
-      _top_left = point_t( 0, 0 );
+      _top_left = top_left;
 
       _apply( view( src_img ));
    }
@@ -428,63 +409,76 @@ private:
          //    into a rgb16_image_t object. The latter might
          //    be a good first solution.
 
-         read_palette_image< View > rpi( _file );
-
          unsigned int num_colors = 0;
          switch( _info._bits_per_sample )
          {
             case 1:
             {
-               gray1_image_t indices( _info._width, _info._height );
+               gray1_image_t indices( _info._width  - _top_left.x
+                                    , _info._height - _top_left.y );
                _read_samples_per_pixel( view( indices ));
 
-               rpi( src_view
-                  , view( indices ));
-
+               read_palette_image( src_view
+                                 , view( indices )
+                                 , _info
+                                 , _file
+                                 , boost::is_same< View, rgb16_view_t >::type() );
                break;
             }
 
             case 2:
             {
-               gray2_image_t indices( _info._width, _info._height );
+               gray2_image_t indices( _info._width  - _top_left.x
+                                    , _info._height - _top_left.y );
                _read_samples_per_pixel( view( indices ));
 
-               rpi( src_view
-                  , view( indices ));
-
+               read_palette_image( src_view
+                                 , view( indices )
+                                 , _info
+                                 , _file
+                                 , boost::is_same< View, rgb16_view_t >::type() );
                break;
             }
 
             case 4:
             {
-               gray4_image_t indices( _info._width, _info._height );
+               gray4_image_t indices( _info._width  - _top_left.x
+                                    , _info._height - _top_left.y );
                _read_samples_per_pixel( view( indices ));
 
-               rpi( src_view
-                  , view( indices ));
-
+               read_palette_image( src_view
+                                 , view( indices )
+                                 , _info
+                                 , _file
+                                 , boost::is_same< View, rgb16_view_t >::type() );
                break;
             }
 
             case 8:
             {
-               gray8_image_t indices( _info._width, _info._height );
+               gray8_image_t indices( _info._width  - _top_left.x
+                                    , _info._height - _top_left.y );
                _read_samples_per_pixel( view( indices ));
 
-               rpi( src_view
-                  , view( indices ));
-
+               read_palette_image( src_view
+                                 , view( indices )
+                                 , _info
+                                 , _file
+                                 , boost::is_same< View, rgb16_view_t >::type() );
                break;
             }
 
             case 16:
             {
-               gray16_image_t indices( _info._width, _info._height );
+               gray16_image_t indices( _info._width  - _top_left.x
+                                     , _info._height - _top_left.y );
                _read_samples_per_pixel( view( indices ));
 
-               rpi( src_view
-                  , view( indices ));
-
+               read_palette_image( src_view
+                                 , view( indices )
+                                 , _info
+                                 , _file
+                                 , boost::is_same< View, rgb16_view_t >::type() );
                break;
             }
 
@@ -629,6 +623,7 @@ private:
 
          read< image_t >( src_view
                         , _top_left
+                        , _info
                         , is_void< image_t >::type() );
 
       }
@@ -638,6 +633,7 @@ private:
 
          read< image_t >( src_view
                         , _top_left
+                        , _info
                         , is_void< image_t >::type() );
 
       }
@@ -649,9 +645,9 @@ private:
 
 private:
 
-   basic_tiff_image_read_info _info;
-
    point_t _top_left;
+
+   basic_tiff_image_read_info _info;
 };
 
 } // detail

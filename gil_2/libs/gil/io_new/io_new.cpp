@@ -3,12 +3,10 @@
 
 #include "stdafx.h"
 
-#include "boost/gil/extension/io_new/tiff_io.hpp"
 
-extern "C" {
-#include "tiff.h"
-#include "tiffio.h"
-}
+#pragma warning( disable: 4675 )
+
+#include "boost/gil/extension/io_new/tiff_io.hpp"
 
 using namespace std;
 using namespace boost;
@@ -110,8 +108,8 @@ struct my_color_converter {
            >
    void operator()(const SrcP& src,DstP& dst) const
    { 
-      my_color_converter_impl< rgb64f_pixel_t
-                             , rgb8_pixel_t >()( src
+      my_color_converter_impl< SrcP
+                             , DstP >()( src
                                        , dst
                                        , _red_range
                                        , _green_range
@@ -145,7 +143,7 @@ int main()
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
    read_test();
-   //read_and_convert_test();
+   read_and_convert_test();
    //write_test();
 
 }
@@ -153,37 +151,6 @@ int main()
 void read_test()
 {
    // read view tests
-
-   {
-      // read palette image test
-      string file_name( ".\\test1_ur_4.tiff" );
-
-      rgb16_image_t src;
-      read_image( file_name, src, tiff_tag() );
-
-      write_view( std::string( ".\\read_4_bit_palette_image_test.tiff" ), const_view( src ), tiff_tag() );
-   }
-
-   {
-      // read palette image test
-      string file_name( ".\\test1_ur_8.tiff" );
-
-      rgb16_image_t src;
-      read_image( file_name, src, tiff_tag() );
-
-      write_view( std::string( ".\\read_8_bit_palette_image_test.tiff" ), const_view( src ), tiff_tag() );
-   }
-
-   {
-      // read palette image test
-      string file_name( ".\\test1_ur_16.tiff" );
-
-      rgb16_image_t src;
-      read_image( file_name, src, tiff_tag() );
-
-      write_view( std::string( ".\\read_16_bit_palette_image_test.tiff" ), const_view( src ), tiff_tag() );
-   }
-
 
    {
       // read palette image test
@@ -195,6 +162,19 @@ void read_test()
       read_image( file_name, src, tiff_tag() );
 
       write_view( std::string( ".\\read_palette_image_test.tiff" ), const_view( src ), tiff_tag() );
+   }
+
+
+   {
+      // partial read palette image test
+
+      //jello.tif	256x192 8-bit RGB (lzw palette) Paul Heckbert "jello"
+      string file_name( ".\\test_images\\tiff\\libtiffpic\\jello.tif" );
+
+      rgb16_image_t src;
+      read_image( file_name, src, point_t( 89, 90 ),tiff_tag() );
+
+      write_view( std::string( ".\\partial read_palette_image_test.tiff" ), const_view( src ), tiff_tag() );
    }
 
    {
