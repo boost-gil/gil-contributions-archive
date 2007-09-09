@@ -15,6 +15,8 @@
 /// \author Christian Henning
 ///         
 
+#include <boost/bind.hpp>
+
 #include <boost/gil/utilities.hpp>
 
 namespace boost { namespace gil { namespace detail {
@@ -84,20 +86,27 @@ template<> struct pixel_type_factory< types::bits4, rgb_layout_t  > { typedef ty
 template<> struct pixel_type_factory< types::bits4, rgba_layout_t > { typedef types::rgba4_pixel_t type; };
 
 template< bool IsPlanar, typename Pixel > struct image_type_factory { typedef image< Pixel, IsPlanar > type; };
+
+// Specializations for bit_aligned images.
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray1_pixel_t> { typedef bit_aligned_image1_type<1, gray_layout_t>::type type; };
-template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb1_pixel_t> { typedef bit_aligned_image1_type<1, rgb_layout_t>::type type; };
-template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba1_pixel_t> { typedef bit_aligned_image1_type<1, rgba_layout_t>::type type; };
+
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb1_pixel_t> { typedef bit_aligned_image3_type<1,1,1, rgb_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba1_pixel_t> { typedef bit_aligned_image4_type<1,1,1,1, rgba_layout_t>::type type; };
 
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray2_pixel_t> { typedef bit_aligned_image1_type<2, gray_layout_t>::type type; };
-template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb2_pixel_t> { typedef bit_aligned_image1_type<2, rgb_layout_t>::type type; };
-template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba2_pixel_t> { typedef bit_aligned_image1_type<2, rgba_layout_t>::type type; };
+
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb2_pixel_t> { typedef bit_aligned_image3_type<2,2,2, rgb_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba2_pixel_t> { typedef bit_aligned_image4_type<2,2,2,2, rgba_layout_t>::type type; };
 
 template< bool IsPlanar > struct image_type_factory<IsPlanar, types::gray4_pixel_t> { typedef bit_aligned_image1_type<4, gray_layout_t>::type type; };
-template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb4_pixel_t> { typedef bit_aligned_image1_type<4, rgb_layout_t>::type type; };
-template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba4_pixel_t> { typedef bit_aligned_image1_type<4, rgba_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgb4_pixel_t> { typedef bit_aligned_image3_type<4,4,4, rgb_layout_t>::type type; };
+template< bool IsPlanar > struct image_type_factory<IsPlanar, types::rgba4_pixel_t> { typedef bit_aligned_image4_type<4,4,4,4, rgba_layout_t>::type type; };
 
-
+// Total specializations for bit_aligned images that are not allowed.
 template< bool IsPlanar > struct image_type_factory<IsPlanar, void> { typedef void type; };
+template<> struct image_type_factory<true, types::gray1_pixel_t> { typedef void type; };
+template<> struct image_type_factory<true, types::gray2_pixel_t> { typedef void type; };
+template<> struct image_type_factory<true, types::gray4_pixel_t> { typedef void type; };
 template<> struct image_type_factory< true, gray8_pixel_t > { typedef void type; };
 template<> struct image_type_factory< true, gray16_pixel_t > { typedef void type; };
 template<> struct image_type_factory< true, gray32_pixel_t > { typedef void type; };
@@ -196,6 +205,54 @@ void skip_over_rows( uint32                            end
    }
 }
 
+template< typename is_bit_aligned
+        , typename Buffer
+        >
+struct swap_bits_fn
+{
+   swap_bits_fn( tiff_file_t file ) {}
+
+   void operator() ( Buffer& ) {}
+};
+
+template<>
+struct swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > >
+{
+   swap_bits_fn( tiff_file_t file ) : _lookup( 256 )
+   {
+      for( int i = 0; i < 256; ++i )
+      {
+         _lookup[i] = swap_bits( i );
+      }
+
+      _swap_bits = ( TIFFIsByteSwapped( file.get() ) > 0 ) ? true : false;
+   }
+
+   void operator() ( std::vector< unsigned char >& buffer )
+   {
+      typedef swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > > tt;
+
+      if( _swap_bits )
+      {
+         std::transform( buffer.begin(), buffer.end(), buffer.begin(), boost::bind( &tt::_swap, *this, _1 ));
+      }
+   }
+ 
+ private:
+ 
+   unsigned char _swap( unsigned char byte )
+   {
+      return _lookup[ byte ];
+   }
+ 
+ private:
+ 
+   std::vector< unsigned char > _lookup;
+   bool _swap_bits;
+};
+
+
+
 template< typename View >
 inline
 void read_data( const View&                       src_view
@@ -204,97 +261,32 @@ void read_data( const View&                       src_view
               , const basic_tiff_image_read_info& info
               , tiff_file_t                       file     )
 {
-   typedef typename View::value_type pixel_t;
 
-   std::size_t size_to_allocate = buffer_size< pixel_t >( src_view.width()
-                                                        , file             );
-   std::vector< pixel_t > buffer( size_to_allocate );
+   typedef read_helper_for_compatible_views< is_bit_aligned< View >::type
+                                           , View
+                                           > read_helper_t;
+
+   typedef read_helper_t::buffer_t buffer_t;
+
+   std::size_t size_to_allocate = buffer_size< View::value_type >( src_view.width()
+                                                              , file             );
+
+   buffer_t buffer( size_to_allocate );
+   read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
+   read_helper_t::iterator_t first = begin + top_left.x; 
+   read_helper_t::iterator_t last  = begin + src_view.width() + top_left.x;
 
    skip_over_rows( (uint32) top_left.y, plane, buffer, info, file );
 
+   swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( file );
+
    for( uint32 row = top_left.y; row < (uint32) src_view.height() + top_left.y; ++row )
    {
-      read_scaline( buffer
-                  , row
-                  , plane
-                  , file );
+      read_scaline( buffer, row, plane, file );
 
-      std::copy( buffer.begin() + top_left.x
-               , buffer.begin() + src_view.width() + top_left.x
-               , src_view.row_begin( row - top_left.y            ));
-   }
-}
+      sb( buffer );
 
-
-
-template< typename View >
-inline
-void read_bit_aligned_data( const View&                       src_view
-                          , const point_t&                    top_left 
-                          , const basic_tiff_image_read_info& info
-                          , tiff_file_t                       file     )
-{
-   typedef std::vector<unsigned char> buffer_t;
-
-   tsize_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
-   buffer_t buffer( scanline_size_in_bytes );
-
-   /// @todo: This wont work for bits3 or bits5, etc.
-   View::x_iterator begin( &buffer.front()    , 0 );
-   View::x_iterator end  ( &buffer.back() + 1 , 0 );
-
-   if( TIFFIsByteSwapped( file.get() ) > 0 )
-   {
-      // create a lookup table for swapping bits.
-      buffer_t lookup( 256 );
-      for( int i = 0; i < 256; ++i )
-      {
-         lookup[i] = swap_bits( i );
-      }
-
-      skip_over_rows( (uint32) top_left.y, 0, buffer, info, file );
-
-      for( uint32 row = 0; row < (uint32) src_view.height(); ++row )
-      {
-         read_scaline( buffer
-                     , row
-                     , 0
-                     , file   );
-
-         
-         buffer_t::iterator buffer_it  = buffer.begin();
-         buffer_t::iterator buffer_end = buffer.end();
-
-         for( ; buffer_it != buffer_end; ++buffer_it  )
-         {
-            *buffer_it = lookup[ *buffer_it ];
-         }
-
-         std::copy( begin + top_left.x
-                  , end   + src_view.width() + top_left.x
-                  , src_view.row_begin( row - top_left.y  ));
-      }
-   }
-   else
-   {
-      // Don't swap bits.
-
-      buffer_t::iterator buffer_it  = buffer.begin();
-      buffer_t::iterator buffer_end = buffer.end();
-
-      skip_over_rows( (uint32) top_left.y, 0, buffer, info, file );
-
-      for( uint32 row = 0; row < (uint32) src_view.height(); ++row )
-      {
-         read_scaline( buffer
-                     , row
-                     , 0
-                     , file   );
-
-         std::copy( begin + top_left.x
-                  , end   + src_view.width() + top_left.x
-                  , src_view.row_begin( row - top_left.y  ));
-      }
+      std::copy( first, last, src_view.row_begin( row - top_left.y ));
    }
 }
 
@@ -323,6 +315,8 @@ void read_interleaved_data_and_convert( const View_User&                  src_vi
                   , file );
 
       // convert data
+//@ todo: doesn't compile
+/*
       std::transform( buffer.begin() + top_left.x
                     , buffer.begin() + src_view.width() + top_left.x
                     , src_view.row_begin( row - top_left.y )
@@ -330,6 +324,7 @@ void read_interleaved_data_and_convert( const View_User&                  src_vi
                                             , typename View_User::value_type
                                             , Color_Converter
                                             >( cc ));
+*/
    }
 }
 

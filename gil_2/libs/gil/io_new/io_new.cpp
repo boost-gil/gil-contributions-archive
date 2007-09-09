@@ -143,7 +143,7 @@ int main()
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
    read_test();
-   read_and_convert_test();
+   //read_and_convert_test();
    //write_test();
 
 }
@@ -416,6 +416,7 @@ void read_and_convert_test()
 
       bmp_write_view( ".\\own_cc_test.bmp.bmp", const_view( src ));
    }
+
 }
 
 void write_test()

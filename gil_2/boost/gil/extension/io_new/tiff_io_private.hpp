@@ -70,10 +70,7 @@ void read_image_info( tiff_file_t                 file
                                                 , info._photometric_interpretation  );
 }
 
-template< typename SrcImageIsBitAligned
-        , typename UserImageIsBitAligned
-        , typename SrcImageIsPlanar
-        >
+template< typename SrcImageIsPlanar >
 struct read_and_no_convert_impl
 {
    template< typename Image_TIFF
@@ -86,29 +83,9 @@ struct read_and_no_convert_impl
 
 };
 
-// Specialization for reading bit aligned images.
-template<>
-struct read_and_no_convert_impl< boost::mpl::bool_< true >
-                               , boost::mpl::bool_< true >
-                               , boost::mpl::bool_< false > >
-{
-   template< typename Image_TIFF
-           , typename View_User
-           >
-   void operator() ( const View_User&                  src_view
-                   , const point_t&                    top_left
-                   , const basic_tiff_image_read_info& info
-                   , tiff_file_t                       file      )
-   {
-      read_bit_aligned_data( src_view, top_left, info, file );
-   }
-};
-
 // Specialization for reading interleaved images.
 template<>
-struct read_and_no_convert_impl< boost::mpl::bool_< false >
-                               , boost::mpl::bool_< false >
-                               , boost::mpl::bool_< false > >
+struct read_and_no_convert_impl< boost::mpl::bool_< false > >
 {
    template< typename Image_TIFF
            , typename View_User
@@ -126,12 +103,12 @@ struct read_and_no_convert_impl< boost::mpl::bool_< false >
    }
 };
 
+// Template 
+
+
 // Specialization for reading planar images.
 template<>
-struct read_and_no_convert_impl< boost::mpl::bool_< false >
-                               , boost::mpl::bool_< false >
-                               , boost::mpl::bool_< true >
-                               >
+struct read_and_no_convert_impl< boost::mpl::bool_< true > >
 {
    template< typename Image_TIFF
            , typename View_User
@@ -152,8 +129,12 @@ struct read_and_no_convert_impl< boost::mpl::bool_< false >
          ; ++sample                                     )
       {
          typedef typename nth_channel_view_type< View_User >::type plane_t;
+
+// @todo: doesn't compile
+/*
          plane_t plane = nth_channel_view( src_view, sample );
          read_data( plane, top_left, sample, info, file );
+*/
       }
    }
 };
@@ -184,15 +165,9 @@ struct read_and_no_convert
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
-      typedef is_bit_aligned< View_TIFF >::type src_image_is_bit_aligned_t;
-      typedef is_bit_aligned< View_User >::type user_image_is_bit_aligned_t;
-
       typedef is_planar< View_TIFF >::type src_image_is_planar_t;
 
-      read_and_no_convert_impl< src_image_is_bit_aligned_t
-                              , user_image_is_bit_aligned_t
-                              , src_image_is_planar_t
-                              > impl;
+      read_and_no_convert_impl< src_image_is_planar_t > impl;
 
       impl.operator()< Image_TIFF >( src_view, top_left, info, _file );
    }
@@ -203,10 +178,7 @@ protected:
 };
 
 
-template< typename SrcImageIsBitAligned
-        , typename UserImageIsBitAligned
-        , typename SrcImageIsPlanar
-        >
+template< typename SrcImageIsPlanar >
 struct read_and_convert_impl
 {
    template< typename Image_TIFF
@@ -220,33 +192,9 @@ struct read_and_convert_impl
                    , tiff_file_t                       file      ) {}
 };
 
-// Specialization for reading and converting bit aligned images.
-template<>
-struct read_and_convert_impl< boost::mpl::bool_< true >
-                            , boost::mpl::bool_< true >
-                            , boost::mpl::bool_< false >
-                            >
-{
-   template< typename Image_TIFF
-           , typename View_User
-           , typename Color_Converter
-           >
-   void operator() ( const View_User&                  src_view
-                   , const point_t&                    top_left
-                   , Color_Converter                   cc
-                   , const basic_tiff_image_read_info& info
-                   , tiff_file_t                       file      )
-   {
-      /// @todo: to be implemented soon.
-   }
-};
-
 // Specialization for reading and converting interleaved images.
 template<>
-struct read_and_convert_impl< boost::mpl::bool_< false >
-                            , boost::mpl::bool_< false >
-                            , boost::mpl::bool_< false >
-                            >
+struct read_and_convert_impl< boost::mpl::bool_< false > >
 {
    template< typename Image_TIFF
            , typename View_User
@@ -264,10 +212,7 @@ struct read_and_convert_impl< boost::mpl::bool_< false >
 
 // Specialization for reading and converting planar images.
 template<>
-struct read_and_convert_impl< boost::mpl::bool_< false >
-                            , boost::mpl::bool_< false >
-                            , boost::mpl::bool_< true >
-                            >
+struct read_and_convert_impl< boost::mpl::bool_< true > >
 {
    template< typename Image_TIFF
            , typename View_User
@@ -282,8 +227,6 @@ struct read_and_convert_impl< boost::mpl::bool_< false >
       typedef typename Image_TIFF::view_t      view_tiff_t;
       typedef typename view_tiff_t::value_type pixel_tiff_t;
 
-      BOOST_STATIC_ASSERT(( is_planar< view_tiff_t >::value ));
-
       Image_TIFF tiff_img( src_view.dimensions() );
 
       for( tsample_t sample = 0
@@ -291,8 +234,12 @@ struct read_and_convert_impl< boost::mpl::bool_< false >
          ; ++sample                                     )
       {
          typedef typename nth_channel_view_type< view_tiff_t >::type plane_t;
+
+// @todo: doesn't compile
+/*
          plane_t plane = nth_channel_view( view( tiff_img ), sample );
          read_data< view_tiff_t >( plane, top_left, sample, info, file );
+*/
       }
 
       transform_pixels( view( tiff_img )
@@ -337,15 +284,9 @@ struct read_and_convert
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
-      typedef is_bit_aligned< View_TIFF >::type src_image_is_bit_aligned_t;
-      typedef is_bit_aligned< View_User >::type user_image_is_bit_aligned_t;
-
       typedef is_planar< View_TIFF >::type src_image_is_planar_t;
 
-      read_and_convert_impl< src_image_is_bit_aligned_t
-                           , user_image_is_bit_aligned_t
-                           , src_image_is_planar_t
-                           > impl;
+      read_and_convert_impl< src_image_is_planar_t > impl;
 
       impl.operator()< Image_TIFF >( src_view, top_left, _cc, info, _file );
    }
@@ -635,7 +576,6 @@ private:
                         , _top_left
                         , _info
                         , is_void< image_t >::type() );
-
       }
       else
       {
