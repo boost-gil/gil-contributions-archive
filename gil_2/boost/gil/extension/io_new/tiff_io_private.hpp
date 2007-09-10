@@ -103,8 +103,39 @@ struct read_and_no_convert_impl< boost::mpl::bool_< false > >
    }
 };
 
-// Template 
 
+template < int K >
+struct plane_recursion
+{
+   template< typename View >
+   static void read_plane( const View&                       src_view
+                         , const point_t&                    top_left
+                         , const basic_tiff_image_read_info& info
+                         , tiff_file_t                       file      )
+   {
+      typedef kth_channel_view_type< K, typename View >::type plane_t;
+      plane_t plane = kth_channel_view<K>( src_view );
+      read_data( plane, top_left, K, info, file );
+
+      plane_recursion< K - 1 >::read_plane( src_view, top_left, info, file );
+   }
+};
+
+template <>
+struct plane_recursion< 0 >
+{
+   template< typename View >
+   static void read_plane( const View&                       src_view
+                         , const point_t&                    top_left
+                         , const basic_tiff_image_read_info& info
+                         , tiff_file_t                       file      )
+   {
+      typedef kth_channel_view_type< 0, typename View >::type plane_t;
+      plane_t plane = kth_channel_view<0>( src_view );
+
+      read_data( plane, top_left, 0, info, file );
+   }
+};
 
 // Specialization for reading planar images.
 template<>
@@ -124,18 +155,20 @@ struct read_and_no_convert_impl< boost::mpl::bool_< true > >
       io_error_if( views_are_compatible<View_User, view_tiff_t>::value != true
                  , "Views are incompatible. You might want to use read_and_convert_image()" );
 
+      plane_recursion< num_channels< View_User >::value - 1 >::read_plane( src_view, top_left, info, file );
+      
+// @todo: doesn't compile
+/*
       for( tsample_t sample = 0
          ; sample < num_channels< pixel_tiff_t >::value
          ; ++sample                                     )
       {
          typedef typename nth_channel_view_type< View_User >::type plane_t;
 
-// @todo: doesn't compile
-/*
          plane_t plane = nth_channel_view( src_view, sample );
          read_data( plane, top_left, sample, info, file );
-*/
       }
+*/
    }
 };
 
@@ -229,25 +262,14 @@ struct read_and_convert_impl< boost::mpl::bool_< true > >
 
       Image_TIFF tiff_img( src_view.dimensions() );
 
-      for( tsample_t sample = 0
-         ; sample < num_channels< pixel_tiff_t >::value
-         ; ++sample                                     )
-      {
-         typedef typename nth_channel_view_type< view_tiff_t >::type plane_t;
-
-// @todo: doesn't compile
-/*
-         plane_t plane = nth_channel_view( view( tiff_img ), sample );
-         read_data< view_tiff_t >( plane, top_left, sample, info, file );
-*/
-      }
+      plane_recursion< num_channels< view_tiff_t >::value - 1 >::read_plane( view( tiff_img ), top_left, info, file );
 
       transform_pixels( view( tiff_img )
                       , src_view
                       , color_convert_deref_fn< typename view_tiff_t::value_type
-                                             , typename View_User::value_type
-                                             , Color_Converter
-                                             >( cc ));
+                                              , typename View_User::value_type
+                                              , Color_Converter
+                                              >( cc ));
    }
 };
 

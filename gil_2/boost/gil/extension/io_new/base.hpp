@@ -117,7 +117,7 @@ struct read_helper_for_compatible_views< mpl::true_, User_View >
 {
    typedef unsigned char element_t;
    typedef std::vector< element_t > buffer_t;
-   typedef typename User_View::x_iterator iterator_t;
+   typedef typename bit_aligned_pixel_iterator< typename User_View::reference > iterator_t;
 
    static iterator_t begin( buffer_t& buffer )
    {

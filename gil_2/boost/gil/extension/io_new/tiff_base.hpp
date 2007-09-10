@@ -261,7 +261,6 @@ void read_data( const View&                       src_view
               , const basic_tiff_image_read_info& info
               , tiff_file_t                       file     )
 {
-
    typedef read_helper_for_compatible_views< is_bit_aligned< View >::type
                                            , View
                                            > read_helper_t;
@@ -290,6 +289,57 @@ void read_data( const View&                       src_view
    }
 }
 
+template< typename is_bit_aligned_
+        , typename Color_Space
+        , typename View
+        >
+struct converter_workaround
+{
+   typedef read_helper_for_compatible_views< is_bit_aligned_
+                                           , View
+                                           > read_helper_t;
+
+   template< typename Dst_View
+           , typename Color_Converter
+           >
+   void operator() ( typename read_helper_t::iterator_t first
+                   , typename read_helper_t::iterator_t last
+                   , const Dst_View&           dst_view
+                   , const point_t&            top_left
+                   , unsigned int              row
+                   , Color_Converter&          cc       )
+   {
+      std::transform( first
+                    , last
+                    , dst_view.row_begin( row - top_left.y )
+                    , color_convert_deref_fn< typename View::value_type
+                                            , typename Dst_View::value_type
+                                            , Color_Converter
+                                            >( cc ));
+   }
+};
+
+template< typename View >
+struct converter_workaround< boost::mpl::true_, rgba_t, View >
+{
+   typedef read_helper_for_compatible_views< boost::mpl::true_
+                                           , View
+                                           > read_helper_t;
+
+   template< typename Dst_View
+           , typename Color_Converter
+           >
+   void operator() ( typename read_helper_t::iterator_t first
+                   , typename read_helper_t::iterator_t last
+                   , const Dst_View&           dst_view
+                   , const point_t&            top_left
+                   , unsigned int              row
+                   , Color_Converter&          cc       )
+   {
+      io_error( "Not implemented yet." );
+   }
+};
+
 template< typename Image_TIFF
         , typename View_User
         , typename Color_Converter
@@ -302,29 +352,41 @@ void read_interleaved_data_and_convert( const View_User&                  src_vi
 {
    typedef typename Image_TIFF::view_t View_TIFF;
 
-   std::size_t size_to_allocate = buffer_size<View_TIFF::value_type>( src_view.width()
-                                                                    , file             );
 
-   std::vector< View_TIFF::value_type > buffer( size_to_allocate );
+   typedef read_helper_for_compatible_views< is_bit_aligned< View_TIFF >::type
+                                           , View_TIFF
+                                           > read_helper_t;
 
-   for( uint32 row = 0; row < (uint32) src_view.height(); ++row )
+   typedef read_helper_t::buffer_t buffer_t;
+
+   std::size_t size_to_allocate = buffer_size< typename View_TIFF::value_type >( src_view.width()
+                                                                               , file             );
+
+   buffer_t buffer( size_to_allocate );
+   read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
+   read_helper_t::iterator_t first = begin + top_left.x; 
+   read_helper_t::iterator_t last  = begin + src_view.width() + top_left.x;
+
+   skip_over_rows( (uint32) top_left.y, 0, buffer, info, file );
+
+   swap_bits_fn< is_bit_aligned< View_TIFF >::type, buffer_t > sb( file );
+
+   for( uint32 row = top_left.y; row < (uint32) src_view.height() + top_left.y; ++row )
    {
-      read_scaline( buffer
-                  , row
-                  , 0
-                  , file );
+      read_scaline( buffer, row, 0, file );
 
-      // convert data
-//@ todo: doesn't compile
-/*
-      std::transform( buffer.begin() + top_left.x
-                    , buffer.begin() + src_view.width() + top_left.x
-                    , src_view.row_begin( row - top_left.y )
-                    , color_convert_deref_fn< typename View_TIFF::value_type
-                                            , typename View_User::value_type
-                                            , Color_Converter
-                                            >( cc ));
-*/
+      sb( buffer );
+
+      // @todo: Default color converter doesn't work for bit aligned rgba image types when being
+      // the source. See color_convert.hpp[270]. The metafunction channel_type does work
+      // for bit aligned images.
+      converter_workaround< typename is_bit_aligned< View_TIFF >::type
+                          , typename color_space_type< typename View_TIFF::value_type >::type
+                          , View_TIFF
+                          > cw;
+
+      cw( first, last, src_view, top_left, row, cc );
+
    }
 }
 
