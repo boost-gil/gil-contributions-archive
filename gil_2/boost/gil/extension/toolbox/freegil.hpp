@@ -23,12 +23,10 @@
 #include "utilgil.hpp"
 #include "utilstl.hpp"
 
-namespace boost {
-namespace gil {
-
 struct glyph
 {
-	glyph(char ch, FT_Face face, boost::gil::rgb8_pixel_t color) :
+	glyph(char ch, FT_Face face, 
+		boost::gil::rgb8_pixel_t color = boost::gil::rgb8_pixel_t(0,0,0)) :
 			ch(ch), face(face), color(color) {}
 
 	char ch;
@@ -36,7 +34,7 @@ struct glyph
 	boost::gil::rgb8_pixel_t color;
 };
 
-template <typename face_t, typename pixel_t>
+template <typename face_t, typename pixel_t=black_t>
 struct make_glyph
 {
 	FT_Face face;
@@ -197,9 +195,6 @@ struct find_last_fitted_glyph
 		return tmp > width;
 	}
 };
-
-} 
-} 
 
 #endif
 
