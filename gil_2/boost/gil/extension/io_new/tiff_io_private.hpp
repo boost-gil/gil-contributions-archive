@@ -156,19 +156,6 @@ struct read_and_no_convert_impl< boost::mpl::bool_< true > >
                  , "Views are incompatible. You might want to use read_and_convert_image()" );
 
       plane_recursion< num_channels< View_User >::value - 1 >::read_plane( src_view, top_left, info, file );
-      
-// @todo: doesn't compile
-/*
-      for( tsample_t sample = 0
-         ; sample < num_channels< pixel_tiff_t >::value
-         ; ++sample                                     )
-      {
-         typedef typename nth_channel_view_type< View_User >::type plane_t;
-
-         plane_t plane = nth_channel_view( src_view, sample );
-         read_data( plane, top_left, sample, info, file );
-      }
-*/
    }
 };
 
@@ -198,11 +185,12 @@ struct read_and_no_convert
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
-      typedef is_planar< View_TIFF >::type src_image_is_planar_t;
+      BOOST_STATIC_ASSERT(( mpl::not_< is_same< Image_TIFF, not_allowed_t >::type >::value ));
 
-      read_and_no_convert_impl< src_image_is_planar_t > impl;
+      //typedef is_planar< View_TIFF >::type src_image_is_planar_t;
 
-      impl.operator()< Image_TIFF >( src_view, top_left, info, _file );
+      //read_and_no_convert_impl< src_image_is_planar_t > impl;
+      //impl.operator()< Image_TIFF >( src_view, top_left, info, _file );
    }
 
 protected:
@@ -306,11 +294,13 @@ struct read_and_convert
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
-      typedef is_planar< View_TIFF >::type src_image_is_planar_t;
+      BOOST_STATIC_ASSERT(( mpl::not_< is_same< Image_TIFF, not_allowed_t >::type >::value ));
 
-      read_and_convert_impl< src_image_is_planar_t > impl;
+      //typedef is_planar< View_TIFF >::type src_image_is_planar_t;
 
-      impl.operator()< Image_TIFF >( src_view, top_left, _cc, info, _file );
+      //read_and_convert_impl< src_image_is_planar_t > impl;
+
+      //impl.operator()< Image_TIFF >( src_view, top_left, _cc, info, _file );
    }
 
 protected:
@@ -502,7 +492,7 @@ private:
 
          case 4:
          {
-            _read_sample_format< 4, Layout >( src_view );
+            //_read_sample_format< 4, Layout >( src_view );
             break;
          }
 
@@ -577,27 +567,29 @@ private:
            >
    void _read_planar( const View& src_view )
    {
-      typedef channel_type_factory< BitsPerSample, SampleFormat >::type channel_t;
-      typedef pixel_type_factory< channel_t, Layout >::type pixel_t;
+      typedef pixel_type_factory< BitsPerSample, SampleFormat, Layout >::type pixel_t;
 
       if( _info._planar_configuration == PLANARCONFIG_CONTIG )
       {
-         typedef image_type_factory< false, pixel_t >::type image_t;
+         typedef image< pixel_t, false > image_t;
 
          read< image_t >( src_view
                         , _top_left
                         , _info
-                        , is_void< image_t >::type() );
+                        , boost::mpl::false_() );
 
       }
       else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
       {
-         typedef image_type_factory< true, pixel_t >::type image_t;
+         typedef image< pixel_t, true > image_t;
 
+         //@todo: Disallow planar gray image type.
+/*
          read< image_t >( src_view
                         , _top_left
                         , _info
                         , is_void< image_t >::type() );
+*/
       }
       else
       {

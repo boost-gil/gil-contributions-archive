@@ -93,11 +93,11 @@ inline unsigned char swap_bits( unsigned char c )
 }
 
 template< typename is_bit_aligned
-        , typename User_View
+        , typename View
         >
 struct read_helper_for_compatible_views
 {
-   typedef typename User_View::value_type element_t;
+   typedef typename View::value_type element_t;
    typedef std::vector< element_t > buffer_t;
    typedef typename buffer_t::const_iterator iterator_t;
 
@@ -112,12 +112,12 @@ struct read_helper_for_compatible_views
    }
 };
 
-template< typename User_View >
-struct read_helper_for_compatible_views< mpl::true_, User_View >
+template< typename View >
+struct read_helper_for_compatible_views< mpl::true_, View >
 {
    typedef unsigned char element_t;
    typedef std::vector< element_t > buffer_t;
-   typedef typename bit_aligned_pixel_iterator< typename User_View::reference > iterator_t;
+   typedef typename bit_aligned_pixel_iterator< typename View::reference > iterator_t;
 
    static iterator_t begin( buffer_t& buffer )
    {

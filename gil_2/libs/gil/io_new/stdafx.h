@@ -26,4 +26,6 @@ extern "C" {
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io/bmp_io.hpp>
 
+#include <boost/mpl/not_equal_to.hpp>
+
 #include <boost/fusion/sequence/intrinsic/value_at.hpp>
