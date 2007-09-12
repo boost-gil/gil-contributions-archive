@@ -28,6 +28,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <boost/gil/extension/io_new/tiff_base.hpp>
+#include <boost/gil/extension/io_new/tiff_supported_read_types.hpp>
 #include <boost/gil/extension/io_new/tiff_io_private_write.hpp>
 
 namespace boost { namespace gil { namespace detail {
@@ -165,7 +166,7 @@ struct read_and_no_convert
    : _file( file )
    {}
 
-   // To be called by when image type is void.
+   // To be called by when image type is not_allowed_t.
    template< typename Image_TIFF
            , typename View_User
            >
@@ -185,12 +186,10 @@ struct read_and_no_convert
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
-      BOOST_STATIC_ASSERT(( mpl::not_< is_same< Image_TIFF, not_allowed_t >::type >::value ));
+      typedef is_planar< View_TIFF > src_image_is_planar_t;
 
-      //typedef is_planar< View_TIFF >::type src_image_is_planar_t;
-
-      //read_and_no_convert_impl< src_image_is_planar_t > impl;
-      //impl.operator()< Image_TIFF >( src_view, top_left, info, _file );
+      read_and_no_convert_impl< src_image_is_planar_t > impl;
+      impl.operator()< Image_TIFF >( src_view, top_left, info, _file );
    }
 
 protected:
@@ -274,7 +273,7 @@ struct read_and_convert
       _cc = cc;
    }
 
-   // To be called by when image type is void.
+   // To be called by when image type is not_allowed_t.
    template< typename Image_TIFF
            , typename View_User
            >
@@ -294,13 +293,10 @@ struct read_and_convert
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
-      BOOST_STATIC_ASSERT(( mpl::not_< is_same< Image_TIFF, not_allowed_t >::type >::value ));
+      typedef is_planar< View_TIFF > src_image_is_planar_t;
 
-      //typedef is_planar< View_TIFF >::type src_image_is_planar_t;
-
-      //read_and_convert_impl< src_image_is_planar_t > impl;
-
-      //impl.operator()< Image_TIFF >( src_view, top_left, _cc, info, _file );
+      read_and_convert_impl< src_image_is_planar_t > impl;
+      impl.operator()< Image_TIFF >( src_view, top_left, _cc, info, _file );
    }
 
 protected:
@@ -492,7 +488,7 @@ private:
 
          case 4:
          {
-            //_read_sample_format< 4, Layout >( src_view );
+            _read_sample_format< 4, Layout >( src_view );
             break;
          }
 
@@ -571,25 +567,26 @@ private:
 
       if( _info._planar_configuration == PLANARCONFIG_CONTIG )
       {
-         typedef image< pixel_t, false > image_t;
+         typedef image_type_factory< pixel_t, false >::type image_t;
 
          read< image_t >( src_view
                         , _top_left
                         , _info
-                        , boost::mpl::false_() );
+                        , is_same< pixel_t, not_allowed_t >::type() );
 
       }
       else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
       {
-         typedef image< pixel_t, true > image_t;
+         typedef image_type_factory< pixel_t, true >::type image_t;
 
-         //@todo: Disallow planar gray image type.
-/*
+         typedef mpl::or_< is_same< pixel_t, not_allowed_t >::type
+                         , is_same< image_t, not_allowed_t >::type
+                         >::type unspecified_t;
+
          read< image_t >( src_view
                         , _top_left
                         , _info
-                        , is_void< image_t >::type() );
-*/
+                        , unspecified_t() );
       }
       else
       {

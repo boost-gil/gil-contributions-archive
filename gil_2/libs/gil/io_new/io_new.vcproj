@@ -166,6 +166,9 @@
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io_private_write.hpp">
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_supported_read_types.hpp">
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_tags.hpp">
 			</File>
 		</Filter>
