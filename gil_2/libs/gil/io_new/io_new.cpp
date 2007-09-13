@@ -282,9 +282,9 @@ void read_test()
                         , 1000.0 );
 
       rgb8_image_t dst( view( src ).dimensions() );
-      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ) );
-   
-      bmp_write_view( ".\\caspian_interleaved.bmp", const_view( dst ));
+      copy_and_convert_pixels( view( src ), view( dst ), my_color_converter( min, max ));
+
+      write_view( std::string( ".\\caspian_interleaved.bmp.tiff" ), const_view( dst ), tiff_tag() );
    }
 
    {
