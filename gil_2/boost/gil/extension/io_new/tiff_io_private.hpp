@@ -34,6 +34,7 @@
 namespace boost { namespace gil { namespace detail {
 
 template <typename Property>
+inline
 bool get_property( const std::string& file_name
                  , typename Property::type& value
                  , tiff_tag                        )
@@ -43,6 +44,7 @@ bool get_property( const std::string& file_name
 
 }
 
+inline
 void read_image_info( tiff_file_t                 file
                     , basic_tiff_image_read_info& info )
 {
@@ -75,6 +77,7 @@ void read_image_info( tiff_file_t                 file
 template< typename Image_TIFF
         , typename View_User
         >
+inline
 void read_and_no_convert_impl( const View_User&                  src_view
                              , const point_t&                    top_left
                              , const basic_tiff_image_read_info& info
@@ -126,6 +129,7 @@ struct plane_recursion< 0 >
 template< typename Image_TIFF
         , typename View_User
         >
+inline
 void read_and_no_convert_impl( const View_User&                  src_view
                              , const point_t&                    top_left
                              , const basic_tiff_image_read_info& info
@@ -185,6 +189,7 @@ template< typename Image_TIFF
         , typename View_User
         , typename Color_Converter
         >
+inline
 void read_and_convert_impl( const View_User&                  src_view
                           , const point_t&                    top_left
                           , Color_Converter                   cc
@@ -204,6 +209,7 @@ template< typename Image_TIFF
         , typename View_User
         , typename Color_Converter
         >
+inline
 void read_and_convert_impl( const View_User&                  src_view
                           , const point_t&                    top_left
                           , Color_Converter                   cc
@@ -452,6 +458,12 @@ private:
          case 1:
          {
             _read_sample_format< 1, Layout >( src_view );
+            break;
+         }
+
+         case 2:
+         {
+            _read_sample_format< 2, Layout >( src_view );
             break;
          }
 

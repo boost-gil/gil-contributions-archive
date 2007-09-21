@@ -4,9 +4,9 @@
 #include "stdafx.h"
 
 
-#pragma warning( disable: 4675 )
-
 #include "boost/gil/extension/io_new/tiff_io.hpp"
+
+#include "read_test.hpp"
 
 using namespace std;
 using namespace boost;
@@ -133,7 +133,8 @@ struct invert_pixel
    }
 };
 
-void read_test();
+
+
 void read_and_convert_test();
 void write_test();
 
@@ -143,11 +144,12 @@ int main()
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
    read_test();
-   read_and_convert_test();
+   //read_and_convert_test();
    //write_test();
 
 }
 
+/*
 void read_test()
 {
    // read view tests
@@ -465,3 +467,4 @@ void write_test()
    }
 
 }
+*/

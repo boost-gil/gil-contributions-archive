@@ -122,6 +122,9 @@
 				RelativePath=".\io_new.cpp">
 			</File>
 			<File
+				RelativePath=".\read_test.cpp">
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -149,6 +152,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\png_io_private.hpp">
+			</File>
+			<File
+				RelativePath=".\read_test.hpp">
 			</File>
 			<File
 				RelativePath=".\stdafx.h">

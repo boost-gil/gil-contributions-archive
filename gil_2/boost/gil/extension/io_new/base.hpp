@@ -46,12 +46,14 @@ typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;
 template < typename Channel >
 struct bits_per_sample : public mpl::int_< sizeof( Channel )* 8 / byte_to_memunit< Channel >::value > {};
 
-inline void io_error( const std::string& descr )
+inline 
+void io_error( const std::string& descr )
 {
    throw std::ios_base::failure( descr );
 }
 
-inline void io_error_if( bool expr, const std::string& descr )
+inline 
+void io_error_if( bool expr, const std::string& descr )
 {
    if( expr ) 
       io_error( descr );
@@ -70,6 +72,7 @@ struct is_bit_aligned
                                                , is_bit_aligned_impl< View > >::value > type;
 };
 
+inline
 std::string convert_to_string( const std::wstring& s )
 {
 	std::size_t len = wcslen( s.c_str() );
@@ -79,7 +82,8 @@ std::string convert_to_string( const std::wstring& s )
    return std::string( c, c + len );
 }
 
-inline unsigned char swap_bits( unsigned char c )
+inline
+unsigned char swap_bits( unsigned char c )
 {
    unsigned char result = 0;
    for( int i = 0; i < 8; ++i )

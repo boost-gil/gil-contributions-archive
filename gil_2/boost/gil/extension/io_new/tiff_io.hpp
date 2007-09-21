@@ -25,9 +25,6 @@ extern "C" {
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <boost/fusion/sequence/container/vector.hpp>
-#include <boost/fusion/sequence/intrinsic/at.hpp>
-
 namespace boost { namespace gil {
 
 struct tiff_tag {};
@@ -78,6 +75,7 @@ namespace boost { namespace gil {
 /// \brief Returns the a tiff property.
 /// Will throw when file_name is invalid.
 template< typename String, typename Property>
+inline
 bool get_property( const String& file_name, typename Property::type& value, tiff_tag )
 {
    return detail::get_property<Property>( file_name, value, tiff_tag() );
@@ -86,6 +84,7 @@ bool get_property( const String& file_name, typename Property::type& value, tiff
 /// \ingroup TIFF_IO
 /// \brief Returns the image info for generating a gil image type.
 template< typename String >
+inline
 basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 {
    basic_tiff_image_read_info info;
@@ -96,6 +95,7 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
 }
 
 template < typename String, typename Image > 
+inline
 void read_image( const String& file_name, Image& img, point_t top_left, tiff_tag )
 {
    detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
@@ -104,6 +104,7 @@ void read_image( const String& file_name, Image& img, point_t top_left, tiff_tag
 
 /// \ingroup TIFF_IO
 template < typename String, typename Image > 
+inline
 void read_image( const String& file_name, Image& img, tiff_tag )
 {
    read_image( file_name, img, point_t( 0, 0 ), tiff_tag() );
@@ -112,6 +113,7 @@ void read_image( const String& file_name, Image& img, tiff_tag )
 
 /// \ingroup TIFF_IO
 template< typename String, typename View > 
+inline
 void read_view( const String& file_name, const View& v, point_t top_left, tiff_tag )
 {
    detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
@@ -121,6 +123,7 @@ void read_view( const String& file_name, const View& v, point_t top_left, tiff_t
 /// \ingroup TIFF_IO
 /// \brief Loads the image specified by the given tiff image file name into the given view.
 template< typename String, typename View > 
+inline
 void read_view( const String&  file_name, const View& v, tiff_tag )
 {
    read_view( file_name, v, point_t( 0, 0 ), tiff_tag() );
@@ -128,6 +131,7 @@ void read_view( const String&  file_name, const View& v, tiff_tag )
 
 /// \ingroup TIFF_IO
 template< typename String, typename Image, typename Color_Converter >
+inline
 void read_and_convert_image(const String& file_name, Image& img, Color_Converter cc, tiff_tag )
 {
    typedef detail::read_and_convert< Color_Converter > reader_color_convert;
@@ -140,6 +144,7 @@ void read_and_convert_image(const String& file_name, Image& img, Color_Converter
 
 /// \ingroup TIFF_IO
 template <typename String, typename Image>
+inline
 void read_and_convert_image( const String& file_name, Image& img, tiff_tag )
 {
    read_and_convert_image( file_name, img, default_color_converter(), tiff_tag() );
@@ -147,14 +152,17 @@ void read_and_convert_image( const String& file_name, Image& img, tiff_tag )
 
 /// \ingroup TIFF_IO
 template< typename String, typename View >
+inline
 void read_and_convert_view( const String& file_name, const View& view, tiff_tag );
 
 /// \ingroup TIFF_IO
 template< typename String, typename View, typename Color_Converter>
+inline
 void read_and_convert_view( const String& file_name, const View& view, Color_Converter cc, tiff_tag );
 
 /// \ingroup TIFF_IO
 template< typename String, typename View > 
+inline
 void write_view( const String& file_name, const View& v, tiff_tag )
 {
    detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
@@ -163,6 +171,7 @@ void write_view( const String& file_name, const View& v, tiff_tag )
 
 /// \ingroup TIFF_IO
 template< typename String, typename View > 
+inline
 void write_view( const String& file_name, const View& v, const tiff_image_write_info& info, tiff_tag )
 {
    detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));

@@ -38,8 +38,7 @@ template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_
 template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
 
 
-
-
+inline
 tiff_file_t tiff_open_for_read( const std::string& file_name )
 {
    TIFF* tiff;
@@ -49,11 +48,13 @@ tiff_file_t tiff_open_for_read( const std::string& file_name )
    return tiff_file_t( tiff, TIFFClose );
 }
 
+inline
 tiff_file_t tiff_open_for_read( const std::wstring& file_name )
 {
    return tiff_open_for_read( convert_to_string( file_name ));
 }
 
+inline
 tiff_file_t tiff_open_for_write( const std::string& file_name )
 {
    TIFF* tiff;
@@ -63,6 +64,7 @@ tiff_file_t tiff_open_for_write( const std::string& file_name )
    return tiff_file_t( tiff, TIFFClose );
 }
 
+inline
 tiff_file_t tiff_open_for_write( const std::wstring& file_name )
 {
    return tiff_open_for_write( convert_to_string( file_name ));
@@ -70,6 +72,7 @@ tiff_file_t tiff_open_for_write( const std::wstring& file_name )
 
 
 template <typename Property>
+inline
 bool get_property( tiff_file_t              file
                  , typename Property::type& value )
 {
@@ -82,6 +85,7 @@ bool get_property( tiff_file_t              file
 }
 
 template <typename Property>
+inline
 bool set_property( tiff_file_t                    file
                  , const typename Property::type& value )
 {
@@ -96,7 +100,8 @@ bool set_property( tiff_file_t                    file
 template< typename Pixel >
 inline
 std::size_t buffer_size( std::size_t width
-                       , tiff_file_t file   )
+                       , tiff_file_t file
+                       , mpl::false_       )
 {
    std::size_t scanline_size_in_bytes = TIFFScanlineSize( file.get() );
 
@@ -105,6 +110,16 @@ std::size_t buffer_size( std::size_t width
    return  std::max( width
                    , (( scanline_size_in_bytes + element_size - 1 ) / element_size ));
 }
+
+template< typename Pixel >
+inline
+std::size_t buffer_size( std::size_t width
+                       , tiff_file_t file
+                       , mpl::true_         )
+{
+   return TIFFScanlineSize( file.get() );
+}
+
 
 template< typename Buffer >
 inline
@@ -190,8 +205,9 @@ void read_data( const View&                       src_view
 
    typedef read_helper_t::buffer_t buffer_t;
 
-   std::size_t size_to_allocate = buffer_size< View::value_type >( src_view.width()
-                                                              , file             );
+   std::size_t size_to_allocate = buffer_size< typename View::value_type >( src_view.width()
+                                                                          , file  
+                                                                          , is_bit_aligned< View >::type() );
 
    buffer_t buffer( size_to_allocate );
    read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
@@ -202,7 +218,7 @@ void read_data( const View&                       src_view
 
    swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( file );
 
-   for( uint32 row = top_left.y; row < (uint32) src_view.height() + top_left.y; ++row )
+   for( uint32 row = (uint32) top_left.y; row < (uint32) src_view.height() + (uint32) top_left.y; ++row )
    {
       read_scaline( buffer, row, plane, file );
 
@@ -267,6 +283,7 @@ template< typename Image_TIFF
         , typename View_User
         , typename Color_Converter
         >
+inline
 void read_interleaved_data_and_convert( const View_User&                  src_view
                                       , const point_t&                    top_left
                                       , Color_Converter                   cc
@@ -283,7 +300,8 @@ void read_interleaved_data_and_convert( const View_User&                  src_vi
    typedef read_helper_t::buffer_t buffer_t;
 
    std::size_t size_to_allocate = buffer_size< typename View_TIFF::value_type >( src_view.width()
-                                                                               , file             );
+                                                                               , file    
+                                                                               , is_bit_aligned< View >::type() );
 
    buffer_t buffer( size_to_allocate );
    read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
@@ -316,6 +334,7 @@ void read_interleaved_data_and_convert( const View_User&                  src_vi
 template< typename View
         , typename Indices_View
         >
+inline
 void read_palette_image( const View&                       src_view
                        , const Indices_View&               indices_view
                        , const basic_tiff_image_read_info& info
@@ -354,7 +373,7 @@ void read_palette_image( const View&                       src_view
 
       for( ; it != end; ++it, ++indices_it )
       {
-         unsigned char i = at_c<0>( *indices_it );
+         bits16 i = at_c<0>( *indices_it );
 
          *it = *palette.xy_at( i, 0 );
       }
@@ -364,6 +383,7 @@ void read_palette_image( const View&                       src_view
 template< typename View
         , typename Indices_View
         >
+inline
 void read_palette_image( const View&                       src_view
                        , const Indices_View&               indices_view
                        , const basic_tiff_image_read_info& info

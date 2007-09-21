@@ -33,6 +33,10 @@ namespace bit_aligned_pixel_types
    struct rgb1_pixel_t {};
    struct rgba1_pixel_t {};
 
+   struct gray2_pixel_t {};
+   struct rgb2_pixel_t {};
+   struct rgba2_pixel_t {};
+
    struct gray4_pixel_t {};
    struct rgb4_pixel_t {};
    struct rgba4_pixel_t {};
@@ -40,33 +44,39 @@ namespace bit_aligned_pixel_types
 
 // gray1_pixel_t
 template<> struct pixel_type_factory< 1, SAMPLEFORMAT_UINT, gray_layout_t >
-{ typedef bit_aligned_pixel_types::gray1_pixel_t type;
-};
+{ typedef bit_aligned_pixel_types::gray1_pixel_t type; };
 
 // rgb1_pixel_t
 template<> struct pixel_type_factory< 1, SAMPLEFORMAT_UINT, rgb_layout_t >
-{ typedef bit_aligned_pixel_types::rgb1_pixel_t type;
-};
+{ typedef bit_aligned_pixel_types::rgb1_pixel_t type; };
 
 // rgba1_pixel_t
 template<> struct pixel_type_factory< 1, SAMPLEFORMAT_UINT, rgba_layout_t >
-{ typedef bit_aligned_pixel_types::rgba1_pixel_t type;
-};
+{ typedef bit_aligned_pixel_types::rgba1_pixel_t type; };
+
+// gray2_pixel_t
+template<> struct pixel_type_factory< 2, SAMPLEFORMAT_UINT, gray_layout_t >
+{ typedef bit_aligned_pixel_types::gray2_pixel_t type; };
+
+// rgb2_pixel_t
+template<> struct pixel_type_factory< 2, SAMPLEFORMAT_UINT, rgb_layout_t >
+{ typedef bit_aligned_pixel_types::rgb2_pixel_t type; };
+
+// rgba2_pixel_t
+template<> struct pixel_type_factory< 2, SAMPLEFORMAT_UINT, rgba_layout_t >
+{ typedef bit_aligned_pixel_types::rgba2_pixel_t type; };
 
 // gray4_pixel_t
 template<> struct pixel_type_factory< 4, SAMPLEFORMAT_UINT, gray_layout_t >
-{ typedef bit_aligned_pixel_types::gray4_pixel_t type;
-};
+{ typedef bit_aligned_pixel_types::gray4_pixel_t type; };
 
 // rgb4_pixel_t
 template<> struct pixel_type_factory< 4, SAMPLEFORMAT_UINT, rgb_layout_t >
-{ typedef bit_aligned_pixel_types::rgb4_pixel_t type;
-};
+{ typedef bit_aligned_pixel_types::rgb4_pixel_t type; };
 
 // rgba4_pixel_t
 template<> struct pixel_type_factory< 4, SAMPLEFORMAT_UINT, rgba_layout_t >
-{ typedef bit_aligned_pixel_types::rgba4_pixel_t type;
-};
+{ typedef bit_aligned_pixel_types::rgba4_pixel_t type; };
 
 
 // Define supported homogeneous pixel types.
@@ -174,6 +184,16 @@ template<> struct image_type_factory< bit_aligned_pixel_types::rgb1_pixel_t, fal
 template<> struct image_type_factory< bit_aligned_pixel_types::rgba1_pixel_t, false >
 { typedef bit_aligned_image4_type< 1, 1, 1, 1, rgba_layout_t >::type type; };
 
+//gray2_image_t
+template<> struct image_type_factory< bit_aligned_pixel_types::gray2_pixel_t, false >
+{ typedef bit_aligned_image1_type< 2, gray_layout_t >::type type; };
+//rgb2_image_t
+template<> struct image_type_factory< bit_aligned_pixel_types::rgb2_pixel_t, false >
+{ typedef bit_aligned_image3_type< 2, 2, 2, rgb_layout_t >::type type; };
+//rgba2_image_t
+template<> struct image_type_factory< bit_aligned_pixel_types::rgba2_pixel_t, false >
+{ typedef bit_aligned_image4_type< 2, 2, 2, 2, rgba_layout_t >::type type; };
+
 //gray4_image_t
 template<> struct image_type_factory< bit_aligned_pixel_types::gray4_pixel_t, false >
 { typedef bit_aligned_image1_type< 4, gray_layout_t >::type type; };
@@ -192,6 +212,13 @@ template<> struct image_type_factory< pixel_type_factory< 1, SAMPLEFORMAT_UINT, 
 template<> struct image_type_factory< pixel_type_factory< 1, SAMPLEFORMAT_UINT, rgb_layout_t >::type, true >
 { typedef not_allowed_t type; };
 template<> struct image_type_factory< pixel_type_factory< 1, SAMPLEFORMAT_UINT, rgba_layout_t >::type, true >
+{ typedef not_allowed_t type; };
+
+template<> struct image_type_factory< pixel_type_factory< 2, SAMPLEFORMAT_UINT, gray_layout_t >::type, true >
+{ typedef not_allowed_t type; };
+template<> struct image_type_factory< pixel_type_factory< 2, SAMPLEFORMAT_UINT, rgb_layout_t >::type, true >
+{ typedef not_allowed_t type; };
+template<> struct image_type_factory< pixel_type_factory< 2, SAMPLEFORMAT_UINT, rgba_layout_t >::type, true >
 { typedef not_allowed_t type; };
 
 template<> struct image_type_factory< pixel_type_factory< 4, SAMPLEFORMAT_UINT, gray_layout_t >::type, true >
