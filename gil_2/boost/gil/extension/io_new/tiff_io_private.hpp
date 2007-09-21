@@ -308,7 +308,6 @@ public:
    void read_view( const View&    src_view
                  , const point_t& top_left )
    {
-
       io_error_if( src_view.dimensions() != point_t( _info._width  - top_left.x
                                                    , _info._height - top_left.y )
                  , "User provided view has incorrect size."                       );

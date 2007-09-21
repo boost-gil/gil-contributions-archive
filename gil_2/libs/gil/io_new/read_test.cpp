@@ -30,7 +30,7 @@ void read_test_impl( const String& file_name )
    for_each_pixel( view( src ), eval_to<0>() );
 }
 
-void read_test()
+void basic_read_test()
 {
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );

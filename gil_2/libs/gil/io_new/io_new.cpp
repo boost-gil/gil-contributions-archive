@@ -143,7 +143,8 @@ int main()
    TIFFSetErrorHandler  ( (TIFFErrorHandler) tiff_error_handler   );
    TIFFSetWarningHandler( (TIFFErrorHandler) tiff_warning_handler );
 
-   read_test();
+   basic_read_test();
+   //read_test();
    //read_and_convert_test();
    //write_test();
 

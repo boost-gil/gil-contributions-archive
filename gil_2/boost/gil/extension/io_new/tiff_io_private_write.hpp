@@ -59,7 +59,8 @@ public:
    }
 
    template< typename View >
-   void apply( const View& v )
+   void apply( const View&    src_view
+             , const point_t& top_left )
    {
       typedef typename color_space_type<View>::type color_space_t;
 
@@ -77,12 +78,14 @@ public:
 
       info._planar_configuration = PLANARCONFIG_CONTIG;
 
-      apply( v, info );
+      apply( src_view, top_left, info );
    }
 
    template< typename View >
-   void apply( const View&                  v
-             , const tiff_image_write_info& info )
+   void apply( const View&                  src_view
+             , const point_t&               top_left
+             , const tiff_image_write_info& info     )
+             
    {
       typedef typename View::value_type pixel_t;
 
@@ -91,8 +94,8 @@ public:
       typedef my_interleaved_pixel_iterator_type_from_pixel_reference<typename View::reference>::type x_iterator;
 
       // write dimensions
-      tiff_image_width::type width   = v.width();
-      tiff_image_height::type height = v.height();
+      tiff_image_width::type width   = src_view.width();
+      tiff_image_height::type height = src_view.height();
 
       set_property<tiff_image_width >( _file, width );
       set_property<tiff_image_height>( _file, height );
@@ -131,13 +134,19 @@ public:
       set_property<tiff_rows_per_strip>( _file, rows_per_strip );
 
       // write the data
-      std::vector< unsigned char > row( (v.width() * samples_per_pixel * bits_per_sample + 7) / 8);
+      std::size_t row_size_in_bytes = (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8;
+      row_size_in_bytes -= top_left.x * samples_per_pixel * bits_per_sample + 7) / 8;
+
+      std::vector< unsigned char > row( row_size_in_bytes );
 
       x_iterator row_it=x_iterator(&*row.begin());
 
-      for( View::y_coord_t y = 0; y < v.height(); ++y )
+      for( View::y_coord_t y = top_left.y; y < src_view.height(); ++y )
       {
-         std::copy( v.row_begin( y ), v.row_end( y ), row_it );
+         std::copy( src_view.row_begin( y ) + top_left.x
+                  , src_view.row_end( y )
+                  , row_it );
+
          write_scaline( row, y, 0, _file );
 
 	      // @todo: do optional bit swapping here if you need to...

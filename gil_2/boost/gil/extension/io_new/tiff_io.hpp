@@ -132,14 +132,30 @@ void read_view( const String&  file_name, const View& v, tiff_tag )
 /// \ingroup TIFF_IO
 template< typename String, typename Image, typename Color_Converter >
 inline
-void read_and_convert_image(const String& file_name, Image& img, Color_Converter cc, tiff_tag )
+void read_and_convert_image(const String& file_name, Image& img, const point_t& top_left, Color_Converter cc, tiff_tag )
 {
    typedef detail::read_and_convert< Color_Converter > reader_color_convert;
 
    detail::tiff_reader<reader_color_convert> reader( detail::tiff_open_for_read( file_name ));
    reader.set_color_converter( cc );
 
-   reader.read_image( img, point_t( 0, 0 ));
+   reader.read_image( img, top_left );
+}
+
+/// \ingroup TIFF_IO
+template< typename String, typename Image, typename Color_Converter >
+inline
+void read_and_convert_image(const String& file_name, Image& img, Color_Converter cc, tiff_tag )
+{
+   read_and_convert_image( file_name, img, point_t( 0, 0 ), cc, tiff_tag() );
+}
+
+/// \ingroup TIFF_IO
+template <typename String, typename Image>
+inline
+void read_and_convert_image( const String& file_name, Image& img, const point_t& top_left, tiff_tag )
+{
+   read_and_convert_image( file_name, img, top_left, default_color_converter(), tiff_tag() );
 }
 
 /// \ingroup TIFF_IO
@@ -147,35 +163,78 @@ template <typename String, typename Image>
 inline
 void read_and_convert_image( const String& file_name, Image& img, tiff_tag )
 {
-   read_and_convert_image( file_name, img, default_color_converter(), tiff_tag() );
+   read_and_convert_image( file_name, img, point_t( 0, 0 ), default_color_converter(), tiff_tag() );
+}
+
+/// \ingroup TIFF_IO
+template< typename String, typename View, typename Color_Converter>
+inline
+void read_and_convert_view( const String& file_name, const View& view, const point_t& top_left, Color_Converter cc, tiff_tag )
+{
+   typedef detail::read_and_convert< Color_Converter > reader_color_convert;
+
+   detail::tiff_reader<reader_color_convert> reader( detail::tiff_open_for_read( file_name ));
+   reader.set_color_converter( cc );
+
+   reader.read_view( view, top_left );
+}
+
+/// \ingroup TIFF_IO
+template< typename String, typename View, typename Color_Converter>
+inline
+void read_and_convert_view( const String& file_name, const View& view, Color_Converter cc, tiff_tag )
+{
+   read_and_convert_view( file_name, view, point_t( 0, 0 ), cc, tiff_tag() );
 }
 
 /// \ingroup TIFF_IO
 template< typename String, typename View >
 inline
-void read_and_convert_view( const String& file_name, const View& view, tiff_tag );
+void read_and_convert_view( const String& file_name, const View& view, const point_t& top_left, tiff_tag )
+{
+   read_and_convert_view( file_name, view, top_left, default_color_converter(), tiff_tag() );
+}
 
 /// \ingroup TIFF_IO
-template< typename String, typename View, typename Color_Converter>
+template< typename String, typename View >
 inline
-void read_and_convert_view( const String& file_name, const View& view, Color_Converter cc, tiff_tag );
+void read_and_convert_view( const String& file_name, const View& view, tiff_tag )
+{
+   read_and_convert_view( file_name, view, point_t( 0, 0 ), default_color_converter(), tiff_tag() );
+}
+
+/// \ingroup TIFF_IO
+template< typename String, typename View > 
+inline
+void write_view( const String& file_name, const View& v, const point_t& top_left, tiff_tag )
+{
+   detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
+   writer.apply( v, top_left );
+}
 
 /// \ingroup TIFF_IO
 template< typename String, typename View > 
 inline
 void write_view( const String& file_name, const View& v, tiff_tag )
 {
-   detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
-   writer.apply( v );
+   write_view( file_name, v, top_left );
 }
 
 /// \ingroup TIFF_IO
 template< typename String, typename View > 
 inline
-void write_view( const String& file_name, const View& v, const tiff_image_write_info& info, tiff_tag )
+void write_view( const String& file_name, const View& v, const point_t& top_left, const tiff_image_write_info& info )
 {
    detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
-   writer.apply( v, info );
+   writer.apply( v, top_left, info );
+}
+
+/// \ingroup TIFF_IO
+template< typename String, typename View > 
+inline
+void write_view( const String& file_name, const View& v, const tiff_image_write_info& info )
+{
+   write_view( file_name, v, point_t( 0, 0 ), info );
 }
 
 } // namespace gil

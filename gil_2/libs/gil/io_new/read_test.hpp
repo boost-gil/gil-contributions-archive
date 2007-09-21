@@ -2,15 +2,26 @@
 #define READ_TEST_HPP
 
 template< int Value >
-struct eval_to
+struct compare
 {
-   template< typename T >
-   void operator() ( const T& v )
+   template< typename Channel >
+   void operator() ( const Channel& c )
    {
-      assert( at_c<0>( v ) == Value );
+      assert( c == 0 );
    }
 };
 
-void read_test();
+
+template< int Value >
+struct eval_to
+{
+   template< typename Pixel >
+   void operator() ( const Pixel& p )
+   {
+      static_for_each( p, compare<Value>() );
+   }
+};
+
+void basic_read_test();
 
 #endif // READ_TEST_HPP
