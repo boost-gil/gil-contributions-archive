@@ -5,6 +5,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.)
 
+#include <math.h>
+
 namespace std
 {
 
@@ -41,6 +43,82 @@ _Fn1 for_each(_InIt _First, _InIt _Last, _InIt2 _First2, _InIt3 _First3, _InIt4 
 	return (_Func);
 }
 
+template<typename out_t, typename _UnaryOperation> inline
+void transform(std::string str, out_t out, _UnaryOperation __unary_op)
+{
+		std::string::iterator __first = str.begin();
+		std::string::iterator __last = str.end();
+
+      for ( ; __first != __last; ++__first, ++out)
+		*out = __unary_op(*__first);
+}
+
+}
+
+struct compare_greater
+{
+	template <typename pair_t>
+	bool operator()(pair_t& a, pair_t& b)
+	{
+		return a.second < b.second;
+	}
+};
+
+struct compare_less
+{
+	template <typename pair_t>
+	bool operator()(pair_t& a, pair_t& b)
+	{
+		return a.second > b.second;
+	}
+};
+
+enum RoundDirection 
+{
+  rd_AwayZero=0,
+  rd_TowardZero=1,
+};
+
+template <class A> inline
+A roundTo(A val, int decimalPlaces)
+{
+  double mult=pow(10.0, decimalPlaces); 
+  return round(val*mult)/mult;
+}
+
+template <class A> inline
+A roundTo(A val, int decimalPlaces, RoundDirection rd)
+{
+  assert((rd==rd_AwayZero)||(rd==rd_TowardZero));
+
+  A ret;
+  double mult=pow(10.0, decimalPlaces);
+  bool less0=(val<0.0 ? true : false);  
+
+  if (less0) {
+    if (rd==rd_AwayZero) {
+      rd=rd_TowardZero;
+    } else if (rd==rd_TowardZero) {
+      rd=rd_AwayZero;
+    }
+  }  
+  
+  switch (rd) {
+    case rd_AwayZero:
+      ret=ceil(val*mult)/mult;
+      break;
+    case rd_TowardZero:
+      ret=floor(val*mult)/mult;
+      break;
+  }
+  return ret;
+}
+
+template <class A> inline
+A truncTo(A val, int decimalPlaces)
+{
+  double mult=pow(10.0, decimalPlaces);
+  return trunc(val*mult)/mult;
 }
 
 #endif

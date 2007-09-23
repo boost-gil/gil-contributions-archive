@@ -34,21 +34,20 @@ struct glyph
 	boost::gil::rgb8_pixel_t color;
 };
 
+typedef boost::shared_ptr<glyph> glyph_t;
+
 template <typename face_t, typename pixel_t=black_t>
 struct make_glyph
 {
-	FT_Face face;
-	boost::gil::rgb8_pixel_t pixel;
-	
-	make_glyph()
+	glyph_t operator()(char ch)	
 	{
+		FT_Face face;
 		face_t()(face);
+
+		boost::gil::rgb8_pixel_t pixel;
 		pixel_t()(pixel);
-	}
-	
-	boost::shared_ptr<glyph> operator()(char ch)
-	{
-		return boost::shared_ptr<glyph>(new glyph(ch,face,pixel));
+
+		return glyph_t(new glyph(ch,face,pixel));
 	}
 };
 
