@@ -25,18 +25,23 @@
 
 struct glyph
 {
-	glyph(char ch, FT_Face face, 
-		boost::gil::rgb8_pixel_t color = boost::gil::rgb8_pixel_t(0,0,0)) :
-			ch(ch), face(face), color(color) {}
+	typedef boost::function<void (boost::gil::rgb8_view_t,int,int)> function_t;
+
+	glyph(char ch, 
+		FT_Face face, 
+		function_t function=black_t()) :
+		ch(ch), 
+		face(face), 
+		function(function){}
 
 	char ch;
 	FT_Face face;
-	boost::gil::rgb8_pixel_t color;
+	function_t function;
 };
 
 typedef boost::shared_ptr<glyph> glyph_t;
 
-template <typename face_t, typename pixel_t=black_t>
+template <typename face_t, typename funct_t=black_t>
 struct make_glyph
 {
 	glyph_t operator()(char ch)	
@@ -44,10 +49,8 @@ struct make_glyph
 		FT_Face face;
 		face_t()(face);
 
-		boost::gil::rgb8_pixel_t pixel;
-		pixel_t()(pixel);
-
-		return glyph_t(new glyph(ch,face,pixel));
+		funct_t funct;
+		return glyph_t(new glyph(ch,face,funct));
 	}
 };
 
@@ -79,6 +82,8 @@ struct make_kerning
 		FT_Vector delta; 
 		FT_Get_Kerning(glyph->face, left_glyph, right_glyph, FT_KERNING_DEFAULT, &delta); 
 		left_glyph = right_glyph; 
+		//TODO: remove kerning
+		printf("%d\n",(delta.x >> 6));
 		return delta.x >> 6; 
 	}
 };
@@ -152,9 +157,21 @@ struct render_gray_glyph
 	const view_t& view;
 	render_gray_glyph(const view_t& view) : view(view), x(0){}	
 
+	template <typename funct_t> inline
+	void impl(const boost::gil::gray8c_view_t& bit, 
+		const view_t& view, const funct_t& funct)
+	{
+		for (int y = 0; y < view.height(); ++y)
+			for (int x = 0; x < view.width(); ++x)
+				if (bit(x,y) == 255)
+					funct(view,x,y);
+	}
+
 	template <typename glyph_t>
 	void operator()(glyph_t glyph, int kerning = 0)
 	{
+		using namespace boost::gil;
+
 		x += kerning;
 
 		FT_GlyphSlot slot = glyph->face->glyph; 
@@ -176,7 +193,8 @@ struct render_gray_glyph
 		boost::gil::gray8c_view_t grayview = boost::gil::interleaved_view(
 			width,height,(pixel_t*)slot->bitmap.buffer,
 				sizeof(unsigned char)*slot->bitmap.width);
-		alpha_blend(grayview,boost::gil::subimage_view(view,x,y,width,height),glyph->color);
+
+		impl(grayview,subimage_view(view,x,y,width,height),glyph->function);
 
 		x += xadvance; 
 	}

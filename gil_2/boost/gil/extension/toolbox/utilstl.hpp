@@ -55,24 +55,6 @@ void transform(std::string str, out_t out, _UnaryOperation __unary_op)
 
 }
 
-struct compare_greater
-{
-	template <typename pair_t>
-	bool operator()(pair_t& a, pair_t& b)
-	{
-		return a.second < b.second;
-	}
-};
-
-struct compare_less
-{
-	template <typename pair_t>
-	bool operator()(pair_t& a, pair_t& b)
-	{
-		return a.second > b.second;
-	}
-};
-
 enum RoundDirection 
 {
   rd_AwayZero=0,

@@ -27,7 +27,7 @@ enum
 struct make_alpha_blend
 {
 	short alpha;
-	make_alpha_blend(short alpha) : alpha(alpha)
+	make_alpha_blend(short alpha=255) : alpha(alpha)
 	{
 		//TODO: BOOST_ASSERT(alpha >= 0 && alpha <= 255);
 	}
@@ -43,16 +43,33 @@ struct make_alpha_blend
 template <int r=0, int g=0, int b=0> 
 struct rgb
 {
+	static const int red = r;
+	static const int green = g;
+	static const int blue = b;
+		
+	template <typename view_t>
+	void operator()(const view_t& view, int x, int y)
+	{
+		typedef boost::gil::rgb8_pixel_t pixel_t;
+		view(x,y) = pixel_t(r,g,b);
+	}
+};
+
+struct color
+{
 	typedef boost::gil::rgb8_pixel_t pixel_t;
 	pixel_t pixel;
 	
-	rgb(pixel_t pixel = pixel_t(r,g,b)) : pixel(pixel) {}
-	
-	bool operator()(pixel_t& out)
+	color(pixel_t pixel) : pixel(pixel) {}
+
+	color(unsigned long hex)
 	{
-		out = pixel;
-		return true;
-	}	
+		using namespace boost::gil;
+		int red = static_cast<bits8>((hex & 0xFF0000) >> 16);
+		int green = static_cast<bits8>((hex & 0x00FF00) >> 8);
+		int blue = static_cast<bits8>(hex & 0x0000FF);
+		pixel = pixel_t(red,green,blue);
+	}
 
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
@@ -61,58 +78,34 @@ struct rgb
 	}
 };
 
-template <typename rgb_t=rgb<>, int a=100> 
+template <int r=0, int g=0, int b=0, int a=255> 
 struct rgba
 {
-	typedef boost::gil::rgb8_pixel_t pixel_t;
-	pixel_t pixel;
-	int alpha;
-		
-	rgba() : alpha(a)
-	{
-		pixel_t pixel;
-		rgb_t()(pixel);
-	}
-
-	rgba(pixel_t pixel, int alpha) : 
-		pixel(pixel), alpha(alpha){}
-
-	bool operator()(pixel_t& out)
-	{
-		out = pixel;
-		return true;
-	}
+	static const int red = r;
+	static const int green = g;
+	static const int blue = b;
+	static const int alpha = a;
 
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
-		pixel_t dst = pixel;
+		typedef boost::gil::rgb8_pixel_t pixel_t;
+		pixel_t dst = pixel_t(r,g,b);
 		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(alpha));
 		view(x,y) = dst;
 	}
 };
 
-template <typename fpix_t, typename tpix_t>
+template <typename rgb_t, typename rgb2_t>
 struct horizontal_gradient
 {
-	typedef boost::gil::rgb8_pixel_t pixel_t;
-	pixel_t tpix,fpix;
-
-	horizontal_gradient()
-	{
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-	}
-
-	bool operator()(pixel_t& out)
-	{
-		out = fpix;
-		return true;
-	}
-
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
+		typedef boost::gil::rgb8_pixel_t pixel_t;
+		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
+		pixel_t tpix(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+
 		double perc = boost::numeric_cast<double>(x+1) / view.width();
 		int alpha = boost::numeric_cast<int>(perc*255);
 		pixel_t dst = tpix;
@@ -121,27 +114,16 @@ struct horizontal_gradient
 	}
 };
 
-template <typename fpix_t, typename tpix_t>
+template <typename rgb_t, typename rgb2_t>
 struct vertical_gradient
 {
-	typedef boost::gil::rgb8_pixel_t pixel_t;
-	pixel_t tpix,fpix;
-
-	vertical_gradient()
-	{
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-	}
-
-	bool operator()(pixel_t& out)
-	{
-		out = fpix;
-		return true;
-	}
-
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
+		typedef boost::gil::rgb8_pixel_t pixel_t;
+		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
+		pixel_t tpix(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+
 		double perc = boost::numeric_cast<double>(y+1) / view.height();
 		int alpha = boost::numeric_cast<int>(perc*255);
 		pixel_t dst = tpix;
@@ -150,28 +132,17 @@ struct vertical_gradient
 	}
 };
 
-template <typename fpix_t, typename tpix_t, int stop>
+template <typename rgb_t, typename rgb2_t, int stop>
 struct vertical_gradient_stop
 {
 	BOOST_STATIC_ASSERT(stop > 0);
-	typedef boost::gil::rgb8_pixel_t pixel_t;
-	pixel_t tpix,fpix;
-
-	vertical_gradient_stop()
-	{
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-	}
-
-	bool operator()(pixel_t& out)
-	{
-		out = fpix;
-		return true;
-	}
 
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
+		typedef boost::gil::rgb8_pixel_t pixel_t;
+		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
+		pixel_t tpix(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
 		BOOST_ASSERT(stop*4 < view.height());
 
 		if (y <= stop)
@@ -221,32 +192,22 @@ struct vertical_gradient_stop
 	}
 };
 
-template <typename fpix_t, typename tpix_t, std::size_t size>
+template <typename rgb_t, typename rgb2_t, std::size_t size>
 struct balanced_gradient
 {
-	typedef boost::gil::rgb8_pixel_t pixel_t;
-	pixel_t tpix,fpix;
 	bool up;
 	int a;
-
-	balanced_gradient() :
-		up(true), a(0)
-	{
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-	}
-
-	bool operator()(pixel_t& out)
-	{
-		out = fpix;
-		return true;
-	}	
 
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
+		typedef boost::gil::rgb8_pixel_t pixel_t;
+		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
+		pixel_t tpix(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+
 		double perc = a/boost::numeric_cast<double>(size);
 		int alpha = boost::numeric_cast<int>(perc*255);
+
 		pixel_t dst = fpix;
 		boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
 		view(x,y) = dst;
@@ -269,27 +230,16 @@ struct balanced_gradient
 	}
 };
 
-template <typename fpix_t, typename tpix_t>
+template <typename rgb_t, typename rgb2_t>
 struct diagonal_gradient
 {
-	typedef boost::gil::rgb8_pixel_t pixel_t;
-	pixel_t tpix,fpix;
-	
-	diagonal_gradient() 
-	{
-	   	tpix_t()(tpix);
-		fpix_t()(fpix);
-	}
-
-	bool operator()(pixel_t& out)
-	{
-		out = fpix;
-		return true;
-	}	
-
 	template <typename view_t>
 	void operator()(const view_t& view, int x, int y)
 	{
+		typedef boost::gil::rgb8_pixel_t pixel_t;
+		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
+		pixel_t tpix(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+
 		double xperc = boost::numeric_cast<double>(x+1) / view.width();
 		double yperc = boost::numeric_cast<double>(y+1) / view.height();
 		double aperc = (xperc + yperc) / 2;
@@ -325,21 +275,6 @@ struct make_balanced_interval
 		return out;
 	}
 };
-
-template <typename gview_t, typename view_t, typename pixel_t> inline
-void alpha_blend(const gview_t& grayview, const view_t& view, const pixel_t& color)
-{
-	using namespace boost::gil;
-
-	for (int y = 0; y < view.height(); ++y)
-		for (int x = 0; x < view.width(); ++x)
-		{
-			pixel_t dst = color;
-			static_for_each(dst, view(x,y), 
-				make_alpha_blend(grayview(x,y)));
-			view(x,y) = dst;
-		}
-}
 
 template <typename view_t, typename pixel_t>
 inline void wuline(const view_t& view, pixel_t pixel,
@@ -432,7 +367,8 @@ inline void wuline(const view_t& view, pixel_t pixel,
 			Weighting = ErrorAcc >> IntensityShift;
 	
 			pixel = pixel_saved;
-			static_for_each(pixel,view(X0,Y0), make_alpha_blend((Weighting ^ WeightingComplementMask)));
+			static_for_each(pixel,view(X0,Y0), 
+				make_alpha_blend((Weighting ^ WeightingComplementMask)));
 			view(X0,Y0) = pixel;
 
 			pixel = pixel_saved;
@@ -458,7 +394,8 @@ inline void wuline(const view_t& view, pixel_t pixel,
 		Weighting = ErrorAcc >> IntensityShift;
 
 		pixel = pixel_saved;
-		static_for_each(pixel,view(X0,Y0), make_alpha_blend(Weighting ^ WeightingComplementMask));
+		static_for_each(pixel,view(X0,Y0), 
+			make_alpha_blend(Weighting ^ WeightingComplementMask));
 		view(X0,Y0) = pixel;
 	
 		pixel = pixel_saved;
@@ -490,12 +427,14 @@ struct draw_wuline
 	}
 };
 
+//TODO: Use gil::point2
 struct defin
 {
 	int x;
 	int y;
 };
 
+//TODO: is this needed?
 template <typename view_t>
 struct translate_coordinates
 {
@@ -577,111 +516,110 @@ inline bool intersect(
 	double y3 = p3.y;
 	double x4 = p4.x;
 	double y4 = p4.y;
-      
-	double ax = x2 - x1;
-    double bx = x3 - x4;
+      	double ax = x2 - x1;
+	double bx = x3 - x4;
 
-    double lowerx;
-    double upperx;
-    double uppery;
-    double lowery;
+    	double lowerx;
+    	double upperx;
+    	double uppery;
+    	double lowery;
 
-    if (ax < 0.0)
-    {
-    	lowerx = x2;
-        upperx = x1;
-    }
-    else
-    {
-    	upperx = x2;
-        lowerx = x1;
-    }
+	if (ax < 0.0)
+    	{
+    		lowerx = x2;
+		upperx = x1;
+    	}
+    	else
+    	{
+    		upperx = x2;
+        	lowerx = x1;
+    	}
 
-    if (bx > 0.0)
-    {
-    	if ((upperx < x4) || (x3 < lowerx))
-        	return false;
-    }
-    else if ((upperx < x3) || (x4 < lowerx))
+    	if (bx > 0.0)
+    	{
+    		if ((upperx < x4) || (x3 < lowerx))
+        		return false;
+    	}
+    	else if ((upperx < x3) || (x4 < lowerx))
 	{
-         return false;
+        	return false;
 	}
 
-    double ay = y2 - y1;
-    double by = y3 - y4;
+    	double ay = y2 - y1;
+    	double by = y3 - y4;
 
-    if (ay < 0.0)
-    {
-	    lowery = y2;
-        uppery = y1;
-    }
-    else
-    {
-    	uppery = y2;
-        lowery = y1;
-    }
+    	if (ay < 0.0)
+    	{
+		lowery = y2;
+        	uppery = y1;
+    	}
+    	else
+    	{
+    		uppery = y2;
+        	lowery = y1;
+    	}
 
-    if (by > 0.0)
-    {
-    	if ((uppery < y4) || (y3 < lowery))
-        	return false;
-    }
+	if (by > 0.0)
+	{
+	    	if ((uppery < y4) || (y3 < lowery))
+        		return false;
+	}
 	else if ((uppery < y3) || (y4 < lowery))
 	{
-    	return false;
+    		return false;
 	}
 
 	double cx = x1 - x3;
-    double cy = y1 - y3;
-    double d  = (by * cx) - (bx * cy);
-    double f  = (ay * bx) - (ax * by);
+	double cy = y1 - y3;
+	double d  = (by * cx) - (bx * cy);
+	double f  = (ay * bx) - (ax * by);
 
-    if (f > 0.0)
-    {
-	    if ((d < 0.0) || (d > f))
-            return false;
-    }
-    else if ((d > 0.0) || (d < f))
+    	if (f > 0.0)
+    	{
+		if ((d < 0.0) || (d > f))
+            		return false;
+    	}
+    	else if ((d > 0.0) || (d < f))
 	{
-         return false;
+        	return false;
 	}
 
-    double e = (ax * cy) - (ay * cx);
+    	double e = (ax * cy) - (ay * cx);
 
-    if (f > 0.0)
-    {
-    	if ((e < 0.0) || (e > f))
-	        return false;
-    }
-    else if ((e > 0.0) || (e < f))
+    	if (f > 0.0)
+    	{
+    		if ((e < 0.0) || (e > f))
+	        	return false;
+    	}
+    	else if ((e > 0.0) || (e < f))
 	{
-         return false;
+        	return false;
 	}
 
-    double ratio = (ax * -by) - (ay * -bx);
+    	double ratio = (ax * -by) - (ay * -bx);
 	double ix,iy;
 
-    if (not_equal(ratio,0.0))
-    {
-         ratio = ((cy * -bx) - (cx * -by)) / ratio;
-         ix = x1 + (ratio * ax);
-         iy = y1 + (ratio * ay);
-    }
-    else
-    {
-         if (is_equal((ax * -cy),(-cx * ay)))
-         {
-            ix = x3;
-            iy = y3;
-         }
-         else
-         {
-            ix = x4;
+    	if (not_equal(ratio,0.0))
+    	{
+        	ratio = ((cy * -bx) - (cx * -by)) / ratio;
+         	ix = x1 + (ratio * ax);
+         	iy = y1 + (ratio * ay);
+    	}
+    	else
+    	{
+        	if (is_equal((ax * -cy),(-cx * ay)))
+         	{
+            		ix = x3;
+            		iy = y3;
+         	}
+         	else
+         	{
+            		ix = x4;
 			iy = y4;
-         }
-    }
+         	}
+    	}
 
-	//TODO: round up or down
+	//TODO: round
 	out.x = boost::numeric_cast<int>(ix);
 	out.y = boost::numeric_cast<int>(iy);
    	return true;
@@ -690,6 +628,7 @@ inline bool intersect(
 template <typename out_t> inline
 void make_circle(int lines, double radius, int cx, int cy, out_t out)
 {
+	//TODO: use PI
 	double pie = 3.1415926535;		
 	int fx,fy;
 	for (int line = 0; line < lines; line++)
@@ -712,6 +651,7 @@ void make_circle(int lines, double radius, int cx, int cy, out_t out)
 template <typename out_t> inline
 void make_star(int lines, double radius, double radius2, int cx, int cy, out_t out)
 {
+	//TODO: PI
 	double pie = 3.1415926535;		
 	int fx,fy;
 	for (int line = 0; line < lines; line++)
