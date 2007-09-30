@@ -43,15 +43,17 @@ struct make_alpha_blend
 template <int r=0, int g=0, int b=0> 
 struct rgb
 {
+	typedef boost::gil::rgb8_pixel_t pixel_t;
 	static const int red = r;
 	static const int green = g;
 	static const int blue = b;
 		
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int a=255)
 	{
-		typedef boost::gil::rgb8_pixel_t pixel_t;
-		view(x,y) = pixel_t(r,g,b);
+		pixel_t dst = pixel_t(r,g,b);
+		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(a));
+		view(x,y) = dst;
 	}
 };
 
@@ -72,24 +74,26 @@ struct color
 	}
 
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int a=255)
 	{
-		view(x,y) = pixel;
+		pixel_t dst = pixel;
+		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(a));
+		view(x,y) = dst;
 	}
 };
 
 template <int r=0, int g=0, int b=0, int a=255> 
 struct rgba
 {
+	typedef boost::gil::rgb8_pixel_t pixel_t;
 	static const int red = r;
 	static const int green = g;
 	static const int blue = b;
 	static const int alpha = a;
 
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int unused=255)
 	{
-		typedef boost::gil::rgb8_pixel_t pixel_t;
 		pixel_t dst = pixel_t(r,g,b);
 		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(alpha));
 		view(x,y) = dst;
@@ -100,7 +104,7 @@ template <typename rgb_t, typename rgb2_t>
 struct horizontal_gradient
 {
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int unused=255)
 	{
 		typedef boost::gil::rgb8_pixel_t pixel_t;
 		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
@@ -118,7 +122,7 @@ template <typename rgb_t, typename rgb2_t>
 struct vertical_gradient
 {
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int unused=255)
 	{
 		typedef boost::gil::rgb8_pixel_t pixel_t;
 		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
@@ -138,7 +142,7 @@ struct vertical_gradient_stop
 	BOOST_STATIC_ASSERT(stop > 0);
 
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int unused=255)
 	{
 		typedef boost::gil::rgb8_pixel_t pixel_t;
 		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
@@ -199,7 +203,7 @@ struct balanced_gradient
 	int a;
 
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int unused=255)
 	{
 		typedef boost::gil::rgb8_pixel_t pixel_t;
 		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
@@ -234,7 +238,7 @@ template <typename rgb_t, typename rgb2_t>
 struct diagonal_gradient
 {
 	template <typename view_t>
-	void operator()(const view_t& view, int x, int y)
+	void operator()(const view_t& view, int x, int y, int unused=255)
 	{
 		typedef boost::gil::rgb8_pixel_t pixel_t;
 		pixel_t fpix(rgb_t::red,rgb_t::green,rgb_t::blue);
@@ -424,32 +428,6 @@ struct draw_wuline
 	void operator()(point_t pt0, point_t pt1)
 	{
 		wuline(view,pixel,pt0.x,pt0.y,pt1.x,pt1.y);
-	}
-};
-
-//TODO: Use gil::point2
-struct defin
-{
-	int x;
-	int y;
-};
-
-//TODO: is this needed?
-template <typename view_t>
-struct translate_coordinates
-{
-	const view_t& view;
-	translate_coordinates(const view_t& view) : view(view){}	
-		
-	boost::gil::point2<int> operator()(const defin& def)
-	{
-		using namespace boost;
-		
-		double x = (numeric_cast<double>(def.x)/100.0) * view.width();
-		double y = (numeric_cast<double>(def.y)/100.0) * view.height();
-		
-		return boost::gil::point2<int>(
-			numeric_cast<int>(x),numeric_cast<int>(y));
 	}
 };
 

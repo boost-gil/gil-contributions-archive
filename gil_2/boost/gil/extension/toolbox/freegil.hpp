@@ -25,7 +25,7 @@
 
 struct glyph
 {
-	typedef boost::function<void (boost::gil::rgb8_view_t,int,int)> function_t;
+	typedef boost::function<void (boost::gil::rgb8_view_t,int,int,int)> function_t;
 
 	glyph(char ch, 
 		FT_Face face, 
@@ -163,8 +163,7 @@ struct render_gray_glyph
 	{
 		for (int y = 0; y < view.height(); ++y)
 			for (int x = 0; x < view.width(); ++x)
-				if (bit(x,y) == 255)
-					funct(view,x,y);
+				funct(view,x,y,bit(x,y));
 	}
 
 	template <typename glyph_t>
