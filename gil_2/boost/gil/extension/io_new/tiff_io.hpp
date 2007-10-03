@@ -90,10 +90,11 @@ basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
    basic_tiff_image_read_info info;
    detail::read_image_info( detail::tiff_open_for_read( file_name )
                           , info                                     );
-   
+
    return info;
 }
 
+/// \ingroup TIFF_IO
 template < typename String, typename Image > 
 inline
 void read_image( const String& file_name, Image& img, point_t top_left, tiff_tag )
