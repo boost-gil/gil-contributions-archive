@@ -82,8 +82,6 @@ struct make_kerning
 		FT_Vector delta; 
 		FT_Get_Kerning(glyph->face, left_glyph, right_glyph, FT_KERNING_DEFAULT, &delta); 
 		left_glyph = right_glyph; 
-		//TODO: remove kerning
-		printf("%d\n",(delta.x >> 6));
 		return delta.x >> 6; 
 	}
 };
