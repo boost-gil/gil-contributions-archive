@@ -41,7 +41,7 @@ struct glyph
 
 typedef boost::shared_ptr<glyph> glyph_t;
 
-template <typename face_t, typename funct_t=black_t>
+template <typename face_t, typename funct_t>
 struct make_glyph
 {
 	glyph_t operator()(char ch)	

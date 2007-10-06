@@ -115,8 +115,8 @@ struct horizontal_gradient
 
 	horizontal_gradient()
 	{
-		fpix = pixel_t(rgb_t::red,rgb_t::green,rgb_t::blue);
-		tpix = pixel_t(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+		fpix = rgb_t().pixel;
+		tpix = rgb2_t().pixel;
 	}
 
 	template <typename view_t>
@@ -138,8 +138,8 @@ struct vertical_gradient
 
 	vertical_gradient()
 	{
-		fpix = pixel_t(rgb_t::red,rgb_t::green,rgb_t::blue);
-		tpix = pixel_t(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+		fpix = rgb_t().pixel;
+		tpix = rgb2_t().pixel;
 	}
 
 	template <typename view_t>
@@ -163,8 +163,8 @@ struct vertical_gradient_stop
 
 	vertical_gradient_stop()
 	{
-		fpix = pixel_t(rgb_t::red,rgb_t::green,rgb_t::blue);
-		tpix = pixel_t(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+		fpix = rgb_t().pixel;
+		tpix = rgb2_t().pixel;
 	}
 
 	template <typename view_t>
@@ -230,8 +230,8 @@ struct balanced_gradient
 
 	balanced_gradient()
 	{
-		fpix = pixel_t(rgb_t::red,rgb_t::green,rgb_t::blue);
-		tpix = pixel_t(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+		fpix = rgb_t().pixel;
+		tpix = rgb2_t().pixel;
 	}
 
 	template <typename view_t>
@@ -270,8 +270,8 @@ struct diagonal_gradient
 
 	diagonal_gradient()
 	{
-		fpix = pixel_t(rgb_t::red,rgb_t::green,rgb_t::blue);
-		tpix = pixel_t(rgb2_t::red,rgb2_t::green,rgb2_t::blue);
+		fpix = rgb_t().pixel;
+		tpix = rgb2_t().pixel;
 	}
 
 	template <typename view_t>
@@ -749,6 +749,7 @@ void fill_polygon(const view_t& view, const polygon_t& polygon)
 				pixel(view2,x,y);
 }
 
+
 typedef rgb<0,0,0> black_t;
 typedef rgb<255,255,255> white_t;
 typedef rgb<219,219,112> goldenrod_t;
@@ -758,12 +759,5 @@ typedef rgb<150,150,150> medium_gray_t;
 typedef rgb<225,225,225> light_gray_t;
 typedef rgb<145,155,118> army_green_t;
 typedef rgb<40,40,40> black_gray_t;
-
-typedef vertical_gradient<army_green_t,white_t> army_barracks_gradient_t;
-typedef vertical_gradient<white_t, goldenrod_t> bannana_gradient_t;
-typedef diagonal_gradient<white_t, yellowgreen_t> apple_gradient_t;
-typedef vertical_gradient_stop<black_gray_t,army_green_t,350> army_fatigue_gradient_t;
-typedef diagonal_gradient<white_t,army_green_t> army_wash_gradient_t;
-typedef horizontal_gradient<black_t,black_gray_t> acid_rain_gradient_t;
 
 #endif
