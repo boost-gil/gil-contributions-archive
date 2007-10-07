@@ -15,6 +15,7 @@
 /// \author Christian Henning
 ///         
 
+#include <boost/array.hpp>
 #include <boost/bind.hpp>
 
 #include <boost/gil/utilities.hpp>
@@ -37,6 +38,8 @@ template<> struct photometric_interpretation< rgb_t  > : public boost::mpl::int_
 template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
 template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
 
+// @todo tiff_file_t is not defined nor forward declared. 
+// You should either include tiff_base or forward declare...
 
 inline
 tiff_file_t tiff_open_for_read( const std::string& file_name )
@@ -73,7 +76,7 @@ tiff_file_t tiff_open_for_write( const std::wstring& file_name )
 
 template <typename Property>
 inline
-bool get_property( tiff_file_t              file
+bool get_property( const tiff_file_t        file
                  , typename Property::type& value )
 {
    if( TIFFGetFieldDefaulted( file.get(), Property::tag, &value ) == 1 )
@@ -143,7 +146,7 @@ void skip_over_rows( uint32                            end
    }
 }
 
-template< typename is_bit_aligned
+template< typename IsBitAligned
         , typename Buffer
         >
 struct swap_bits_fn
@@ -156,7 +159,7 @@ struct swap_bits_fn
 template<>
 struct swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > >
 {
-   swap_bits_fn( tiff_file_t file ) : _lookup( 256 )
+   swap_bits_fn( tiff_file_t file )
    {
       for( int i = 0; i < 256; ++i )
       {
@@ -172,20 +175,23 @@ struct swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > >
 
       if( _swap_bits )
       {
-         std::transform( buffer.begin(), buffer.end(), buffer.begin(), boost::bind( &tt::_swap, *this, _1 ));
+         std::transform( buffer.begin()
+                       , buffer.end()
+                       , buffer.begin()
+                       , boost::bind( &tt::_swap, *this, _1 ));
       }
    }
  
  private:
  
-   unsigned char _swap( unsigned char byte )
+   unsigned char _swap( unsigned char byte ) const
    {
       return _lookup[ byte ];
    }
  
  private:
  
-   std::vector< unsigned char > _lookup;
+   boost::array< unsigned char, 256 > _lookup;
    bool _swap_bits;
 };
 
@@ -212,7 +218,7 @@ void read_data( const View&                       src_view
    buffer_t buffer( size_to_allocate );
    read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
    read_helper_t::iterator_t first = begin + top_left.x; 
-   read_helper_t::iterator_t last  = begin + src_view.width() + top_left.x;
+   read_helper_t::iterator_t last  = first + src_view.width();
 
    skip_over_rows( (uint32) top_left.y, plane, buffer, info, file );
 
@@ -228,13 +234,13 @@ void read_data( const View&                       src_view
    }
 }
 
-template< typename is_bit_aligned_
-        , typename Color_Space
+template< typename IsBitAligned
+        , typename ColorSpace
         , typename View
         >
 struct converter_workaround
 {
-   typedef read_helper_for_compatible_views< is_bit_aligned_
+   typedef read_helper_for_compatible_views< IsBitAligned
                                            , View
                                            > read_helper_t;
 
@@ -243,10 +249,10 @@ struct converter_workaround
            >
    void operator() ( typename read_helper_t::iterator_t first
                    , typename read_helper_t::iterator_t last
-                   , const Dst_View&           dst_view
-                   , const point_t&            top_left
-                   , unsigned int              row
-                   , Color_Converter&          cc       )
+                   , const Dst_View&                    dst_view
+                   , const point_t&                     top_left
+                   , unsigned int                       row
+                   , Color_Converter&                   cc       )
    {
       std::transform( first
                     , last
@@ -290,6 +296,7 @@ void read_interleaved_data_and_convert( const View_User&                  src_vi
                                       , const basic_tiff_image_read_info& info
                                       , tiff_file_t                       file        )
 {
+   // @todo gil convention: end typedefs with _t unless they already exist in say STL
    typedef typename Image_TIFF::view_t View_TIFF;
 
 
@@ -312,22 +319,21 @@ void read_interleaved_data_and_convert( const View_User&                  src_vi
 
    swap_bits_fn< is_bit_aligned< View_TIFF >::type, buffer_t > sb( file );
 
+   // @todo: Default color converter doesn't work for bit aligned rgba image types when being
+   // the source. See color_convert.hpp[270]. The metafunction channel_type does work
+   // for bit aligned images.
+   converter_workaround< typename is_bit_aligned< View_TIFF >::type
+                       , typename color_space_type< typename View_TIFF::value_type >::type
+                       , View_TIFF
+                       > cw;
+
    for( uint32 row = top_left.y; row < (uint32) src_view.height() + top_left.y; ++row )
    {
       read_scaline( buffer, row, 0, file );
 
       sb( buffer );
 
-      // @todo: Default color converter doesn't work for bit aligned rgba image types when being
-      // the source. See color_convert.hpp[270]. The metafunction channel_type does work
-      // for bit aligned images.
-      converter_workaround< typename is_bit_aligned< View_TIFF >::type
-                          , typename color_space_type< typename View_TIFF::value_type >::type
-                          , View_TIFF
-                          > cw;
-
       cw( first, last, src_view, top_left, row, cc );
-
    }
 }
 
@@ -341,9 +347,9 @@ void read_palette_image( const View&                       src_view
                        , tiff_file_t                       file
                        , boost::mpl::true_                                )
 {
-   tiff_color_map::red   red;
-   tiff_color_map::green green;
-   tiff_color_map::blue  blue;
+   tiff_color_map::red_t   red;
+   tiff_color_map::green_t green;
+   tiff_color_map::blue_t  blue;
 
    TIFFGetFieldDefaulted( file.get()
                         , tiff_color_map::tag
@@ -375,7 +381,7 @@ void read_palette_image( const View&                       src_view
       {
          bits16 i = at_c<0>( *indices_it );
 
-         *it = *palette.xy_at( i, 0 );
+         *it = palette[i];
       }
    }
 }
@@ -388,7 +394,10 @@ void read_palette_image( const View&                       src_view
                        , const Indices_View&               indices_view
                        , const basic_tiff_image_read_info& info
                        , tiff_file_t                       file
-                       , boost::mpl::false_                                 ) {}
+                       , boost::mpl::false_          /* is View rgb16_view_t*/ )
+{
+   io_error( "User supplied image type must be rgb16_image_t." );
+}
 
 
 template< typename Buffer >

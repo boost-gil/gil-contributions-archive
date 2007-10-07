@@ -60,17 +60,7 @@ void io_error_if( bool expr, const std::string& descr )
 }
 
 template< typename View >
-struct is_bit_aligned_impl : public boost::mpl::bool_< byte_to_memunit< typename View::x_iterator >::value == 8 >
-{};
-
-template< typename View >
-struct is_bit_aligned
-{
-   static const value = is_base_of< boost::mpl::true_, is_bit_aligned_impl< View > >::value;
-
-   typedef boost::mpl::bool_< boost::is_base_of< boost::mpl::true_
-                                               , is_bit_aligned_impl< View > >::value > type;
-};
+struct is_bit_aligned : public mpl::bool_< byte_to_memunit< typename View::x_iterator >::value == 8 > {};
 
 inline
 std::string convert_to_string( const std::wstring& s )
@@ -130,6 +120,8 @@ struct read_helper_for_compatible_views< mpl::true_, View >
                   
    static iterator_t end( buffer_t& buffer )
    {
+      // @todo Won't this break if 8 is not divisible by the bit depth? 
+      // What if your bitdepth is 3. The last pixel may not have offset 0
       return iterator_t( &buffer.back() + 1, 0 );
    }
 };
