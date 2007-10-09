@@ -148,6 +148,12 @@
 				RelativePath="..\..\..\boost\gil\extension\io_new\base.hpp">
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_base.hpp">
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io.hpp">
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io_private.hpp">
 			</File>
 			<File

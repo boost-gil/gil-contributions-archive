@@ -18,14 +18,6 @@
 /// see http://www.libpng.org/pub/png/libpng.html
 /// or http://www.libpng.org/pub/png/spec/1.2/png-1.2.pdf
 
-#include <fstream>
-#include <algorithm>
-#include <string>
-
-extern "C" {
-//#include "tiff.h"
-}
-
 namespace boost { namespace gil {
 
 

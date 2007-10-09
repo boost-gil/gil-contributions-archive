@@ -21,10 +21,6 @@
 #include <algorithm>
 #include <string>
 
-extern "C" {
-//#include "tiff.h"
-}
-
 namespace boost { namespace gil {
 
 } // namespace gil

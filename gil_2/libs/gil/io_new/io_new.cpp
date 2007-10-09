@@ -456,7 +456,7 @@ void write_test()
       gray1_image_t src( 100, 100 );
       fill_pixels( view( src ), gray1_pixel_t( 0 ));
 
-      tiff_image_write_info info;
+      basic_tiff_image_write_info info;
       info._photometric_interpretation = PHOTOMETRIC_MINISBLACK;
       info._compression                = COMPRESSION_LZW;
       info._orientation                = ORIENTATION_TOPLEFT;

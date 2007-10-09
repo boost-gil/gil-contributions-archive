@@ -38,8 +38,8 @@ template<> struct photometric_interpretation< rgb_t  > : public boost::mpl::int_
 template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
 template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
 
-// @todo tiff_file_t is not defined nor forward declared. 
-// You should either include tiff_base or forward declare...
+
+typedef boost::shared_ptr<TIFF> tiff_file_t;
 
 inline
 tiff_file_t tiff_open_for_read( const std::string& file_name )
