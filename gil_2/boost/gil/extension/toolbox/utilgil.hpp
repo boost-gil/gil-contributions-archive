@@ -28,6 +28,31 @@ struct make_alpha_blend
 	}
 };
 
+template <unsigned long hex_>
+struct rgbhex
+{
+	static const unsigned long hex = hex_;
+	typedef boost::gil::rgb8_pixel_t pixel_t;
+	pixel_t pixel;
+
+	rgbhex()
+	{
+		using namespace boost::gil;
+		int red = static_cast<bits8>((hex & 0xFF0000) >> 16);
+		int green = static_cast<bits8>((hex & 0x00FF00) >> 8);
+		int blue = static_cast<bits8>(hex & 0x0000FF);
+		pixel = pixel_t(red,green,blue);
+	}
+
+	template <typename view_t>
+	void operator()(const view_t& view, int x, int y, int a=255)
+	{
+		pixel_t dst = pixel;
+		boost::gil::static_for_each(dst, view(x,y), make_alpha_blend(a));
+		view(x,y) = dst;
+	}
+};
+
 struct color
 {
 	typedef boost::gil::rgb8_pixel_t pixel_t;
@@ -285,31 +310,6 @@ struct diagonal_gradient
 		pixel_t dst = tpix;
 		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
 		view(x,y) = dst;
-	}
-};
-
-struct make_balanced_interval
-{
-	int r,adj,pos;
-	make_balanced_interval(int width, int size)  : pos(0)
-	{
-		BOOST_ASSERT(size >= 1);
-		r = (width-1)%size,
-		adj = (width-1)/size;
-	}
-		
-	int operator()(int in)
-	{
-		int out = pos;
-		pos += adj;
-
-		if (r)
-		{
-			pos++;
-			r--;
-		}
-
-		return out;
 	}
 };
 

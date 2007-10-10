@@ -27,12 +27,8 @@ struct glyph
 {
 	typedef boost::function<void (boost::gil::rgb8_view_t,int,int,int)> function_t;
 
-	glyph(char ch, 
-		FT_Face face, 
-		function_t function=black_t()) :
-		ch(ch), 
-		face(face), 
-		function(function){}
+	glyph(char ch, FT_Face face, function_t function=black_t()) :
+		ch(ch), face(face), function(function){}
 
 	char ch;
 	FT_Face face;
