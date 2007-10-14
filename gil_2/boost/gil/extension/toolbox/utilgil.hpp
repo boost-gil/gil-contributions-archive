@@ -178,6 +178,7 @@ struct vertical_gradient
 	}
 };
 
+//TODO: improve this
 template <typename rgb_t, typename rgb2_t, int stop>
 struct vertical_gradient_stop
 {
@@ -188,6 +189,7 @@ struct vertical_gradient_stop
 
 	vertical_gradient_stop()
 	{
+		//TODO: ugly
 		fpix = rgb_t().pixel;
 		tpix = rgb2_t().pixel;
 	}
@@ -244,49 +246,7 @@ struct vertical_gradient_stop
 	}
 };
 
-template <typename rgb_t, typename rgb2_t, std::size_t size>
-struct balanced_gradient
-{
-	bool up;
-	int a;
-
-	typedef boost::gil::rgb8_pixel_t pixel_t;
-	pixel_t fpix,tpix;
-
-	balanced_gradient()
-	{
-		fpix = rgb_t().pixel;
-		tpix = rgb2_t().pixel;
-	}
-
-	template <typename view_t>
-	void operator()(const view_t& view, int x, int y, int unused=255)
-	{
-		double perc = a/boost::numeric_cast<double>(size);
-		int alpha = boost::numeric_cast<int>(perc*255);
-
-		pixel_t dst = fpix;
-		boost::gil::static_for_each(dst, tpix, make_alpha_blend(alpha));
-		view(x,y) = dst;
-		
-		if (up)
-		{
-			a++;
-			if (a == size)
-				up = false;
-		}
-		else
-		{
-			a--;
-			if (a < 0)
-			{
-				a = 0;
-				up = true;
-			}
-		}
-	}
-};
-
+//TODO: broken
 template <typename rgb_t, typename rgb2_t>
 struct diagonal_gradient
 {
@@ -310,157 +270,6 @@ struct diagonal_gradient
 		pixel_t dst = tpix;
 		boost::gil::static_for_each(dst, fpix, make_alpha_blend(alpha));
 		view(x,y) = dst;
-	}
-};
-
-template <typename view_t, typename pixel_t>
-inline void wuline(const view_t& view, pixel_t pixel,
-	int X0, int Y0, int X1, int Y1,
-	int NumLevels = 256, int IntensityBits=8)
-{
-	using namespace boost::gil;
-
-	unsigned short IntensityShift, ErrorAdj, ErrorAcc;
-	unsigned short ErrorAccTemp, Weighting, WeightingComplementMask;
-	short DeltaX, DeltaY, Temp, XDir;
-	pixel_t pixel_saved = pixel;
-	
-	if (Y0 > Y1) 
-	{
-  		Temp = Y0; 
-		Y0 = Y1; 
-		Y1 = Temp;
-  		Temp = X0; 
-		X0 = X1; 
-		X1 = Temp;
-	}
-
-	view(X0,Y0) = pixel;
-
-	if ((DeltaX = X1 - X0) >= 0) 
-	{
-  		XDir = 1;
-	} 
-	else 
-	{
-		XDir = -1;
-		DeltaX = -DeltaX; 
-	}
-
-	if ((DeltaY = Y1 - Y0) == 0) 
-	{
-  		while (DeltaX-- != 0) 
-		{
-			X0 += XDir;
-			view(X0,Y0) = pixel;
-  		}
-      		
-		return;
-	}
-	
-	if (DeltaX == 0) 
-	{
-		do 
-		{
-			Y0++;
-			view(X0,Y0) = pixel;
-		} 
-		while (--DeltaY != 0);
-
-		return;
-	}
-
-	if (DeltaX == DeltaY) 
-	{
-		do 
-		{
-			X0 += XDir;
-			Y0++;
-			view(X0,Y0) = pixel;
-		} 
-		while (--DeltaY != 0);
-
-		return;
-	}
-
-	ErrorAcc = 0;  
-	IntensityShift = 16 - IntensityBits;
-	WeightingComplementMask = NumLevels - 1;
-
-	if (DeltaY > DeltaX) 
-	{
-		ErrorAdj = ((unsigned long) DeltaX << 16) / (unsigned long) DeltaY;
-
-      		while (--DeltaY) 
-		{
-			ErrorAccTemp = ErrorAcc;   
-			ErrorAcc += ErrorAdj;     
-         	
-			if (ErrorAcc <= ErrorAccTemp) 
-				X0 += XDir;
-         		
-			Y0++;
-
-			Weighting = ErrorAcc >> IntensityShift;
-	
-			pixel = pixel_saved;
-			static_for_each(pixel,view(X0,Y0), 
-				make_alpha_blend((Weighting ^ WeightingComplementMask)));
-			view(X0,Y0) = pixel;
-
-			pixel = pixel_saved;
-			static_for_each(pixel,view(X0 + XDir, Y0), make_alpha_blend(Weighting));
-			view(X0 + XDir, Y0) = pixel;
-  		}
-
-		view(X1,Y1) = pixel;
-		return;
-	}
-
-	ErrorAdj = ((unsigned long) DeltaY << 16) / (unsigned long) DeltaX;
-	while (--DeltaX) 
-	{
-		ErrorAccTemp = ErrorAcc;   
-		ErrorAcc += ErrorAdj;     
-      		
-		if (ErrorAcc <= ErrorAccTemp) 
-			Y0++;
-
-		X0 += XDir; 
-      		
-		Weighting = ErrorAcc >> IntensityShift;
-
-		pixel = pixel_saved;
-		static_for_each(pixel,view(X0,Y0), 
-			make_alpha_blend(Weighting ^ WeightingComplementMask));
-		view(X0,Y0) = pixel;
-	
-		pixel = pixel_saved;
-		static_for_each(pixel,view(X0, Y0 + 1), make_alpha_blend(Weighting));
-		view(X0,Y0+1) = pixel;
-	}
-
-	view(X1,Y1) = pixel_saved;
-}
-
-template <typename view_t>
-struct draw_wuline
-{
-	typedef typename view_t::value_type value_type;
-	const view_t& view;
-	value_type pixel;
-	draw_wuline(const view_t& view, const value_type& pixel) : 
-		view(view),pixel(pixel) {}
-
-	void operator()(int x, int y, int x1, int y1)
-	{
-		wuline(view,pixel,x,y,x1,y1);
-	}
-
-	template <typename point_t>
-	void operator()(point_t pt0, point_t pt1)
-	{
-		wuline(view,pixel,pt0.x,pt0.y,pt1.x,pt1.y);
 	}
 };
 
@@ -727,8 +536,17 @@ struct shift_polygon
 	}	
 };
 
+template <typename pixel_t, typename view_t>
+void fill(const view_t& view)
+{
+	pixel_t pixel;	
+	for (int x = 0; x < view.width(); ++x)
+		for (int y = 0; y < view.height(); ++y)
+			pixel(view,x,y);
+}
+
 template <typename pixel_t, typename view_t, typename polygon_t>
-void fill_polygon(const view_t& view, const polygon_t& polygon)
+void fill(const view_t& view, const polygon_t& polygon)
 {
 	int left,right,top,bottom;
 	std::for_each(polygon.begin(),polygon.end(),
@@ -748,16 +566,5 @@ void fill_polygon(const view_t& view, const polygon_t& polygon)
 			if (point_in(x,y))
 				pixel(view2,x,y);
 }
-
-
-typedef rgb<0,0,0> black_t;
-typedef rgb<255,255,255> white_t;
-typedef rgb<219,219,112> goldenrod_t;
-typedef rgb<235,240,240> yellowgreen_t;
-typedef rgb<80,80,80> dark_gray_t;
-typedef rgb<150,150,150> medium_gray_t;
-typedef rgb<225,225,225> light_gray_t;
-typedef rgb<145,155,118> army_green_t;
-typedef rgb<40,40,40> black_gray_t;
 
 #endif

@@ -43,6 +43,13 @@ _Fn1 for_each(_InIt _First, _InIt _Last, _InIt2 _First2, _InIt3 _First3, _InIt4 
 	return (_Func);
 }
 
+template<typename _InIt, typename _InIt2, typename _InIt3, typename _InIt4, typename _InIt5, typename _Fn1> inline
+_Fn1 for_each(_InIt _First, _InIt _Last, _InIt2 _First2, _InIt3 _First3, _InIt4 _First4, _InIt5 _First5, _Fn1 _Func)
+{	
+	for (; _First != _Last; ++_First,++_First2,++_First3,++_First4,++_First5)
+		_Func(*_First, *_First2, *_First3, *_First4, *_First5);
+	return (_Func);
+}
 template<typename out_t, typename _UnaryOperation> inline
 void transform(std::string str, out_t out, _UnaryOperation __unary_op)
 {
