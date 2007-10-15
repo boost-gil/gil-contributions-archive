@@ -31,7 +31,7 @@ jpeg_file_t jpeg_open_for_read( const std::string& file_name )
    io_error_if( ( file = fopen( file_name.c_str(), "r" )) == NULL
               , "file_mgr: failed to open file" );
 
-   return jpeg_file_t( tiff, fclose );
+   return jpeg_file_t( file, fclose );
 }
 
 inline
@@ -54,6 +54,67 @@ inline
 jpeg_file_t jpeg_open_for_write( const std::wstring& file_name )
 {
    return jpeg_open_for_write( convert_to_string( file_name ));
+}
+
+struct jpeg_decompress_mgr
+{
+   jpeg_decompress_mgr( jpeg_file_t file )
+   {
+      _cinfo.err = jpeg_std_error( &_jerr );
+
+      jpeg_create_decompress( &_cinfo              );
+      jpeg_stdio_src        ( &_cinfo, _file.get() );
+      jpeg_read_header      ( &_cinfo, TRUE        );
+      
+      
+      if( jpeg_start_decompress( &_cinfo ) == false )
+      {
+         io_error( "Cannot start decompression." );
+      }
+   }
+
+   ~jpeg_decompress_mgr()
+   {
+      jpeg_finish_decompress ( &_cinfo );
+      jpeg_destroy_decompress( &_cinfo );
+   }
+
+   const jpeg_decompress_struct& get() const
+   {
+      return _cinfo;
+   }
+
+private:
+
+   jpeg_decompress_struct _cinfo;
+   jpeg_error_mgr         _jerr;
+}
+
+struct jpeg_compress_mgr
+{
+   jpeg_compress_mgr( jpeg_file_t file )
+   {
+      _cinfo.err = jpeg_std_error( &_jerr );
+
+      jpeg_create_compress( &_cinfo             );
+      jpeg_stdio_dest     ( &_cinfo, file.get() );
+   }
+
+   ~jpeg_compress_mgr()
+   {
+      jpeg_finish_compress ( &_cinfo );
+      jpeg_destroy_compress( &_cinfo );
+   }
+
+   jpeg_compress_struct& get()
+   {
+      return _cinfo;
+   }
+
+private:
+
+   jpeg_compress_struct _cinfo;
+   jpeg_error_mgr       _jerr;
 }
 
 } // namespace details

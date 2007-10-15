@@ -38,13 +38,16 @@ namespace boost { namespace gil {
 
 struct basic_jpeg_image_read_info
 {
-   tiff_image_width::type  _width;
-   tiff_image_height::type _height;
+   jpeg_image_width::type  _width;
+   jpeg_image_height::type _height;
+
+   jpeg_num_components::type _num_components;
+   jpeg_color_space::type    _color_space;
 };
 
 struct basic_jpeg_image_write_info
 {
-   // @todo: add quality tag
+   jpeg_quality::type _quality;
 };
 
 } // namespace gil
@@ -53,16 +56,6 @@ struct basic_jpeg_image_write_info
 #include <boost/gil/extension/io_new/jpeg_io_private.hpp>
 
 namespace boost { namespace gil {
-
-/// \ingroup JPEG_IO
-/// \brief Returns the a tiff property.
-/// Will throw when file_name is invalid.
-template< typename String, typename Property>
-inline
-bool get_property( const String& file_name, typename Property::type& value, const jpeg_tag& tag )
-{
-   return detail::get_property<Property>( file_name, value, tag );
-}
 
 /// \ingroup JPEG_IO
 /// \brief Returns the image info for generating a gil image type.
