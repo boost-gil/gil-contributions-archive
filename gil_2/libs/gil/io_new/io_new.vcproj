@@ -157,6 +157,9 @@
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io_private.hpp">
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_supported_read_types.hpp">
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_tags.hpp">
 			</File>
 			<File

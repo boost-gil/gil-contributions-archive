@@ -142,7 +142,6 @@ private:
    template< typename Image_TIFF
            , typename View_User
            >
-   inline
    void read( const View_User&                  src_view
             , const point_t&                    top_left
             , const basic_tiff_image_read_info& info
@@ -162,7 +161,6 @@ private:
    template< typename Image_TIFF
            , typename View_User
            >
-   inline
    void read( const View_User&                  src_view
             , const point_t&                    top_left
             , const basic_tiff_image_read_info& info
@@ -216,12 +214,12 @@ struct read_and_convert
    {
       typedef typename Image_TIFF::view_t View_TIFF;
 
-      read_and_convert_impl< Image_TIFF >( src_view
-                                         , top_left
-                                         , _cc
-                                         , info
-                                         , _file
-                                         , is_planar< View_TIFF >() );
+      read_impl< Image_TIFF >( src_view
+                             , top_left
+                             , _cc
+                             , info
+                             , _file
+                             , is_planar< View_TIFF >() );
    }
 
 private:
@@ -231,19 +229,17 @@ private:
            , typename View_User
            , typename Color_Converter
            >
-   inline
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , Color_Converter                   cc
-            , const basic_tiff_image_read_info& info
-            , tiff_file_t                       file
-            , boost::mpl::false_   /* is_planar */         )
+   void read_impl( const View_User&                  src_view
+                 , const point_t&                    top_left
+                 , Color_Converter                   cc
+                 , const basic_tiff_image_read_info& info
+                 , boost::mpl::false_   /* is_planar */         )
    {
       read_interleaved_data_and_convert< Image_TIFF >( src_view
-                                                   , top_left
-                                                   , cc
-                                                   , info
-                                                   , file       );
+                                                     , top_left
+                                                     , cc
+                                                     , info
+                                                     , _file     );
    };
 
    // read and convert planar images.
@@ -251,13 +247,11 @@ private:
            , typename View_User
            , typename Color_Converter
            >
-   inline
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , Color_Converter                   cc
-            , const basic_tiff_image_read_info& info
-            , tiff_file_t                       file
-            , boost::mpl::true_   /* is_planar */         )
+   void read_impl( const View_User&                  src_view
+                 , const point_t&                    top_left
+                 , Color_Converter                   cc
+                 , const basic_tiff_image_read_info& info
+                 , boost::mpl::true_   /* is_planar */         )
    {
       typedef typename Image_TIFF::view_t      view_tiff_t;
       typedef typename view_tiff_t::value_type pixel_tiff_t;
@@ -267,7 +261,7 @@ private:
       plane_recursion< num_channels< view_tiff_t >::value - 1 >::read_plane( view( tiff_img )
                                                                            , top_left
                                                                            , info
-                                                                           , file               );
+                                                                           , _file            );
 
       transform_pixels( view( tiff_img )
                       , src_view
@@ -411,6 +405,7 @@ private:
       {
          case 1:
          {
+            /// @todo private function name don't have underscore prefix
             _read_bits_per_sample< gray_layout_t >( src_view );
             break;
          }

@@ -71,6 +71,8 @@ struct jpeg_decompress_mgr
       {
          io_error( "Cannot start decompression." );
       }
+
+      io_error_if( _cinfo.data_precision != 8, "Image file is not supported." );
    }
 
    ~jpeg_decompress_mgr()
@@ -116,6 +118,7 @@ private:
    jpeg_compress_struct _cinfo;
    jpeg_error_mgr       _jerr;
 }
+
 
 } // namespace details
 } // namespace gil
