@@ -20,6 +20,19 @@ typedef boost::mpl::map<
 ,	 boost::mpl::pair<gil::bits32s	,  boost::mpl::int_<IPL_DEPTH_32S> >
     > ipl_depth_map_from_channel_t_map;
 
+struct undefined {};
+
+// I'm using a tyedef instead of a static constant so we can have
+// type safety and generate an exception when we need to.
+template < typename Depth > struct ipl_depth_type { typedef undefined type; };
+struct ipl_depth_type< gil::bits8 >   { typedef boost::mpl::int_<IPL_DEPTH_8U>  type; };
+struct ipl_depth_type< gil::bits16 >  { typedef boost::mpl::int_<IPL_DEPTH_16U> type; };
+struct ipl_depth_type< gil::bits32f > { typedef boost::mpl::int_<IPL_DEPTH_32F> type; };
+struct ipl_depth_type< double >       { typedef boost::mpl::int_<IPL_DEPTH_64F> type; };
+struct ipl_depth_type< gil::bits8s >  { typedef boost::mpl::int_<IPL_DEPTH_8S>  type; };
+struct ipl_depth_type< gil::bits16s > { typedef boost::mpl::int_<IPL_DEPTH_16S> type; };
+struct ipl_depth_type< gil::bits32s > { typedef boost::mpl::int_<IPL_DEPTH_32S> type; };
+
 
 typedef boost::mpl::map<
 	 boost::mpl::pair<gil::gray_t	,  boost::mpl::int_<1> >
@@ -53,8 +66,7 @@ ipl_image_wrapper create_ipl_image( VIEW view )
    IplImage* img;
 
    img = cvCreateImageHeader( make_cvSize( view.dimensions() )
-		                      , boost::mpl::at< ipl_depth_map_from_channel_t_map
-                                            , channel_t>::type::value
+		                      , ipl_depth_type<channel_t>::type::value
                             , boost::mpl::at< ipl_nchannels_from_gil_color_space_map
                                             , color_space_t>::type::value             );
 
