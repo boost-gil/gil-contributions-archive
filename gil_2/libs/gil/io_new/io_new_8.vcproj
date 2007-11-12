@@ -40,12 +40,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\gil\gil_2"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="C:\gil\gil_2;c:\boost;C:\Program Files\GnuWin32\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
@@ -61,9 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib $(NoInherit) libtiff.lib"
+				AdditionalDependencies="kernel32.lib $(NoInherit) libtiff.lib jpeg.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib"
+				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib;C:\boost\stage\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -183,6 +183,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\jpeg_read_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\read_test.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 			</File>
@@ -197,11 +213,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_base.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io_private.hpp"
 				>
 			</File>
 			<File
+				RelativePath=".\jpeg_read_test.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_supported_read_types.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_tags.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\png_io_private.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\read_test.hpp"
 				>
 			</File>
 			<File
@@ -239,43 +279,43 @@
 			Name="old"
 			>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\dynamic_io.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\dynamic_io.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\io_error.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\io_error.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\jpeg_dynamic_io.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\jpeg_dynamic_io.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\jpeg_io.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\jpeg_io_private.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io_private.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\png_dynamic_io.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\png_dynamic_io.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\png_io.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\png_io.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\png_io_private.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\png_io_private.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\tiff_dynamic_io.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\tiff_dynamic_io.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\boost_1.34\boost\gil\extension\io\tiff_io.hpp"
+				RelativePath="..\..\..\..\..\boost\boost\gil\extension\io\tiff_io.hpp"
 				>
 			</File>
 		</Filter>

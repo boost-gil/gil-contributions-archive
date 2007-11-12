@@ -59,25 +59,29 @@ protected:
    void read( const View_User&                  src_view
             , const point_t&                    top_left
             , const basic_jpeg_image_read_info& info
-            , boost::mpl::false_                               )
+            , boost::mpl::false_                          )
    {
-      typedef typename Image_JPEG::view_t      view_tiff_t;
-      typedef typename view_tiff_t::value_type pixel_tiff_t;
+      typedef typename Image_JPEG::view_t view_jpeg_t;
+      typedef typename view_jpeg_t::value_type pixel_t;
 
-      io_error_if( views_are_compatible<View_User, view_tiff_t>::value != true
+      io_error_if( views_are_compatible<View_User, view_jpeg_t>::value != true
                  , "Views are incompatible. You might want to use read_and_convert_image()" );
 
-      std::vector< typename Image_JPEG::view_t::value_type > row( src_view.width() );
-      JSAMPLE* row_address = (JSAMPLE*) &row.front();
+      typedef std::vector< view_jpeg_t::value_type > buffer_t;
+      buffer_t buffer( src_view.width() );
+
+      JSAMPLE* row_address = reinterpret_cast<JSAMPLE*>( &buffer.front() );
 
       jpeg_decompress_mgr mgr( _file );
 
-      for( int y=0; y < src_view.height(); ++y )
+      for( int y = 0; y < src_view.height(); ++y )
       {
-         io_error_if( jpeg_read_scanlines( &mgr.get(), (JSAMPARRAY) &row_address, 1 ) != 1
-                    , "jpeg_reader::apply(): fail to read JPEG file"                    );
+         io_error_if( jpeg_read_scanlines( &mgr.get()
+                                         , (JSAMPARRAY) &row_address
+                                         , 1 ) != 1
+                    , "jpeg_reader::apply(): fail to read JPEG file" );
 
-         std::copy( row.begin(), row.end(), src_view.row_begin( y ));
+         //std::copy( buffer.begin(), buffer.end(), src_view.row_begin( y ));
       }
    }
 
@@ -206,21 +210,19 @@ private:
       {
          case JCS_GRAYSCALE:
          {
-            num_components< gray_layout_t >( src_view );
+            //num_components< gray_layout_t >( src_view );
             break;
          }
          
          case JCS_RGB:
          {
             num_components< rgb_layout_t >( src_view );
-
             break;
          }
 
          case JCS_CMYK:
          {
-            num_components< cmyk_layout_t >( src_view );
-
+            //num_components< cmyk_layout_t >( src_view );
             break;
          }
 
@@ -240,22 +242,19 @@ private:
       {
          case 1:
          {
-            read_image< 1, Layout >( src_view );
-
+            //read_image< 1, Layout >( src_view );
             break;
          }
 
          case 3:
          {
             read_image< 3, Layout >( src_view );
-
             break;
          }
 
          case 4:
          {
-            read_image< 4, Layout >( src_view );
-
+            //read_image< 4, Layout >( src_view );
             break;
          }
 
@@ -276,7 +275,6 @@ private:
       typedef image_type_factory< NumComponents, Layout >::type image_t;
 
       typedef is_same< image_t, not_allowed_t >::type unspecified_t;
-
 
       read< image_t >( src_view
                      , _top_left

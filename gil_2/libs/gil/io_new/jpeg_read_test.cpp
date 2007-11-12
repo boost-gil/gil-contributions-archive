@@ -15,10 +15,10 @@ void read_test_impl( const String& file_name )
    read_image( file_name, src, jpeg_tag() );
 }
 
-void basic_read_test()
+void basic_jpeg_read_test()
 {
    {
-      string file_name( ".\\test_images\\jpeg\\test_.jpg" );
+      string file_name( ".\\test_images\\jpeg\\test.jpg" );
       read_test_impl<rgb8_image_t>( file_name );
    }
 }

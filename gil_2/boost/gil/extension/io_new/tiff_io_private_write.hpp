@@ -135,7 +135,7 @@ public:
 
       // write the data
       std::size_t row_size_in_bytes = (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8;
-      row_size_in_bytes -= top_left.x * samples_per_pixel * bits_per_sample + 7) / 8;
+      row_size_in_bytes -= ( top_left.x * samples_per_pixel * bits_per_sample + 7 ) / 8;
 
       std::vector< unsigned char > row( row_size_in_bytes );
 
