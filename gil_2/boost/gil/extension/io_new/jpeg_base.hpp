@@ -47,7 +47,7 @@ jpeg_file_t jpeg_open_for_write( const std::string& file_name )
    io_error_if( ( file = fopen( file_name.c_str(), "w" )) == NULL
               , "file_mgr: failed to open file" );
 
-   return jpeg_file_t( tiff, fclose );
+   return jpeg_file_t( file, fclose );
 }
 
 inline
@@ -62,9 +62,9 @@ struct jpeg_decompress_mgr
    {
       _cinfo.err = jpeg_std_error( &_jerr );
 
-      jpeg_create_decompress( &_cinfo              );
-      jpeg_stdio_src        ( &_cinfo, _file.get() );
-      jpeg_read_header      ( &_cinfo, TRUE        );
+      jpeg_create_decompress( &_cinfo             );
+      jpeg_stdio_src        ( &_cinfo, file.get() );
+      jpeg_read_header      ( &_cinfo, TRUE       );
       
       
       if( jpeg_start_decompress( &_cinfo ) == false )
@@ -86,11 +86,16 @@ struct jpeg_decompress_mgr
       return _cinfo;
    }
 
+   jpeg_decompress_struct& get()
+   {
+      return _cinfo;
+   }
+
 private:
 
    jpeg_decompress_struct _cinfo;
    jpeg_error_mgr         _jerr;
-}
+};
 
 struct jpeg_compress_mgr
 {
@@ -117,7 +122,7 @@ private:
 
    jpeg_compress_struct _cinfo;
    jpeg_error_mgr       _jerr;
-}
+};
 
 
 } // namespace details

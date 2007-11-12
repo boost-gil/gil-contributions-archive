@@ -122,7 +122,16 @@
 				RelativePath=".\io_new.cpp">
 			</File>
 			<File
+				RelativePath=".\jpeg_read_test.cpp">
+			</File>
+			<File
 				RelativePath=".\read_test.cpp">
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp">
@@ -155,6 +164,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io_private.hpp">
+			</File>
+			<File
+				RelativePath=".\jpeg_read_test.hpp">
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_supported_read_types.hpp">

@@ -22,6 +22,6 @@ struct eval_to
    }
 };
 
-void basic_read_test();
+void basic_jpeg_read_test();
 
 #endif // READ_TEST_HPP

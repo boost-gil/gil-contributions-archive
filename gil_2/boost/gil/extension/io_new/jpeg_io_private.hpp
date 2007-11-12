@@ -32,7 +32,7 @@ void read_image_info_impl( const jpeg_decompress_mgr   mgr
 {
    info._width          = mgr.get().image_width;
    info._height         = mgr.get().image_height;
-   info._num_components = mgr.get().input_components;
+   info._num_components = mgr.get().num_components;
    info._color_space    = mgr.get().out_color_space;
 }
 
@@ -40,7 +40,7 @@ inline
 void read_image_info( jpeg_file_t                 file
                     , basic_jpeg_image_read_info& info )
 {
-   jpeg_decompress_mgr mgr;
+   jpeg_decompress_mgr mgr( file );
 
    read_image_info_impl( mgr, info );
 }
@@ -53,32 +53,35 @@ struct read_and_no_convert
 
 protected:
 
-   template< typename Image_TIFF
+   template< typename Image_JPEG
            , typename View_User
            >
    void read( const View_User&                  src_view
             , const point_t&                    top_left
             , const basic_jpeg_image_read_info& info
-            , boost::mpl::false_                            )
+            , boost::mpl::false_                               )
    {
-      typedef typename Image_TIFF::view_t      view_tiff_t;
+      typedef typename Image_JPEG::view_t      view_tiff_t;
       typedef typename view_tiff_t::value_type pixel_tiff_t;
 
       io_error_if( views_are_compatible<View_User, view_tiff_t>::value != true
                  , "Views are incompatible. You might want to use read_and_convert_image()" );
 
+      std::vector< typename Image_JPEG::view_t::value_type > row( src_view.width() );
       JSAMPLE* row_address = (JSAMPLE*) &row.front();
 
-      for( int y=0; y<view.height(); ++y )
-      {
-         io_error_if( jpeg_read_scanlines(& _cinfo, (JSAMPARRAY) &row_address, 1 )!=1
-                    , "jpeg_reader::apply(): fail to read JPEG file"                   );
+      jpeg_decompress_mgr mgr( _file );
 
-         std::copy( row.begin(), row.end(), view.row_begin( y ));
+      for( int y=0; y < src_view.height(); ++y )
+      {
+         io_error_if( jpeg_read_scanlines( &mgr.get(), (JSAMPARRAY) &row_address, 1 ) != 1
+                    , "jpeg_reader::apply(): fail to read JPEG file"                    );
+
+         std::copy( row.begin(), row.end(), src_view.row_begin( y ));
       }
    }
 
-   template< typename Image_TIFF
+   template< typename Image_JPEG
            , typename View_User
            >
    void read( const View_User&                  src_view
@@ -108,20 +111,23 @@ struct read_and_convert
 
 protected:
 
-   template< typename Image_TIFF
+   template< typename Image_JPEG
            , typename View_User
            >
    void read( const View_User&                  src_view
             , const point_t&                    top_left
             , const basic_jpeg_image_read_info& info
+            , const jpeg_decompress_struct&     decompress_mgr
             , boost::mpl::false_                            )
    {
       std::vector<gray8_pixel_t> row(view.width());
       JSAMPLE* row_address=(JSAMPLE*)&row.front();
 
+      jpeg_decompress_mgr mgr( _file );
+
       for(int y=0;y<view.height();++y)
       {
-         io_error_if( jpeg_read_scanlines( &_cinfo, (JSAMPARRAY) &row_address, 1 ) !=1
+         io_error_if( jpeg_read_scanlines( &mgr.get(), (JSAMPARRAY) &row_address, 1 ) !=1
                     , "jpeg_reader_color_covert::apply(): fail to read JPEG file"      );
 
          std::transform( row.begin()
@@ -133,7 +139,7 @@ protected:
       }
    }
 
-   template< typename Image_TIFF
+   template< typename Image_JPEG
            , typename View_User
            >
    void read( const View_User&                  src_view
@@ -157,7 +163,7 @@ class jpeg_reader : public Reader
 {
 public:
 
-   jpeg_reader( tiff_file_t file )
+   jpeg_reader( jpeg_file_t file )
    : Reader( file )
    {
       read_image_info( file, _info );
@@ -194,7 +200,7 @@ private:
    template< typename View >
    void apply_impl( const View& src_view )
    {
-      jpeg_decompress_mgr mgr;
+      jpeg_decompress_mgr mgr( _file );
 
       switch( _info._color_space )
       {
@@ -225,8 +231,8 @@ private:
       }
    }
 
-   template< typename View
-           , typename Layout
+   template< typename Layout
+           , typename View
            >
    void num_components( const View& src_view )
    {
@@ -234,28 +240,28 @@ private:
       {
          case 1:
          {
-            read_image< 1, Layout >( view );
+            read_image< 1, Layout >( src_view );
 
             break;
          }
 
          case 3:
          {
-            read_image< 3, Layout >( view );
+            read_image< 3, Layout >( src_view );
 
             break;
          }
 
          case 4:
          {
-            read_image< 4, Layout >( view );
+            read_image< 4, Layout >( src_view );
 
             break;
          }
 
          default:
          {
-            io_error( "Image file is not supported." )
+            io_error( "Image file is not supported." );
             break;
          }
       }
@@ -267,7 +273,10 @@ private:
            >
    void read_image( const View& src_view )
    {
-      typedef image_type_factory< NumComponents, Layout >::type image_t ;
+      typedef image_type_factory< NumComponents, Layout >::type image_t;
+
+      typedef is_same< image_t, not_allowed_t >::type unspecified_t;
+
 
       read< image_t >( src_view
                      , _top_left

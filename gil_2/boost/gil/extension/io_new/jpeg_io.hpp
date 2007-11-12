@@ -33,6 +33,7 @@ struct jpeg_tag {};
 
 
 #include <boost/gil/extension/io_new/base.hpp>
+#include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
 namespace boost { namespace gil {
 
