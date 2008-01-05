@@ -18,7 +18,7 @@ void jpeg_read_test_impl( const String& file_name )
 void basic_jpeg_read_test()
 {
    {
-      string file_name( ".\\test_images\\jpeg\\test.jpg" );
+      string file_name( ".\\test_images\\jpeg\\88.jpg" );
       jpeg_read_test_impl<rgb8_image_t>( file_name );
    }
 }

@@ -32,10 +32,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libtiff.lib jpeg.lib"
+				AdditionalDependencies="libtiff.lib libjpeg.lib"
 				OutputFile="$(OutDir)/io_new.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib"
+				AdditionalLibraryDirectories="&quot;.\my own libjpeg&quot;;C:\Program Files\GnuWin32\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/io_new.pdb"
 				SubSystem="1"
@@ -126,11 +126,6 @@
 			</File>
 			<File
 				RelativePath=".\read_test.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp">
