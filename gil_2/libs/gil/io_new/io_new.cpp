@@ -3,10 +3,9 @@
 
 #include "stdafx.h"
 
-
-#include "jpeg_read_test.hpp"
+#include "read_test.hpp"
 
 int main()
 {
-   basic_jpeg_read_test();
+   basic_read_test();
 }

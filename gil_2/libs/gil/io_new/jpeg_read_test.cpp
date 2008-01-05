@@ -9,7 +9,7 @@ using namespace gil;
 template< typename Image
         , typename String
         >
-void read_test_impl( const String& file_name )
+void jpeg_read_test_impl( const String& file_name )
 {
    Image src;
    read_image( file_name, src, jpeg_tag() );
@@ -19,6 +19,6 @@ void basic_jpeg_read_test()
 {
    {
       string file_name( ".\\test_images\\jpeg\\test.jpg" );
-      read_test_impl<rgb8_image_t>( file_name );
+      jpeg_read_test_impl<rgb8_image_t>( file_name );
    }
 }

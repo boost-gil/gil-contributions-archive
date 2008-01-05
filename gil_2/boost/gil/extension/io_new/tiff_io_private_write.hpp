@@ -27,17 +27,17 @@ public:
 };
 
 
-template< typename Channels
+template< typename Channel
         , typename Layout
         , bool Mutable
         >
 struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< uint8_t
-                                                                                                 , Channels
+                                                                                                 , Channel
                                                                                                  , Layout
                                                                                                  , Mutable
                                                                                                  > >
 	: public iterator_type_from_pixel< const bit_aligned_pixel_reference< uint8_t
-	                                                                    , Channels
+	                                                                    , Channel
 	                                                                    , Layout
 	                                                                    , Mutable
 	                                                                    > 

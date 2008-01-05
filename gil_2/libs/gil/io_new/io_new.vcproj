@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libtiff.lib"
+				AdditionalDependencies="libtiff.lib jpeg.lib"
 				OutputFile="$(OutDir)/io_new.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib"
@@ -127,8 +127,7 @@
 			<File
 				RelativePath=".\read_test.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="TRUE">
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"/>
 				</FileConfiguration>
