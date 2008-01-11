@@ -10,7 +10,7 @@ using namespace boost;
 using namespace gil;
 using namespace sdl;
 
-int main( int argc, char* argv[] )
+int _tmain( int argc, char* argv[] )
 {
    typedef sdl_window<> window_t;
    typedef shared_ptr< window_t > window_ptr_t;
