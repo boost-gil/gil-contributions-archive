@@ -4,7 +4,7 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/gil/extension/io_new_2/io.hpp>
 #include <boost/gil/extension/io_new_2/png.hpp>
-#include <boost/gil/extension/io_new_2/jpeg.hpp>
+//#include <boost/gil/extension/io_new_2/jpeg.hpp>
 #include <boost/gil/gil_all.hpp>
 #include <iterator>
 #include <algorithm>
@@ -36,12 +36,12 @@ int main(int argc, char *argv[])
 
     {
         rgb8_image_t image;
-        read_image( "test\\test.png", image, png_tag());
+        read_image( "test\\chh.PNG", image, png_tag());
     }
 
     {
-        rgb8_image_t image;
-        read_image( "test\\test.jpeg", image, jpeg_tag());
+        //rgb8_image_t image;
+        //read_image( "test\\test.jpeg", image, jpeg_tag());
     }
 
     return 0;

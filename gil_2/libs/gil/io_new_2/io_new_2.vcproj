@@ -61,9 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpng.lib libtiff.lib jpeg.lib"
+				AdditionalDependencies="zlib.lib libpng.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
