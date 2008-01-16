@@ -29,14 +29,14 @@ public:
     file_stream_device( std::string const& file_name, read_tag )
         : file(0),_close(true)
     {
-        io_error_if( ( file = fopen( file_name.c_str(), "r" )) == NULL
+        io_error_if( ( file = fopen( file_name.c_str(), "rb" )) == NULL
                 , "file_stream_device: failed to open file" );
     }
 
     file_stream_device( std::string const& file_name, write_tag )
         : file(0),_close(true)
     {
-        io_error_if( ( file = fopen( file_name.c_str(), "w" )) == NULL
+        io_error_if( ( file = fopen( file_name.c_str(), "wb" )) == NULL
                 , "file_stream_device: failed to open file" );
     }
 
