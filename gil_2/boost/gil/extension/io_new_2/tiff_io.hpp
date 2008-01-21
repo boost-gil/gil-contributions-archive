@@ -25,217 +25,147 @@ extern "C" {
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace boost { namespace gil {
-
-struct tiff_tag {};
-
-} // namespace gil
-} // namespace boost
-
+#include <boost/gil/extension/io_new_2/detail/base.hpp>
 
 #include <boost/gil/extension/io_new_2/base.hpp>
 #include <boost/gil/extension/io_new_2/tiff_tags.hpp>
-
-namespace boost { namespace gil {
-
-struct basic_tiff_image_read_info
-{
-   tiff_image_width::type  _width;
-   tiff_image_height::type _height;
-
-   tiff_compression::type _compression;
-
-   tiff_bits_per_sample::type   _bits_per_sample;
-   tiff_samples_per_pixel::type _samples_per_pixel;
-   tiff_sample_format::type     _sample_format;
-
-   tiff_planar_configuration::type _planar_configuration;
-
-   tiff_photometric_interpretation::type _photometric_interpretation;
-};
-
-struct basic_tiff_image_write_info
-{
-   tiff_photometric_interpretation::type _photometric_interpretation;
-   tiff_compression::type                _compression;
-   tiff_orientation::type                _orientation;
-   tiff_planar_configuration::type       _planar_configuration;
-};
-
-} // namespace gil
-} // namespace boost
-
 #include <boost/gil/extension/io_new_2/tiff_io_private.hpp>
 
 namespace boost { namespace gil {
 
-/// \ingroup TIFF_IO
-/// \brief Returns the a tiff property.
-/// Will throw when file_name is invalid.
-template< typename String, typename Property>
-inline
-bool get_property( const String& file_name, typename Property::type& value, const tiff_tag& tag )
+template< typename Device
+        , typename ConversionPolicy
+        >
+struct reader< Device
+             , tiff_tag
+             , ConversionPolicy > 
 {
-   return detail::get_property<Property>( file_name, value, tag );
-}
+public:
 
-/// \ingroup TIFF_IO
-/// \brief Returns the image info for generating a gil image type.
-template< typename String >
-inline
-basic_tiff_image_read_info read_image_info( const String& file_name, tiff_tag )
+   reader( Device& device )
+   {}
+
+   reader( Device&                                                device
+         , typename const ConversionPolicy::color_converter_type& cc     )
+   : _cc_policy( cc )
+   {
+   }
+
+   image_read_info<tiff_tag> get_info()
+   {
+      image_read_info<tiff_tag> ret = {0};
+      return ret;
+   }
+
+    template< typename Image >
+    void read_image( Image&         image
+                   , const point_t& top_left )
+    {
+        image_read_info<tiff_tag> info( get_info() );
+        image.recreate( info._width  - top_left.x
+                      , info._height - top_left.y );
+
+        apply_impl( view( image )
+                  , top_left
+                  , info          );
+    }
+
+    template<typename View>
+    void read_view( View&          view
+                  , const point_t& top_left )
+    {
+        image_read_info<tiff_tag> info( get_info() );
+        io_error_if( view.dimensions() !=  point_t( info._width  - top_left.x
+                                                  , info._height - top_left.y )
+                , "User provided view has incorrect size."                       );
+
+        apply_impl( view
+                  , top_left
+                  , info      );
+    }
+private:
+
+    template< typename View >
+    void apply_impl( View&                            view
+                   , const point_t&                   top_left
+                   , const image_read_info<tiff_tag>& info     )
+    {
+    }
+
+   template< typename ImagePixel
+         , typename View
+         >
+   void read_rows( View&          view
+               , const point_t& top_left )
+   {
+      io_error_if( ! ConversionPolicy::template is_allowed<ImagePixel,typename View::value_type>::type::value,
+               "User provided view has incorrect color space or channel type.");
+
+      std::vector<ImagePixel> buffer( view.width() );
+
+      for( int y = 0; y < view.height(); ++y )
+      {
+         cc_policy.read( buffer.begin() + top_left.x
+                        , buffer.end()
+                        , view.row_begin( y )          );
+      }
+   }
+
+    ConversionPolicy _cc_policy;
+};
+
+template < typename Device >
+struct writer< Device
+             , tiff_tag
+             > 
 {
-   basic_tiff_image_read_info info;
-   detail::read_image_info( detail::tiff_open_for_read( file_name )
-                          , info                                     );
+   writer( Device& file )
+   : _out(file)
+   {
+   }
 
-   return info;
-}
+   ~writer()
+   {
+   }
 
-/// \ingroup TIFF_IO
-template < typename String, typename Image > 
-inline
-void read_image( const String& file_name, Image& img, point_t top_left, tiff_tag )
-{
-   detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
-   reader.read_image( img, top_left );
-}
+   template<typename View>
+   void apply( const View&    view
+             , const point_t& top_left
+             , boost::mpl::true_       )
+   {
+      write_rows( view
+                , top_left );
+   }
 
-/// \ingroup TIFF_IO
-template < typename String, typename Image > 
-inline
-void read_image( const String& file_name, Image& img, const tiff_tag& tag )
-{
-   read_image( file_name, img, point_t( 0, 0 ), tag );
-}
+    template<typename View>
+    void apply( const View& view
+              , const point_t& top_left
+              , boost::mpl::false_      )
+    {
+        write_rows(view, top_left);
+    }
 
+    template<typename View>
+    void apply( const View&                       view
+              , const point_t&                    top_left
+              , const image_write_info<tiff_tag>& info      )
+    {
+        write_rows( view
+                  , top_left );
+    }
 
-/// \ingroup TIFF_IO
-template< typename String, typename View > 
-inline
-void read_view( const String& file_name, const View& v, point_t top_left, tiff_tag )
-{
-   detail::tiff_reader<detail::read_and_no_convert> reader( detail::tiff_open_for_read( file_name ));
-   reader.read_view( v, top_left );
-}
+private:
 
-/// \ingroup TIFF_IO
-/// \brief Loads the image specified by the given tiff image file name into the given view.
-template< typename String, typename View > 
-inline
-void read_view( const String&  file_name, const View& v, const tiff_tag& tag )
-{
-   read_view( file_name, v, point_t( 0, 0 ), tag );
-}
+    template< typename View >
+    void write_rows( const View&    view
+                   , const point_t& top_left )
+    {
+    }
 
-/// \ingroup TIFF_IO
-template< typename String, typename Image, typename Color_Converter >
-inline
-void read_and_convert_image(const String& file_name, Image& img, const point_t& top_left, Color_Converter cc, tiff_tag )
-{
-   typedef detail::read_and_convert< Color_Converter > reader_color_convert;
+    Device& _out;
+};
 
-   detail::tiff_reader<reader_color_convert> reader( detail::tiff_open_for_read( file_name ));
-   reader.set_color_converter( cc );
-
-   reader.read_image( img, top_left );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename Image, typename Color_Converter >
-inline
-void read_and_convert_image(const String& file_name, Image& img, Color_Converter cc, const tiff_tag& tag )
-{
-   read_and_convert_image( file_name, img, point_t( 0, 0 ), cc, tag );
-}
-
-/// \ingroup TIFF_IO
-template <typename String, typename Image>
-inline
-void read_and_convert_image( const String& file_name, Image& img, const point_t& top_left, const tiff_tag& tag )
-{
-   read_and_convert_image( file_name, img, top_left, default_color_converter(), tag );
-}
-
-/// \ingroup TIFF_IO
-template <typename String, typename Image>
-inline
-void read_and_convert_image( const String& file_name, Image& img, const tiff_tag& tag )
-{
-   read_and_convert_image( file_name, img, point_t( 0, 0 ), default_color_converter(), tag );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View, typename Color_Converter>
-inline
-void read_and_convert_view( const String& file_name, const View& view, const point_t& top_left, Color_Converter cc, tiff_tag )
-{
-   typedef detail::read_and_convert< Color_Converter > reader_color_convert;
-
-   detail::tiff_reader<reader_color_convert> reader( detail::tiff_open_for_read( file_name ));
-   reader.set_color_converter( cc );
-
-   reader.read_view( view, top_left );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View, typename Color_Converter>
-inline
-void read_and_convert_view( const String& file_name, const View& view, Color_Converter cc, const tiff_tag& tag )
-{
-   read_and_convert_view( file_name, view, point_t( 0, 0 ), cc, tag );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View >
-inline
-void read_and_convert_view( const String& file_name, const View& view, const point_t& top_left, const tiff_tag& tag )
-{
-   read_and_convert_view( file_name, view, top_left, default_color_converter(), tag );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View >
-inline
-void read_and_convert_view( const String& file_name, const View& view, const tiff_tag& tag )
-{
-   read_and_convert_view( file_name, view, point_t( 0, 0 ), default_color_converter(), tag );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View > 
-inline
-void write_view( const String& file_name, const View& v, const point_t& top_left, tiff_tag )
-{
-   detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
-   writer.apply( v, top_left );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View > 
-inline
-void write_view( const String& file_name, const View& v, const tiff_tag& tag )
-{
-   write_view( file_name, v, point_t( 0, 0 ), tag );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View > 
-inline
-void write_view( const String& file_name, const View& v, const point_t& top_left, const basic_tiff_image_write_info& info )
-{
-   detail::tiff_writer writer( detail::tiff_open_for_write( file_name ));
-   writer.apply( v, top_left, info );
-}
-
-/// \ingroup TIFF_IO
-template< typename String, typename View > 
-inline
-void write_view( const String& file_name, const View& v, const basic_tiff_image_write_info& info )
-{
-   write_view( file_name, v, point_t( 0, 0 ), info );
-}
-
+} // namespace detail
 } // namespace gil
 } // namespace boost
 
