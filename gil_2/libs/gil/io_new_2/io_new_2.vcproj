@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="zlib.lib libpng.lib jpeg.lib"
+				AdditionalDependencies="zlib.lib libpng.lib jpeg.lib libtiff.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib"
 				ModuleDefinitionFile=""
@@ -241,23 +241,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new_2\tiff_base.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new_2\tiff_io.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new_2\tiff_io_private.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new_2\tiff_io_private_write.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new_2\tiff_supported_read_types.hpp"
+				RelativePath="..\..\..\boost\gil\extension\io_new_2\tiff.hpp"
 				>
 			</File>
 			<File
@@ -301,6 +285,30 @@
 				</File>
 				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\reader.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_io.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_io_private.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_io_private_write.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_supported_read_types.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_supported_types.hpp"
 					>
 				</File>
 			</Filter>
