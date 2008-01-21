@@ -64,7 +64,7 @@ public:
    {
       typedef typename color_space_type<View>::type color_space_t;
 
-      basic_tiff_image_write_info info;
+      image_write_info<tiff_tag> info;
 
       // write photometric interpretion - Warning: This value is rather subjective.
       // The user should better set this value itself. There is no way to decide if
@@ -82,9 +82,9 @@ public:
    }
 
    template< typename View >
-   void apply( const View&                        src_view
-             , const point_t&                     top_left
-             , const basic_tiff_image_write_info& info     )
+   void apply( const View&                       src_view
+             , const point_t&                    top_left
+             , const image_write_info<tiff_tag>& info     )
              
    {
       typedef typename View::value_type pixel_t;

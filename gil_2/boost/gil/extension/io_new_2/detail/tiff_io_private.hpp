@@ -45,8 +45,8 @@ bool get_property( const std::string& file_name
 }
 
 inline
-void read_image_info( tiff_file_t                 file
-                    , basic_tiff_image_read_info& info )
+void read_image_info( tiff_file_t                file
+                    , image_read_info<tiff_tag>& info )
 {
    get_property<tiff_image_width>( file
                                  , info._width );
@@ -77,10 +77,10 @@ template < int K >
 struct plane_recursion
 {
    template< typename View >
-   static void read_plane( const View&                       src_view
-                         , const point_t&                    top_left
-                         , const basic_tiff_image_read_info& info
-                         , tiff_file_t                       file      )
+   static void read_plane( const View&                      src_view
+                         , const point_t&                   top_left
+                         , const image_read_info<tiff_tag>& info
+                         , tiff_file_t                      file      )
    {
       typedef kth_channel_view_type< K, typename View >::type plane_t;
       plane_t plane = kth_channel_view<K>( src_view );
@@ -94,11 +94,14 @@ template <>
 struct plane_recursion< -1 >
 {
    template< typename View >
-   static void read_plane( const View&                       src_view
-                         , const point_t&                    top_left
-                         , const basic_tiff_image_read_info& info
-                         , tiff_file_t                       file      ) {}
+   static void read_plane( const View&                      src_view
+                         , const point_t&                   top_left
+                         , const image_read_info<tiff_tag>& info
+                         , tiff_file_t                      file      ) {}
 };
+
+/*
+// see conversion_policies.hpp
 
 struct read_and_no_convert
 {
@@ -110,9 +113,9 @@ struct read_and_no_convert
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , const basic_tiff_image_read_info& info
+   void read( const View_User&                 src_view
+            , const point_t&                   top_left
+            , const image_read_info<tiff_tag>& info
             , boost::mpl::true_                            )
    {
       io_error( "Tiff image type not supported." );
@@ -122,9 +125,9 @@ struct read_and_no_convert
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , const basic_tiff_image_read_info& info
+   void read( const View_User&                 src_view
+            , const point_t&                   top_left
+            , const image_read_info<tiff_tag>& info
             , boost::mpl::false_                          )
    {
       typedef typename Image_TIFF::view_t View_TIFF;
@@ -142,11 +145,12 @@ private:
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , const basic_tiff_image_read_info& info
-            , tiff_file_t                       file
-            , boost::mpl::true_   /* is_planar */         )
+   void read( const View_User&                 src_view
+            , const point_t&                   top_left
+            , const image_read_info<tiff_tag>& info
+            , tiff_file_t                      file
+            , boost::mpl::true_   // is_planar     
+              )
    {
       typedef typename Image_TIFF::view_t      view_tiff_t;
       typedef typename view_tiff_t::value_type pixel_tiff_t;
@@ -161,11 +165,12 @@ private:
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , const basic_tiff_image_read_info& info
-            , tiff_file_t                       file
-            , boost::mpl::false_   /* is_planar */         )
+   void read( const View_User&                 src_view
+            , const point_t&                   top_left
+            , const image_read_info<tiff_tag>& info
+            , tiff_file_t                      file
+            , boost::mpl::false_   // is_planar  
+                    )
    {
       io_error_if( views_are_compatible< View_User
                                        , typename Image_TIFF::view_t >::value != true
@@ -195,9 +200,9 @@ struct read_and_convert
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , const basic_tiff_image_read_info& info
+   void read( const View_User&                 src_view
+            , const point_t&                   top_left
+            , const image_read_info<tiff_tag>& info
             , boost::mpl::true_                          )
    {
       io_error( "Tiff image type not supported." );
@@ -207,9 +212,9 @@ struct read_and_convert
    template< typename Image_TIFF
            , typename View_User
            >
-   void read( const View_User&                  src_view
-            , const point_t&                    top_left
-            , const basic_tiff_image_read_info& info
+   void read( const View_User&                 src_view
+            , const point_t&                   top_left
+            , const image_read_info<tiff_tag>& info
             , boost::mpl::false_                         )
    {
       typedef typename Image_TIFF::view_t View_TIFF;
@@ -229,11 +234,12 @@ private:
            , typename View_User
            , typename Color_Converter
            >
-   void read_impl( const View_User&                  src_view
-                 , const point_t&                    top_left
-                 , Color_Converter                   cc
-                 , const basic_tiff_image_read_info& info
-                 , boost::mpl::false_   /* is_planar */         )
+   void read_impl( const View_User&                 src_view
+                 , const point_t&                   top_left
+                 , Color_Converter                  cc
+                 , const image_read_info<tiff_tag>& info
+                 , boost::mpl::false_   // is_planar
+                      )
    {
       read_interleaved_data_and_convert< Image_TIFF >( src_view
                                                      , top_left
@@ -247,11 +253,12 @@ private:
            , typename View_User
            , typename Color_Converter
            >
-   void read_impl( const View_User&                  src_view
-                 , const point_t&                    top_left
-                 , Color_Converter                   cc
-                 , const basic_tiff_image_read_info& info
-                 , boost::mpl::true_   /* is_planar */         )
+   void read_impl( const View_User&                 src_view
+                 , const point_t&                   top_left
+                 , Color_Converter                  cc
+                 , const image_read_info<tiff_tag>& info
+                 , boost::mpl::true_   // is_planar
+                        )
    {
       typedef typename Image_TIFF::view_t      view_tiff_t;
       typedef typename view_tiff_t::value_type pixel_tiff_t;
@@ -277,7 +284,6 @@ protected:
 
    Color_Converter _cc;
 };
-
 
 template< typename Reader >
 class tiff_reader : public Reader
@@ -564,8 +570,9 @@ private:
 
    point_t _top_left;
 
-   basic_tiff_image_read_info _info;
+   image_read_info<tiff_tag> _info;
 };
+*/
 
 } // detail
 } // namespace gil

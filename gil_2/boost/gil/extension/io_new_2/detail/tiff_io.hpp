@@ -27,11 +27,11 @@ extern "C" {
 
 #include <boost/gil/extension/io_new_2/detail/base.hpp>
 
-#include <boost/gil/extension/io_new_2/base.hpp>
+//#include <boost/gil/extension/io_new_2/base.hpp>
 #include <boost/gil/extension/io_new_2/tiff_tags.hpp>
-#include <boost/gil/extension/io_new_2/tiff_io_private.hpp>
+#include <boost/gil/extension/io_new_2/detail/tiff_io_private.hpp>
 
-namespace boost { namespace gil {
+namespace boost { namespace gil { namespace detail {
 
 template< typename Device
         , typename ConversionPolicy

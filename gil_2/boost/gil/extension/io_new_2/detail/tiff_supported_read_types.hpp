@@ -7,6 +7,8 @@
 /// \author Christian Henning
 ///         
 
+#include <boost/gil/image.hpp>
+
 namespace boost { namespace gil { namespace detail {
 
 struct not_allowed_t {};

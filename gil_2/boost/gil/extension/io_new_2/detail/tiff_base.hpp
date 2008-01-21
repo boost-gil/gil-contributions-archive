@@ -126,11 +126,11 @@ std::size_t buffer_size( std::size_t width
 
 template< typename Buffer >
 inline
-void skip_over_rows( uint32                            end
-                   , uint32                            plane
-                   , Buffer&                           buffer
-                   , const basic_tiff_image_read_info& info
-                   , tiff_file_t                       file   )
+void skip_over_rows( uint32                           end
+                   , uint32                           plane
+                   , Buffer&                          buffer
+                   , const image_read_info<tiff_tag>& info
+                   , tiff_file_t                      file   )
 {
    if( info._compression != COMPRESSION_NONE )
    {
@@ -195,15 +195,54 @@ struct swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > >
    bool _swap_bits;
 };
 
+template< typename is_bit_aligned
+        , typename View
+        >
+struct read_helper_for_compatible_views
+{
+   typedef typename View::value_type element_t;
+   typedef std::vector< element_t > buffer_t;
+   typedef typename buffer_t::const_iterator iterator_t;
+
+   static iterator_t begin( const buffer_t& buffer )
+   {
+      return iterator_t( buffer.begin() );
+   }
+                  
+   static iterator_t end( const buffer_t& buffer )
+   {
+      return iterator_t( buffer.end() );
+   }
+};
+
+template< typename View >
+struct read_helper_for_compatible_views< mpl::true_, View >
+{
+   typedef unsigned char element_t;
+   typedef std::vector< element_t > buffer_t;
+   typedef typename bit_aligned_pixel_iterator< typename View::reference > iterator_t;
+
+   static iterator_t begin( buffer_t& buffer )
+   {
+      return iterator_t( &buffer.front(), 0 );
+   }
+                  
+   static iterator_t end( buffer_t& buffer )
+   {
+      // @todo Won't this break if 8 is not divisible by the bit depth? 
+      // What if your bitdepth is 3. The last pixel may not have offset 0
+      return iterator_t( &buffer.back() + 1, 0 );
+   }
+};
 
 
 template< typename View >
 inline
-void read_data( const View&                       src_view
-              , const point_t&                    top_left
-              , unsigned int                      plane
-              , const basic_tiff_image_read_info& info
-              , tiff_file_t                       file     )
+void read_data( const View&                      src_view
+              , const point_t&                   top_left
+              , unsigned int                     plane
+              , const image_read_info<tiff_tag>& info
+              , tiff_file_t                      file     )
 {
    typedef read_helper_for_compatible_views< is_bit_aligned< View >::type
                                            , View
@@ -290,11 +329,11 @@ template< typename Image_TIFF
         , typename Color_Converter
         >
 inline
-void read_interleaved_data_and_convert( const View_User&                  src_view
-                                      , const point_t&                    top_left
-                                      , Color_Converter                   cc
-                                      , const basic_tiff_image_read_info& info
-                                      , tiff_file_t                       file        )
+void read_interleaved_data_and_convert( const View_User&                 src_view
+                                      , const point_t&                   top_left
+                                      , Color_Converter                  cc
+                                      , const image_read_info<tiff_tag>& info
+                                      , tiff_file_t                      file        )
 {
    // @todo gil convention: end typedefs with _t unless they already exist in say STL
    typedef typename Image_TIFF::view_t View_TIFF;
@@ -341,10 +380,10 @@ template< typename View
         , typename Indices_View
         >
 inline
-void read_palette_image( const View&                       src_view
-                       , const Indices_View&               indices_view
-                       , const basic_tiff_image_read_info& info
-                       , tiff_file_t                       file
+void read_palette_image( const View&                      src_view
+                       , const Indices_View&              indices_view
+                       , const image_read_info<tiff_tag>& info
+                       , tiff_file_t                      file
                        , boost::mpl::true_                                )
 {
    tiff_color_map::red_t   red;
@@ -390,10 +429,10 @@ template< typename View
         , typename Indices_View
         >
 inline
-void read_palette_image( const View&                       src_view
-                       , const Indices_View&               indices_view
-                       , const basic_tiff_image_read_info& info
-                       , tiff_file_t                       file
+void read_palette_image( const View&                      src_view
+                       , const Indices_View&              indices_view
+                       , const image_read_info<tiff_tag>& info
+                       , tiff_file_t                      file
                        , boost::mpl::false_          /* is View rgb16_view_t*/ )
 {
    io_error( "User supplied image type must be rgb16_image_t." );

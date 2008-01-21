@@ -86,46 +86,6 @@ unsigned char swap_bits( unsigned char c )
    return result;
 }
 
-template< typename is_bit_aligned
-        , typename View
-        >
-struct read_helper_for_compatible_views
-{
-   typedef typename View::value_type element_t;
-   typedef std::vector< element_t > buffer_t;
-   typedef typename buffer_t::const_iterator iterator_t;
-
-   static iterator_t begin( const buffer_t& buffer )
-   {
-      return iterator_t( buffer.begin() );
-   }
-                  
-   static iterator_t end( const buffer_t& buffer )
-   {
-      return iterator_t( buffer.end() );
-   }
-};
-
-template< typename View >
-struct read_helper_for_compatible_views< mpl::true_, View >
-{
-   typedef unsigned char element_t;
-   typedef std::vector< element_t > buffer_t;
-   typedef typename bit_aligned_pixel_iterator< typename View::reference > iterator_t;
-
-   static iterator_t begin( buffer_t& buffer )
-   {
-      return iterator_t( &buffer.front(), 0 );
-   }
-                  
-   static iterator_t end( buffer_t& buffer )
-   {
-      // @todo Won't this break if 8 is not divisible by the bit depth? 
-      // What if your bitdepth is 3. The last pixel may not have offset 0
-      return iterator_t( &buffer.back() + 1, 0 );
-   }
-};
-
 } // namespace details
 } // namespace gil
 } // namespace boost
