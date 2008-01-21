@@ -436,6 +436,4 @@ private:
 
 
 
-#endif
-
-
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_HPP_INCLUDED

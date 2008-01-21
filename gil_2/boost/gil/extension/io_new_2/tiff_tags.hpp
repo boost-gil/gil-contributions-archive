@@ -27,6 +27,8 @@ extern "C" {
 
 namespace boost { namespace gil {
 
+struct tiff_tag : format_tag {};
+
 struct tiff_new_subfile_type
 {
    typedef boost::uint32_t type;
@@ -236,6 +238,31 @@ struct tiff_indexed
    static const unsigned int tag = TIFFTAG_INDEXED;
 };
 
+template<>
+struct image_read_info<tiff_tag>
+{
+   tiff_image_width::type  _width;
+   tiff_image_height::type _height;
+
+   tiff_compression::type _compression;
+
+   tiff_bits_per_sample::type   _bits_per_sample;
+   tiff_samples_per_pixel::type _samples_per_pixel;
+   tiff_sample_format::type     _sample_format;
+
+   tiff_planar_configuration::type _planar_configuration;
+
+   tiff_photometric_interpretation::type _photometric_interpretation;
+};
+
+template<>
+struct image_write_info<tiff_tag>
+{
+   tiff_photometric_interpretation::type _photometric_interpretation;
+   tiff_compression::type                _compression;
+   tiff_orientation::type                _orientation;
+   tiff_planar_configuration::type       _planar_configuration;
+};
 
 } // namespace gil
 } // namespace boost

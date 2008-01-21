@@ -365,5 +365,4 @@ private:
 }
 }
 
-#endif
-
+#endif // BOOST_GIL_EXTENSION_IO_JPEG_IO_HPP_INCLUDED

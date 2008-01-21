@@ -9,6 +9,8 @@
 #ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED
 #define BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED 
 
+#include <malloc.h>
+
 #ifdef ADD_FS_PATH_SUPPORT
 #include <boost/filesystem/path.hpp>
 #endif 
