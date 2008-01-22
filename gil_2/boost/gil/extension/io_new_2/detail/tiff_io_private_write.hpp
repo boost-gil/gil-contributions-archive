@@ -47,6 +47,8 @@ struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligne
 	                                 >
 {};
 
+/*
+
 // Right now only gray_t and rgb_t images are supported. See comment below
 // for the photometric interpretation.
 class tiff_writer
@@ -158,6 +160,7 @@ private:
    tiff_file_t _file;
 
 };
+*/
 
 } // namespace details
 } // namespace gil

@@ -25,10 +25,9 @@ extern "C" {
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <boost/gil/extension/io_new_2/detail/base.hpp>
-
-//#include <boost/gil/extension/io_new_2/base.hpp>
 #include <boost/gil/extension/io_new_2/tiff_tags.hpp>
+
+#include <boost/gil/extension/io_new_2/detail/base.hpp>
 #include <boost/gil/extension/io_new_2/detail/tiff_io_private.hpp>
 
 namespace boost { namespace gil { namespace detail {
@@ -43,18 +42,40 @@ struct reader< Device
 public:
 
    reader( Device& device )
+   : _io_dev( device )
    {}
 
    reader( Device&                                                device
          , typename const ConversionPolicy::color_converter_type& cc     )
-   : _cc_policy( cc )
+   : _io_dev   ( device )
+   , _cc_policy( cc     )
    {
    }
 
    image_read_info<tiff_tag> get_info()
    {
-      image_read_info<tiff_tag> ret = {0};
-      return ret;
+      image_read_info<tiff_tag> info = {0};
+
+      io_error_if( _io_dev.get_property<tiff_image_width>               ( info._width ) == false
+                 , "cannot read tiff tag." );
+      io_error_if( _io_dev.get_property<tiff_image_height>              ( info._height ) == false
+                 , "cannot read tiff tag." );
+      io_error_if( _io_dev.get_property<tiff_compression>               ( info._compression ) == false
+                 , "cannot read tiff tag." );
+      io_error_if( _io_dev.get_property<tiff_samples_per_pixel>         ( info._samples_per_pixel ) == false
+                 , "cannot read tiff tag." );
+      io_error_if( _io_dev.get_property<tiff_bits_per_sample>           ( info._bits_per_sample ) == false
+                 , "cannot read tiff tag." );
+      io_error_if( _io_dev.get_property<tiff_sample_format>             ( info._sample_format ) == false
+                 , "cannot read tiff tag." );
+      io_error_if( _io_dev.get_property<tiff_planar_configuration>      ( info._planar_configuration ) == false
+                 , "cannot read tiff tag." );
+
+      ///@todo: Doesn't work right now.
+      //io_error_if( _io_dev.get_property<tiff_photometric_interpretation>( info._photometric_interpretation  ) == false
+      //           , "cannot read tiff tag." );
+
+      return info;
    }
 
     template< typename Image >
@@ -110,6 +131,8 @@ private:
                         , view.row_begin( y )          );
       }
    }
+
+    Device& _io_dev;
 
     ConversionPolicy _cc_policy;
 };

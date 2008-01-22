@@ -38,13 +38,12 @@ template<> struct photometric_interpretation< rgb_t  > : public boost::mpl::int_
 template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
 template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
 
-
+/*
 typedef boost::shared_ptr<TIFF> tiff_file_t;
 
 inline
 tiff_file_t tiff_open_for_read( const std::string& file_name )
 {
-   TIFF* tiff;
    io_error_if( ( tiff = TIFFOpen( file_name.c_str(), "r" )) == NULL
               , "file_mgr: failed to open file" );
 
@@ -433,7 +432,8 @@ void read_palette_image( const View&                      src_view
                        , const Indices_View&              indices_view
                        , const image_read_info<tiff_tag>& info
                        , tiff_file_t                      file
-                       , boost::mpl::false_          /* is View rgb16_view_t*/ )
+                       , boost::mpl::false_          // is View rgb16_view_t
+                        )
 {
    io_error( "User supplied image type must be rgb16_image_t." );
 }
@@ -468,7 +468,7 @@ void write_scaline( Buffer&     buffer
 
    io_error_if( size == -1, "Write error." );
 }
-
+*/
 } // namespace details
 } // namespace gil
 } // namespace boost

@@ -33,44 +33,13 @@
 
 namespace boost { namespace gil { namespace detail {
 
-template <typename Property>
-inline
-bool get_property( const std::string& file_name
-                 , typename Property::type& value
-                 , tiff_tag                        )
-{
-   return get_property<Property>( tiff_open_for_read( file_name )
-                                , value                           );
 
-}
-
+/*
 inline
 void read_image_info( tiff_file_t                file
                     , image_read_info<tiff_tag>& info )
 {
-   get_property<tiff_image_width>( file
-                                 , info._width );
 
-   get_property<tiff_image_height>( file
-                                 , info._height );
-
-   get_property<tiff_compression>( file
-                                 , info._compression );
-
-   get_property<tiff_samples_per_pixel>( file
-                                       , info._samples_per_pixel );
-
-   get_property<tiff_bits_per_sample>( file
-                                     , info._bits_per_sample );
-
-   get_property<tiff_sample_format>( file
-                                   , info._sample_format );
-
-   get_property<tiff_planar_configuration>( file
-                                          , info._planar_configuration );
-
-   get_property<tiff_photometric_interpretation>( file
-                                                , info._photometric_interpretation  );
 }
 
 template < int K >
@@ -100,7 +69,6 @@ struct plane_recursion< -1 >
                          , tiff_file_t                      file      ) {}
 };
 
-/*
 // see conversion_policies.hpp
 
 struct read_and_no_convert

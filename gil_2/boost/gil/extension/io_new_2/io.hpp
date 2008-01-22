@@ -140,11 +140,12 @@ image_read_info<FormatTag>
 read_image_info( Device & file, FormatTag const& tag, 
         typename enable_if<typename mpl::and_<
             typename is_format_tag<FormatTag>::type,
-            typename detail::is_adaptable_input_device<Device>::type
+            typename detail::is_adaptable_input_device<FormatTag,Device>::type
         >::type>::type * ptr = 0
         )
 {
-    typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
+    typedef typename detail::is_adaptable_input_device<FormatTag,Device>::device_type device_type;
+
     device_type dev(file);
     return detail::reader<device_type,FormatTag,detail::read_and_no_convert>( file ).get_info();
 }
@@ -159,9 +160,9 @@ read_image_info( String const& file_name, FormatTag const& tag,
         >::type>::type * ptr = 0
         )
 {
-    detail::file_stream_device reader( 
+    detail::file_stream_device<FormatTag> reader( 
             detail::convert_to_string(file_name), 
-            detail::file_stream_device::read_tag()
+            detail::file_stream_device<FormatTag>::read_tag()
             );
     return read_image_info( reader, tag);
 }
@@ -189,7 +190,7 @@ inline void read_image(
         Device & file, Image& img, point_t top_left, 
         FormatTag const& tag,
         typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<Device>::type,
+            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
             typename is_format_tag<FormatTag>::type,
             typename is_supported<typename Image::value_type, FormatTag>::type 
         >::type>::type * ptr = 0
@@ -244,7 +245,7 @@ void read_image(
         Device& file, Image& img, 
         FormatTag const& tag,
         typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<Device>::type,
+            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
             typename is_supported<typename Image::value_type, FormatTag>::type,
             typename is_format_tag<FormatTag>::type
         >::type>::type * ptr1 = 0 
@@ -300,7 +301,7 @@ inline void read_view(
         FormatTag const& tag,
         typename enable_if<typename mpl::and_<
             typename is_format_tag<FormatTag>::type,
-            typename detail::is_adaptable_input_device<Device>::type,
+            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
             typename is_supported<typename View::value_type, FormatTag>::type
         >::type>::type * ptr = 0 
         )
@@ -351,7 +352,7 @@ inline void read_view(
             typename is_format_tag<FormatTag>::type,
             typename mpl::or_<
                 typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<Device>::type
+                typename detail::is_adaptable_input_device<FormatTag,Device>::type
             >::type,
             typename is_supported<typename View::value_type, FormatTag>::type
         >::type>::type * ptr = 0
@@ -383,7 +384,7 @@ template< typename Device, typename Image, typename ColorConverter, typename For
 inline
 void read_and_convert_image( Device & file, Image& img, const point_t& top_left, ColorConverter const& cc, FormatTag const& tag,
         typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<Device>::type,
+            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
             typename is_format_tag<FormatTag>::type
             >::type>::type * ptr1 = 0 
         )
@@ -431,7 +432,7 @@ void read_and_convert_image(
         typename enable_if<typename mpl::and_<
             typename mpl::or_<
                 typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<Device>::type
+                typename detail::is_adaptable_input_device<FormatTag,Device>::type
                 >::type,
             typename is_format_tag<FormatTag>::type
             >::type>::type * ptr1 = 0 
@@ -458,7 +459,7 @@ void read_and_convert_image( Device& device, Image& img, const point_t& top_left
         typename enable_if<typename mpl::and_<
             typename mpl::or_<
                 typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<Device>::type
+                typename detail::is_adaptable_input_device<FormatTag,Device>::type
                 >::type,
             typename is_format_tag<FormatTag>::type
         >::type>::type * ptr1 = 0 )
@@ -484,7 +485,7 @@ void read_and_convert_image( Device & device, Image& img, FormatTag const & tag,
         typename enable_if<typename mpl::and_<
             typename mpl::or_<
                 typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<Device>::type
+                typename detail::is_adaptable_input_device<FormatTag,Device>::type
                 >::type,
             typename is_format_tag<FormatTag>::type
             >::type>::type * ptr1 = 0 )
@@ -514,7 +515,7 @@ template<typename Device, typename View, typename ColorConverter, typename Forma
 inline
 void read_and_convert_view( Device& device, const View& view, const point_t& top_left, ColorConverter cc, FormatTag const& tag,
         typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<Device>::type,
+            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
             typename is_format_tag<FormatTag>::type
          >::type>::type * ptr1 = 0)
 {
@@ -544,7 +545,7 @@ void read_and_convert_view( Device& device, const View& view, ColorConverter cc,
         typename enable_if<typename mpl::and_<
             typename mpl::or_<
                 typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<Device>::type
+                typename detail::is_adaptable_input_device<FormatTag,Device>::type
                 >::type,
             typename is_format_tag<FormatTag>::type
         >::type>::type * ptr1 = 0)
@@ -570,7 +571,7 @@ void read_and_convert_view( Device& device, const View& view, const point_t& top
         typename enable_if<typename mpl::and_<
             typename mpl::or_<
                 typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<Device>::type
+                typename detail::is_adaptable_input_device<FormatTag,Device>::type
                 >::type,
             typename is_format_tag<FormatTag>::type
         >::type>::type * ptr1 = 0)
@@ -596,7 +597,7 @@ void read_and_convert_view( Device& device, const View& view, FormatTag const& t
         typename enable_if<typename mpl::and_<
             typename mpl::or_<
                 typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<Device>::type
+                typename detail::is_adaptable_input_device<FormatTag,Device>::type
                 >::type,
             typename is_format_tag<FormatTag>::type
         >::type>::type * ptr1 = 0)
@@ -639,7 +640,7 @@ template<typename Device, typename View, typename FormatTag>
 inline
 void write_view( Device & device, View const& view, point_t const& top_left, FormatTag const& tag,
         typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_output_device<Device>::type,
+            typename detail::is_adaptable_output_device<FormatTag,Device>::type,
             typename is_format_tag<FormatTag>::type,
             typename is_supported<typename View::value_type, FormatTag>::type
         >::type>::type * ptr = 0
@@ -673,7 +674,7 @@ void write_view( Device & device, const View& view, FormatTag const& tag,
         typename enable_if<typename mpl::and_<
             typename mpl::or_<
                 typename detail::is_output_device<Device>::type,
-                typename detail::is_adaptable_output_device<Device>::type
+                typename detail::is_adaptable_output_device<FormatTag,Device>::type
             >::type,
             typename is_format_tag<FormatTag>::type,
             typename is_supported<typename View::value_type, FormatTag>::type
@@ -717,7 +718,7 @@ inline
 void write_view( Device & device, const View& view, const point_t& top_left, 
         const image_write_info<FormatTag>& info, 
         typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_output_device<Device>::type,
+            typename detail::is_adaptable_output_device<FormatTag,Device>::type,
             typename is_format_tag<FormatTag>::type,
             typename is_supported<typename View::value_type, FormatTag>::type
         >::type>::type * ptr2 = 0 
@@ -766,7 +767,7 @@ void write_view( Device & device, const View& view, const image_write_info<Forma
             typename is_format_tag<FormatTag>::type,
             typename mpl::or_<
                 typename detail::is_output_device<Device>::type,
-                typename detail::is_adaptable_output_device<Device>::type
+                typename detail::is_adaptable_output_device<FormatTag,Device>::type
             >::type,
             typename is_supported<typename View::value_type, FormatTag>::type
         >::type>::type * ptr2 = 0 

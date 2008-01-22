@@ -254,6 +254,8 @@ template<typename PixelType, typename FormatTag>
 struct is_supported;
 
 struct format_tag{};
+struct tiff_tag : format_tag {};
+
 
 namespace detail{
 

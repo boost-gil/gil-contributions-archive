@@ -27,8 +27,6 @@ extern "C" {
 
 namespace boost { namespace gil {
 
-struct tiff_tag : format_tag {};
-
 struct tiff_new_subfile_type
 {
    typedef boost::uint32_t type;
