@@ -19,6 +19,9 @@ int main(int argc, char *argv[])
 
    {
       image_read_info< tiff_tag > info = read_image_info( "test\\test.tif", tiff_tag() );
+
+      rgba8_image_t img;
+      read_image( "test\\test.tif", img, tiff_tag() );
    }
 
    {

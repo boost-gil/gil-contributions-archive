@@ -215,9 +215,9 @@ inline void read_image(
         >::type>::type * ptr = 0
         )
 {
-    detail::file_stream_device device( 
+    detail::file_stream_device<FormatTag> device( 
             detail::convert_to_string(file_name), 
-            detail::file_stream_device::read_tag()
+            detail::file_stream_device<FormatTag>::read_tag()
             );
     read_image( device, img, top_left, tag );
 }
@@ -270,9 +270,9 @@ void read_image(
         >::type>::type * ptr = 0 
         )
 {
-    detail::file_stream_device device( 
+    detail::file_stream_device<FormatTag> device( 
             detail::convert_to_string(file_name), 
-            detail::file_stream_device::read_tag()
+            detail::file_stream_device<FormatTag>::read_tag()
             );
     read_image( device, img, point_t( 0, 0 ), tag );
 }
@@ -323,9 +323,9 @@ inline void read_view(
         >::type>::type * ptr = 0
         )
 {
-    detail::file_stream_device device(
+    detail::file_stream_device<FormatTag> device(
             detail::convert_to_string(file_name), 
-            detail::file_stream_device::read_tag()
+            detail::file_stream_device<FormatTag>::read_tag()
             );
     read_view( device, view, top_left, tag);
 }
@@ -402,9 +402,9 @@ void read_and_convert_image( String const& file_name, Image& img, const point_t&
             typename is_format_tag<FormatTag>::type
         >::type>::type * ptr1 = 0 )
 {
-    detail::file_stream_device device(
+    detail::file_stream_device<FormatTag> device(
             detail::convert_to_string(file_name),
-            detail::file_stream_device::read_tag()
+            detail::file_stream_device<FormatTag>::read_tag()
             );
     read_and_convert_image( device, img, top_left, cc, tag );
 }
@@ -532,9 +532,9 @@ void read_and_convert_view( String const& file_name, const View& view, const poi
             typename is_format_tag<FormatTag>::type
         >::type>::type * ptr1 = 0)
 {
-    detail::file_stream_device device( 
+    detail::file_stream_device<FormatTag> device( 
             detail::convert_to_string(file_name), 
-            detail::file_stream_device::read_tag() 
+            detail::file_stream_device<FormatTag>::read_tag() 
             );
     read_and_convert_view( device, view, top_left, cc, tag );
 }
@@ -660,9 +660,9 @@ void write_view( String const& file_name, View const& view, point_t const& top_l
         >::type>::type * ptr = 0
         )
 {
-    detail::file_stream_device device( 
+    detail::file_stream_device<FormatTag> device( 
             detail::convert_to_string(file_name), 
-            detail::file_stream_device::write_tag()
+            detail::file_stream_device<FormatTag>::write_tag()
             );
     write_view( device, view, top_left, tag );
 }
@@ -739,9 +739,9 @@ void write_view( String const& file_name, const View& view, const point_t& top_l
         >::type>::type * ptr2 = 0 
         )
 {
-    detail::file_stream_device device(
+    detail::file_stream_device<FormatTag> device(
             detail::convert_to_string(file_name),
-            detail::file_stream_device::write_tag()
+            detail::file_stream_device<FormatTag>::write_tag()
             );
     write_view( device, view, top_left, info );
 }
