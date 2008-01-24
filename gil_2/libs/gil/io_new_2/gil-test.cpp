@@ -18,14 +18,17 @@ int main(int argc, char *argv[])
    using namespace boost::mpl;
 
    {
+      image_read_info< png_tag > info = read_image_info( "test\\test.png", png_tag() );
+
+      rgba8_image_t img;
+      read_image( "test\\test.png", img, png_tag() );
+   }
+
+   {
       image_read_info< tiff_tag > info = read_image_info( "test\\test.tif", tiff_tag() );
 
       rgba8_image_t img;
       read_image( "test\\test.tif", img, tiff_tag() );
-   }
-
-   {
-      image_read_info< png_tag > info = read_image_info( "test\\test.png", png_tag() );
    }
 
    {

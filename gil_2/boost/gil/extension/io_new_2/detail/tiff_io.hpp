@@ -269,7 +269,6 @@ private:
            >
    void read_planar( const View& dst_view )
    {
-   /*
       typedef pixel_type_factory< BitsPerSample, SampleFormat, Layout >::type pixel_t;
 
       if( _info._planar_configuration == PLANARCONFIG_CONTIG )
@@ -280,11 +279,8 @@ private:
                          , is_same< image_t, not_allowed_t >::type
                          >::type unspecified_t;
 
-         read< image_t >( src_view
-                        , _top_left
-                        , _info
-                        , unspecified_t() );
-
+         read_rows_interleaved< image_t >( dst_view
+                                         , unspecified_t() );
       }
       else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
       {
@@ -294,27 +290,76 @@ private:
                          , is_same< image_t, not_allowed_t >::type
                          >::type unspecified_t;
 
-         read< image_t >( src_view
-                        , _top_left
-                        , _info
-                        , unspecified_t() );
+         read_rows_planar< image_t >( _view
+                                    , unspecified_t() );
       }
       else
       {
          io_error( "Wrong planar configuration setting." );
       }
-   */
    }
 
-
-   template< typename ImagePixel
+   template< typename Tiff_Image
            , typename View
            >
-   void read_rows( View&          view
-               , const point_t& top_left )
+   void read_rows_interleaved( View&      dst_view
+                             , mpl::true_ // unspecified image type
+                             )
+   { io_error( "Tiff image type isn't supported." ); }
+
+   template< typename Tiff_Image
+           , typename View
+           >
+   void read_rows_planar( View&      dst_view
+                        , mpl::true_ // unspecified image type
+                        )
+   { io_error( "Tiff image type isn't supported." ); }
+
+   template< typename Tiff_Image
+           , typename View
+           >
+   void read_rows_interleaved( View&       dst_view
+                             , mpl::false_ // unspecified image type
+                             )
    {
-      io_error_if( ! ConversionPolicy::template is_allowed<ImagePixel,typename View::value_type>::type::value,
-               "User provided view has incorrect color space or channel type.");
+      typedef typename Tiff_Image::view_t      tiff_view_t;
+      typedef typename tiff_view_t::value_type tiff_pixel_t;
+
+      typedef typename View::value_type user_pixel_t;
+
+      io_error_if( !ConversionPolicy::template is_allowed< tiff_pixel_t
+                                                         , user_pixel_t 
+                                                         >::type::value
+                 , "User provided view has incorrect color space or channel type." );
+
+/*
+      std::vector<ImagePixel> buffer( view.width() );
+
+      for( int y = 0; y < view.height(); ++y )
+      {
+         cc_policy.read( buffer.begin() + top_left.x
+                       , buffer.end()
+                       , view.row_begin( y )          );
+      }
+*/
+   }
+
+   template< typename Tiff_Image
+           , typename View
+           >
+   void read_rows_planar( View&       dst_view
+                        , mpl::false_ // unspecified image type
+                        )
+   {
+      typedef typename Tiff_Image::view_t      tiff_view_t;
+      typedef typename tiff_view_t::value_type tiff_pixel_t;
+
+      typedef typename View::value_type user_pixel_t;
+
+      io_error_if( !ConversionPolicy::template is_allowed< tiff_pixel_t
+                                                         , user_pixel_t 
+                                                         >::type::value
+                 , "User provided view has incorrect color space or channel type." );
 
       std::vector<ImagePixel> buffer( view.width() );
 
