@@ -377,21 +377,6 @@ void read_interleaved_data_and_convert( const View_User&                 src_vie
 
 template< typename Buffer >
 inline 
-void read_scaline( Buffer&     buffer
-                 , uint32      row
-                 , tsample_t   plane
-                 , tiff_file_t file             )
-{
-   int size = TIFFReadScanline( file.get()
-                              , &buffer.front()
-                              , row
-                              , plane           );
-
-   io_error_if( size == -1, "Read error." );
-}
-
-template< typename Buffer >
-inline 
 void write_scaline( Buffer&     buffer
                   , uint32      row
                   , tsample_t   plane

@@ -106,6 +106,7 @@ public:
 
         apply_impl( view );
     }
+
 private:
 
    template< typename View >
@@ -290,7 +291,7 @@ private:
                          , is_same< image_t, not_allowed_t >::type
                          >::type unspecified_t;
 
-         read_rows_planar< image_t >( _view
+         read_rows_planar< image_t >( dst_view
                                     , unspecified_t() );
       }
       else
@@ -299,21 +300,9 @@ private:
       }
    }
 
-   template< typename Tiff_Image
-           , typename View
-           >
-   void read_rows_interleaved( View&      dst_view
-                             , mpl::true_ // unspecified image type
-                             )
-   { io_error( "Tiff image type isn't supported." ); }
-
-   template< typename Tiff_Image
-           , typename View
-           >
-   void read_rows_planar( View&      dst_view
-                        , mpl::true_ // unspecified image type
-                        )
-   { io_error( "Tiff image type isn't supported." ); }
+   // specializations for unspecified image types.
+   template< typename Tiff_Image, typename View > void read_rows_interleaved( View& dst_view, mpl::true_ ) { io_error( "Tiff image type isn't supported." ); }
+   template< typename Tiff_Image, typename View > void read_rows_planar( View& dst_view, mpl::true_ ) { io_error( "Tiff image type isn't supported." ); }
 
    template< typename Tiff_Image
            , typename View
@@ -332,16 +321,23 @@ private:
                                                          >::type::value
                  , "User provided view has incorrect color space or channel type." );
 
-/*
-      std::vector<ImagePixel> buffer( view.width() );
+      std::vector<tiff_pixel_t> buffer( dst_view.width() );
 
-      for( int y = 0; y < view.height(); ++y )
+      skip_over_rows( buffer, 0 );
+
+      for( uint32 row = _top_left.y
+         ; row < (uint32) dst_view.height() + _top_left.y
+         ; ++row 
+         )
       {
-         cc_policy.read( buffer.begin() + top_left.x
-                       , buffer.end()
-                       , view.row_begin( y )          );
+         _io_dev.read_scaline( buffer
+                             , row
+                             , 0      );
+
+         _cc_policy.read( buffer.begin() + _top_left.x
+                        , buffer.end()
+                        , dst_view.row_begin( row )     );
       }
-*/
    }
 
    template< typename Tiff_Image
@@ -361,13 +357,36 @@ private:
                                                          >::type::value
                  , "User provided view has incorrect color space or channel type." );
 
-      std::vector<ImagePixel> buffer( view.width() );
+      std::vector<tiff_pixel_t> buffer( dst_view.width() );
 
-      for( int y = 0; y < view.height(); ++y )
+/*
+      skip_over_rows( buffer, plane );
+
+      for( int y = 0; y < dst_view.height(); ++y )
       {
-         cc_policy.read( buffer.begin() + top_left.x
-                       , buffer.end()
-                       , view.row_begin( y )          );
+         _cc_policy.read( buffer.begin() + _top_left.x
+                        , buffer.end()
+                        , dst_view.row_begin( y )       );
+      }
+*/
+   }
+
+   template< typename Buffer >
+   void skip_over_rows( Buffer& buffer
+                      , uint32  plane  )
+   {
+      if( _info._compression != COMPRESSION_NONE )
+      {
+         // Skipping over rows is not possible for compressed images(  no random access ). See man
+         // page ( diagnostics section ) for more information.
+
+         uint32 last_row = static_cast<uint32>( _top_left.y );
+         for( uint32 row = 0; row < last_row; ++row )
+         {
+            _io_dev.read_scaline( buffer
+                                , row
+                                , plane  );
+         }
       }
    }
 

@@ -124,6 +124,17 @@ public:
       return false;
    }
    
+   template< typename Buffer >
+   void read_scaline( Buffer&     buffer
+                    , uint32      row
+                    , tsample_t   plane   )
+   {
+      io_error_if( TIFFReadScanline( _tiff_file.get()
+                                   , &buffer.front()
+                                   , row
+                                   , plane           ) == -1
+                  , "Read error."                             );
+   }
 
 private:
 
