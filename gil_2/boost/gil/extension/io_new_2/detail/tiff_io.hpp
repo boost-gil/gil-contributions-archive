@@ -22,6 +22,7 @@ extern "C" {
 
 #include <algorithm>
 #include <string>
+#include <vector>
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -325,8 +326,8 @@ private:
 
       skip_over_rows( buffer, 0 );
 
-      for( uint32 row = _top_left.y
-         ; row < (uint32) dst_view.height() + _top_left.y
+      for( std::ptrdiff_t row = _top_left.y
+         ; row < dst_view.height() + _top_left.y
          ; ++row 
          )
       {
@@ -357,18 +358,8 @@ private:
                                                          >::type::value
                  , "User provided view has incorrect color space or channel type." );
 
-      std::vector<tiff_pixel_t> buffer( dst_view.width() );
-
-/*
-      skip_over_rows( buffer, plane );
-
-      for( int y = 0; y < dst_view.height(); ++y )
-      {
-         _cc_policy.read( buffer.begin() + _top_left.x
-                        , buffer.end()
-                        , dst_view.row_begin( y )       );
-      }
-*/
+      plane_recursion< num_channels< View >::value - 1 > pr;
+      pr.read_plane( dst_view );
    }
 
    template< typename Buffer >
@@ -379,15 +370,185 @@ private:
       {
          // Skipping over rows is not possible for compressed images(  no random access ). See man
          // page ( diagnostics section ) for more information.
-
-         uint32 last_row = static_cast<uint32>( _top_left.y );
-         for( uint32 row = 0; row < last_row; ++row )
+         for( std::ptrdiff_t row = 0; row < _top_left.y; ++row )
          {
             _io_dev.read_scaline( buffer
                                 , row
                                 , plane  );
          }
       }
+   }
+
+   template < int K >
+   struct plane_recursion
+   {
+      template< typename View >
+      void read_plane( const View& dst_view )
+      {
+         typedef kth_channel_view_type< K, typename View >::type plane_t;
+         plane_t plane = kth_channel_view<K>( dst_view );
+         read_data( plane, K );
+
+         plane_recursion< K - 1 > pr;
+         pr.read_plane( dst_view );
+      }
+   };
+
+   template <>
+   struct plane_recursion< -1 >
+   {
+      template< typename View >
+      void read_plane( const View& dst_view ) {}
+   };
+
+
+   template< typename View >
+   static
+   void read_data( const View& dst_view
+                 , int         plane     )
+   {
+      typedef read_helper_for_compatible_views< is_bit_aligned< View >::type
+                                              , View
+                                              > read_helper_t;
+
+      typedef read_helper_t::buffer_t buffer_t;
+
+/*
+      std::size_t size_to_allocate = buffer_size< typename View::value_type >( dst_view.width()
+                                                                             , is_bit_aligned< View >::type() );
+      buffer_t buffer( size_to_allocate );
+      read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
+      read_helper_t::iterator_t first = begin + _top_left.x;
+      read_helper_t::iterator_t last  = first + dst_view.width();
+
+      skip_over_rows( buffer, plane );
+
+      swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( file );
+
+      for( std::ptrdiff_t row = _top_left.y
+         ; row < dst_view.height() + _top_left.y
+         ; ++row )
+      {
+         _io_dev.read_scaline( buffer
+                             , row
+                             , plane   );
+
+         sb( buffer );
+
+         _cc_policy.read( first
+                        , last
+                        , dst_view.row_begin( row ));
+      }
+*/
+   }
+
+   template< typename is_bit_aligned
+           , typename View
+           >
+   struct read_helper_for_compatible_views
+   {
+      typedef typename View::value_type element_t;
+      typedef std::vector< element_t > buffer_t;
+      typedef typename buffer_t::const_iterator iterator_t;
+
+      static iterator_t begin( const buffer_t& buffer )
+      {
+         return iterator_t( buffer.begin() );
+      }
+                     
+      static iterator_t end( const buffer_t& buffer )
+      {
+         return iterator_t( buffer.end() );
+      }
+   };
+
+   template< typename View >
+   struct read_helper_for_compatible_views< mpl::true_, View >
+   {
+      typedef unsigned char element_t;
+      typedef std::vector< element_t > buffer_t;
+      typedef typename bit_aligned_pixel_iterator< typename View::reference > iterator_t;
+
+      static iterator_t begin( buffer_t& buffer )
+      {
+         return iterator_t( &buffer.front(), 0 );
+      }
+                     
+      static iterator_t end( buffer_t& buffer )
+      {
+         // @todo Won't this break if 8 is not divisible by the bit depth? 
+         // What if your bitdepth is 3. The last pixel may not have offset 0
+         return iterator_t( &buffer.back() + 1, 0 );
+      }
+   };
+
+
+   template< typename IsBitAligned
+           , typename Buffer
+           >
+   struct swap_bits_fn
+   {
+      void operator() ( Buffer& ) {}
+   };
+
+   template<>
+   struct swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > >
+   {
+      swap_bits_fn()
+      {
+         for( int i = 0; i < 256; ++i )
+         {
+            _lookup[i] = swap_bits( i );
+         }
+
+         _swap_bits = ( _io_dev.are_bytes_swapped() > 0 ) ? true : false;
+      }
+
+      void operator() ( std::vector< unsigned char >& buffer )
+      {
+         typedef swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > > tt;
+
+         if( _swap_bits )
+         {
+            std::transform( buffer.begin()
+                          , buffer.end()
+                          , buffer.begin()
+                          , boost::bind( &tt::_swap, *this, _1 ));
+         }
+      }
+    
+    private:
+    
+      unsigned char _swap( unsigned char byte ) const
+      {
+         return _lookup[ byte ];
+      }
+    
+    private:
+    
+      boost::array< unsigned char, 256 > _lookup;
+      bool _swap_bits;
+   };
+
+   template< typename Pixel >
+   std::size_t buffer_size( std::size_t width
+                          , mpl::false_ // is_bit_aligned
+                          )
+   {
+      std::size_t scanline_size_in_bytes = _io_dev.get_scanline_size();
+
+      std::size_t element_size = sizeof( Pixel );
+
+      return  std::max( width
+                      , (( scanline_size_in_bytes + element_size - 1 ) / element_size ));
+   }
+
+   template< typename Pixel >
+   std::size_t buffer_size( std::size_t width
+                          , mpl::true_  // is_bit_aligned
+                          )
+   {
+      return _io_dev.get_scanline_size();
    }
 
 private:
@@ -429,7 +590,7 @@ struct writer< Device
               , const point_t& top_left
               , boost::mpl::false_      )
     {
-        write_rows(view, top_left);
+        write_rows( view, top_left);
     }
 
     template<typename View>

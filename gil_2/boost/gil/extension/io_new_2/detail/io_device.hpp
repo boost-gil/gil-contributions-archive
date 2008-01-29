@@ -125,15 +125,25 @@ public:
    }
    
    template< typename Buffer >
-   void read_scaline( Buffer&     buffer
-                    , uint32      row
-                    , tsample_t   plane   )
+   void read_scaline( Buffer&        buffer
+                    , std::ptrdiff_t row
+                    , tsample_t      plane   )
    {
       io_error_if( TIFFReadScanline( _tiff_file.get()
                                    , &buffer.front()
-                                   , row
+                                   , (uint32) row
                                    , plane           ) == -1
                   , "Read error."                             );
+   }
+
+   bool are_bytes_swapped()
+   {
+      TIFFIsByteSwapped( _tiff_file.get() );
+   }
+
+   std::size_t get_scanline_size()
+   {
+      TIFFScanlineSize( _tiff_file.get() );
    }
 
 private:
