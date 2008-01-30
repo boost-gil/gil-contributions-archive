@@ -143,7 +143,7 @@ public:
 
    std::size_t get_scanline_size()
    {
-      TIFFScanlineSize( _tiff_file.get() );
+      return TIFFScanlineSize( _tiff_file.get() );
    }
 
 private:

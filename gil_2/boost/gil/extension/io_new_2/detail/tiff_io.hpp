@@ -33,6 +33,40 @@ extern "C" {
 
 namespace boost { namespace gil { namespace detail {
 
+template < int K >
+struct plane_recursion
+{
+   template< typename View
+           , typename Device
+           , typename ConversionPolicy
+           >
+   static
+   void read_plane( const View& dst_view, reader< Device
+                                                , tiff_tag
+                                                , ConversionPolicy >* p )
+   {
+      typedef kth_channel_view_type< K, typename View >::type plane_t;
+      plane_t plane = kth_channel_view<K>( dst_view );
+      p->read_data( plane, K );
+
+      plane_recursion< K - 1 >::read_plane( dst_view, p );
+   }
+};
+
+template <>
+struct plane_recursion< -1 >
+{
+   template< typename View
+           , typename Device
+           , typename ConversionPolicy
+           >
+   static
+   void read_plane( const View& dst_view, reader< Device
+                                                , tiff_tag
+                                                , ConversionPolicy >* p ) {}
+};
+
+
 template< typename Device
         , typename ConversionPolicy
         >
@@ -358,8 +392,8 @@ private:
                                                          >::type::value
                  , "User provided view has incorrect color space or channel type." );
 
-      plane_recursion< num_channels< View >::value - 1 > pr;
-      pr.read_plane( dst_view );
+      plane_recursion< num_channels< View >::value - 1 >::read_plane( dst_view
+                                                                    , this      );
    }
 
    template< typename Buffer >
@@ -379,31 +413,7 @@ private:
       }
    }
 
-   template < int K >
-   struct plane_recursion
-   {
-      template< typename View >
-      void read_plane( const View& dst_view )
-      {
-         typedef kth_channel_view_type< K, typename View >::type plane_t;
-         plane_t plane = kth_channel_view<K>( dst_view );
-         read_data( plane, K );
-
-         plane_recursion< K - 1 > pr;
-         pr.read_plane( dst_view );
-      }
-   };
-
-   template <>
-   struct plane_recursion< -1 >
-   {
-      template< typename View >
-      void read_plane( const View& dst_view ) {}
-   };
-
-
    template< typename View >
-   static
    void read_data( const View& dst_view
                  , int         plane     )
    {
@@ -413,7 +423,6 @@ private:
 
       typedef read_helper_t::buffer_t buffer_t;
 
-/*
       std::size_t size_to_allocate = buffer_size< typename View::value_type >( dst_view.width()
                                                                              , is_bit_aligned< View >::type() );
       buffer_t buffer( size_to_allocate );
@@ -423,7 +432,7 @@ private:
 
       skip_over_rows( buffer, plane );
 
-      swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( file );
+      swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb;
 
       for( std::ptrdiff_t row = _top_left.y
          ; row < dst_view.height() + _top_left.y
@@ -439,7 +448,6 @@ private:
                         , last
                         , dst_view.row_begin( row ));
       }
-*/
    }
 
    template< typename is_bit_aligned
@@ -560,6 +568,9 @@ private:
    image_read_info<tiff_tag> _info;
 
    point_t _top_left;
+
+   template < int K > friend struct plane_recursion;
+
 };
 
 template < typename Device >
