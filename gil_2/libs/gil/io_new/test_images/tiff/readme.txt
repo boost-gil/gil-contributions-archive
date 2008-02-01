@@ -1,1 +1,0 @@
-taken from http://www.remotesensing.org/libtiff/images.html
