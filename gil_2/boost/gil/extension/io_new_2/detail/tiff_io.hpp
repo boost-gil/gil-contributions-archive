@@ -201,7 +201,7 @@ private:
       tiff_color_map::red_t   red;
       tiff_color_map::green_t green;
       tiff_color_map::blue_t  blue;
-   /*
+
       TIFFGetFieldDefaulted( file.get()
                            , tiff_color_map::tag
                            , &red
@@ -220,7 +220,6 @@ private:
 
       rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
 
-
       for( rgb16_view_t::y_coord_t y = 0; y < src_view.height(); ++y )
       {
          rgb16_view_t::x_iterator it  = src_view.row_begin( y );
@@ -235,7 +234,6 @@ private:
             *it = palette[i];
          }
       }
-   */
    }
 
    template< typename View
