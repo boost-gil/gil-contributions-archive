@@ -64,21 +64,6 @@ int main(int argc, char *argv[])
    using namespace boost::gil;
    using namespace boost::mpl;
 
-   typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-   typedef image_t::view_t::value_type pixel_t;
-   pixel_t pixel;
-
-   typedef channel_type<pixel_t>::type channel_t;
-
-   boost::uint16_t data=0;
-   channel_t c( &data, 0 );
-
-   BOOST_STATIC_ASSERT(( is_same< channel_t
-                                , packed_dynamic_channel_reference<unsigned char,1,true > >::value ));
-
-   int i = 9;
-
-/*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );
       typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
@@ -212,6 +197,6 @@ int main(int argc, char *argv[])
    {
       image_read_info< jpeg_tag > info = read_image_info( "test\\test.jpg", jpeg_tag() );
    }
-*/
+
    return 0;
 }

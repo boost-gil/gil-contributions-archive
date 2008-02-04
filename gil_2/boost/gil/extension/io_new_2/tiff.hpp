@@ -15,10 +15,7 @@ namespace boost{ namespace gil {
 
 template<typename PixelType>
 struct is_supported<PixelType,tiff_tag>
-    : mpl::bool_<detail::tiff_rw_support<
-                    typename channel_type<PixelType>::type,
-                    typename color_space_type<PixelType>::type
-                    >::is_supported>
+    : mpl::bool_< detail::tiff_rw_support::is_supported >
 {};
 
 }}

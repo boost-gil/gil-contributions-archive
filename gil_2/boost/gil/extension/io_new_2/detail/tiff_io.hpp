@@ -198,15 +198,10 @@ private:
                           , boost::mpl::true_   // is View rgb16_view_t
                           )
    {
-      tiff_color_map::red_t   red;
-      tiff_color_map::green_t green;
-      tiff_color_map::blue_t  blue;
-
-      TIFFGetFieldDefaulted( file.get()
-                           , tiff_color_map::tag
-                           , &red
-                           , &green
-                           , &blue                 );
+      tiff_color_map::red_t   red   = NULL;
+      tiff_color_map::green_t green = NULL;
+      tiff_color_map::blue_t  blue  = NULL;
+      _io_dev.get_field_defaulted( red, green, blue );
 
       typedef channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
       int num_colors = channel_traits< channel_t >::max_value();
@@ -220,10 +215,10 @@ private:
 
       rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
 
-      for( rgb16_view_t::y_coord_t y = 0; y < src_view.height(); ++y )
+      for( rgb16_view_t::y_coord_t y = 0; y < dst_view.height(); ++y )
       {
-         rgb16_view_t::x_iterator it  = src_view.row_begin( y );
-         rgb16_view_t::x_iterator end = src_view.row_end( y );
+         rgb16_view_t::x_iterator it  = dst_view.row_begin( y );
+         rgb16_view_t::x_iterator end = dst_view.row_end( y );
 
          typename Indices_View::x_iterator indices_it = indices_view.row_begin( y );
 

@@ -146,6 +146,18 @@ public:
       return TIFFScanlineSize( _tiff_file.get() );
    }
 
+
+   int get_field_defaulted( boost::uint16_t* red
+                          , boost::uint16_t* green
+                          , boost::uint16_t* blue  )
+   {
+      return TIFFGetFieldDefaulted( _tiff_file.get()
+                                  , TIFFTAG_COLORMAP
+                                  , &red
+                                  , &green
+                                  , &blue              );
+   }
+
 private:
 
    typedef boost::shared_ptr<TIFF> tiff_file_t;
