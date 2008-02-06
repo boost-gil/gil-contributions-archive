@@ -29,7 +29,10 @@ struct compare
    template< typename Channel >
    void operator() ( const Channel& c )
    {
-      assert( c == 0 );
+      if( c != 0 )
+      {
+         throw std::exception();
+      }
    }
 };
 
@@ -63,26 +66,58 @@ int main(int argc, char *argv[])
 {
    using namespace boost::gil;
    using namespace boost::mpl;
-
+/*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );
       typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-
-      image_t img;
-      read_image( file_name, img, tiff_tag() );
+      read_test_impl<image_t>( file_name );
    }
+
    {
       string file_name( ".\\test_images\\tiff\\gray2_image.tif" );
       typedef bit_aligned_image1_type< 2, gray_layout_t >::type image_t;
       read_test_impl<image_t>( file_name );
    }
-
+*/
    {
       string file_name( ".\\test_images\\tiff\\gray4_image.tif" );
       typedef bit_aligned_image1_type< 4, gray_layout_t >::type image_t;
-      read_test_impl<image_t>( file_name );
+      typedef image_t::view_t::value_type pixel_t;
+
+      image_t src;
+      read_image( file_name, src, tiff_tag() );
+
+      for (int y = 0; y < src.height(); ++y )
+      {
+         image_t::view_t::x_iterator src_it = view( src ).row_begin( y );
+
+         for( int x = 0; x< src.width(); ++x )
+         {
+            if( src_it[x] != 0 )
+            {
+               int i = 9;
+            }
+         }
+      }
+
+/*
+      for (int y = 0; y < src.height(); ++y )
+      {
+         image_t::view_t::y_iterator src_it = view( src ).row_begin( y );
+
+         for( int x = 0; x< src.width(); ++x )
+         {
+            if( src[x] != 0 )
+            {
+               int i = 9;
+            }
+         }
+      }
+*/
+
    }
 
+/*
    {
       string file_name( ".\\test_images\\tiff\\gray8_image.tif" );
       read_test_impl<gray8_image_t>( file_name );
@@ -178,6 +213,8 @@ int main(int argc, char *argv[])
       string file_name( ".\\test_images\\tiff\\rgba64f_image.tif" );
       read_test_impl<rgba64f_image_t>( file_name );
    }
+*/
+/*
    {
       image_read_info< tiff_tag > info = read_image_info( "test\\test.tif", tiff_tag() );
 
@@ -197,6 +234,6 @@ int main(int argc, char *argv[])
    {
       image_read_info< jpeg_tag > info = read_image_info( "test\\test.jpg", jpeg_tag() );
    }
-
+*/
    return 0;
 }
