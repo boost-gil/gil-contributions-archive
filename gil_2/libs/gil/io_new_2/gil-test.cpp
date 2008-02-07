@@ -72,13 +72,14 @@ int main(int argc, char *argv[])
       typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
       read_test_impl<image_t>( file_name );
    }
+*/
 
    {
       string file_name( ".\\test_images\\tiff\\gray2_image.tif" );
       typedef bit_aligned_image1_type< 2, gray_layout_t >::type image_t;
       read_test_impl<image_t>( file_name );
    }
-*/
+
    {
       string file_name( ".\\test_images\\tiff\\gray4_image.tif" );
       typedef bit_aligned_image1_type< 4, gray_layout_t >::type image_t;
@@ -99,22 +100,6 @@ int main(int argc, char *argv[])
             }
          }
       }
-
-/*
-      for (int y = 0; y < src.height(); ++y )
-      {
-         image_t::view_t::y_iterator src_it = view( src ).row_begin( y );
-
-         for( int x = 0; x< src.width(); ++x )
-         {
-            if( src[x] != 0 )
-            {
-               int i = 9;
-            }
-         }
-      }
-*/
-
    }
 
 /*
