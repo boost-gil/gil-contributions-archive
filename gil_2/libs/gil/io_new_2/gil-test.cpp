@@ -66,13 +66,20 @@ int main(int argc, char *argv[])
 {
    using namespace boost::gil;
    using namespace boost::mpl;
+
+   string file_name( "C:\\gil\\Eurosoft\\data\\test-zeichnung1.tif" );
+   typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
+
+   image_t src;
+   read_image( file_name, src, tiff_tag() );
+
+
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );
       typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
       read_test_impl<image_t>( file_name );
    }
-*/
 
    {
       string file_name( ".\\test_images\\tiff\\gray2_image.tif" );
@@ -83,26 +90,10 @@ int main(int argc, char *argv[])
    {
       string file_name( ".\\test_images\\tiff\\gray4_image.tif" );
       typedef bit_aligned_image1_type< 4, gray_layout_t >::type image_t;
-      typedef image_t::view_t::value_type pixel_t;
 
-      image_t src;
-      read_image( file_name, src, tiff_tag() );
-
-      for (int y = 0; y < src.height(); ++y )
-      {
-         image_t::view_t::x_iterator src_it = view( src ).row_begin( y );
-
-         for( int x = 0; x< src.width(); ++x )
-         {
-            if( src_it[x] != 0 )
-            {
-               int i = 9;
-            }
-         }
-      }
+      read_test_impl<image_t>( file_name );
    }
 
-/*
    {
       string file_name( ".\\test_images\\tiff\\gray8_image.tif" );
       read_test_impl<gray8_image_t>( file_name );

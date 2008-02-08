@@ -175,11 +175,13 @@ public:
     {
     }
 
-    size_t read( unsigned char * data, int count )
+    size_t read( unsigned char * data, size_t count )
     {
         size_t cr = 0;
         do{
-            size_t c = in.readsome(reinterpret_cast<char*>(data), count );
+            size_t c = in.readsome( reinterpret_cast<char*>( data )
+                                  , static_cast<std::streamsize>( count ));
+
             count -= c;
             data += c;
             cr += c;
