@@ -248,7 +248,7 @@ private:
     ConversionPolicy cc_policy;
     png_structp _png_ptr;
     png_infop _info_ptr;
-};
+   };
 
 template<typename Device>
 class writer<Device,png_tag> : png_io_base<Device>

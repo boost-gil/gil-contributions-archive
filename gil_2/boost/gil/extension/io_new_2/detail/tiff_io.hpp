@@ -107,10 +107,8 @@ public:
                  , "cannot read tiff tag." );
       io_error_if( _io_dev.get_property<tiff_planar_configuration>      ( info._planar_configuration ) == false
                  , "cannot read tiff tag." );
-
-      ///@todo: Doesn't work right now.
-      //io_error_if( _io_dev.get_property<tiff_photometric_interpretation>( info._photometric_interpretation  ) == false
-      //           , "cannot read tiff tag." );
+      io_error_if( _io_dev.get_property<tiff_photometric_interpretation>( info._photometric_interpretation  ) == false
+                 , "cannot read tiff tag." );
 
       return info;
    }

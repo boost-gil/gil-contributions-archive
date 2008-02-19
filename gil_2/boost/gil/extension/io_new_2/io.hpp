@@ -119,82 +119,199 @@ struct image_read_info;
 template<typename FormatTag>
 struct image_write_info;
 
+template< typename Device
+        , typename FormatTag
+        >
+struct enable_if_input_device_formattag : public enable_if< typename mpl::and_ < typename is_format_tag<FormatTag>::type
+                                                                               , typename detail::is_input_device<Device>::type
+                                                                               >::type
+                                                          > {};
+
+template< typename Device
+        , typename FormatTag
+        >
+struct enable_if_device_formattag : public enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
+                                                                        , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                    , Device
+                                                                                                                    >::type
+                                                                        >::type
+                                                    > {};
+
+template< typename String
+        , typename FormatTag
+        >
+struct enable_if_string_formattag : public enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
+                                                                        , typename detail::is_supported_path_spec< String >::type
+                                                                        >::type
+                                                    > {};
+
+template< typename Device
+        , typename FormatTag
+        >
+struct enable_if_in_dev_or_adapt_in_dev_formattag : public enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
+                                                                                                           , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                                                       , Device
+                                                                                                                                                       >::type
+                                                                                                           >::type
+                                                                                        , typename is_format_tag< FormatTag >::type
+                                                                                        >::type
+                                                                    >
+
+
+template< typename Device
+        , typename Image
+        , typename FormatTag
+        >
+struct enable_if_input_device_image_formattag : public enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
+                                                                                    , typename is_format_tag          < FormatTag >::type
+                                                                                    , typename is_supported           < typename Image::value_type
+                                                                                                                      , FormatTag 
+                                                                                                                      >::type 
+                                                                                    >::type 
+                                                                > {};
+
+template< typename Device
+        , typename Image
+        , typename FormatTag
+        >
+struct enable_if_adapt_in_dvc_img_frmttag : public enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                            , Device
+                                                                                                                            >::type
+                                                                                , typename is_format_tag<FormatTag>::type
+                                                                                , typename is_supported< typename Image::value_type
+                                                                                                       , FormatTag
+                                                                                                       >::type 
+                                                                                >::type
+                                                            >{};
+                                                            
+template < typename String
+         , typename Image
+         , typename FormatTag
+         > 
+struct enable_if_strng_img_frmttag : public enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
+                                                                         , typename is_format_tag<FormatTag>::type
+                                                                         , typename is_supported< typename Image::value_type
+                                                                                                , FormatTag
+                                                                                                >::type
+                                                                         >::type
+                                                     > {};
+template < typename Device
+         , typename Image
+         , typename FormatTag
+         >
+struct enable_if_in_dev_adapt_in_dev : public enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
+                                                                           , typename mpl::or_< typename detail::is_input_device< Device >::type
+                                                                                              , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                                          , Device
+                                                                                                                                          >::type
+                                                                                              >::type
+                                                                           , typename is_supported< typename View::value_type, FormatTag>::type
+                                                                           >::type
+                                                       > {};
+
+
 /// \ingroup IO
 /// \brief Returns the image info for generating a gil image type.
-template<typename Device, typename FormatTag>
-inline 
-image_read_info<FormatTag>
-read_image_info( Device & file, FormatTag const& tag, 
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_input_device<Device>::type
-        >::type>::type * ptr = 0
-        )
+template< typename Device
+        , typename FormatTag
+        >
+inline
+image_read_info< FormatTag >
+read_image_info( Device&         file
+               , const FormatTag tag
+               , typename enable_if_input_device_formattag< Device
+                                                          , FormatTag >::type* ptr = 0
+               )
 {
-    return detail::reader<Device,FormatTag,detail::read_and_no_convert>( file ).get_info();
+    return detail::reader< Device
+                         , FormatTag
+                         , detail::read_and_no_convert
+                         >( file ).get_info();
 }
 
-template<typename Device, typename FormatTag>
+template< typename Device
+        , typename FormatTag
+        >
 inline 
 image_read_info<FormatTag>
-read_image_info( Device & file, FormatTag const& tag, 
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_adaptable_input_device<FormatTag,Device>::type
-        >::type>::type * ptr = 0
-        )
+read_image_info( Device&          file
+               , const FormatTag& tag
+               , typename enable_if_device_formattag< Device
+                                                    , FormatTag >::type* ptr = 0
+               )
 {
-    typedef typename detail::is_adaptable_input_device<FormatTag,Device>::device_type device_type;
+    typedef typename detail::is_adaptable_input_device< FormatTag
+                                                      , Device
+                                                      >::device_type device_type;
 
-    device_type dev(file);
-    return detail::reader<device_type,FormatTag,detail::read_and_no_convert>( file ).get_info();
+    device_type dev( file );
+    return detail::reader< device_type
+                         , FormatTag
+                         , detail::read_and_no_convert
+                         >( file ).get_info();
 }
 
-template<typename String,typename FormatTag>
+template< typename String
+        , typename FormatTag
+        >
 inline 
 image_read_info<FormatTag>  
-read_image_info( String const& file_name, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_supported_path_spec<String>::type
-        >::type>::type * ptr = 0
-        )
+read_image_info( const String&    file_name
+               , const FormatTag& tag
+               , typename enable_if_string_formattag< String, FormatTag >::type* ptr = 0
+               )
 {
-    detail::file_stream_device<FormatTag> reader( 
-            detail::convert_to_string(file_name), 
-            detail::file_stream_device<FormatTag>::read_tag()
-            );
-    return read_image_info( reader, tag);
+    detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )
+                                                  , detail::file_stream_device< FormatTag >::read_tag()
+                                                  );
+
+    return read_image_info( reader
+                          , tag    );
 }
 
 // ------ Image --- Reader -------- no conversion -----------
 
+
 /// \ingroup IO
-template <typename Device, typename Image, typename FormatTag> 
-inline void read_image( 
-        Device & file, Image& img, point_t top_left, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_input_device<Device>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename Image::value_type, FormatTag>::type 
-        >::type>::type * ptr = 0
-        )
+template < typename Device
+         , typename Image
+         , typename FormatTag
+         > 
+inline 
+void read_image( Device&          file
+               , Image&           img
+               , const point_t&   top_left
+               , const point_t&   bottom_right
+               , const FormatTag& tag
+               , typename enable_if_input_device_image_formattag< Device
+                                                                , Image
+                                                                , FormatTag
+                                                                >::type* ptr = 0
+               )
 {
-    detail::reader<Device,FormatTag,detail::read_and_no_convert> reader(file);
-    reader.read_image( img, top_left );
+    detail::reader< Device
+                  , FormatTag
+                  , detail::read_and_no_convert
+                  > reader( file );
+
+    reader.read_image( img
+                     , top_left );
 }
 
-template <typename Device, typename Image, typename FormatTag> 
-inline void read_image( 
-        Device & file, Image& img, point_t top_left, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename Image::value_type, FormatTag>::type 
-        >::type>::type * ptr = 0
-        )
+template < typename Device
+         , typename Image
+         , typename FormatTag
+         > 
+inline void read_image( Device&          file
+                      , Image&           img
+                      , const point_t&   top_left
+                      , const point_t&   bottom_right
+                      , const FormatTag& tag
+                      , typename enable_if_adaptable_input_device_image_formattag< Device
+                                                                                 , Image
+                                                                                 , FormatTag
+                                                                                 >::type* ptr = 0
+                      )
 {
     typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
     device_type dev(file);
@@ -202,420 +319,708 @@ inline void read_image(
     reader.read_image( img, top_left );
 }
 
-
-
-template <typename String,typename Image, typename FormatTag> 
-inline void read_image( 
-        String const& file_name, Image& img, point_t top_left, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename Image::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
+template < typename String
+         , typename Image
+         , typename FormatTag
+         > 
+inline 
+void read_image( const String& file_name
+               , Image& img
+               , const point_t& top_left
+               , const point_t& bottom_right
+               , const FormatTag& tag
+               , typename enable_if_strng_img_frmttag::type* ptr = 0
+               )
 {
-    detail::file_stream_device<FormatTag> device( 
-            detail::convert_to_string(file_name), 
-            detail::file_stream_device<FormatTag>::read_tag()
-            );
-    read_image( device, img, top_left, tag );
+    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
+                                                , detail::file_stream_device<FormatTag>::read_tag()
+                                                );
+
+    read_image( device
+              , img
+              , top_left
+              , bottom_left
+              , tag
+              );
 }
 
 /// \ingroup IO
-template <typename Device, typename Image, typename FormatTag> 
+template < typename Device
+         , typename Image
+         , typename FormatTag
+         > 
 inline
-void read_image( 
-        Device& file, Image& img, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_input_device<Device>::type,
-            typename is_supported<typename Image::value_type, FormatTag>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0 
-        )
+void read_image( Device& file
+               , Image& img
+               , const FormatTag& tag
+               , typename enable_if_input_device_image_formattag< Device
+                                                                , Image
+                                                                , FormatTag
+                                                                >::type* ptr = 0 
+               )
 {
-    read_image( file, img, point_t( 0, 0 ), tag );
+    read_image( file
+              , img
+              , point_t( 0, 0 )
+              , point_t( 0, 0 )
+              , tag
+              );
 }
 
 /// \ingroup IO
-template <typename Device, typename Image, typename FormatTag> 
+template < typename Device
+         , typename Image
+         , typename FormatTag
+         > 
 inline
-void read_image( 
-        Device& file, Image& img, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
-            typename is_supported<typename Image::value_type, FormatTag>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0 
-        )
+void read_image( Device&          file
+               , Image&           img
+               , const FormatTag& tag
+               , typename enable_if_adapt_in_dvc_img_frmttag< Device
+                                                            , Image
+                                                            , FormatTag
+                                                            >::type* ptr = 0 
+               )
 {
-    typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
-    device_type dev(file);
-    read_image( dev, img, point_t( 0, 0 ), tag );
+    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    device_type dev( file );
+
+    read_image( dev
+              , img
+              , point_t( 0, 0 )
+              , point_t( 0, 0 )
+              , tag
+              );
 }
 
 /// \ingroup IO
-template <typename String, typename Image,typename FormatTag> 
+template < typename String
+         , typename Image
+         , typename FormatTag
+         > 
 inline
-void read_image( 
-        String const& file_name,
-        Image& img, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename Image::value_type, FormatTag>::type 
-        >::type>::type * ptr = 0 
+void read_image( const String&    file_name
+               , Image&           img
+               , const FormatTag& tag
+               , typename enable_if_strng_img_frmttag< String
+                                                     , Image
+                                                     , FormatTag
+                                                     >::type* ptr = 0 
         )
 {
-    detail::file_stream_device<FormatTag> device( 
-            detail::convert_to_string(file_name), 
-            detail::file_stream_device<FormatTag>::read_tag()
-            );
-    read_image( device, img, point_t( 0, 0 ), tag );
+    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
+                                                , detail::file_stream_device<FormatTag>::read_tag()
+                                                );
+
+    read_image( device
+              , img
+              , point_t( 0, 0 )
+              , point_t( 0, 0 )
+              , tag
+              );
 }
 
 // ------ View --- Reader -------- no conversion -----------
 
 /// \ingroup PNG_I
-template<typename Device, typename View, typename FormatTag > 
-inline void read_view( 
-        Device & file, const View& view, point_t top_left, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_input_device<Device>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0 
-        )
+template < typename Device
+         , typename View
+         , typename FormatTag
+         >
+inline 
+void read_view( Device&          file
+              , const View&      view
+              , const point_t&   top_left
+              , const point_t&   bottom_right
+              , const FormatTag& tag
+              , typename enable_if_input_device_image_formattag< Device
+                                                               , View
+                                                               , FormatTag
+                                                               >::type* ptr = 0 
+              )
 {
-    detail::reader<Device,FormatTag,detail::read_and_no_convert> reader(file);
-    reader.read_view( view, top_left );
+    detail::reader< Device
+                  , FormatTag
+                  , detail::read_and_no_convert
+                  > reader( file );
+
+    reader.read_view( view
+                    , top_left
+                    , bottom_right
+                    );
 }
 
-template<typename Device, typename View, typename FormatTag > 
-inline void read_view( 
-        Device & file, const View& view, point_t top_left, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0 
-        )
+template < typename Device
+         , typename View
+         , typename FormatTag
+         > 
+inline 
+void read_view( Device&          file
+              , const View&      view
+              , const point_t&   top_left
+              , const point_t&   bottom_right
+              , const FormatTag& tag
+              , typename enable_if_adapt_in_dvc_img_frmttag< Device
+                                                           , View
+                                                           , FormatTag
+                                                           >::type* ptr = 0 
+              )
 {
-    typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
-    device_type dev(file);
-    detail::reader<device_type,FormatTag,detail::read_and_no_convert> reader(dev);
-    reader.read_view( view, top_left );
+    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    device_type dev( file );
+
+    detail::reader< device_type
+                  , FormatTag
+                  , detail::read_and_no_convert
+                  > reader(dev);
+
+    reader.read_view( view
+                    , top_left
+                    , bottom_right
+                    );
 }
 
-template<typename String,typename View, typename FormatTag> 
-inline void read_view( 
-        String const& file_name, const View& view, point_t top_left, 
-        FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
+template < typename String
+         , typename View
+         , typename FormatTag
+         > 
+inline 
+void read_view( const String& file_name
+              , const View& view
+              , const point_t& top_left
+              , const point_t& bottom_right
+              , const FormatTag& tag
+              , typename enable_if_strng_img_frmttag< String
+                                                    , View
+                                                    , FormatTag
+                                                    >::type* ptr = 0
+              )
 {
-    detail::file_stream_device<FormatTag> device(
-            detail::convert_to_string(file_name), 
-            detail::file_stream_device<FormatTag>::read_tag()
-            );
-    read_view( device, view, top_left, tag);
+    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
+                                                , detail::file_stream_device< FormatTag >::read_tag()
+                                                );
+
+    read_view( device
+             , view
+             , top_left
+             , bottom_right
+             , tag
+             );
 }
 
 /// \ingroup IO
 /// \brief Loads the image specified by the \a file_name into the given \a view.
-template<typename String,typename View, typename FormatTag> 
-inline void read_view( 
-        String const& file_name, const View& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
+template < typename String
+         , typename View
+         , typename FormatTag
+         > 
+inline 
+void read_view( const String&    file_name
+              , const View&      view
+              , FormatTag const& tag
+              , typename enable_if_strng_img_frmttag< String
+                                                    , View
+                                                    , FormatTag
+                                                    >::type* ptr = 0
+              )
 {
     read_view( file_name, view, point_t(0,0), tag);
 }
 
-template<typename Device,typename View, typename FormatTag> 
-inline void read_view( 
-        Device & device, const View& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename mpl::or_<
-                typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<FormatTag,Device>::type
-            >::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
+template< typename Device
+        , typename View
+        , typename FormatTag
+        > 
+inline 
+void read_view( Device&          device
+              , const View&      view
+              , const FormatTag& tag
+              , typename enable_if_in_dev_adapt_in_dev< Device
+                                                      , View
+                                                      , FormatTag
+                                                      >::type* ptr = 0
+              )
 {
-    read_view( device, view, point_t(0,0), tag);
+    read_view( device
+             , view
+             , point_t(0,0)
+             , point_t(0,0)
+             , tag
+             );
 }
 
 // ------ Image --- Reader ------- With ColorConverter -----------------
 
 /// \ingroup IO
-template< typename Device, typename Image, typename ColorConverter, typename FormatTag>
+template< typename Device
+        , typename Image
+        , typename ColorConverter
+        , typename FormatTag
+        >
 inline
-void read_and_convert_image( Device & file, Image& img, const point_t& top_left, ColorConverter const& cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_input_device<Device>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0 
-        )
+void read_and_convert_image( Device&        file
+                           , Image&         img
+                           , const point_t& top_left
+                           , const point_t& bottom_right
+                           , const ColorConverter& cc
+                           , const FormatTag& tag
+                           , typename enable_if_input_device_formattag< Device
+                                                                      , FormatTag
+                                                                      >::type* ptr = 0 
+                           )
 {
     typedef detail::read_and_convert< ColorConverter > reader_color_convert;
 
-    detail::reader<Device,FormatTag,reader_color_convert> reader(file, cc);
+    detail::reader< Device
+                  , FormatTag
+                  , reader_color_convert
+                  > reader( file
+                          , cc
+                          );
 
-    reader.read_image( img, top_left );
+    reader.read_image( img
+                     , top_left
+                     , bottom_right
+                     );
 }
 
-template< typename Device, typename Image, typename ColorConverter, typename FormatTag>
+template< typename Device
+        , typename Image
+        , typename ColorConverter
+        , typename FormatTag
+        >
 inline
-void read_and_convert_image( Device & file, Image& img, const point_t& top_left, ColorConverter const& cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
-            typename is_format_tag<FormatTag>::type
-            >::type>::type * ptr1 = 0 
-        )
+void read_and_convert_image( Device&               file
+                           , Image&                img
+                           , const point_t&        top_left
+                           , const point_t&        bottom_right
+                           , const ColorConverter& cc
+                           , const FormatTag&      tag
+                           , typename enable_if_device_formattag< Device
+                                                                , FormatTag
+                                                                >::type* ptr = 0 
+                           )
 {
-    typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
-    device_type dev(file);
-    read_and_convert_image( dev, img, top_left, cc, tag );
+    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    device_type dev( file );
+
+    read_and_convert_image( dev
+                          , img
+                          , top_left
+                          , cc
+                          , tag
+                          );
 }
 
-template<typename String,typename Image, typename ColorConverter, typename FormatTag>
+template < typename String
+         , typename Image
+         , typename ColorConverter
+         , typename FormatTag
+         >
 inline
-void read_and_convert_image( String const& file_name, Image& img, const point_t& top_left, ColorConverter const& cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0 )
+void read_and_convert_image( const String& file_name
+                           , Image& img
+                           , const point_t& top_left
+                           , const point_t& bottom_right
+                           , const ColorConverter& cc
+                           , const FormatTag& tag
+                           , typename enable_if_string_formattag< String
+                                                                , Image
+                                                                >::type* ptr = 0
+                           )
 {
-    detail::file_stream_device<FormatTag> device(
-            detail::convert_to_string(file_name),
-            detail::file_stream_device<FormatTag>::read_tag()
-            );
-    read_and_convert_image( device, img, top_left, cc, tag );
-}
+    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
+                                                  , detail::file_stream_device< FormatTag >::read_tag()
+                                                  );
 
-/// \ingroup IO
-template<typename String,typename Image, typename ColorConverter, typename FormatTag>
-inline
-void read_and_convert_image(
-        String const& file_name, Image& img, 
-        ColorConverter const& cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-            >::type>::type * ptr1 = 0 
-        )
-{
-    read_and_convert_image( file_name, img, point_t( 0, 0 ), cc, tag );
-}
-
-template<typename Device,typename Image, typename ColorConverter, typename FormatTag>
-inline
-void read_and_convert_image(
-        Device & device, Image& img, 
-        ColorConverter const& cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename mpl::or_<
-                typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<FormatTag,Device>::type
-                >::type,
-            typename is_format_tag<FormatTag>::type
-            >::type>::type * ptr1 = 0 
-        )
-{
-    read_and_convert_image( device, img, point_t( 0, 0 ), cc, tag );
-}
-
-/// \ingroup IO
-template <typename String, typename Image, typename FormatTag>
-inline
-void read_and_convert_image( String const& file_name, Image& img, const point_t& top_left, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0 )
-{
-   read_and_convert_image( file_name, img, top_left, default_color_converter(), tag );
-}
-
-template <typename Device, typename Image, typename FormatTag>
-inline
-void read_and_convert_image( Device& device, Image& img, const point_t& top_left, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename mpl::or_<
-                typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<FormatTag,Device>::type
-                >::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0 )
-{
-   read_and_convert_image( device, img, top_left, default_color_converter(), tag );
+    read_and_convert_image( device
+                          , img
+                          , top_left
+                          , bottom_right
+                          , cc
+                          , tag
+                          );
 }
 
 /// \ingroup IO
-template <typename String, typename Image, typename FormatTag>
+template < typename String
+         , typename Image
+         , typename ColorConverter
+         , typename FormatTag
+         >
 inline
-void read_and_convert_image( String const& file_name, Image& img, FormatTag const & tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-            >::type>::type * ptr1 = 0 )
+void read_and_convert_image( const String& file_name
+                           , Image& img
+                           , const ColorConverter& cc
+                           , const FormatTag& tag
+                           , typename enable_if_string_formattag< String
+                                                                , FormatTag
+                                                                >::type* ptr = 0 
+                           )
 {
-   read_and_convert_image( file_name, img, point_t( 0, 0 ), default_color_converter(), tag );
+    read_and_convert_image( file_name
+                          , img
+                          , point_t( 0, 0 )
+                          , point_t( 0, 0 )
+                          , cc
+                          , tag
+                          );
 }
 
-template <typename Device, typename Image, typename FormatTag>
+template < typename Device
+         , typename Image
+         , typename ColorConverter
+         , typename FormatTag
+         >
 inline
-void read_and_convert_image( Device & device, Image& img, FormatTag const & tag,
-        typename enable_if<typename mpl::and_<
-            typename mpl::or_<
-                typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<FormatTag,Device>::type
-                >::type,
-            typename is_format_tag<FormatTag>::type
-            >::type>::type * ptr1 = 0 )
+void read_and_convert_image( Device&               device
+                           , Image&                img
+                           , const ColorConverter& cc
+                           , const FormatTag&      tag
+                           , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
+                                                                                , FormatTag
+                                                                                > ::type* ptr = 0 
+                           )
 {
-   read_and_convert_image( device, img, point_t( 0, 0 ), default_color_converter(), tag );
+    read_and_convert_image( device
+                          , img
+                          , point_t( 0, 0 )
+                          , point_t( 0, 0 )
+                          , cc
+                          , tag
+                          );
+}
+
+/// \ingroup IO
+template < typename String
+         , typename Image
+         , typename FormatTag
+         >
+inline
+void read_and_convert_image( const String&    file_name
+                           , Image&           img
+                           , const point_t&   top_left
+                           , const point_t&   bottom_right
+                           , const FormatTag& tag
+                           , typename enable_if_string_formattag< String
+                                                                , FormatTag
+                                                                >::type* ptr = 0
+                           )
+{
+   read_and_convert_image( file_name
+                         , img
+                         , top_left
+                         , bottom_right
+                         , default_color_converter()
+                         , tag
+                         );
+}
+
+template < typename Device
+         , typename Image
+         , typename FormatTag
+         >
+inline
+void read_and_convert_image( Device& device
+                           , Image& img
+                           , const point_t& top_left
+                           , const point_t& bottom_right 
+                           , const FormatTag& tag
+                           , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
+                                                                                , FormatTag
+                                                                                >::type* ptr = 0
+                           )
+{
+   read_and_convert_image( device
+                         , img
+                         , top_left
+                         , bottom_right
+                         , default_color_converter()
+                         , tag
+                         );
+}
+
+/// \ingroup IO
+template < typename String
+         , typename Image
+         , typename FormatTag
+         >
+inline
+void read_and_convert_image( const String&    file_name
+                           , Image&           img
+                           , const FormatTag& tag
+                           , typename enable_if_string_formattag< String
+                                                                , FormatTag
+                                                                >::type* ptr = 0
+                           )
+{
+   read_and_convert_image( file_name
+                         , img
+                         , point_t( 0, 0 )
+                         , point_t( 0, 0 )
+                         , default_color_converter()
+                         , tag
+                         );
+}
+
+template < typename Device
+         , typename Image
+         , typename FormatTag
+         >
+inline
+void read_and_convert_image( Device&          device
+                           , Image&           img
+                           , const FormatTag& tag
+                           , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
+                                                                                , FormatTag
+                                                                                >::type* ptr = 0
+                           )
+{
+   read_and_convert_image( device
+                         , img
+                         , point_t( 0, 0 )
+                         , point_t( 0, 0 )
+                         , default_color_converter()
+                         , tag
+                         );
 }
 
 // ----- View --- Reader --------- With ColorConverter -----------------
 
 /// \ingroup IO
-template<typename Device, typename View, typename ColorConverter, typename FormatTag>
+template< typename Device
+        , typename View
+        , typename ColorConverter
+        , typename FormatTag
+        >
 inline
-void read_and_convert_view( Device& device, const View& view, const point_t& top_left, ColorConverter cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_input_device<Device>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0)
+void read_and_convert_view( Device&               file
+                          , const View&           view
+                          , const point_t&        top_left
+                          , const point_t&        bottom_right
+                          , const ColorConverter& cc
+                          , const FormatTag&      tag
+                          , typename enable_if_input_device_formattag< Device
+                                                                     , FormatTag
+                                                                     >::type* ptr = 0 
+                          )
 {
     typedef detail::read_and_convert< ColorConverter > reader_color_convert;
 
-    detail::reader<Device,FormatTag,reader_color_convert> reader(device,cc);
+    detail::reader< Device
+                  , FormatTag
+                  , reader_color_convert
+                  > reader( file
+                          , cc
+                          );
 
-    reader.read_view( view, top_left );
+    reader.read_view( view
+                     , top_left
+                     , bottom_right
+                     );
 }
 
-template<typename Device, typename View, typename ColorConverter, typename FormatTag>
+
+template< typename Device
+        , typename View
+        , typename ColorConverter
+        , typename FormatTag
+        >
 inline
-void read_and_convert_view( Device& device, const View& view, const point_t& top_left, ColorConverter cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_input_device<FormatTag,Device>::type,
-            typename is_format_tag<FormatTag>::type
-         >::type>::type * ptr1 = 0)
+void read_and_convert_view( Device&               file
+                          , const View&           view
+                          , const point_t&        top_left
+                          , const point_t&        bottom_right
+                          , const ColorConverter& cc
+                          , const FormatTag&      tag
+                          , typename enable_if_device_formattag< Device
+                                                               , FormatTag
+                                                               >::type* ptr = 0 
+                          )
 {
-    typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
-    device_type dev(device);
-    read_and_convert_view( dev, view, top_left, cc, tag );
+    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    device_type dev( file );
+
+    read_and_convert_view( dev
+                         , view
+                         , top_left
+                         , cc
+                         , tag
+                         );
 }
 
-template<typename String, typename View, typename ColorConverter, typename FormatTag>
+template < typename String
+         , typename Views
+         , typename ColorConverter
+         , typename FormatTag
+         >
 inline
-void read_and_convert_view( String const& file_name, const View& view, const point_t& top_left, ColorConverter cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0)
+void read_and_convert_view( const String&         file_name
+                          , const View&           view
+                          , const point_t&        top_left
+                          , const point_t&        bottom_right
+                          , const ColorConverter& cc
+                          , const FormatTag&      tag
+                          , typename enable_if_string_formattag< String
+                                                               , Image
+                                                               >::type* ptr = 0
+                          )
 {
-    detail::file_stream_device<FormatTag> device( 
-            detail::convert_to_string(file_name), 
-            detail::file_stream_device<FormatTag>::read_tag() 
-            );
-    read_and_convert_view( device, view, top_left, cc, tag );
-}
+    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
+                                                  , detail::file_stream_device< FormatTag >::read_tag()
+                                                  );
 
-template<typename Device, typename View, typename ColorConverter, typename FormatTag>
-inline
-void read_and_convert_view( Device& device, const View& view, ColorConverter cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename mpl::or_<
-                typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<FormatTag,Device>::type
-                >::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0)
-{
-    read_and_convert_view( device, view, point_t(0,0), cc, tag );
-}
-
-template<typename String, typename View, typename ColorConverter, typename FormatTag>
-inline
-void read_and_convert_view( String const& file_name, const View& view, ColorConverter cc, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0)
-{
-    read_and_convert_view( file_name, view, point_t(0,0), cc, tag );
+    read_and_convert_view( device
+                         , view
+                         , top_left
+                         , bottom_right
+                         , cc
+                         , tag
+                         );
 }
 
 /// \ingroup IO
-template<typename Device, typename View, typename ColorConverter, typename FormatTag>
+template < typename String
+         , typename View
+         , typename ColorConverter
+         , typename FormatTag
+         >
 inline
-void read_and_convert_view( Device& device, const View& view, const point_t& top_left, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename mpl::or_<
-                typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<FormatTag,Device>::type
-                >::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0)
+void read_and_convert_view( const String&         file_name
+                          , const View&           view
+                          , const ColorConverter& cc
+                          , const FormatTag&      tag
+                          , typename enable_if_string_formattag< String
+                                                               , FormatTag
+                                                               >::type* ptr = 0 
+                          )
 {
-    read_and_convert_view( device, view, top_left, default_color_converter(), tag );
+    read_and_convert_view( file_name
+                         , view
+                         , point_t( 0, 0 )
+                         , point_t( 0, 0 )
+                         , cc
+                         , tag
+                         );
 }
 
-template< typename String, typename View, typename FormatTag>
+template < typename Device
+         , typename View
+         , typename ColorConverter
+         , typename FormatTag
+         >
 inline
-void read_and_convert_view( String const& file_name, const View& view, const point_t& top_left, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0 )
+void read_and_convert_view( Device&               device
+                          , const View&           view
+                          , const ColorConverter& cc
+                          , const FormatTag&      tag
+                          , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
+                                                                               , FormatTag
+                                                                               > ::type* ptr = 0 
+                          )
 {
-   read_and_convert_view( file_name, view, top_left, default_color_converter(), tag );
+    read_and_convert_view( device
+                         , view
+                         , point_t( 0, 0 )
+                         , point_t( 0, 0 )
+                         , cc
+                         , tag
+                         );
 }
 
 /// \ingroup IO
-template<typename Device, typename View, typename ColorConverter, typename FormatTag>
+template < typename String
+         , typename View
+         , typename FormatTag
+         >
 inline
-void read_and_convert_view( Device& device, const View& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename mpl::or_<
-                typename detail::is_input_device<Device>::type,
-                typename detail::is_adaptable_input_device<FormatTag,Device>::type
-                >::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0)
+void read_and_convert_view( const String&    file_name
+                          , const View&      view
+                          , const point_t&   top_left
+                          , const point_t&   bottom_right
+                          , const FormatTag& tag
+                          , typename enable_if_string_formattag< String
+                                                               , FormatTag
+                                                               >::type* ptr = 0
+                          )
 {
-    read_and_convert_view( device, view, point_t(0,0), default_color_converter(), tag );
+   read_and_convert_view( file_name
+                        , view
+                        , top_left
+                        , bottom_right
+                        , default_color_converter()
+                        , tag
+                        );
 }
 
-template<typename String, typename View, typename ColorConverter, typename FormatTag>
+template < typename Device
+         , typename View
+         , typename FormatTag
+         >
 inline
-void read_and_convert_view( String const& file_name, const View& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type
-        >::type>::type * ptr1 = 0)
+void read_and_convert_view( Device&          device
+                          , const View&      view
+                          , const point_t&   top_left
+                          , const point_t&   bottom_right 
+                          , const FormatTag& tag
+                          , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
+                                                                               , FormatTag
+                                                                               >::type* ptr = 0
+                          )
 {
-    read_and_convert_view( file_name, view, point_t(0,0), default_color_converter(), tag );
+   read_and_convert_view( device
+                        , view
+                        , top_left
+                        , bottom_right
+                        , default_color_converter()
+                        , tag
+                        );
 }
 
+/// \ingroup IO
+template < typename String
+         , typename View
+         , typename FormatTag
+         >
+inline
+void read_and_convert_view( const String&    file_name
+                          , const view&      view
+                          , const FormatTag& tag
+                          , typename enable_if_string_formattag< String
+                                                               , FormatTag
+                                                               >::type* ptr = 0
+                          )
+{
+   read_and_convert_view( file_name
+                        , img
+                        , point_t( 0, 0 )
+                        , point_t( 0, 0 )
+                        , default_color_converter()
+                        , tag
+                        );
+}
+
+template < typename Device
+         , typename View
+         , typename FormatTag
+         >
+inline
+void read_and_convert_view( Device&          device
+                          , const View&      view
+                          , const FormatTag& tag
+                          , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
+                                                                               , FormatTag
+                                                                               >::type* ptr = 0
+                          )
+{
+   read_and_convert_view( device
+                        , view
+                        , point_t( 0, 0 )
+                        , point_t( 0, 0 )
+                        , default_color_converter()
+                        , tag
+                        );
+}
 
 //---- Writer -------------------------------
 

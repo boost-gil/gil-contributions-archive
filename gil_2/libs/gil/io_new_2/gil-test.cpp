@@ -67,14 +67,14 @@ int main(int argc, char *argv[])
    using namespace boost::gil;
    using namespace boost::mpl;
 
-   string file_name( "C:\\gil\\Eurosoft\\data\\test-zeichnung1.tif" );
-   typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-
-   image_t src;
-   read_image( file_name, src, tiff_tag() );
-
+   image_read_info< jpeg_tag > info = read_image_info( string( "test\\test.jpg" ), jpeg_tag() );
 
 /*
+   string file_name( ".\\test_images\\tiff\\found online\\flower.tif" );
+   gray8_image_t img;
+   
+   read_and_convert_image( file_name, img, tiff_tag() );
+
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );
       typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
@@ -190,6 +190,7 @@ int main(int argc, char *argv[])
       read_test_impl<rgba64f_image_t>( file_name );
    }
 */
+
 /*
    {
       image_read_info< tiff_tag > info = read_image_info( "test\\test.tif", tiff_tag() );
