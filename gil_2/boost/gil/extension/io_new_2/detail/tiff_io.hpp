@@ -128,10 +128,18 @@ public:
 
     template<typename View>
     void read_view( View&          view
-                  , const point_t& top_left )
+                  , const point_t& top_left
+                  , const point_t& bottom_right
+                  )
     {
         _info     = get_info();
         _top_left = top_left;
+
+        if( bottom_right == point_t( 0, 0 ))
+        {
+            _bottom_right.x = _info._width  - 1;
+            _bottom_right.y = _info._height - 1;
+        }
 
         io_error_if( view.dimensions() !=  point_t( _info._width  - _top_left.x
                                                   , _info._height - _top_left.y )
