@@ -122,92 +122,92 @@ struct image_write_info;
 template< typename Device
         , typename FormatTag
         >
-struct enable_if_input_device_formattag : public enable_if< typename mpl::and_ < typename is_format_tag<FormatTag>::type
-                                                                               , typename detail::is_input_device<Device>::type
-                                                                               >::type
+struct enable_if_in_dev_frmt : public enable_if< typename mpl::and_ < typename is_format_tag<FormatTag>::type
+                                                                    , typename detail::is_input_device<Device>::type
+                                                                    >::type
                                                           > {};
 
 template< typename Device
         , typename FormatTag
         >
-struct enable_if_device_formattag : public enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
-                                                                        , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                    , Device
-                                                                                                                    >::type
-                                                                        >::type
-                                                    > {};
+struct enable_if_adapt_in_dev_frmt : public enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
+                                                                         , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                     , Device
+                                                                                                                     >::type
+                                                                         >::type
+                                                     > {};
 
 template< typename String
         , typename FormatTag
         >
-struct enable_if_string_formattag : public enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                        , typename detail::is_supported_path_spec< String >::type
-                                                                        >::type
-                                                    > {};
+struct enable_if_str_frmt : public enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
+                                                                , typename detail::is_supported_path_spec< String >::type
+                                                                >::type
+                                            > {};
 
 template< typename Device
         , typename FormatTag
         >
-struct enable_if_in_dev_or_adapt_in_dev_formattag : public enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                                           , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                                       , Device
-                                                                                                                                                       >::type
-                                                                                                           >::type
-                                                                                        , typename is_format_tag< FormatTag >::type
-                                                                                        >::type
-                                                                    >
+struct enable_if_in_dev_or_adapt_in_dev_frmt : public enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
+                                                                                                      , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                                                  , Device
+                                                                                                                                                  >::type
+                                                                                                      >::type
+                                                                                   , typename is_format_tag< FormatTag >::type
+                                                                                   >::type
+                                                               > {};
 
-
-template< typename Device
-        , typename Image
-        , typename FormatTag
-        >
-struct enable_if_input_device_image_formattag : public enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
-                                                                                    , typename is_format_tag          < FormatTag >::type
-                                                                                    , typename is_supported           < typename Image::value_type
-                                                                                                                      , FormatTag 
-                                                                                                                      >::type 
-                                                                                    >::type 
-                                                                > {};
 
 template< typename Device
         , typename Image
         , typename FormatTag
         >
-struct enable_if_adapt_in_dvc_img_frmttag : public enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                            , Device
-                                                                                                                            >::type
-                                                                                , typename is_format_tag<FormatTag>::type
-                                                                                , typename is_supported< typename Image::value_type
-                                                                                                       , FormatTag
-                                                                                                       >::type 
-                                                                                >::type
-                                                            >{};
+struct enable_if_in_dev_img_frmt : public enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
+                                                                       , typename is_format_tag          < FormatTag >::type
+                                                                       , typename is_supported           < typename Image::value_type
+                                                                                                         , FormatTag 
+                                                                                                         >::type 
+                                                                       >::type 
+                                                   > {};
+
+template< typename Device
+        , typename Image
+        , typename FormatTag
+        >
+struct enable_if_adapt_in_dev_img_frmt : public enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                         , Device
+                                                                                                                         >::type
+                                                                             , typename is_format_tag<FormatTag>::type
+                                                                             , typename is_supported< typename Image::value_type
+                                                                                                    , FormatTag
+                                                                                                    >::type 
+                                                                             >::type
+                                                         >{};
                                                             
 template < typename String
          , typename Image
          , typename FormatTag
          > 
-struct enable_if_strng_img_frmttag : public enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
-                                                                         , typename is_format_tag<FormatTag>::type
-                                                                         , typename is_supported< typename Image::value_type
-                                                                                                , FormatTag
-                                                                                                >::type
-                                                                         >::type
-                                                     > {};
+struct enable_if_str_img_frmt : public enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
+                                                                    , typename is_format_tag<FormatTag>::type
+                                                                    , typename is_supported< typename Image::value_type
+                                                                                           , FormatTag
+                                                                                           >::type
+                                                                    >::type
+                                                > {};
 template < typename Device
          , typename Image
          , typename FormatTag
          >
-struct enable_if_in_dev_adapt_in_dev : public enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
-                                                                           , typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                              , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                          , Device
-                                                                                                                                          >::type
-                                                                                              >::type
-                                                                           , typename is_supported< typename View::value_type, FormatTag>::type
-                                                                           >::type
-                                                       > {};
+struct enable_if_in_dev_or_adapt_in_dev_img_frmt : public enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
+                                                                                       , typename mpl::or_< typename detail::is_input_device< Device >::type
+                                                                                                          , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                                                      , Device
+                                                                                                                                                      >::type
+                                                                                                          >::type
+                                                                                       , typename is_supported< typename Image::value_type, FormatTag>::type
+                                                                                       >::type
+                                                                   > {};
 
 
 /// \ingroup IO
@@ -219,8 +219,9 @@ inline
 image_read_info< FormatTag >
 read_image_info( Device&         file
                , const FormatTag tag
-               , typename enable_if_input_device_formattag< Device
-                                                          , FormatTag >::type* ptr = 0
+               , typename enable_if_in_dev_frmt< Device
+                                               , FormatTag
+                                               >::type* ptr = 0
                )
 {
     return detail::reader< Device
@@ -236,8 +237,9 @@ inline
 image_read_info<FormatTag>
 read_image_info( Device&          file
                , const FormatTag& tag
-               , typename enable_if_device_formattag< Device
-                                                    , FormatTag >::type* ptr = 0
+               , typename enable_if_adapt_in_dev_frmt< Device
+                                                     , FormatTag
+                                                     >::type* ptr = 0
                )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -258,7 +260,9 @@ inline
 image_read_info<FormatTag>  
 read_image_info( const String&    file_name
                , const FormatTag& tag
-               , typename enable_if_string_formattag< String, FormatTag >::type* ptr = 0
+               , typename enable_if_str_frmt< String
+                                            , FormatTag
+                                            >::type* ptr = 0
                )
 {
     detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )
@@ -283,10 +287,10 @@ void read_image( Device&          file
                , const point_t&   top_left
                , const point_t&   bottom_right
                , const FormatTag& tag
-               , typename enable_if_input_device_image_formattag< Device
-                                                                , Image
-                                                                , FormatTag
-                                                                >::type* ptr = 0
+               , typename enable_if_in_dev_img_frmt< Device
+                                                   , Image
+                                                   , FormatTag
+                                                   >::type* ptr = 0
                )
 {
     detail::reader< Device
@@ -307,10 +311,10 @@ inline void read_image( Device&          file
                       , const point_t&   top_left
                       , const point_t&   bottom_right
                       , const FormatTag& tag
-                      , typename enable_if_adaptable_input_device_image_formattag< Device
-                                                                                 , Image
-                                                                                 , FormatTag
-                                                                                 >::type* ptr = 0
+                      , typename enable_if_adapt_in_dev_img_frmt< Device
+                                                                , Image
+                                                                , FormatTag
+                                                                >::type* ptr = 0
                       )
 {
     typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
@@ -329,7 +333,10 @@ void read_image( const String& file_name
                , const point_t& top_left
                , const point_t& bottom_right
                , const FormatTag& tag
-               , typename enable_if_strng_img_frmttag::type* ptr = 0
+               , typename enable_if_str_img_frmt< String
+                                                , Image
+                                                , FormatTag
+                                                >::type* ptr = 0
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -353,10 +360,10 @@ inline
 void read_image( Device& file
                , Image& img
                , const FormatTag& tag
-               , typename enable_if_input_device_image_formattag< Device
-                                                                , Image
-                                                                , FormatTag
-                                                                >::type* ptr = 0 
+               , typename enable_if_in_dev_img_frmt< Device
+                                                   , Image
+                                                   , FormatTag
+                                                   >::type* ptr = 0 
                )
 {
     read_image( file
@@ -376,10 +383,10 @@ inline
 void read_image( Device&          file
                , Image&           img
                , const FormatTag& tag
-               , typename enable_if_adapt_in_dvc_img_frmttag< Device
-                                                            , Image
-                                                            , FormatTag
-                                                            >::type* ptr = 0 
+               , typename enable_if_adapt_in_dev_img_frmt< Device
+                                                         , Image
+                                                         , FormatTag
+                                                         >::type* ptr = 0 
                )
 {
     typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
@@ -402,10 +409,10 @@ inline
 void read_image( const String&    file_name
                , Image&           img
                , const FormatTag& tag
-               , typename enable_if_strng_img_frmttag< String
-                                                     , Image
-                                                     , FormatTag
-                                                     >::type* ptr = 0 
+               , typename enable_if_str_img_frmt< String
+                                                , Image
+                                                , FormatTag
+                                                >::type* ptr = 0 
         )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -433,10 +440,10 @@ void read_view( Device&          file
               , const point_t&   top_left
               , const point_t&   bottom_right
               , const FormatTag& tag
-              , typename enable_if_input_device_image_formattag< Device
-                                                               , View
-                                                               , FormatTag
-                                                               >::type* ptr = 0 
+              , typename enable_if_in_dev_img_frmt< Device
+                                                  , View
+                                                  , FormatTag
+                                                  >::type* ptr = 0 
               )
 {
     detail::reader< Device
@@ -460,10 +467,10 @@ void read_view( Device&          file
               , const point_t&   top_left
               , const point_t&   bottom_right
               , const FormatTag& tag
-              , typename enable_if_adapt_in_dvc_img_frmttag< Device
-                                                           , View
-                                                           , FormatTag
-                                                           >::type* ptr = 0 
+              , typename enable_if_adapt_in_dev_img_frmt< Device
+                                                        , View
+                                                        , FormatTag
+                                                        >::type* ptr = 0 
               )
 {
     typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
@@ -490,10 +497,10 @@ void read_view( const String& file_name
               , const point_t& top_left
               , const point_t& bottom_right
               , const FormatTag& tag
-              , typename enable_if_strng_img_frmttag< String
-                                                    , View
-                                                    , FormatTag
-                                                    >::type* ptr = 0
+              , typename enable_if_str_img_frmt< String
+                                               , View
+                                               , FormatTag
+                                               >::type* ptr = 0
               )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -518,10 +525,10 @@ inline
 void read_view( const String&    file_name
               , const View&      view
               , FormatTag const& tag
-              , typename enable_if_strng_img_frmttag< String
-                                                    , View
-                                                    , FormatTag
-                                                    >::type* ptr = 0
+              , typename enable_if_str_img_frmt< String
+                                               , View
+                                               , FormatTag
+                                               >::type* ptr = 0
               )
 {
     read_view( file_name, view, point_t(0,0), tag);
@@ -535,10 +542,10 @@ inline
 void read_view( Device&          device
               , const View&      view
               , const FormatTag& tag
-              , typename enable_if_in_dev_adapt_in_dev< Device
-                                                      , View
-                                                      , FormatTag
-                                                      >::type* ptr = 0
+              , typename enable_if_in_dev_or_adapt_in_dev_img_frmt< Device
+                                                                  , View
+                                                                  , FormatTag
+                                                                  >::type* ptr = 0
               )
 {
     read_view( device
@@ -564,9 +571,9 @@ void read_and_convert_image( Device&        file
                            , const point_t& bottom_right
                            , const ColorConverter& cc
                            , const FormatTag& tag
-                           , typename enable_if_input_device_formattag< Device
-                                                                      , FormatTag
-                                                                      >::type* ptr = 0 
+                           , typename enable_if_in_dev_frmt< Device
+                                                           , FormatTag
+                                                           >::type* ptr = 0 
                            )
 {
     typedef detail::read_and_convert< ColorConverter > reader_color_convert;
@@ -596,9 +603,9 @@ void read_and_convert_image( Device&               file
                            , const point_t&        bottom_right
                            , const ColorConverter& cc
                            , const FormatTag&      tag
-                           , typename enable_if_device_formattag< Device
-                                                                , FormatTag
-                                                                >::type* ptr = 0 
+                           , typename enable_if_adapt_in_dev_frmt< Device
+                                                                 , FormatTag
+                                                                 >::type* ptr = 0 
                            )
 {
     typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
@@ -624,9 +631,9 @@ void read_and_convert_image( const String& file_name
                            , const point_t& bottom_right
                            , const ColorConverter& cc
                            , const FormatTag& tag
-                           , typename enable_if_string_formattag< String
-                                                                , Image
-                                                                >::type* ptr = 0
+                           , typename enable_if_str_frmt< String
+                                                        , Image
+                                                        >::type* ptr = 0
                            )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
@@ -653,9 +660,9 @@ void read_and_convert_image( const String& file_name
                            , Image& img
                            , const ColorConverter& cc
                            , const FormatTag& tag
-                           , typename enable_if_string_formattag< String
-                                                                , FormatTag
-                                                                >::type* ptr = 0 
+                           , typename enable_if_str_frmt< String
+                                                        , FormatTag
+                                                        >::type* ptr = 0 
                            )
 {
     read_and_convert_image( file_name
@@ -677,9 +684,9 @@ void read_and_convert_image( Device&               device
                            , Image&                img
                            , const ColorConverter& cc
                            , const FormatTag&      tag
-                           , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
-                                                                                , FormatTag
-                                                                                > ::type* ptr = 0 
+                           , typename enable_if_in_dev_or_adapt_in_dev_frmt< Device
+                                                                           , FormatTag
+                                                                           > ::type* ptr = 0 
                            )
 {
     read_and_convert_image( device
@@ -702,9 +709,9 @@ void read_and_convert_image( const String&    file_name
                            , const point_t&   top_left
                            , const point_t&   bottom_right
                            , const FormatTag& tag
-                           , typename enable_if_string_formattag< String
-                                                                , FormatTag
-                                                                >::type* ptr = 0
+                           , typename enable_if_str_frmt< String
+                                                        , FormatTag
+                                                        >::type* ptr = 0
                            )
 {
    read_and_convert_image( file_name
@@ -726,9 +733,9 @@ void read_and_convert_image( Device& device
                            , const point_t& top_left
                            , const point_t& bottom_right 
                            , const FormatTag& tag
-                           , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
-                                                                                , FormatTag
-                                                                                >::type* ptr = 0
+                           , typename enable_if_in_dev_or_adapt_in_dev_frmt< Device
+                                                                           , FormatTag
+                                                                           >::type* ptr = 0
                            )
 {
    read_and_convert_image( device
@@ -749,9 +756,9 @@ inline
 void read_and_convert_image( const String&    file_name
                            , Image&           img
                            , const FormatTag& tag
-                           , typename enable_if_string_formattag< String
-                                                                , FormatTag
-                                                                >::type* ptr = 0
+                           , typename enable_if_str_frmt< String
+                                                        , FormatTag
+                                                        >::type* ptr = 0
                            )
 {
    read_and_convert_image( file_name
@@ -771,9 +778,9 @@ inline
 void read_and_convert_image( Device&          device
                            , Image&           img
                            , const FormatTag& tag
-                           , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
-                                                                                , FormatTag
-                                                                                >::type* ptr = 0
+                           , typename enable_if_in_dev_or_adapt_in_dev_frmt< Device
+                                                                           , FormatTag
+                                                                           >::type* ptr = 0
                            )
 {
    read_and_convert_image( device
@@ -800,9 +807,9 @@ void read_and_convert_view( Device&               file
                           , const point_t&        bottom_right
                           , const ColorConverter& cc
                           , const FormatTag&      tag
-                          , typename enable_if_input_device_formattag< Device
-                                                                     , FormatTag
-                                                                     >::type* ptr = 0 
+                          , typename enable_if_in_dev_frmt< Device
+                                                          , FormatTag
+                                                          >::type* ptr = 0 
                           )
 {
     typedef detail::read_and_convert< ColorConverter > reader_color_convert;
@@ -833,9 +840,9 @@ void read_and_convert_view( Device&               file
                           , const point_t&        bottom_right
                           , const ColorConverter& cc
                           , const FormatTag&      tag
-                          , typename enable_if_device_formattag< Device
-                                                               , FormatTag
-                                                               >::type* ptr = 0 
+                          , typename enable_if_adapt_in_dev_frmt< Device
+                                                                , FormatTag
+                                                                >::type* ptr = 0 
                           )
 {
     typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
@@ -850,7 +857,7 @@ void read_and_convert_view( Device&               file
 }
 
 template < typename String
-         , typename Views
+         , typename View
          , typename ColorConverter
          , typename FormatTag
          >
@@ -861,9 +868,9 @@ void read_and_convert_view( const String&         file_name
                           , const point_t&        bottom_right
                           , const ColorConverter& cc
                           , const FormatTag&      tag
-                          , typename enable_if_string_formattag< String
-                                                               , Image
-                                                               >::type* ptr = 0
+                          , typename enable_if_str_frmt< String
+                                                       , View
+                                                       >::type* ptr = 0
                           )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
@@ -890,9 +897,9 @@ void read_and_convert_view( const String&         file_name
                           , const View&           view
                           , const ColorConverter& cc
                           , const FormatTag&      tag
-                          , typename enable_if_string_formattag< String
-                                                               , FormatTag
-                                                               >::type* ptr = 0 
+                          , typename enable_if_str_frmt< String
+                                                       , FormatTag
+                                                       >::type* ptr = 0 
                           )
 {
     read_and_convert_view( file_name
@@ -914,9 +921,9 @@ void read_and_convert_view( Device&               device
                           , const View&           view
                           , const ColorConverter& cc
                           , const FormatTag&      tag
-                          , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
-                                                                               , FormatTag
-                                                                               > ::type* ptr = 0 
+                          , typename enable_if_in_dev_or_adapt_in_dev_frmt< Device
+                                                                          , FormatTag
+                                                                          > ::type* ptr = 0 
                           )
 {
     read_and_convert_view( device
@@ -939,9 +946,9 @@ void read_and_convert_view( const String&    file_name
                           , const point_t&   top_left
                           , const point_t&   bottom_right
                           , const FormatTag& tag
-                          , typename enable_if_string_formattag< String
-                                                               , FormatTag
-                                                               >::type* ptr = 0
+                          , typename enable_if_str_frmt< String
+                                                       , FormatTag
+                                                       >::type* ptr = 0
                           )
 {
    read_and_convert_view( file_name
@@ -963,9 +970,9 @@ void read_and_convert_view( Device&          device
                           , const point_t&   top_left
                           , const point_t&   bottom_right 
                           , const FormatTag& tag
-                          , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
-                                                                               , FormatTag
-                                                                               >::type* ptr = 0
+                          , typename enable_if_in_dev_or_adapt_in_dev_frmt< Device
+                                                                          , FormatTag
+                                                                          >::type* ptr = 0
                           )
 {
    read_and_convert_view( device
@@ -984,11 +991,11 @@ template < typename String
          >
 inline
 void read_and_convert_view( const String&    file_name
-                          , const view&      view
+                          , const View&      view
                           , const FormatTag& tag
-                          , typename enable_if_string_formattag< String
-                                                               , FormatTag
-                                                               >::type* ptr = 0
+                          , typename enable_if_str_frmt< String
+                                                       , FormatTag
+                                                       >::type* ptr = 0
                           )
 {
    read_and_convert_view( file_name
@@ -1008,9 +1015,9 @@ inline
 void read_and_convert_view( Device&          device
                           , const View&      view
                           , const FormatTag& tag
-                          , typename enable_if_in_dev_or_adapt_in_dev_formattag< Device
-                                                                               , FormatTag
-                                                                               >::type* ptr = 0
+                          , typename enable_if_in_dev_or_adapt_in_dev_frmt< Device
+                                                                          , FormatTag
+                                                                          >::type* ptr = 0
                           )
 {
    read_and_convert_view( device
@@ -1184,4 +1191,3 @@ void write_view( Device & device, const View& view, const image_write_info<Forma
 }}
 
 #endif
-

@@ -115,10 +115,34 @@ public:
 
     template< typename Image >
     void read_image( Image&         image
-                   , const point_t& top_left )
+                   , const point_t& top_left
+                   , const point_t& bottom_right
+                   )
     {
         _info     = get_info();
         _top_left = top_left;
+
+        if( bottom_right == point_t( 0, 0 ))
+        {
+            _bottom_right.x = _info._width  - 1;
+            _bottom_right.y = _info._height - 1;
+        }
+        else
+        {
+            _bottom_right = bottom_right;
+        }
+
+        io_error_if( (   ( _info._width - 1  ) < _top_left.x
+                      && ( _info._width - 1  ) < _bottom_right.x
+                      && ( _info._height - 1 ) < _top_left.y
+                      && ( _info._height - 1 ) < _bottom_right.y  )
+                   , "User provided view has incorrect size."       );
+
+        io_error_if( (   _top_left.x > _bottom_right.x
+                      && _top_left.y > _bottom_right.y
+                     )
+                   , "User provided view has incorrect size." );
+
 
         image.recreate( _info._width  - _top_left.x
                       , _info._height - _top_left.y );
@@ -128,8 +152,8 @@ public:
 
     template<typename View>
     void read_view( View&          view
-                  , const point_t& top_left
-                  , const point_t& bottom_right
+                  , const point_t& top_left     // src image coordinates
+                  , const point_t& bottom_right // src image coordinates
                   )
     {
         _info     = get_info();
@@ -140,10 +164,23 @@ public:
             _bottom_right.x = _info._width  - 1;
             _bottom_right.y = _info._height - 1;
         }
+        else
+        {
+            _bottom_right = bottom_right;
+        }
 
-        io_error_if( view.dimensions() !=  point_t( _info._width  - _top_left.x
-                                                  , _info._height - _top_left.y )
-                , "User provided view has incorrect size."                       );
+        io_error_if( ( ( _info._width - 1  )   > _top_left.x
+                      && ( _info._width - 1  ) > _bottom_right.x
+                      && ( _info._height - 1 ) > _top_left.y
+                      && ( _info._height - 1 ) > _bottom_right.y
+                     )
+                   , "User provided view has incorrect size." 
+                   );
+
+        io_error_if( (   _top_left.x > _bottom_right.x
+                      && _top_left.y > _bottom_right.y
+                     )
+                   , "User provided view has incorrect size." );
 
         apply_impl( view );
     }
@@ -553,9 +590,9 @@ private:
    image_read_info<tiff_tag> _info;
 
    point_t _top_left;
+   point_t _bottom_right;
 
    template < int K > friend struct plane_recursion;
-
 };
 
 template < typename Device >

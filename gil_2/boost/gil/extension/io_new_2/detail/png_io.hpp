@@ -100,15 +100,22 @@ public:
     }
 
     template<typename Image>
-    void read_image( Image &image, point_t const& top_left )
+    void read_image( Image&         image
+                   , const point_t& top_left
+                   , const point_t& bottom_right
+                   )
     {
         image_read_info<png_tag> info(get_info());
         image.recreate( info._width - top_left.x, 
                 info._height - top_left.y );
         read_data( view(image), top_left, info);
     }
+
     template<typename View>
-    void read_view( View &view, point_t const& top_left )
+    void read_view( const View&    view
+                  , const point_t& top_left
+                  , const point_t& bottom_right
+                  )
     {
         image_read_info<png_tag> info(get_info());
         io_error_if( view.dimensions() != point_t( info._width  - top_left.x
