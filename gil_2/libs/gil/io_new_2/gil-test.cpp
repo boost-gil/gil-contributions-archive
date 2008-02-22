@@ -67,14 +67,11 @@ int main(int argc, char *argv[])
    using namespace boost::gil;
    using namespace boost::mpl;
 
-   image_read_info< jpeg_tag > info = read_image_info( string( "test\\test.jpg" ), jpeg_tag() );
+   rgb8_image_t img;
+   read_image( ".\\test_images\\tiff\\found online\\flower.tif"
+             , img, tiff_tag() );
 
 /*
-   string file_name( ".\\test_images\\tiff\\found online\\flower.tif" );
-   gray8_image_t img;
-   
-   read_and_convert_image( file_name, img, tiff_tag() );
-
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );
       typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;

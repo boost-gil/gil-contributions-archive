@@ -299,7 +299,8 @@ void read_image( Device&          file
                   > reader( file );
 
     reader.read_image( img
-                     , top_left );
+                     , top_left
+                     , bottom_right );
 }
 
 template < typename Device
@@ -320,7 +321,10 @@ inline void read_image( Device&          file
     typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
     device_type dev(file);
     detail::reader<device_type,FormatTag,detail::read_and_no_convert> reader(dev);
-    reader.read_image( img, top_left );
+
+    reader.read_image( img
+                     , top_left
+                     , bottom_right );
 }
 
 template < typename String
@@ -761,6 +765,8 @@ void read_and_convert_image( const String&    file_name
                                                         >::type* ptr = 0
                            )
 {
+   typedef enable_if_str_frmt< String, FormatTag >::type tt;
+
    read_and_convert_image( file_name
                          , img
                          , point_t( 0, 0 )

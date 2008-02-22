@@ -144,8 +144,8 @@ public:
                    , "User provided view has incorrect size." );
 
 
-        image.recreate( _info._width  - _top_left.x
-                      , _info._height - _top_left.y );
+        image.recreate( _bottom_right.x - _top_left.x
+                      , _bottom_right.y - _top_left.y );
 
         apply_impl( view( image ));
     }
@@ -449,16 +449,19 @@ private:
                                                                              , is_view_bit_aligned_t() );
       buffer_t buffer( size_to_allocate );
       read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
+      read_helper_t::iterator_t end   = read_helper_t::end  ( buffer );
+
       read_helper_t::iterator_t first = begin + _top_left.x;
-      read_helper_t::iterator_t last  = first + dst_view.width();
+      read_helper_t::iterator_t last  = end - ( dst_view.width() - _bottom_right.x );
 
       skip_over_rows( buffer, plane );
 
       swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb;
 
       for( std::ptrdiff_t row = _top_left.y
-         ; row < dst_view.height() + _top_left.y
-         ; ++row )
+         ; row < ( _bottom_right.y - _top_left.y )
+         ; ++row
+         )
       {
          _io_dev.read_scaline( buffer
                              , row
