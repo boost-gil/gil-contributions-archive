@@ -69,7 +69,10 @@ int main(int argc, char *argv[])
 
    rgb8_image_t img;
    read_image( ".\\test_images\\tiff\\found online\\flower.tif"
-             , img, tiff_tag() );
+             , img
+             , point_t( 0, 0 )
+             , point_t( 199, 1 )
+             , tiff_tag() );
 
 /*
    {

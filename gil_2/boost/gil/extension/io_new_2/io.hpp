@@ -350,7 +350,7 @@ void read_image( const String& file_name
     read_image( device
               , img
               , top_left
-              , bottom_left
+              , bottom_right
               , tag
               );
 }

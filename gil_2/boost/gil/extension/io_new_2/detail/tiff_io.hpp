@@ -120,6 +120,12 @@ public:
                    )
     {
         _info     = get_info();
+
+        check_coordinates( top_left
+                         , bottom_right
+                         , _info
+                         );
+
         _top_left = top_left;
 
         if( bottom_right == point_t( 0, 0 ))
@@ -132,20 +138,9 @@ public:
             _bottom_right = bottom_right;
         }
 
-        io_error_if( (   ( _info._width - 1  ) < _top_left.x
-                      && ( _info._width - 1  ) < _bottom_right.x
-                      && ( _info._height - 1 ) < _top_left.y
-                      && ( _info._height - 1 ) < _bottom_right.y  )
-                   , "User provided view has incorrect size."       );
 
-        io_error_if( (   _top_left.x > _bottom_right.x
-                      && _top_left.y > _bottom_right.y
-                     )
-                   , "User provided view has incorrect size." );
-
-
-        image.recreate( _bottom_right.x - _top_left.x
-                      , _bottom_right.y - _top_left.y );
+        image.recreate( ( _bottom_right.x + 1 ) - _top_left.x
+                      , ( _bottom_right.y + 1 ) - _top_left.y );
 
         apply_impl( view( image ));
     }
@@ -157,6 +152,13 @@ public:
                   )
     {
         _info     = get_info();
+
+        check_coordinates( top_left
+                         , bottom_right
+                         , _info
+                         );
+
+
         _top_left = top_left;
 
         if( bottom_right == point_t( 0, 0 ))
@@ -168,19 +170,6 @@ public:
         {
             _bottom_right = bottom_right;
         }
-
-        io_error_if( ( ( _info._width - 1  )   > _top_left.x
-                      && ( _info._width - 1  ) > _bottom_right.x
-                      && ( _info._height - 1 ) > _top_left.y
-                      && ( _info._height - 1 ) > _bottom_right.y
-                     )
-                   , "User provided view has incorrect size." 
-                   );
-
-        io_error_if( (   _top_left.x > _bottom_right.x
-                      && _top_left.y > _bottom_right.y
-                     )
-                   , "User provided view has incorrect size." );
 
         apply_impl( view );
     }
@@ -449,10 +438,11 @@ private:
                                                                              , is_view_bit_aligned_t() );
       buffer_t buffer( size_to_allocate );
       read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
-      read_helper_t::iterator_t end   = read_helper_t::end  ( buffer );
 
       read_helper_t::iterator_t first = begin + _top_left.x;
-      read_helper_t::iterator_t last  = end - ( dst_view.width() - _bottom_right.x );
+      read_helper_t::iterator_t last  = begin + _bottom_right.x + 1; // one after last element
+
+      int dist = distance( first, last );
 
       skip_over_rows( buffer, plane );
 

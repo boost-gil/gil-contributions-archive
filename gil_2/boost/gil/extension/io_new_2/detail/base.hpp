@@ -360,6 +360,29 @@ struct row_buffer_helper_view<View,
     {}
 };
 
+
+template< typename Info >
+void check_coordinates( const point_t& top_left
+                      , const point_t& bottom_right
+                      , const Info&    image_info )
+{
+   typedef point_t::value_type int_t;
+
+   int_t width  = static_cast<int_t>( image_info._width  );
+   int_t height = static_cast<int_t>( image_info._height );
+
+   io_error_if( (  ( width - 1  ) < top_left.x
+                && ( width - 1  ) < bottom_right.x
+                && ( height - 1 ) < top_left.y
+                && ( height - 1 ) < bottom_right.y  )
+             , "User provided view has incorrect size."       );
+
+   io_error_if( (  top_left.x > bottom_right.x
+                && top_left.y > bottom_right.y
+               )
+             , "User provided view has incorrect size." );
+}
+
 } // namespace detail
 
 
