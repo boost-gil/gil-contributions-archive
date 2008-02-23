@@ -1040,7 +1040,9 @@ void read_and_convert_view( Device&          device
 /// \ingroup IO
 template<typename Device, typename View, typename FormatTag>
 inline
-void write_view( Device & device, View const& view, point_t const& top_left, FormatTag const& tag,
+void write_view( Device& device
+                , const View& view
+                , FormatTag const& tag,
         typename enable_if<typename mpl::and_<
             typename detail::is_output_device<Device>::type,
             typename is_format_tag<FormatTag>::type,
@@ -1048,15 +1050,13 @@ void write_view( Device & device, View const& view, point_t const& top_left, For
         >::type>::type * ptr = 0
         )
 {
-   typedef detail::is_bit_aligned< typename View::value_type >::type tt;
-
     detail::writer<Device,FormatTag> writer(device);
-    writer.apply( view, top_left, tt() );
+    writer.apply( view );
 }
 
 template<typename Device, typename View, typename FormatTag>
 inline
-void write_view( Device & device, View const& view, point_t const& top_left, FormatTag const& tag,
+void write_view( Device & device, View const& view, FormatTag const& tag,
         typename enable_if<typename mpl::and_<
             typename detail::is_adaptable_output_device<FormatTag,Device>::type,
             typename is_format_tag<FormatTag>::type,
@@ -1065,12 +1065,12 @@ void write_view( Device & device, View const& view, point_t const& top_left, For
         )
 {
     typename detail::is_adaptable_output_device<Device>::device_type dev(device);
-    write_view( dev, view, top_left );
+    write_view( dev, view );
 }
 
 template<typename String, typename View, typename FormatTag>
 inline
-void write_view( String const& file_name, View const& view, point_t const& top_left, FormatTag const& tag,
+void write_view( String const& file_name, View const& view, FormatTag const& tag,
         typename enable_if<typename mpl::and_<
             typename detail::is_supported_path_spec<String>::type,
             typename is_format_tag<FormatTag>::type,
@@ -1082,43 +1082,13 @@ void write_view( String const& file_name, View const& view, point_t const& top_l
             detail::convert_to_string(file_name), 
             detail::file_stream_device<FormatTag>::write_tag()
             );
-    write_view( device, view, top_left, tag );
-}
-
-/// \ingroup IO
-template< typename Device, typename View, typename FormatTag > 
-inline
-void write_view( Device & device, const View& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename mpl::or_<
-                typename detail::is_output_device<Device>::type,
-                typename detail::is_adaptable_output_device<FormatTag,Device>::type
-            >::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
-{
-   write_view( device, view, point_t( 0, 0 ), tag );
-}
-
-template<typename String,typename View, typename FormatTag > 
-inline
-void write_view( String const& file_name, const View& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
-{
-   write_view( file_name, view, point_t( 0, 0 ), tag );
+    write_view( device, view, tag );
 }
 
 /// \ingroup IO
 template< typename Device,typename View, typename FormatTag> 
 inline
-void write_view( Device & device, const View& view, const point_t& top_left, 
+void write_view( Device & device, const View& view, 
         const image_write_info<FormatTag>& info, 
         typename enable_if<typename mpl::and_<
             typename is_format_tag<FormatTag>::type,
@@ -1128,12 +1098,12 @@ void write_view( Device & device, const View& view, const point_t& top_left,
         )
 {
     detail::writer<Device,FormatTag> writer(device);
-    writer.apply( view, top_left, info );
+    writer.apply( view, info );
 }
 
 template< typename Device,typename View, typename FormatTag> 
 inline
-void write_view( Device & device, const View& view, const point_t& top_left, 
+void write_view( Device & device, const View& view,
         const image_write_info<FormatTag>& info, 
         typename enable_if<typename mpl::and_<
             typename detail::is_adaptable_output_device<FormatTag,Device>::type,
@@ -1143,12 +1113,12 @@ void write_view( Device & device, const View& view, const point_t& top_left,
         )
 {
     typename detail::is_adaptable_output_device<Device>::device_type dev(device);
-    write_view(dev, view, top_left, info);
+    write_view(dev, view, info);
 }
 
 template<typename String,typename View, typename FormatTag> 
 inline
-void write_view( String const& file_name, const View& view, const point_t& top_left, 
+void write_view( String const& file_name, const View& view, 
         const image_write_info<FormatTag>& info,
         typename enable_if<typename mpl::and_<
             typename is_format_tag<FormatTag>::type,
@@ -1161,37 +1131,7 @@ void write_view( String const& file_name, const View& view, const point_t& top_l
             detail::convert_to_string(file_name),
             detail::file_stream_device<FormatTag>::write_tag()
             );
-    write_view( device, view, top_left, info );
-}
-
-/// \ingroup IO
-template< typename String, typename View, typename FormatTag > 
-inline
-void write_view( String const& file_name, const View& view, const image_write_info<FormatTag>& info, 
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr2 = 0 
-        )
-{
-   write_view( file_name, view, point_t( 0, 0 ), info );
-}
-
-template<typename Device, typename View, typename FormatTag > 
-inline
-void write_view( Device & device, const View& view, const image_write_info<FormatTag>& info, 
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename mpl::or_<
-                typename detail::is_output_device<Device>::type,
-                typename detail::is_adaptable_output_device<FormatTag,Device>::type
-            >::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr2 = 0 
-        )
-{
-   write_view( device, view, point_t( 0, 0 ), info );
+    write_view( device, view, info );
 }
 
 }}

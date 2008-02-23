@@ -71,9 +71,13 @@ int main(int argc, char *argv[])
    read_image( ".\\test_images\\tiff\\found online\\flower.tif"
              , img
              , point_t( 0, 0 )
-             , point_t( 199, 1 )
+             , point_t( 199, 0 )
              , tiff_tag() );
 
+
+    write_view( "c:\\remove.tif"
+              , view( img )
+              , tiff_tag() );
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );

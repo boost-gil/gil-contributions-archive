@@ -18,6 +18,9 @@
 #include <ostream>
 #include <istream>
 #include <vector>
+
+#include <boost/array.hpp>
+#include <boost/bind.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
 #include <boost/gil/utilities.hpp>
@@ -383,10 +386,60 @@ void check_coordinates( const point_t& top_left
              , "User provided view has incorrect size." );
 }
 
+
+template< typename IsBitAligned
+        , typename Buffer
+        >
+struct swap_bits_fn
+{
+   template< typename Device >
+   swap_bits_fn( const Device& dev ) {}
+
+   void operator() ( Buffer& ) {}
+};
+
+template<>
+struct swap_bits_fn< boost::mpl::true_
+                   , std::vector< unsigned char > >
+{
+   template< typename Device >
+   swap_bits_fn( const Device& dev )
+   {
+      for( int i = 0; i < 256; ++i )
+      {
+         _lookup[i] = swap_bits( i );
+      }
+
+      _swap_bits = ( dev.are_bytes_swapped() > 0 ) ? true : false;
+   }
+
+   void operator() ( std::vector< unsigned char >& buffer )
+   {
+      typedef swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > > tt;
+
+      if( _swap_bits )
+      {
+         std::transform( buffer.begin()
+                       , buffer.end()
+                       , buffer.begin()
+                       , boost::bind( &tt::_swap, *this, _1 ));
+      }
+   }
+ 
+ private:
+ 
+   unsigned char _swap( unsigned char byte ) const
+   {
+      return _lookup[ byte ];
+   }
+ 
+ private:
+ 
+   boost::array< unsigned char, 256 > _lookup;
+   bool _swap_bits;
+};
+
 } // namespace detail
-
-
-
 } // namespace gil
 } // namespace boost
 

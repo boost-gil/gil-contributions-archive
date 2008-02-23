@@ -100,35 +100,68 @@ class file_stream_device< tiff_tag >
 {
 public:
 
-   struct read_tag {};
-   struct write_tag {};
+    struct read_tag {};
+    struct write_tag {};
 
-   file_stream_device( std::string const& file_name, read_tag )
-   {
-      TIFF* tiff;
+    file_stream_device( std::string const& file_name, read_tag )
+    {
+        TIFF* tiff;
 
-      io_error_if( ( tiff = TIFFOpen( file_name.c_str(), "r" )) == NULL
-                 , "file_stream_device: failed to open file" );
+        io_error_if( ( tiff = TIFFOpen( file_name.c_str(), "r" )) == NULL
+                   , "file_stream_device: failed to open file" );
 
-      _tiff_file = tiff_file_t( tiff, TIFFClose );
-   }
+        _tiff_file = tiff_file_t( tiff, TIFFClose );
+    }
 
-   template <typename Property>
-   bool get_property( typename Property::type& value  )
-   {
-      if( TIFFGetFieldDefaulted( _tiff_file.get(), Property::tag, &value ) == 1 )
-      {
-         return true;
-      }
+    file_stream_device( std::string const& file_name, write_tag )
+    {
+        TIFF* tiff;
 
-      return false;
-   }
+        io_error_if( ( tiff = TIFFOpen( file_name.c_str(), "w" )) == NULL
+                   , "file_stream_device: failed to open file" );
+
+        _tiff_file = tiff_file_t( tiff, TIFFClose );
+    }
+
+    unsigned int get_default_strip_size()
+    {
+        return TIFFDefaultStripSize( _tiff_file.get()
+                                   , 0 );
+    }
+
+    template <typename Property>
+    bool get_property( typename Property::type& value  )
+    {
+        if( TIFFGetFieldDefaulted( _tiff_file.get()
+                                 , Property::tag
+                                 , &value ) == 1 )
+        {
+            return true;
+        }
+
+        return false;
+    }
    
-   template< typename Buffer >
-   void read_scaline( Buffer&        buffer
-                    , std::ptrdiff_t row
-                    , tsample_t      plane   )
-   {
+
+    template <typename Property>
+    inline
+    bool set_property( const typename Property::type& value )
+    {
+       if( TIFFSetField( _tiff_file.get()
+                       , Property::tag
+                       , value  ) == 1 )
+       {
+          return true;
+       }
+
+       return false;
+    }
+
+    template< typename Buffer >
+    void read_scaline( Buffer&        buffer
+                     , std::ptrdiff_t row
+                     , tsample_t      plane   )
+    {
       io_error_if( TIFFReadScanline( _tiff_file.get()
                                    , &buffer.front()
                                    , (uint32) row
@@ -157,6 +190,23 @@ public:
                                   , &green
                                   , &blue              );
    }
+
+    template< typename Buffer >
+    inline 
+    void write_scaline( Buffer&     buffer
+                      , uint32      row
+                      , tsample_t   plane
+                      )
+    {
+       io_error_if( TIFFWriteScanline( _tiff_file.get()
+                                     , &buffer.front()
+                                     , row
+                                     , plane 
+                                     ) == -1
+                   , "Write error"
+                   );
+    }
+
 
 private:
 

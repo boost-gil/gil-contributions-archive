@@ -27,9 +27,9 @@ extern "C" {
 #include <boost/shared_ptr.hpp>
 
 #include <boost/gil/extension/io_new_2/tiff_tags.hpp>
-
 #include <boost/gil/extension/io_new_2/detail/base.hpp>
-#include <boost/gil/extension/io_new_2/detail/tiff_io_private.hpp>
+#include <boost/gil/extension/io_new_2/detail/tiff_supported_read_types.hpp>
+
 
 namespace boost { namespace gil { namespace detail {
 
@@ -442,14 +442,12 @@ private:
       read_helper_t::iterator_t first = begin + _top_left.x;
       read_helper_t::iterator_t last  = begin + _bottom_right.x + 1; // one after last element
 
-      int dist = distance( first, last );
-
       skip_over_rows( buffer, plane );
 
-      swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb;
+      swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( _io_dev );
 
       for( std::ptrdiff_t row = _top_left.y
-         ; row < ( _bottom_right.y - _top_left.y )
+         ; row <= ( _bottom_right.y - _top_left.y )
          ; ++row
          )
       {
@@ -478,11 +476,6 @@ private:
       {
          return iterator_t( buffer.begin() );
       }
-                     
-      static iterator_t end( const buffer_t& buffer )
-      {
-         return iterator_t( buffer.end() );
-      }
    };
 
    template< typename View >
@@ -496,62 +489,8 @@ private:
       {
          return iterator_t( &buffer.front(), 0 );
       }
-                     
-      static iterator_t end( buffer_t& buffer )
-      {
-         // @todo Won't this break if 8 is not divisible by the bit depth? 
-         // What if your bitdepth is 3. The last pixel may not have offset 0
-         return iterator_t( &buffer.back() + 1, 0 );
-      }
    };
 
-
-   template< typename IsBitAligned
-           , typename Buffer
-           >
-   struct swap_bits_fn
-   {
-      void operator() ( Buffer& ) {}
-   };
-
-   template<>
-   struct swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > >
-   {
-      swap_bits_fn()
-      {
-         for( int i = 0; i < 256; ++i )
-         {
-            _lookup[i] = swap_bits( i );
-         }
-
-         _swap_bits = ( _io_dev.are_bytes_swapped() > 0 ) ? true : false;
-      }
-
-      void operator() ( std::vector< unsigned char >& buffer )
-      {
-         typedef swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > > tt;
-
-         if( _swap_bits )
-         {
-            std::transform( buffer.begin()
-                          , buffer.end()
-                          , buffer.begin()
-                          , boost::bind( &tt::_swap, *this, _1 ));
-         }
-      }
-    
-    private:
-    
-      unsigned char _swap( unsigned char byte ) const
-      {
-         return _lookup[ byte ];
-      }
-    
-    private:
-    
-      boost::array< unsigned char, 256 > _lookup;
-      bool _swap_bits;
-   };
 
    template< typename Pixel >
    std::size_t buffer_size( std::size_t width
@@ -588,55 +527,181 @@ private:
    template < int K > friend struct plane_recursion;
 };
 
+
+template <typename PixelReference>
+struct my_interleaved_pixel_iterator_type_from_pixel_reference
+{
+private:
+	typedef typename boost::remove_reference< PixelReference >::type::value_type pixel_t;
+public:
+	typedef typename iterator_type_from_pixel< pixel_t
+	                                         , false
+	                                         , false
+	                                         , true
+	                                         >::type type;
+};
+
+
+template< typename Channel
+        , typename Layout
+        , bool Mutable
+        >
+struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< uint8_t
+                                                                                                 , Channel
+                                                                                                 , Layout
+                                                                                                 , Mutable
+                                                                                                 >
+                                                              >
+	: public iterator_type_from_pixel< const bit_aligned_pixel_reference< uint8_t
+	                                                                    , Channel
+	                                                                    , Layout
+	                                                                    , Mutable
+	                                                                    > 
+	                                 ,false
+	                                 ,false
+	                                 ,true
+	                                 > {};
+
+
+
+
+
+template < typename Channel > struct sample_format : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32f> : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<double>  : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<bits8s>  : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits16s> : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits32s> : public mpl::int_<SAMPLEFORMAT_INT> {};
+
+template <typename Channel> struct photometric_interpretation {};
+template<> struct photometric_interpretation< gray_t > : public boost::mpl::int_< PHOTOMETRIC_MINISBLACK > {};
+template<> struct photometric_interpretation< rgb_t  > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
+
+
 template < typename Device >
 struct writer< Device
              , tiff_tag
              > 
 {
-   writer( Device& file )
-   : _out(file)
-   {
-   }
+    typedef image_write_info<tiff_tag> info_t;
 
-   ~writer()
-   {
-   }
-
-   template<typename View>
-   void apply( const View&    view
-             , const point_t& top_left
-             , boost::mpl::true_       )
-   {
-      write_rows( view
-                , top_left );
-   }
+    writer( Device& dev )
+    : _io_dev( dev ) {}
 
     template<typename View>
-    void apply( const View& view
-              , const point_t& top_left
-              , boost::mpl::false_      )
+    void apply( const View& view )
     {
-        write_rows( view, top_left);
+        typedef typename color_space_type<View>::type color_space_t;
+
+        info_t info;
+
+        // write photometric interpretion - Warning: This value is rather subjective.
+        // The user should better set this value itself. There is no way to decide if
+        // a image is PHOTOMETRIC_MINISWHITE or PHOTOMETRIC_MINISBLACK. This writer
+        // will assume PHOTOMETRIC_MINISBLACK for gray_t images and PHOTOMETRIC_RGB
+        // for rgb_t images.
+        info._photometric_interpretation = photometric_interpretation< color_space_t >::value;
+
+        info._compression = COMPRESSION_LZW;
+        info._orientation = ORIENTATION_TOPLEFT;
+
+        info._planar_configuration = PLANARCONFIG_CONTIG;
+
+        write_view( view
+                  , info );
     }
 
     template<typename View>
-    void apply( const View&                       view
-              , const point_t&                    top_left
-              , const image_write_info<tiff_tag>& info      )
+    void apply( const View&   view
+              , const info_t& info )
     {
-        write_rows( view
-                  , top_left );
+        write_view( view
+                  , info );
     }
 
 private:
 
     template< typename View >
-    void write_rows( const View&    view
-                   , const point_t& top_left )
+    void write_view( const View&   src_view
+                   , const info_t& info
+                   )
     {
+        typedef typename View::value_type pixel_t;
+
+        // get the type of the first channel (heterogeneous pixels might be broken for now!)
+        typedef typename channel_traits< typename element_type< pixel_t >::type >::value_type channel_t;
+        typedef my_interleaved_pixel_iterator_type_from_pixel_reference<typename View::reference>::type x_iterator;
+
+        // write dimensions
+        tiff_image_width::type width   = src_view.width();
+        tiff_image_height::type height = src_view.height();
+
+        _io_dev.set_property<tiff_image_width >( width  );
+        _io_dev.set_property<tiff_image_height>( height );
+
+        // write planar configuration
+        if( is_bit_aligned<View>::value == false )
+        {
+            _io_dev.set_property<tiff_planar_configuration>( info._planar_configuration );
+        }
+
+        // write samples per pixel
+        tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
+        _io_dev.set_property<tiff_samples_per_pixel>( samples_per_pixel );
+
+        // write bits per sample
+        // @todo: Settings this value usually requires to write for each sample the bit
+        // value seperately in case they are different, like rgb556.
+        tiff_bits_per_sample::type bits_per_sample = unsigned_integral_num_bits<channel_t>::value;
+        _io_dev.set_property<tiff_bits_per_sample>( bits_per_sample );
+
+        // write sample format
+        tiff_sample_format::type sampl_format = sample_format< channel_t >::type::value;
+        _io_dev.set_property<tiff_sample_format>( sampl_format );
+
+        // write photometric format
+        _io_dev.set_property<tiff_photometric_interpretation>( info._photometric_interpretation );
+
+        // write compression
+        _io_dev.set_property<tiff_compression>( info._compression );
+
+        // write orientation
+        _io_dev.set_property<tiff_orientation>( info._orientation );
+
+        // write rows per strip
+        _io_dev.set_property<tiff_rows_per_strip>( _io_dev.get_default_strip_size() );
+
+        // write the data
+        std::size_t row_size_in_bytes = (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8;
+
+        std::vector< unsigned char > row( row_size_in_bytes );
+
+        x_iterator row_it = x_iterator( &(*row.begin()));
+
+        for( View::y_coord_t y = 0; y < src_view.height(); ++y )
+        {
+         std::copy( src_view.row_begin( y )
+                  , src_view.row_end( y )
+                  , row_it
+                  );
+
+         _io_dev.write_scaline( row
+                              , y
+                              , 0
+                              );
+
+          // @todo: do optional bit swapping here if you need to...
+        }
     }
 
-    Device& _out;
+private:
+
+    Device& _io_dev;
 };
 
 } // namespace detail
