@@ -119,7 +119,7 @@ public:
                    , const point_t& bottom_right
                    )
     {
-        _info     = get_info();
+        _info = get_info();
 
         check_coordinates( top_left
                          , bottom_right
@@ -151,7 +151,7 @@ public:
                   , const point_t& bottom_right // src image coordinates
                   )
     {
-        _info     = get_info();
+        _info = get_info();
 
         check_coordinates( top_left
                          , bottom_right

@@ -67,17 +67,37 @@ int main(int argc, char *argv[])
    using namespace boost::gil;
    using namespace boost::mpl;
 
-   rgb8_image_t img;
-   read_image( ".\\test_images\\tiff\\found online\\flower.tif"
-             , img
-             , point_t( 0, 0 )
-             , point_t( 199, 0 )
-             , tiff_tag() );
+    {
+       rgb8_image_t img;
+       read_image( ".\\test_images\\tiff\\found online\\flower.tif"
+                 , img
+                 , point_t( 0, 0 )
+                 , point_t( 199, 0 )
+                 , tiff_tag() );
 
 
-    write_view( "c:\\remove.tif"
-              , view( img )
-              , tiff_tag() );
+        write_view( "c:\\remove.tif"
+                  , view( img )
+                  , tiff_tag() );
+    }
+
+    {
+        image_read_info<png_tag> info = read_image_info( "c:\\q3rt_Demo_poster_0003.png"
+                                                       , png_tag()
+                                                       );
+
+        rgb8_image_t img;
+        read_image( "c:\\q3rt_Demo_poster_0003.png"
+                  , img
+                  , point_t( 0, 0 )
+                  , point_t( info._width - 1, 0 )
+                  , png_tag()
+                  );
+
+        write_view( "c:\\remove.png"
+                  , view( img )
+                  , png_tag() );
+    }
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );

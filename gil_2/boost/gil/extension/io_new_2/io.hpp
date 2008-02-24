@@ -209,6 +209,32 @@ struct enable_if_in_dev_or_adapt_in_dev_img_frmt : public enable_if< typename mp
                                                                                        >::type
                                                                    > {};
 
+template < typename Device
+         , typename View
+         , typename FormatTag
+         >
+struct enable_if_out_dev_img_frmt : public enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
+                                                                        , typename is_format_tag< FormatTag >::type
+                                                                        , typename is_supported< typename View::value_type
+                                                                                               , FormatTag
+                                                                                               >::type
+                                                                        >::type
+                                                    > {};
+
+
+template < typename Device
+         , typename View
+         , typename FormatTag
+         >
+struct enable_if_adapt_out_dev_img_frmt : public enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
+                                                                                                                           , Device
+                                                                                                                           >::type
+                                                                              , typename is_format_tag< FormatTag >::type
+                                                                              , typename is_supported< typename View::value_type
+                                                                                                     , FormatTag>::type
+                                                                              >::type
+                                                          > {};
+
 
 /// \ingroup IO
 /// \brief Returns the image info for generating a gil image type.
@@ -1038,102 +1064,141 @@ void read_and_convert_view( Device&          device
 //---- Writer -------------------------------
 
 /// \ingroup IO
-template<typename Device, typename View, typename FormatTag>
+template< typename Device
+        , typename View
+        , typename FormatTag
+        >
 inline
-void write_view( Device& device
-                , const View& view
-                , FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_output_device<Device>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
+void write_view( Device&          device
+               , const View&      view
+               , const FormatTag& tag
+               , typename enable_if_out_dev_img_frmt< Device
+                                                    , View
+                                                    , FormatTag
+                                                    >::type* ptr = 0
+               )
 {
-    detail::writer<Device,FormatTag> writer(device);
+    detail::writer< Device
+                  , FormatTag
+                  > writer( device );
+
     writer.apply( view );
 }
 
-template<typename Device, typename View, typename FormatTag>
+template< typename Device
+        , typename View
+        , typename FormatTag
+        >
 inline
-void write_view( Device & device, View const& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_output_device<FormatTag,Device>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
+void write_view( Device&          device
+               , const View&      view
+               , const FormatTag& tag
+               , typename enable_if_adapt_out_dev_img_frmt< Device
+                                                          , View
+                                                          , FormatTag
+                                                          >::type* ptr = 0
         )
 {
-    typename detail::is_adaptable_output_device<Device>::device_type dev(device);
-    write_view( dev, view );
+    typename detail::is_adaptable_output_device< Device >::device_type dev( device );
+
+    write_view( dev
+              , view );
 }
 
-template<typename String, typename View, typename FormatTag>
+template< typename String
+        , typename View
+        , typename FormatTag
+        >
 inline
-void write_view( String const& file_name, View const& view, FormatTag const& tag,
-        typename enable_if<typename mpl::and_<
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr = 0
-        )
+void write_view( const String&    file_name
+               , const View&      view
+               , const FormatTag& tag
+               , typename enable_if_str_img_frmt< String
+                                                , View
+                                                , FormatTag
+                                                >::type* ptr = 0
+               )
 {
-    detail::file_stream_device<FormatTag> device( 
-            detail::convert_to_string(file_name), 
-            detail::file_stream_device<FormatTag>::write_tag()
-            );
-    write_view( device, view, tag );
+    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
+                                                , detail::file_stream_device<FormatTag>::write_tag()
+                                                );
+
+    write_view( device
+               , view
+               , tag
+               );
 }
 
 /// \ingroup IO
-template< typename Device,typename View, typename FormatTag> 
+template< typename Device
+        , typename View
+        , typename FormatTag
+        > 
 inline
-void write_view( Device & device, const View& view, 
-        const image_write_info<FormatTag>& info, 
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_output_device<Device>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr2 = 0 
-        )
+void write_view( Device&                            device
+               , const View&                        view
+               , const image_write_info<FormatTag>& info
+               , typename enable_if_out_dev_img_frmt< Device
+                                                    , View
+                                                    , FormatTag
+                                                    >::type* ptr = 0 
+               )
 {
-    detail::writer<Device,FormatTag> writer(device);
-    writer.apply( view, info );
+    detail::writer< Device
+                  , FormatTag
+                  > writer( device );
+
+    writer.apply( view
+                , info );
 }
 
-template< typename Device,typename View, typename FormatTag> 
+template< typename Device
+        , typename View
+        , typename FormatTag
+        > 
 inline
-void write_view( Device & device, const View& view,
-        const image_write_info<FormatTag>& info, 
-        typename enable_if<typename mpl::and_<
-            typename detail::is_adaptable_output_device<FormatTag,Device>::type,
-            typename is_format_tag<FormatTag>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr2 = 0 
-        )
+void write_view( Device&                              device
+               , const View&                          view
+               , const image_write_info< FormatTag >& info
+               , typename enable_if_adapt_out_dev_img_frmt< Device
+                                                          , View
+                                                          , FormatTag
+                                                          >::type* ptr = 0 
+               )
 {
-    typename detail::is_adaptable_output_device<Device>::device_type dev(device);
-    write_view(dev, view, info);
+    typename detail::is_adaptable_output_device< Device >::device_type dev( device );
+
+    write_view( dev
+              , view
+              , info
+              );
 }
 
-template<typename String,typename View, typename FormatTag> 
+template< typename String
+        , typename View
+        , typename FormatTag
+        > 
 inline
-void write_view( String const& file_name, const View& view, 
-        const image_write_info<FormatTag>& info,
-        typename enable_if<typename mpl::and_<
-            typename is_format_tag<FormatTag>::type,
-            typename detail::is_supported_path_spec<String>::type,
-            typename is_supported<typename View::value_type, FormatTag>::type
-        >::type>::type * ptr2 = 0 
-        )
+void write_view( const String&                        file_name
+               , const View&                          view
+               , const image_write_info< FormatTag >& info
+               , typename enable_if_str_img_frmt< String
+                                                , View
+                                                , FormatTag
+                                                >::type* ptr = 0 
+               )
 {
-    detail::file_stream_device<FormatTag> device(
-            detail::convert_to_string(file_name),
-            detail::file_stream_device<FormatTag>::write_tag()
-            );
-    write_view( device, view, info );
+    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
+                                                  , detail::file_stream_device< FormatTag >::write_tag()
+                                                  );
+
+    write_view( device
+              , view
+              , info
+              );
 }
 
-}}
+} // namespace gil
+} // namespace boost
 
 #endif

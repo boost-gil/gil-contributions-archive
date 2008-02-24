@@ -53,23 +53,33 @@ protected:
 
 };
 
-template<typename Device, typename ConversionPolicy>
-class reader<Device,png_tag,ConversionPolicy> : png_io_base<Device>
+template< typename Device
+        , typename ConversionPolicy
+        >
+class reader< Device
+            , png_tag
+            , ConversionPolicy
+            > : public png_io_base< Device >
 {
 public:
-    reader( Device & io_dev )
-        : png_io_base<Device>(io_dev), _png_ptr(0), _info_ptr(0)
+
+    reader( Device& io_dev )
+    : png_io_base< Device >( io_dev )
+    , _png_ptr ( 0 )
+    , _info_ptr( 0 )
     {
         this->check();
-
         init_reader();
     }
 
-    reader( Device & io_dev, typename ConversionPolicy::color_converter_type const& cc )
-        : png_io_base<Device>(io_dev), cc_policy(cc), _png_ptr(0), _info_ptr(0)
+    reader( Device& io_dev
+          , const typename ConversionPolicy::color_converter_type& cc )
+    : png_io_base< Device >( io_dev )
+    , cc_policy( cc )
+    , _png_ptr ( 0 )
+    , _info_ptr( 0 )
     {
         this->check();
-
         init_reader();
     }
 
@@ -105,10 +115,21 @@ public:
                    , const point_t& bottom_right
                    )
     {
-        image_read_info<png_tag> info(get_info());
-        image.recreate( info._width - top_left.x, 
-                info._height - top_left.y );
-        read_data( view(image), top_left, info);
+        image_read_info< png_tag > info( get_info() );
+
+        check_coordinates( top_left
+                         , bottom_right
+                         , _info
+                         );
+
+        image.recreate( ( bottom_right.x + 1 ) - top_left.x
+                      , ( bottom_right.y + 1 ) - top_left.y );
+
+        read_data( view( image )
+                 , top_left
+                 , bottom_right
+                 , info
+                 );
     }
 
     template<typename View>
@@ -118,15 +139,26 @@ public:
                   )
     {
         image_read_info<png_tag> info(get_info());
-        io_error_if( view.dimensions() != point_t( info._width  - top_left.x
-                    , info._height - top_left.y )
-                , "png_reader::read_view(): User provided view has incorrect size.");
-        read_data( view, top_left, info );
+
+        check_coordinates( top_left
+                         , bottom_right
+                         , _info
+                         );
+
+        read_data( view
+                 , top_left
+                 , bottom_right
+                 , info
+                 );
     }
 
 private:
     template<typename View>
-    void read_data( View &view, point_t const& top_left, image_read_info<png_tag> const& info )
+    void read_data( const View&                       view
+                  , const point_t&                    top_left
+                  , const point_t&                    bottom_right
+                  , const image_read_info< png_tag >& info
+                  )
     {
         if (little_endian() )
         {   
@@ -161,64 +193,96 @@ private:
         typedef bit_aligned_pixel_reference<byte,mpl::vector_c<int,4>,gray_layout_t,true> gray_4b;
 
 
-        switch(color_type)
+        switch( color_type )
         {
-        case PNG_COLOR_TYPE_GRAY:
-            switch (bit_depth) 
+            case PNG_COLOR_TYPE_GRAY:
             {
-            case 1: read_rows<gray_1b>(view, top_left ); break;
-            case 2: read_rows<gray_2b>(view, top_left ); break;
-            case 4: read_rows<gray_4b>(view, top_left);  break;
-            case 8: read_rows<gray8_pixel_t>(view, top_left); break;
-            case 16:read_rows<gray16_pixel_t>(view, top_left);break;
-            default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+                switch( bit_depth )
+                {
+                    case 1: read_rows< gray_1b >       ( view, top_left, bottom_right ); break;
+                    case 2: read_rows< gray_2b >       ( view, top_left, bottom_right ); break;
+                    case 4: read_rows< gray_4b >       ( view, top_left, bottom_right ); break;
+                    case 8: read_rows< gray8_pixel_t > ( view, top_left, bottom_right ); break;
+                    case 16:read_rows< gray16_pixel_t >( view, top_left, bottom_right ); break;
+                    default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+                }
+
+                break;
             }
-            break;
-        case PNG_COLOR_TYPE_GA:
-            switch (bit_depth) {
-            case 8: read_rows<gray_alpha8_pixel_t>(view, top_left); break;
-            case 16:read_rows<gray_alpha16_pixel_t>(view, top_left);break;
-            default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+            case PNG_COLOR_TYPE_GA:
+            {
+                switch( bit_depth )
+                {
+                    case 8: read_rows< gray_alpha8_pixel_t > ( view, top_left, bottom_right ); break;
+                    case 16:read_rows< gray_alpha16_pixel_t >( view, top_left, bottom_right ); break;
+                    default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+                }
+
+                break;
             }
-            break;
-        case PNG_COLOR_TYPE_RGB:
-            switch (bit_depth) {
-            case 8:  read_rows<rgb8_pixel_t>(view, top_left); break;
-            case 16: read_rows<rgb16_pixel_t>(view, top_left);break;
-            default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+            case PNG_COLOR_TYPE_RGB:
+            {
+                switch (bit_depth)
+                {
+                    case 8:  read_rows< rgb8_pixel_t > ( view, top_left, bottom_right ); break;
+                    case 16: read_rows< rgb16_pixel_t >( view, top_left, bottom_right ); break;
+                    default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+                }
+
+                break;
             }
-            break;
-        case PNG_COLOR_TYPE_RGBA:
-            switch (bit_depth) {
-            case 8:  read_rows<rgba8_pixel_t>(view,top_left); break;
-            case 16: read_rows<rgba16_pixel_t>(view,top_left);break;
-            default: io_error("png_reader_color_convert::read_data(): unknown combination of color type and bit depth");
+            case PNG_COLOR_TYPE_RGBA:
+            {
+                switch( bit_depth )
+                {
+                    case 8 : read_rows< rgba8_pixel_t > ( view,top_left, bottom_right ); break;
+                    case 16: read_rows< rgba16_pixel_t >( view,top_left, bottom_right ); break;
+                    default: io_error("png_reader_color_convert::read_data(): unknown combination of color type and bit depth");
+                }
+
+                break;
             }
-            break;
-        default: io_error("png_reader_color_convert::read_data(): unknown color type");
+            default: io_error("png_reader_color_convert::read_data(): unknown color type");
         }
-        png_read_end(_png_ptr,NULL);
+
+        png_read_end( _png_ptr
+                    , NULL
+                    );
     }
 
-    template<typename ImagePixel, typename View>
-    void read_rows( View & view, point_t const& top_left )
+    template< typename ImagePixel
+            , typename View
+            >
+    void read_rows( const View& view
+                  , const point_t& top_left
+                  , const point_t& bottom_right
+                  )
     {
         row_buffer_helper<ImagePixel> buffer(view.width());
 
         io_error_if( ! ConversionPolicy::template is_allowed<ImagePixel,typename View::value_type>::type::value,
                 "User provided view has incorrect size.");
 
+        // skip rows
         for( int i = top_left.x; i != 0; --i)
-            png_read_row(_png_ptr, reinterpret_cast<png_bytep>(buffer.data()), 0);
+        {
+            png_read_row( _png_ptr
+                        , reinterpret_cast< png_bytep >( buffer.data() )
+                        , 0
+                        );
+        }
 
         for(int y = 0; y != view.height(); ++y )
         {
-            png_read_row(_png_ptr, reinterpret_cast<png_bytep>(buffer.data()), 0);
-            cc_policy.read(
-                    buffer.begin()+top_left.x, 
-                    buffer.end(), 
-                    view.row_begin(y)
-                    );
+            png_read_row( _png_ptr
+                        , reinterpret_cast< png_bytep >( buffer.data() )
+                        , 0
+                        );
+
+            cc_policy.read( buffer.begin() + top_left.x
+                          , buffer.begin() + bottom_right.x + 1
+                          , view.row_begin( y )
+                          );
         }
     }
 
@@ -288,64 +352,66 @@ public:
 
 
     template <typename View>
-    void apply(const View& view, point_t const& top_left, image_write_info<png_tag> const& info) 
+    void apply( const View&                      view
+              , const image_write_info<png_tag>& info )
     {
-        typedef png_rw_support<
-                        typename channel_type<View>::type,
-                        typename color_space_type<View>::type
-                        > png_rw_info;
-        png_set_IHDR(_png_ptr, _info_ptr, 
-                view.width() - top_left.x, 
-                view.height() - top_left.y,
-                png_rw_info::bit_depth,
-                png_rw_info::color_type,
-                info._interlace_method,
-                info._compression_method,
-                info._filter_method 
-                );
+        typedef png_rw_support< typename channel_type<View>::type
+                              , typename color_space_type<View>::type
+                              > png_rw_info;
+
+        png_set_IHDR( _png_ptr
+                    , _info_ptr
+                    , view.width()
+                    , view.height()
+                    , png_rw_info::bit_depth
+                    , png_rw_info::color_type
+                    , info._interlace_method
+                    , info._compression_method
+                    , info._filter_method 
+                    );
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED 
-        png_set_gAMA( _png_ptr, _info_ptr, info._gamma );
+        png_set_gAMA( _png_ptr
+                    , _info_ptr
+                    , info._gamma
+                    );
 #else
-        png_set_gAMA_fixed( _png_ptr, _info_ptr, info._gamma );
+        png_set_gAMA_fixed( _png_ptr
+                          , _info_ptr
+                          , info._gamma
+                          );
 #endif
-        png_set_pHYs(_png_ptr, _info_ptr, &info._x_res, &info._y_res, PNG_RESOLUTION_METER );
-        png_set_sBIT(_png_ptr, _info_ptr, const_cast<png_color_8*>(&info._sbits) );
 
-        png_write_info(_png_ptr,_info_ptr);
-        write_view(view,top_left);
+        png_set_pHYs( _png_ptr
+                    , _info_ptr
+                    , &info._x_res
+                    , &info._y_res
+                    , PNG_RESOLUTION_METER
+                    );
+
+        png_set_sBIT( _png_ptr
+                    , _info_ptr
+                    , const_cast< png_color_8* >( &info._sbits )
+                    );
+
+        png_write_info( _png_ptr
+                      ,_info_ptr
+                      );
+
+        write_view( view
+                  , is_bit_aligned< View >::type );
     }
 
-    template <typename View>
-    void apply(const View& view, point_t const& top_left, boost::mpl::false_ isbit )
-    {
-        typedef png_rw_support<
-                        typename channel_type<View>::type,
-                        typename color_space_type<View>::type
-                        > png_rw_info;
-        png_set_IHDR(_png_ptr, _info_ptr, 
-                view.width() - top_left.x, 
-                view.height() - top_left.y,
-                png_rw_info::bit_depth,
-                png_rw_info::color_type,
-                PNG_INTERLACE_NONE,
-                PNG_COMPRESSION_TYPE_DEFAULT,
-                PNG_FILTER_TYPE_DEFAULT);
-
-        png_write_info(_png_ptr,_info_ptr);
-        write_view(view,top_left,isbit);
-    }
-
-    template <typename View>
-    void apply(const View& view, point_t const& top_left, boost::mpl::true_ isbit )
+    template< typename View >
+    void apply( const View& view )
     {
         typedef png_rw_support<
                         typename kth_semantic_element_type<typename View::value_type, 0>::type,
                         typename color_space_type<View>::type
                         > png_rw_info;
         png_set_IHDR(_png_ptr, _info_ptr, 
-                view.width() - top_left.x, 
-                view.height() - top_left.y,
+                view.width(),
+                view.height(),
                 png_rw_info::bit_depth,
                 png_rw_info::color_type,
                 PNG_INTERLACE_NONE,
@@ -353,12 +419,15 @@ public:
                 PNG_FILTER_TYPE_DEFAULT);
 
         png_write_info(_png_ptr,_info_ptr);
-        write_view(view,top_left,isbit);
+        write_view( view
+                  , is_bit_aligned< View >::type );
     }
 
 private:
     template<typename View>
-    void write_view(View const & view, point_t const& top_left, boost::mpl::false_ ) 
+    void write_view( const View& view
+                   ,  boost::mpl::false_ // is bit aligned
+                   )
     {
         typedef png_rw_support<
                         typename channel_type<View>::type,
@@ -373,28 +442,32 @@ private:
                 png_set_packswap(_png_ptr);
         }
 
-        row_buffer_helper_view<View> row_buffer(
-                view.width() - top_left.x 
-                );
-        for( int y = top_left.y; y != view.height(); ++ y) 
+        row_buffer_helper_view<View> row_buffer( view.width() );
+
+        for( int y = 0; y != view.height(); ++ y) 
         {
-            std::copy(view.row_begin(y) + top_left.x,
-                    view.row_end(y),
-                    row_buffer.begin());
-            png_write_row(
-                    _png_ptr, 
-                    reinterpret_cast<png_bytep>(row_buffer.data())
-                    );
+            std::copy( view.row_begin( y )
+                     , view.row_end  ( y )
+                     , row_buffer.begin()
+                     );
+
+            png_write_row( _png_ptr
+                         , reinterpret_cast< png_bytep >( row_buffer.data() )
+                         );
         }
         
-        png_write_end(_png_ptr,_info_ptr);
+        png_write_end( _png_ptr
+                     , _info_ptr
+                     );
     }
 
     template<typename View>
-    void write_view(View const & view, point_t const& top_left, boost::mpl::true_ ) 
+    void write_view( const View& view
+                   , boost::mpl::true_ // is bit aligned
+                   ) 
     {
-        typedef png_rw_support<
-                        typename kth_semantic_element_type<typename View::value_type, 0>::type,
+        typedef png_rw_support< typename kth_semantic_element_type< typename View::value_type
+                                                                 , 0>::type,
                         typename color_space_type<View>::type
                         > png_rw_info;
 
@@ -406,18 +479,18 @@ private:
                 png_set_packswap(_png_ptr);
         }
 
-        row_buffer_helper_view<View> row_buffer(
-                view.width() - top_left.x 
-                );
-        for( int y = top_left.y; y != view.height(); ++ y) 
+        row_buffer_helper_view< View > row_buffer( view.width() );
+
+        for( int y = 0; y != view.height(); ++ y) 
         {
-            std::copy(view.row_begin(y) + top_left.x,
-                    view.row_end(y),
-                    row_buffer.begin());
-            png_write_row(
-                    _png_ptr, 
-                    reinterpret_cast<png_bytep>(row_buffer.data())
-                    );
+            std::copy( view.row_begin( y )
+                     , view.row_end  ( y )
+                     , row_buffer.begin()
+                     );
+
+            png_write_row( _png_ptr
+                         , reinterpret_cast< png_bytep >( row_buffer.data() )
+                         );
         }
         
         png_write_end(_png_ptr,_info_ptr);
