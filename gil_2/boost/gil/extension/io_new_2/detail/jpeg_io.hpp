@@ -123,7 +123,9 @@ private:
     JOCTET buffer[1024];
 };
 
-template<typename Device, typename ConversionPolicy>
+template< typename Device
+        , typename ConversionPolicy
+        >
 struct reader<Device,jpeg_tag,ConversionPolicy> 
     : jpeg_decompress_mgr<Device>
 {
@@ -154,10 +156,32 @@ public:
                    )
     {
         image_read_info<jpeg_tag> info(get_info());
-        image.recreate( info._width  - top_left.x
-                      , info._height - top_left.y );
 
-        apply_impl( view( image ), top_left, info );
+        check_coordinates( top_left
+                         , bottom_right
+                         , info
+                         );
+
+        point_t _bottom_right;
+
+        if( bottom_right == point_t( 0, 0 ))
+        {
+            _bottom_right.x = info._width  - 1;
+            _bottom_right.y = info._height - 1;
+        }
+        else
+        {
+            _bottom_right = bottom_right;
+        }
+
+        image.recreate( ( _bottom_right.x + 1 ) - top_left.x
+                      , ( _bottom_right.y + 1 ) - top_left.y );
+
+        apply_impl( view( image )
+                  , top_left
+                  , _bottom_right
+                  , info
+                  );
     }
 
     template<typename View>

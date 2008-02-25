@@ -119,15 +119,27 @@ public:
 
         check_coordinates( top_left
                          , bottom_right
-                         , _info
+                         , info
                          );
 
-        image.recreate( ( bottom_right.x + 1 ) - top_left.x
-                      , ( bottom_right.y + 1 ) - top_left.y );
+        point_t _bottom_right;
+
+        if( bottom_right == point_t( 0, 0 ))
+        {
+            _bottom_right.x = info._width  - 1;
+            _bottom_right.y = info._height - 1;
+        }
+        else
+        {
+            _bottom_right = bottom_right;
+        }
+
+        image.recreate( ( _bottom_right.x + 1 ) - top_left.x
+                      , ( _bottom_right.y + 1 ) - top_left.y );
 
         read_data( view( image )
                  , top_left
-                 , bottom_right
+                 , _bottom_right
                  , info
                  );
     }
@@ -145,9 +157,21 @@ public:
                          , _info
                          );
 
+        point_t _bottom_right;
+
+        if( bottom_right == point_t( 0, 0 ))
+        {
+            _bottom_right.x = info._width  - 1;
+            _bottom_right.y = info._height - 1;
+        }
+        else
+        {
+            _bottom_right = bottom_right;
+        }
+
         read_data( view
                  , top_left
-                 , bottom_right
+                 , _bottom_right
                  , info
                  );
     }
@@ -264,7 +288,7 @@ private:
                 "User provided view has incorrect size.");
 
         // skip rows
-        for( int i = top_left.x; i != 0; --i)
+        for( int y = 0; y < top_left.y; ++y )
         {
             png_read_row( _png_ptr
                         , reinterpret_cast< png_bytep >( buffer.data() )
@@ -272,7 +296,7 @@ private:
                         );
         }
 
-        for(int y = 0; y != view.height(); ++y )
+        for(int y = 0; y < view.height(); ++y )
         {
             png_read_row( _png_ptr
                         , reinterpret_cast< png_bytep >( buffer.data() )
@@ -420,7 +444,7 @@ public:
 
         png_write_info(_png_ptr,_info_ptr);
         write_view( view
-                  , is_bit_aligned< View >::type );
+                  , is_bit_aligned< View >::type() );
     }
 
 private:

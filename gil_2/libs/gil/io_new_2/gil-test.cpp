@@ -82,15 +82,13 @@ int main(int argc, char *argv[])
     }
 
     {
-        image_read_info<png_tag> info = read_image_info( "c:\\q3rt_Demo_poster_0003.png"
+        image_read_info<png_tag> info = read_image_info( ".\\test_images\\png\\PngSuite\\F00N2C08.PNG"
                                                        , png_tag()
                                                        );
 
         rgb8_image_t img;
-        read_image( "c:\\q3rt_Demo_poster_0003.png"
+        read_image( ".\\test_images\\png\\PngSuite\\F00N2C08.PNG"
                   , img
-                  , point_t( 0, 0 )
-                  , point_t( info._width - 1, 0 )
                   , png_tag()
                   );
 
