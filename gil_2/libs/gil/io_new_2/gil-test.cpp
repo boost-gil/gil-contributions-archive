@@ -96,6 +96,23 @@ int main(int argc, char *argv[])
                   , view( img )
                   , png_tag() );
     }
+
+    {
+        image_read_info<jpeg_tag> info = read_image_info( ".\\test_images\\jpg\\found online\\test.jpg"
+                                                        , jpeg_tag()
+                                                        );
+
+        rgb8_image_t img;
+        read_image( ".\\test_images\\jpg\\found online\\test.jpg"
+                  , img
+                  , jpeg_tag()
+                  );
+
+        write_view( "c:\\remove2.jpg"
+                  , view( img )
+                  , jpeg_tag() );
+    }
+
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );

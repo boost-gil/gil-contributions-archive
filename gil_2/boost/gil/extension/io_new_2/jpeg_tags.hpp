@@ -9,7 +9,10 @@
 #ifndef BOOST_GIL_EXTENSION_IO_JPEG_TAGS_HPP_INCLUDED 
 #define BOOST_GIL_EXTENSION_IO_JPEG_TAGS_HPP_INCLUDED
 
+extern "C" {
 #include <jpeglib.h>
+}
+
 #include <boost/gil/extension/io_new_2/detail/base.hpp>
 /// \file
 /// \brief All supported jpeg tags by the gil io extension.
@@ -46,6 +49,11 @@ struct jpeg_quality
    typedef int type;
 };
 
+struct jpeg_data_precision
+{
+   typedef int type;
+};
+
 template<>
 struct image_read_info<jpeg_tag> 
 {
@@ -54,6 +62,8 @@ struct image_read_info<jpeg_tag>
 
    jpeg_num_components::type _num_components;
    jpeg_color_space::type    _color_space;
+
+   jpeg_data_precision::type _data_precision;
 };
 
 template<>

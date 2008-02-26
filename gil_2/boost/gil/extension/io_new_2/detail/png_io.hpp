@@ -282,10 +282,10 @@ private:
                   , const point_t& bottom_right
                   )
     {
-        row_buffer_helper<ImagePixel> buffer(view.width());
-
         io_error_if( ! ConversionPolicy::template is_allowed<ImagePixel,typename View::value_type>::type::value,
                 "User provided view has incorrect size.");
+
+        row_buffer_helper<ImagePixel> buffer(view.width());
 
         // skip rows
         for( int y = 0; y < top_left.y; ++y )
