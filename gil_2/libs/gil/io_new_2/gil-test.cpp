@@ -59,9 +59,6 @@ void read_test_impl( const String& file_name )
    for_each_pixel( view( src ), eval_to<0>() );
 }
 
-
-
-
 int main(int argc, char *argv[])
 {
    using namespace boost::gil;
@@ -74,11 +71,6 @@ int main(int argc, char *argv[])
                  , point_t( 0, 0 )
                  , point_t( 199, 0 )
                  , tiff_tag() );
-
-
-        write_view( "c:\\remove.tif"
-                  , view( img )
-                  , tiff_tag() );
     }
 
     {
@@ -91,10 +83,6 @@ int main(int argc, char *argv[])
                   , img
                   , png_tag()
                   );
-
-        write_view( "c:\\remove.png"
-                  , view( img )
-                  , png_tag() );
     }
 
     {
@@ -108,11 +96,7 @@ int main(int argc, char *argv[])
                   , jpeg_tag()
                   );
 
-        write_view( "c:\\remove2.jpg"
-                  , view( img )
-                  , jpeg_tag() );
     }
-
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );
@@ -228,9 +212,7 @@ int main(int argc, char *argv[])
       string file_name( ".\\test_images\\tiff\\rgba64f_image.tif" );
       read_test_impl<rgba64f_image_t>( file_name );
    }
-*/
 
-/*
    {
       image_read_info< tiff_tag > info = read_image_info( "test\\test.tif", tiff_tag() );
 

@@ -63,7 +63,7 @@ public:
             fclose(file);
     }
 
-    size_t read( unsigned char * data, int count )
+    std::size_t read( unsigned char * data, int count )
     {
         return fread(data, 1, count, file );
     }
