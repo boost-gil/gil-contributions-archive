@@ -218,11 +218,11 @@ struct default_color_converter_impl<hsv_t,rgb_t>
       }
 
       get_color(dst,red_t())  =
-         channel_convert<typename color_element_type<red_t,  P2>::type>( red );
+         channel_convert<typename color_element_type< P2, red_t >::type>( red );
       get_color(dst,green_t())=
-         channel_convert<typename color_element_type<green_t,P2>::type>( green );
+         channel_convert<typename color_element_type< P2, green_t >::type>( green );
       get_color(dst,blue_t()) =
-         channel_convert<typename color_element_type<blue_t, P2>::type>( blue );
+         channel_convert<typename color_element_type< P2, blue_t >::type>( blue );
    }
 };
 

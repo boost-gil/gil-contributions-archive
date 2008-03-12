@@ -3,8 +3,6 @@
 
 #include "stdafx.h"
 
-#include <boost/gil/extension/io/bmp_io.hpp>
-#include <boost/gil/extension/toolbox/rgb_algorithms.hpp>
 #include <boost/gil/extension/toolbox/hsl.hpp>
 #include <boost/gil/extension/toolbox/hsv.hpp>
 
