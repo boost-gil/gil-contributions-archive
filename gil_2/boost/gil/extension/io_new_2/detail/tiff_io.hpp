@@ -589,6 +589,8 @@ class writer< Device
             , tiff_tag
             > 
 {
+public:
+
     typedef image_write_info<tiff_tag> info_t;
 
     writer( Device& dev )

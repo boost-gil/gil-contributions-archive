@@ -64,39 +64,13 @@ int main(int argc, char *argv[])
    using namespace boost::gil;
    using namespace boost::mpl;
 
-    {
-       rgb8_image_t img;
-       read_image( ".\\test_images\\tiff\\found online\\flower.tif"
-                 , img
-                 , point_t( 0, 0 )
-                 , point_t( 199, 0 )
-                 , tiff_tag() );
-    }
+   {
+      rgb8_image_t img( 320, 240 );
+      fill_pixels( view( img ), rgb8_pixel_t( 255, 0 , 0 ));
 
-    {
-        image_read_info<png_tag> info = read_image_info( ".\\test_images\\png\\PngSuite\\F00N2C08.PNG"
-                                                       , png_tag()
-                                                       );
+      write_view( "c:\\remove.jpg", view( img ), jpeg_tag() );
 
-        rgb8_image_t img;
-        read_image( ".\\test_images\\png\\PngSuite\\F00N2C08.PNG"
-                  , img
-                  , png_tag()
-                  );
-    }
-
-    {
-        image_read_info<jpeg_tag> info = read_image_info( ".\\test_images\\jpg\\found online\\test.jpg"
-                                                        , jpeg_tag()
-                                                        );
-
-        rgb8_image_t img;
-        read_image( ".\\test_images\\jpg\\found online\\test.jpg"
-                  , img
-                  , jpeg_tag()
-                  );
-
-    }
+   }
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );

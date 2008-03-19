@@ -355,6 +355,7 @@ template<typename Device>
 class writer<Device,png_tag> : png_io_base<Device>
 {
 public:
+
     writer( Device & io_dev )
         : png_io_base<Device>(io_dev), _png_ptr(0), _info_ptr(0)
     {

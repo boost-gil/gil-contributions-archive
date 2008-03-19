@@ -303,6 +303,8 @@ private:
 template< typename Device >
 class writer<Device,jpeg_tag> 
 {
+public:
+
     writer( Device & file )
         : out(file)
     {
