@@ -23,7 +23,7 @@ namespace boost{ namespace gil{ namespace detail
  * parameter will be used. 
  */
 template<typename IODevice, typename FormatTag, typename ConverstionPolicy>
-struct reader;
+class reader;
 
 }}}
 

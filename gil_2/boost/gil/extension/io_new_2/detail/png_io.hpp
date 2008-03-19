@@ -9,7 +9,10 @@
 #ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_HPP_INCLUDED
 #define BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_HPP_INCLUDED 
 
+extern "C" {
 #include <png.h>
+}
+
 #include <boost/gil/extension/io_new_2/detail/base.hpp>
 #include <boost/gil/extension/io_new_2/png_tags.hpp>
 
@@ -282,10 +285,13 @@ private:
                   , const point_t& bottom_right
                   )
     {
-        io_error_if( ! ConversionPolicy::template is_allowed<ImagePixel,typename View::value_type>::type::value,
-                "User provided view has incorrect size.");
+        io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
+                                                            , typename View::value_type
+                                                            >::type::value
+                    , "User provided view has incorrect size."
+                    );
 
-        row_buffer_helper<ImagePixel> buffer(view.width());
+        row_buffer_helper<ImagePixel> buffer( static_cast<int>( view.width() ));
 
         // skip rows
         for( int y = 0; y < top_left.y; ++y )
@@ -343,7 +349,7 @@ private:
     ConversionPolicy cc_policy;
     png_structp _png_ptr;
     png_infop _info_ptr;
-   };
+};
 
 template<typename Device>
 class writer<Device,png_tag> : png_io_base<Device>

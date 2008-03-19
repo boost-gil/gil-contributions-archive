@@ -136,7 +136,7 @@ private:
 template< typename Device
         , typename ConversionPolicy
         >
-struct reader<Device,jpeg_tag,ConversionPolicy> 
+class reader<Device,jpeg_tag,ConversionPolicy> 
     : jpeg_decompress_mgr<Device>
 {
 public:
@@ -301,7 +301,7 @@ private:
 };
 
 template< typename Device >
-struct writer<Device,jpeg_tag> 
+class writer<Device,jpeg_tag> 
 {
     writer( Device & file )
         : out(file)

@@ -70,9 +70,10 @@ struct plane_recursion< -1 >
 template< typename Device
         , typename ConversionPolicy
         >
-struct reader< Device
-             , tiff_tag
-             , ConversionPolicy > 
+class reader< Device
+            , tiff_tag
+            , ConversionPolicy
+            > 
 {
 public:
 
@@ -584,9 +585,9 @@ template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_
 
 
 template < typename Device >
-struct writer< Device
-             , tiff_tag
-             > 
+class writer< Device
+            , tiff_tag
+            > 
 {
     typedef image_write_info<tiff_tag> info_t;
 

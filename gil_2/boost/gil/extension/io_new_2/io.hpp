@@ -105,9 +105,9 @@ namespace boost{ namespace gil {
 
 namespace detail {
     template<typename Device, typename FormatTag, typename ConversionPolicy>
-    struct reader;
+    class reader;
     template<typename Device, typename FormatTag>
-    struct writer;
+    class writer;
 }
 
 template<typename FormatTag>
