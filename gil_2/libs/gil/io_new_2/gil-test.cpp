@@ -65,8 +65,12 @@ int main(int argc, char *argv[])
    using namespace boost::mpl;
 
    {
-      rgb8_image_t img( 320, 240 );
-      fill_pixels( view( img ), rgb8_pixel_t( 255, 0 , 0 ));
+      rgb8_image_t img;
+      read_image( "C:\\gil\\gil_2\\libs\\gil\\io_new_2\\test_images\\jpg\\found online\\test.jpg"
+                , img
+                , point_t( 68, 68 )
+                , point_t( 69, 69 )
+                , jpeg_tag() );
 
       write_view( "c:\\remove.jpg", view( img ), jpeg_tag() );
 

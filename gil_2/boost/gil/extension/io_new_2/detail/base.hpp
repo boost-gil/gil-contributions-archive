@@ -384,6 +384,11 @@ void check_coordinates( const point_t& top_left
                 && top_left.y > bottom_right.y
                )
              , "User provided view has incorrect size." );
+
+   io_error_if( (  ( bottom_right.x - top_left.x ) >= width
+                || ( bottom_right.y - top_left.y ) >= height
+               )
+             , "User provided view has incorrect size." );
 }
 
 

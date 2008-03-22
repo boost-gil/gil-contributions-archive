@@ -235,26 +235,25 @@ private:
         {
         case JCS_GRAYSCALE:
             io_error_if(info._num_components!=1,"reader<jpeg>: error in image data");
-            read_rows<gray8_pixel_t>( view );
+            read_rows<gray8_pixel_t>( view, info );
             break;
         case JCS_RGB:
             io_error_if(info._num_components!=3,"reader<jpeg>: error in image data");
-            read_rows<rgb8_pixel_t>( view );
+            read_rows<rgb8_pixel_t>( view, info );
         case JCS_YCbCr:
             io_error_if(info._num_components!=3,"reader<jpeg>: error in image data");
             //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
-            this->_cinfo.out_color_space = JCS_RGB;
-            read_rows<rgb8_pixel_t>( view );
+            read_rows<rgb8_pixel_t>( view, info );
             break;
         case JCS_CMYK:
             io_error_if(info._num_components!=4,"reader<jpeg>: error in image data");
-            read_rows<cmyk8_pixel_t>( view );
+            read_rows<cmyk8_pixel_t>( view, info );
             break;
         case JCS_YCCK:
             io_error_if(info._num_components!=4,"reader<jpeg>: error in image data");
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             this->_cinfo.out_color_space = JCS_CMYK;
-            read_rows<cmyk8_pixel_t>( view );
+            read_rows<cmyk8_pixel_t>( view, info );
             break;
         default:
             break;
@@ -267,32 +266,56 @@ private:
     template< typename ImagePixel
             , typename View
             >
-    void read_rows( const View& view )
-    {
-        io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
-                                                            , typename View::value_type
-                                                            >::type::value
-                   , "User provided view has incorrect color space or channel type."
-                   );
+   void read_rows( const View&                      view
+                 , const image_read_info<jpeg_tag>& info
+                 )
+   {
+      io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
+                                                         , typename View::value_type
+                                                         >::type::value
+                , "User provided view has incorrect color space or channel type."
+                );
 
-        std::vector<ImagePixel> buffer( view.width() );
+      
+      std::vector<ImagePixel> buffer( info._width );
 
-        JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
+      JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
 
-        for( int y=0; y < view.height(); ++y )
-        {
-            io_error_if( jpeg_read_scanlines( &this->_cinfo
-                                            , &row_adr
-                                            , 1
-                                            ) !=1
-                       , "jpeg_read_scanlines: fail to read JPEG file" );
+      //@todo: Skip scanlines if necessary.
+      while( _cinfo.output_scanline <  _top_left.y )
+      {
+         io_error_if( jpeg_read_scanlines( &_cinfo
+                                         , &row_adr
+                                         , 1
+                                         ) !=1
+                    , "jpeg_read_scanlines: fail to read JPEG file" );
+      }
 
-            cc_policy.read( buffer.begin() + _top_left.x
-                          , buffer.begin() + _bottom_right.x + 1
-                          , view.row_begin( y )
-                          );
-        }
-    }
+      for( int y =0; y < view.height(); ++y )
+      {
+         io_error_if( jpeg_read_scanlines( &_cinfo
+                                         , &row_adr
+                                         , 1
+                                         ) !=1
+                    , "jpeg_read_scanlines: fail to read JPEG file" );
+
+         cc_policy.read( buffer.begin() + _top_left.x
+                       , buffer.begin() + _bottom_right.x + 1
+                       , view.row_begin( y )
+                       );
+      }
+
+      //@todo: Finish up. There might be a better way to do that.
+      while( _cinfo.output_scanline <  _cinfo.image_height )
+      {
+         io_error_if( jpeg_read_scanlines( &_cinfo
+                                         , &row_adr
+                                         , 1
+                                         ) !=1
+                    , "jpeg_read_scanlines: fail to read JPEG file" );
+      }
+
+   }
 
     point_t _top_left;
     point_t _bottom_right;
@@ -406,12 +429,11 @@ private:
     }
     static boolean empty_buffer( jpeg_compress_struct * cinfo )
     {
-        gil_jpeg_destination_mgr * dest = reinterpret_cast<gil_jpeg_destination_mgr*>(cinfo->dest);
-        dest->_this->out.write(
-                reinterpret_cast<unsigned char*>(dest->_this->buffer), 
-                ( dest->_jdest.next_output_byte - dest->_this->buffer ) / sizeof(JOCTET) 
-                );
+        gil_jpeg_destination_mgr* dest = reinterpret_cast<gil_jpeg_destination_mgr*>(cinfo->dest);
 
+        dest->_this->out.write( dest->_this->buffer
+                              , buffer_size 
+                              );
 
         writer<Device,jpeg_tag>::init_device( cinfo );
         return 1;
@@ -432,7 +454,9 @@ private:
     jpeg_error_mgr       _jerr;
 
     gil_jpeg_destination_mgr _dest;
-    JOCTET buffer[1024];
+
+    static const unsigned int buffer_size = 1024;
+    JOCTET buffer[buffer_size];
 };
 
 } // detail
