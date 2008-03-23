@@ -63,18 +63,29 @@ int main(int argc, char *argv[])
 {
    using namespace boost::gil;
    using namespace boost::mpl;
+   namespace fs = boost::filesystem;
 
+   string str_path( ".\\test_images\\jpg\\found online\\w3.org\\" );
+   fs::path full_path = fs::system_complete( fs::path( str_path, fs::native ) );
+
+   if ( fs::is_directory( full_path ) )
    {
-      rgb8_image_t img;
-      read_image( "C:\\gil\\gil_2\\libs\\gil\\io_new_2\\test_images\\jpg\\found online\\test.jpg"
-                , img
-                , point_t( 68, 68 )
-                , point_t( 69, 69 )
-                , jpeg_tag() );
+      fs::directory_iterator end_iter;
+      for( fs::directory_iterator dir_itr( full_path )
+         ; dir_itr != end_iter
+         ; ++dir_itr
+         )
+      {
+         if ( fs::is_regular( dir_itr->status() ) 
+            && ( fs::extension( dir_itr->path() ) == ".jpg" ))
+         {
+            rgb8_image_t img;
+            read_and_convert_image( str_path + dir_itr->path().leaf(), img, jpeg_tag() );
 
-      write_view( "c:\\remove.jpg", view( img ), jpeg_tag() );
-
+         }
+      }
    }
+
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );

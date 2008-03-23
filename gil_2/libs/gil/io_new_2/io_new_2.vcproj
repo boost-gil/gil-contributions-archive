@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="zlib.lib libpng.lib jpeg.lib libtiff.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib"
+				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib;C:\boost\stage\lib"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -196,13 +196,6 @@
 			<File
 				RelativePath=".\gil-test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp"

@@ -281,8 +281,8 @@ private:
 
       JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
 
-      //@todo: Skip scanlines if necessary.
-      while( _cinfo.output_scanline <  _top_left.y )
+      //Skip scanlines if necessary.
+      for( int y = 0; y <  _top_left.y; ++y )
       {
          io_error_if( jpeg_read_scanlines( &_cinfo
                                          , &row_adr
@@ -291,7 +291,8 @@ private:
                     , "jpeg_read_scanlines: fail to read JPEG file" );
       }
 
-      for( int y =0; y < view.height(); ++y )
+      // Read data.
+      for( int y = 0; y < view.height(); ++y )
       {
          io_error_if( jpeg_read_scanlines( &_cinfo
                                          , &row_adr
