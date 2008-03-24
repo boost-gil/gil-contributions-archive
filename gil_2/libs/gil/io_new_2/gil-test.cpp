@@ -65,8 +65,15 @@ int main(int argc, char *argv[])
    using namespace boost::mpl;
    namespace fs = boost::filesystem;
 
-   string str_path( ".\\test_images\\jpg\\found online\\w3.org\\" );
-   fs::path full_path = fs::system_complete( fs::path( str_path, fs::native ) );
+   string in_path( ".\\test_images\\png\\PngSuite\\BASI0G01.png" );
+   string out_path( ".\\test\\png\\PngSuite\\" );
+
+   rgb8_image_t img;
+   read_and_convert_image( in_path, img, png_tag() );
+
+/*
+
+   fs::path in_full_path  = fs::system_complete( fs::path( in_path, fs::native ) );
 
    if ( fs::is_directory( full_path ) )
    {
@@ -77,15 +84,19 @@ int main(int argc, char *argv[])
          )
       {
          if ( fs::is_regular( dir_itr->status() ) 
-            && ( fs::extension( dir_itr->path() ) == ".jpg" ))
+            && ( fs::extension( dir_itr->path() ) == ".PNG" ))
          {
             rgb8_image_t img;
-            read_and_convert_image( str_path + dir_itr->path().leaf(), img, jpeg_tag() );
+            read_and_convert_image( in_path + dir_itr->path().leaf(), img, png_tag() );
 
+            write_view( out_path + fs::basename( dir_itr->path() ) + ".png"
+                      , view( img )
+                      , png_tag()
+                      );
          }
       }
    }
-
+*/
 /*
    {
       string file_name( ".\\test_images\\tiff\\gray1_image.tif" );

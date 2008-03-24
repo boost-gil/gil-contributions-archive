@@ -226,11 +226,11 @@ private:
             {
                 switch( bit_depth )
                 {
-                    case 1: read_rows< gray_1b >       ( view, top_left, bottom_right ); break;
-                    case 2: read_rows< gray_2b >       ( view, top_left, bottom_right ); break;
-                    case 4: read_rows< gray_4b >       ( view, top_left, bottom_right ); break;
-                    case 8: read_rows< gray8_pixel_t > ( view, top_left, bottom_right ); break;
-                    case 16:read_rows< gray16_pixel_t >( view, top_left, bottom_right ); break;
+                    case 1: read_rows< gray_1b >       ( view, top_left, bottom_right, info ); break;
+                    case 2: read_rows< gray_2b >       ( view, top_left, bottom_right, info ); break;
+                    case 4: read_rows< gray_4b >       ( view, top_left, bottom_right, info ); break;
+                    case 8: read_rows< gray8_pixel_t > ( view, top_left, bottom_right, info ); break;
+                    case 16:read_rows< gray16_pixel_t >( view, top_left, bottom_right, info ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -240,8 +240,8 @@ private:
             {
                 switch( bit_depth )
                 {
-                    case 8: read_rows< gray_alpha8_pixel_t > ( view, top_left, bottom_right ); break;
-                    case 16:read_rows< gray_alpha16_pixel_t >( view, top_left, bottom_right ); break;
+                    case 8: read_rows< gray_alpha8_pixel_t > ( view, top_left, bottom_right, info ); break;
+                    case 16:read_rows< gray_alpha16_pixel_t >( view, top_left, bottom_right, info ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -251,8 +251,8 @@ private:
             {
                 switch (bit_depth)
                 {
-                    case 8:  read_rows< rgb8_pixel_t > ( view, top_left, bottom_right ); break;
-                    case 16: read_rows< rgb16_pixel_t >( view, top_left, bottom_right ); break;
+                    case 8:  read_rows< rgb8_pixel_t > ( view, top_left, bottom_right, info ); break;
+                    case 16: read_rows< rgb16_pixel_t >( view, top_left, bottom_right, info ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -262,8 +262,8 @@ private:
             {
                 switch( bit_depth )
                 {
-                    case 8 : read_rows< rgba8_pixel_t > ( view,top_left, bottom_right ); break;
-                    case 16: read_rows< rgba16_pixel_t >( view,top_left, bottom_right ); break;
+                    case 8 : read_rows< rgba8_pixel_t > ( view,top_left, bottom_right, info ); break;
+                    case 16: read_rows< rgba16_pixel_t >( view,top_left, bottom_right, info ); break;
                     default: io_error("png_reader_color_convert::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -280,9 +280,10 @@ private:
     template< typename ImagePixel
             , typename View
             >
-    void read_rows( const View& view
-                  , const point_t& top_left
-                  , const point_t& bottom_right
+    void read_rows( const View&                       view
+                  , const point_t&                    top_left
+                  , const point_t&                    bottom_right
+                  , const image_read_info< png_tag >& info
                   )
     {
         io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
@@ -291,7 +292,7 @@ private:
                     , "User provided view has incorrect size."
                     );
 
-        row_buffer_helper<ImagePixel> buffer( static_cast<int>( view.width() ));
+        row_buffer_helper<ImagePixel> buffer( static_cast<int>( info._width ));
 
         // skip rows
         for( int y = 0; y < top_left.y; ++y )
