@@ -224,10 +224,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new_2\base.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new_2\gray_alpha.hpp"
 				>
 			</File>
@@ -252,6 +248,26 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new_2\read_and_convert_image.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new_2\read_and_convert_view.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new_2\read_image.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new_2\read_image_info.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new_2\read_view.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
@@ -261,6 +277,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new_2\tiff_tags.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new_2\write_view.hpp"
 				>
 			</File>
 			<Filter
@@ -316,6 +336,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_supported_types.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\typedefs.hpp"
 					>
 				</File>
 			</Filter>

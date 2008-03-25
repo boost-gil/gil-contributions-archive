@@ -22,14 +22,14 @@ namespace detail {
     struct writer;
 }
 
-template<typename FormatTag>
-struct is_format_tag : is_base_and_derived<format_tag,FormatTag> {};
+struct format_tag {};
 
-template<typename FormatTag>
-struct image_read_info;
+template<typename PixelType, typename FormatTag> struct is_supported;
 
-template<typename FormatTag>
-struct image_write_info;
+template<typename FormatTag> struct is_format_tag : is_base_and_derived<format_tag,FormatTag> {};
+
+template<typename FormatTag> struct image_read_info;
+template<typename FormatTag> struct image_write_info;
 
 /// \ingroup IO
 template< typename Device

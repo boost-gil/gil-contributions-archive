@@ -65,11 +65,22 @@ int main(int argc, char *argv[])
    using namespace boost::mpl;
    namespace fs = boost::filesystem;
 
-   string in_path( ".\\test_images\\png\\PngSuite\\BASI0G01.png" );
-   string out_path( ".\\test\\png\\PngSuite\\" );
+   string in_path( ".\\test_images\\png\\test.png" );
+   string out_path( ".\\test\\png\\test.png" );
 
-   rgb8_image_t img;
-   read_and_convert_image( in_path, img, png_tag() );
+   {
+      gray8_image_t img;
+      read_and_convert_image( in_path, img, png_tag() );
+      write_view( out_path, view( img ), png_tag() );
+
+      for( int x = 0; x < view( img ).width(); ++x )
+      {
+         unsigned char v = *view( img ).at( x, 0 );
+
+         int i = 9;
+      }
+
+   }
 
 /*
 

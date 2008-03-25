@@ -1,19 +1,23 @@
 /*
-  Copyright 2005-2007 Adobe Systems Incorporated
-  Distributed under the MIT License (see accompanying file LICENSE_1_0_0.txt
-  or a copy at http://opensource.adobe.com/licenses.html)
+    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
 */
 
 /*************************************************************************************************/
 
-#ifndef GIL_TIFF_IO_PRIVATE_HPP
-#define GIL_TIFF_IO_PRIVATE_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_TIFF_IO_PRIVATE_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_IO_TIFF_IO_PRIVATE_HPP_INCLUDED
 
-/// \file
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
 /// \brief 
-//
-/// \author Christian Henning
-/// 
+/// \author Christian Henning and Andreas Pokorny \n
+///         
+/// \date   2007-2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
 #include "tiff.h"
@@ -711,4 +715,4 @@ private:
 } // namespace gil
 } // namespace boost
 
-#endif // GIL_TIFF_IO_PRIVATE_HPP
+#endif // BOOST_GIL_EXTENSION_IO_TIFF_IO_PRIVATE_HPP_INCLUDED

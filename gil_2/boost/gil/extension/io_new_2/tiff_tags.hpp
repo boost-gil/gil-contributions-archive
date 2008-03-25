@@ -1,22 +1,25 @@
 /*
-  Copyright 2005-2007 Adobe Systems Incorporated
-  Distributed under the MIT License (see accompanying file LICENSE_1_0_0.txt
-  or a copy at http://opensource.adobe.com/licenses.html)
+    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
 */
 
 /*************************************************************************************************/
 
-#ifndef TIFF_TAGS_HPP
-#define TIFF_TAGS_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_TIFF_TAGS_HPP
+#define BOOST_GIL_EXTENSION_IO_TIFF_TAGS_HPP
 
-/// \file
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
 /// \brief All supported tiff tags by the gil io extension.
-///
-/// For a description see: http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
-///
-/// \author Christian Henning
+/// \author Christian Henning and Andreas Pokorny \n
 ///         
+/// \date   2007-2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
+/// For a description see: http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
 /// see http://www.remotesensing.org/libtiff/
 /// or http://www.libtiff.org/man/
 
@@ -26,6 +29,8 @@ extern "C" {
 }
 
 namespace boost { namespace gil {
+
+struct tiff_tag : format_tag {};
 
 struct tiff_new_subfile_type
 {
@@ -265,4 +270,4 @@ struct image_write_info<tiff_tag>
 } // namespace gil
 } // namespace boost
 
-#endif // TIFF_TAGS_HPP
+#endif // BOOST_GIL_EXTENSION_IO_TIFF_TAGS_HPP

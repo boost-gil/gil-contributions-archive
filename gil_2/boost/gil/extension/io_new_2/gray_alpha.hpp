@@ -1,16 +1,25 @@
-
 /*
-    Copyright 2007 Andreas Pokorny
-   
+    Copyright 2007-2008 Andreas Pokorny
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
-
-    See http://opensource.adobe.com/gil for most recent version including documentation.
 */
 
-#ifndef GIL_GRAY_ALPHA_H
-#define GIL_GRAY_ALPHA_H
+/*************************************************************************************************/
+
+
+#ifndef BOOST_GIL_GRAY_ALPHA_HPP_INCLUDED
+#define BOOST_GIL_GRAY_ALPHA_HPP_INCLUDED
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
+/// \brief
+/// \author Andreas Pokorny \n
+///         
+/// \date   2007-2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
+
 #include <boost/gil/gil_config.hpp>
 #include <boost/mpl/contains.hpp>
 #include <boost/gil/gray.hpp>
@@ -89,4 +98,4 @@ struct default_color_converter_impl<gray_alpha_t,gray_t> {
 } // gil
 } // boost
 
-#endif
+#endif // BOOST_GIL_GRAY_ALPHA_HPP_INCLUDED

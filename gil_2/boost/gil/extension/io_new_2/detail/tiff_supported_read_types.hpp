@@ -1,11 +1,23 @@
-#ifndef TIFF_SUPPORTED_READ_TYPES_HPP
-#define TIFF_SUPPORTED_READ_TYPES_HPP
+/*
+    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
 
-/// \file
-/// \brief  Defining some basic libtiff wrappers.
-//
-/// \author Christian Henning
+/*************************************************************************************************/
+
+#ifndef BOOST_GIL_EXTENSION_IO_TIFF_SUPPORTED_READ_TYPES_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_IO_TIFF_SUPPORTED_READ_TYPES_HPP_INCLUDED
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
+/// \brief 
+/// \author Christian Henning and Andreas Pokorny \n
 ///         
+/// \date   2007-2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/gil/image.hpp>
 
@@ -260,4 +272,4 @@ template<> struct image_type_factory< pixel< double, rgba_layout_t >, true >
 } // namespace gil
 } // namespace boost
 
-#endif // TIFF_SUPPORTED_READ_TYPES_HPP
+#endif // BOOST_GIL_EXTENSION_IO_TIFF_SUPPORTED_READ_TYPES_HPP_INCLUDED

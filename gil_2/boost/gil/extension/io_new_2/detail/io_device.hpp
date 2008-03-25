@@ -1,11 +1,23 @@
 /*
-  Copyright 2007-2008 Andreas Pokorny
-  Distributed under the MIT License (see accompanying file LICENSE_1_0_0.txt
-  or a copy at http://opensource.adobe.com/licenses.html)
+    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
 */
+
+/*************************************************************************************************/
 
 #ifndef BOOST_GIL_EXTENSION_IO_DETAIL_IO_DEVICE_HPP_INCLUDED
 #define BOOST_GIL_EXTENSION_IO_DETAIL_IO_DEVICE_HPP_INCLUDED
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
+/// \brief 
+/// \author Christian Henning and Andreas Pokorny \n
+///         
+/// \date   2007-2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
 #include "tiff.h"
@@ -16,6 +28,8 @@ extern "C" {
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/gil/extension/io_new_2/detail/base.hpp>
+
+#include "tiff_tags.hpp"
 
 namespace boost { namespace gil { namespace detail {
 /*!
@@ -356,10 +370,12 @@ template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,v
     typedef file_stream_device< FormatTag > device_type;
 };
 
+template<typename Device, typename FormatTag, typename ConversionPolicy> class reader;
+template<typename Device, typename FormatTag> class writer;
 
-} // ns detail
-} // ns gil
-} // ns boost
+} // namespace detail
+} // namespace gil
+} // namespace boost
 
 #endif
 

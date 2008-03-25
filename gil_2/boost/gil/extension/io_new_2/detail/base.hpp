@@ -1,19 +1,23 @@
 /*
-  Copyright 2005-2007 Adobe Systems Incorporated
-  Distributed under the MIT License (see accompanying file LICENSE_1_0_0.txt
-  or a copy at http://opensource.adobe.com/licenses.html)
+    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
 */
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_BASE_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_BASE_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP_INCLUDED
 
-/// \file
-/// \brief  Defining some basic data types.
-//
-/// \author Christian Henning
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
+/// \brief 
+/// \author Christian Henning and Andreas Pokorny \n
 ///         
+/// \date   2007-2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <ostream>
 #include <istream>
@@ -28,9 +32,25 @@
 #include <boost/gil/bit_aligned_pixel_reference.hpp>
 #include <boost/gil/bit_aligned_pixel_iterator.hpp>
 
+#include "detail/typedefs.hpp"
+
 namespace boost { namespace gil {
 
 typedef boost::gil::point2< std::ptrdiff_t > point_t;
+
+struct format_tag {};
+
+/**
+ * Boolean meta function, mpl::true_ if the pixel type \a PixelType is supported 
+ * by the image format identified with \a FormatTag.
+ * \todo the name is_supported is to generic, pick something more IO realted.
+ */
+template<typename PixelType, typename FormatTag> struct is_supported;
+
+template<typename FormatTag> struct is_format_tag : is_base_and_derived<format_tag,FormatTag> {};
+template<typename FormatTag> struct image_read_info;
+template<typename FormatTag> struct image_write_info;
+
 
 namespace detail {
 
@@ -45,11 +65,6 @@ struct rgb_to_luminance_fn< double, double, double, GrayChannelValue > {
       return channel_convert<GrayChannelValue>( red * 0.30 + green * 0.59 + blue * 0.11 );
    }
 };
-
-
-typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
-typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
-typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;
 
 
 template < typename Channel >
@@ -248,18 +263,6 @@ struct channel_type<const packed_pixel<B,C,L> >
 		>
 {};
 
-/**
- * Boolean meta function, mpl::true_ if the pixel type \a PixelType is supported 
- * by the image format identified with \a FormatTag.
- * \todo the name is_supported is to generic, pick something more IO realted.
- */
-template<typename PixelType, typename FormatTag>
-struct is_supported;
-
-struct format_tag{};
-struct tiff_tag : format_tag {};
-
-
 namespace detail{
 
 template<typename PixelT,typename DummyT = void >
@@ -448,4 +451,4 @@ struct swap_bits_fn< boost::mpl::true_
 } // namespace gil
 } // namespace boost
 
-#endif // BASE_HPP
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP_INCLUDED
