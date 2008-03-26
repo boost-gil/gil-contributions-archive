@@ -19,7 +19,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/gil/image.hpp>
+#include <boost/gil/gil_all.hpp>
 
 namespace boost { namespace gil { namespace detail {
 

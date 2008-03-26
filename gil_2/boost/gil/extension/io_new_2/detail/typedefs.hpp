@@ -28,6 +28,12 @@ namespace boost { namespace gil { namespace detail {
 
 ///@todo We should use boost::preprocessor here.
 
+typedef unsigned char byte;
+
+typedef bit_aligned_pixel_reference<byte,mpl::vector_c<int,1>,gray_layout_t,true> gray_1b;
+typedef bit_aligned_pixel_reference<byte,mpl::vector_c<int,2>,gray_layout_t,true> gray_2b;
+typedef bit_aligned_pixel_reference<byte,mpl::vector_c<int,4>,gray_layout_t,true> gray_4b;
+
 typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
 typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
 typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;

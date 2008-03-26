@@ -28,7 +28,6 @@ extern "C" {
 #include <boost/gil/extension/io_new_2/io.hpp>
 #include <boost/gil/extension/io_new_2/png_tags.hpp>
 #include <boost/gil/extension/io_new_2/detail/png_supported_types.hpp>
-#include <boost/gil/extension/io_new_2/detail/png_io.hpp>
 
 namespace boost{ namespace gil {
 

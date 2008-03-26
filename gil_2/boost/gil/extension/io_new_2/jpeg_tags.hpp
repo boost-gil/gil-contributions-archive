@@ -12,7 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
-/// \brief
+/// \brief All supported jpeg tags by the gil io extension.
 /// \author Christian Henning and Andreas Pokorny \n
 ///         
 /// \date   2007-2008 \n
@@ -24,11 +24,6 @@ extern "C" {
 }
 
 #include <boost/gil/extension/io_new_2/detail/base.hpp>
-/// \file
-/// \brief All supported jpeg tags by the gil io extension.
-///
-/// \author Christian Henning
-///         
 
 namespace boost { namespace gil {
 

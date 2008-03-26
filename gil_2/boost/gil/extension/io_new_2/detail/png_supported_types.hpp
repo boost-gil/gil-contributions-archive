@@ -19,7 +19,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include "boost/gil/extension/io_new_2/gray_alpha.hpp"
+#include "boost/gil/extension/toolbox/gray_alpha.hpp"
 
 namespace boost { namespace gil { namespace detail {
 

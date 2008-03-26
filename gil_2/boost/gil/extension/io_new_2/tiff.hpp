@@ -25,10 +25,16 @@
 #include <boost/gil/channel.hpp>
 #include <boost/gil/color_base.hpp>
 #include <boost/gil/extension/io_new_2/io.hpp>
-#include <boost/gil/extension/io_new_2/detail/tiff_io.hpp>
-#include <boost/gil/extension/io_new_2/detail/tiff_supported_types.hpp>
 
 namespace boost{ namespace gil {
+
+namespace detail {
+
+struct tiff_rw_support {
+    BOOST_STATIC_CONSTANT(bool,is_supported=true);
+};
+
+} // namespace detail
 
 template<typename PixelType>
 struct is_supported<PixelType,tiff_tag>

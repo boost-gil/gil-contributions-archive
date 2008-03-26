@@ -82,6 +82,34 @@ int main(int argc, char *argv[])
 
    }
 
+   {
+      gray8_image_t img;
+      read_and_convert_image( in_path, img, jpeg_tag() );
+      write_view( out_path, view( img ), jpeg_tag() );
+
+      for( int x = 0; x < view( img ).width(); ++x )
+      {
+         unsigned char v = *view( img ).at( x, 0 );
+
+         int i = 9;
+      }
+
+   }
+
+   {
+      gray8_image_t img;
+      read_and_convert_image( in_path, img, tiff_tag() );
+      write_view( out_path, view( img ), tiff_tag() );
+
+      for( int x = 0; x < view( img ).width(); ++x )
+      {
+         unsigned char v = *view( img ).at( x, 0 );
+
+         int i = 9;
+      }
+
+   }
+
 /*
 
    fs::path in_full_path  = fs::system_complete( fs::path( in_path, fs::native ) );
