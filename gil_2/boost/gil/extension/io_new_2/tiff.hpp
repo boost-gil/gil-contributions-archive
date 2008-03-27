@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Copyright 2007-2008 Christian Henning, Andreas Pokorny, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief
-/// \author Christian Henning and Andreas Pokorny \n
+/// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///         
 /// \date   2007-2008 \n
 ///
@@ -30,6 +30,7 @@ namespace boost{ namespace gil {
 
 namespace detail {
 
+// TIFF virtually supports everything 
 struct tiff_rw_support {
     BOOST_STATIC_CONSTANT(bool,is_supported=true);
 };

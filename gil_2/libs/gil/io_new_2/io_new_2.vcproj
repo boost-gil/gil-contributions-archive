@@ -323,10 +323,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\reader.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new_2\detail\tiff_io_read.hpp"
 					>
 				</File>

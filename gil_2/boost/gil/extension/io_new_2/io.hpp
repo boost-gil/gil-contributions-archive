@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief
-/// \author Christian Henning and Andreas Pokorny \n
+/// \author Christian Henning, Andreas Pokorny \n
 ///         
 /// \date   2007-2008 \n
 ///
@@ -102,6 +102,9 @@
  * \endcode
  * 
  */
+
+
+
 
 #include "read_image.hpp"
 #include "read_view.hpp"

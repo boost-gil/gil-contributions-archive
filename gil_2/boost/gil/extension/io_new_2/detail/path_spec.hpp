@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Copyright 2007-2008 Andreas Pokorny, Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief 
-/// \author Christian Henning and Andreas Pokorny \n
+/// \author Andreas Pokorny, Christian Henning \n
 ///         
 /// \date   2007-2008 \n
 ///
@@ -26,33 +26,14 @@
 #endif 
 namespace boost{ namespace gil{ namespace detail{
 
-template<typename P>
-struct is_supported_path_spec : mpl::false_
-{};
+template<typename P> struct is_supported_path_spec       : mpl::false_ {};
+template<> struct is_supported_path_spec< std::string >  : mpl::true_ {};
+template<> struct is_supported_path_spec< std::wstring > : mpl::true_ {};
+template<> struct is_supported_path_spec< const char* >  : mpl::true_ {};
+template<> struct is_supported_path_spec< char* >        : mpl::true_ {};
 
-template<>
-struct is_supported_path_spec<std::string> : mpl::true_
-{};
-
-template<>
-struct is_supported_path_spec<std::wstring> : mpl::true_
-{};
-
-template<>
-struct is_supported_path_spec<char const*> : mpl::true_
-{};
-
-template<>
-struct is_supported_path_spec<char *> : mpl::true_
-{};
-
-template<int i>
-struct is_supported_path_spec<const char [i]> : mpl::true_
-{};
-
-template<int i>
-struct is_supported_path_spec<char [i]> : mpl::true_
-{};
+template<int i> struct is_supported_path_spec<const char [i]> : mpl::true_ {};
+template<int i> struct is_supported_path_spec<char [i]> : mpl::true_ {};
 
 #ifdef ADD_FS_PATH_SUPPORT
 template<typename String, typename Traits>
@@ -61,7 +42,9 @@ struct is_supported_path_spec<filesystem::basic_path<String,Traits> > : mpl::tru
 #endif
 
 inline std::string convert_to_string( std::string const& obj)
-{ return obj; }
+{
+   return obj;
+}
 
 inline std::string convert_to_string( std::wstring const& s )
 {
@@ -74,12 +57,12 @@ inline std::string convert_to_string( std::wstring const& s )
 
 inline std::string convert_to_string( const char* str )
 {
-    return std::string(str);
+    return std::string( str );
 }
 
 inline std::string convert_to_string( char* str )
 {
-    return std::string(str);
+    return std::string( str );
 }
 
 #ifdef ADD_FS_PATH_SUPPORT
@@ -88,9 +71,8 @@ inline std::string convert_to_string( filesystem::basic_path<String,T> const& pa
 {
     return convert_to_string( T::to_internal(path) );
 }
-#endif
+#endif // ADD_FS_PATH_SUPPORT
 
 }}}
 
-#endif 
-
+#endif BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED

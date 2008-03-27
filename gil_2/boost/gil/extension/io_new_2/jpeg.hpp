@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief
-/// \author Christian Henning and Andreas Pokorny \n
+/// \author Christian Henning, Andreas Pokorny \n
 ///         
 /// \date   2007-2008 \n
 ///
@@ -37,6 +37,7 @@ struct is_supported<PixelType,jpeg_tag>
                     >::is_supported>
 {};
 
-}}
+} // namespace boost
+} // namespace gil
 
 #endif // BOOST_GIL_EXTENSION_IO_JPEG_HPP_INCLUDED

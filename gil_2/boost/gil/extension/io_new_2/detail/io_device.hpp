@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny
+    Copyright 2007-2008 Andreas Pokorny, Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief 
-/// \author Christian Henning and Andreas Pokorny \n
+/// \author Andreas Pokorny, Christian Henning \n
 ///         
 /// \date   2007-2008 \n
 ///
@@ -234,12 +234,11 @@ private:
 class istream_device
 {
 public:
-    istream_device( std::istream & in )
-        : in(in)
-    {
-    }
+   istream_device( std::istream& in )
+   : in(in) {}
 
-    size_t read( unsigned char * data, size_t count )
+    size_t read( unsigned char* data
+               , std::size_t    count )
     {
         size_t cr = 0;
         do{
