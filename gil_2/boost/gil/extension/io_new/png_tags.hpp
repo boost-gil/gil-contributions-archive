@@ -22,7 +22,7 @@
 extern "C" {
 #include <png.h>
 }
-#include <boost/gil/extension/io_new_2/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/base.hpp>
 
 namespace boost { namespace gil {
 

@@ -30,9 +30,9 @@ extern "C" {
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <boost/gil/extension/io_new_2/tiff_tags.hpp>
-#include <boost/gil/extension/io_new_2/detail/base.hpp>
-#include <boost/gil/extension/io_new_2/detail/tiff_supported_read_types.hpp>
+#include <boost/gil/extension/io_new/tiff_tags.hpp>
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/tiff_supported_read_types.hpp>
 
 
 namespace boost { namespace gil { namespace detail {

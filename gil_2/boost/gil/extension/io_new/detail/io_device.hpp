@@ -27,7 +27,7 @@ extern "C" {
 #include <boost/shared_ptr.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/gil/extension/io_new_2/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/base.hpp>
 
 #include "tiff_tags.hpp"
 

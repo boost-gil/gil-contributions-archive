@@ -2,10 +2,10 @@
 
 #include <iostream>
 #include <boost/type_traits/is_same.hpp>
-#include <boost/gil/extension/io_new_2/io.hpp>
-#include <boost/gil/extension/io_new_2/png.hpp>
-#include <boost/gil/extension/io_new_2/jpeg.hpp>
-#include <boost/gil/extension/io_new_2/tiff.hpp>
+#include <boost/gil/extension/io_new/io.hpp>
+#include <boost/gil/extension/io_new/png.hpp>
+#include <boost/gil/extension/io_new/jpeg.hpp>
+#include <boost/gil/extension/io_new/tiff.hpp>
 #include <boost/gil/gil_all.hpp>
 #include <iterator>
 #include <algorithm>

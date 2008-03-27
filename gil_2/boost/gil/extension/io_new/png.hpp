@@ -25,9 +25,9 @@ extern "C" {
 
 #include <boost/gil/channel.hpp>
 #include <boost/gil/color_base.hpp>
-#include <boost/gil/extension/io_new_2/io.hpp>
-#include <boost/gil/extension/io_new_2/png_tags.hpp>
-#include <boost/gil/extension/io_new_2/detail/png_supported_types.hpp>
+#include <boost/gil/extension/io_new/io.hpp>
+#include <boost/gil/extension/io_new/png_tags.hpp>
+#include <boost/gil/extension/io_new/detail/png_supported_types.hpp>
 
 namespace boost{ namespace gil {
 

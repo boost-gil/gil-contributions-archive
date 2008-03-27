@@ -8,10 +8,10 @@
 #include <boost/type_traits/is_base_and_derived.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/gil/extension/io_new_2/detail/io_device.hpp>
-#include <boost/gil/extension/io_new_2/detail/base.hpp>
-#include <boost/gil/extension/io_new_2/detail/path_spec.hpp>
-#include <boost/gil/extension/io_new_2/detail/conversion_policies.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/path_spec.hpp>
+#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 
 namespace boost{ namespace gil {
 
