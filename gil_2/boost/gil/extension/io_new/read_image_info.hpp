@@ -34,8 +34,9 @@
 
 namespace boost{ namespace gil {
 
+
 /// \ingroup IO
-/// \brief Returns the image info for generating a gil image type.
+/// \brief Returns the image info. Image info is file format specific.
 template< typename Device
         , typename FormatTag
         >
@@ -46,7 +47,7 @@ read_image_info( Device&         file
                , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
                                                        , typename detail::is_input_device<Device>::type
                                                        >::type
-                                                >::type* ptr = 0
+                                   >::type* ptr = 0
                )
 {
     return detail::reader< Device
@@ -55,6 +56,8 @@ read_image_info( Device&         file
                          >( file ).get_info();
 }
 
+/// \ingroup IO
+/// \brief Returns the image info. Image info is file format specific.
 template< typename Device
         , typename FormatTag
         >
@@ -81,6 +84,8 @@ read_image_info( Device&          file
                          >( file ).get_info();
 }
 
+/// \ingroup IO
+/// \brief Returns the image info. Image info is file format specific.
 template< typename String
         , typename FormatTag
         >
