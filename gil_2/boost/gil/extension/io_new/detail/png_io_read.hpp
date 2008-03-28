@@ -19,9 +19,13 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/gil/extension/io_new/detail/typedefs.hpp>
-#include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/png_tags.hpp>
+
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/typedefs.hpp>
+#include <boost/gil/extension/io_new/detail/png_supported_types.hpp>
+
+
 
 namespace boost { namespace gil { namespace detail {
 
@@ -47,15 +51,21 @@ protected:
                 "png_check_validity: invalid png image");
     }
 
-    static void read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+    static void read_data( png_structp png_ptr, png_bytep data, png_size_t length)
     {
-        static_cast<Device*>(png_get_io_ptr(png_ptr) )->read(data, length );
+        static_cast<Device*>(png_get_io_ptr(png_ptr) )->read( data
+                                                            , length );
     }
-    static void write_data(png_structp png_ptr,
-            png_bytep data, png_size_t length)
+
+    static void write_data( png_structp png_ptr
+                          , png_bytep   data
+                          , png_size_t  length
+                          )
     {
-        static_cast<Device*>(png_get_io_ptr(png_ptr) )->write(data, length );
+        static_cast<Device*>( png_get_io_ptr( png_ptr ))->write( data
+                                                               , length );
     }
+
     static void flush(png_structp png_ptr)
     {
         static_cast<Device*>(png_get_io_ptr(png_ptr) )->flush();

@@ -114,18 +114,22 @@ public:
     template< typename View >
     void apply( const View& view )
     {
-        typedef png_rw_support<
-                        typename kth_semantic_element_type<typename View::value_type, 0>::type,
-                        typename color_space_type<View>::type
-                        > png_rw_info;
-        png_set_IHDR(_png_ptr, _info_ptr, 
-                view.width(),
-                view.height(),
-                png_rw_info::bit_depth,
-                png_rw_info::color_type,
-                PNG_INTERLACE_NONE,
-                PNG_COMPRESSION_TYPE_DEFAULT,
-                PNG_FILTER_TYPE_DEFAULT);
+        typedef png_rw_support< typename kth_semantic_element_type< typename View::value_type
+                                                                  , 0
+                                                                  >::type
+                              , typename color_space_type<View>::type
+                              > png_rw_info;
+
+        png_set_IHDR( _png_ptr
+                    , _info_ptr
+                    , static_cast<int>( view.width()  )
+                    , static_cast<int>( view.height() )
+                    , png_rw_info::bit_depth
+                    , png_rw_info::color_type
+                    , PNG_INTERLACE_NONE
+                    , PNG_COMPRESSION_TYPE_DEFAULT
+                    , PNG_FILTER_TYPE_DEFAULT
+                    );
 
         png_write_info(_png_ptr,_info_ptr);
         write_view( view

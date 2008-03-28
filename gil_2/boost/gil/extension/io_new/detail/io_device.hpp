@@ -77,14 +77,16 @@ public:
             fclose(file);
     }
 
-    std::size_t read( unsigned char * data, int count )
+    std::size_t read( unsigned char* data
+                    , std::size_t    count )
     {
-        return fread(data, 1, count, file );
+        return fread( data, 1, static_cast<int>( count ), file );
     }
 
-    void write( unsigned char const * data, int count )
+    void write( const unsigned char* data
+              , std::size_t          count )
     {
-        fwrite(data, 1, count, file);
+        fwrite(data, 1, static_cast<int>( count ), file);
     }
 
     //!\todo replace with std::ios::seekdir?
@@ -254,19 +256,17 @@ public:
 
     void seek( long count, int whence )
     {
-        in.seekg(
-                count,
-                whence == SEEK_SET
-                ?std::ios::beg
-                :(whence == SEEK_CUR
-                    ?std::ios::cur
-                    :std::ios::end)
+        in.seekg( count
+                , whence == SEEK_SET ? std::ios::beg
+                                     :( whence == SEEK_CUR ? std::ios::cur
+                                                           : std::ios::end )
                 );
     }
 
-    void write( unsigned char const* data, int count )
+    void write( const unsigned char* data
+              , std::size_t          count )
     {
-        //throw?
+        throw std::runtime_error( "Bad io error." );
     }
 
     void flush() {}
@@ -286,9 +286,10 @@ public:
     {
     }
 
-    size_t read( unsigned char * data, int count )
+    size_t read( unsigned char* data
+               , std::size_t    count )
     {
-        //throw?
+        throw std::runtime_error( "Bad io error." );
     }
 
     void seek( long count, int whence )
@@ -303,9 +304,12 @@ public:
                 );
     }
 
-    void write( unsigned char const* data, int count )
+    void write( const unsigned char* data
+              , std::size_t          count )
     {
-        out.write(reinterpret_cast<char const*>(data), count);
+        out.write( reinterpret_cast<char const*>( data )
+                 , static_cast<std::streamsize>( count )
+                 );
     }
 
     void flush()
@@ -314,6 +318,7 @@ public:
     }
 
 private:
+
     std::ostream& out;
 };
 
