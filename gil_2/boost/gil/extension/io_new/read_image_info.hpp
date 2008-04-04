@@ -28,10 +28,6 @@
 #include <boost/gil/extension/io_new/detail/path_spec.hpp>
 #include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 
-#include <boost/gil/extension/io_new/detail/jpeg_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/png_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/tiff_io_read.hpp>
-
 namespace boost{ namespace gil {
 
 
@@ -78,10 +74,11 @@ read_image_info( Device&          file
                                                       >::device_type device_type;
 
     device_type dev( file );
+
     return detail::reader< device_type
                          , FormatTag
                          , detail::read_and_no_convert
-                         >( file ).get_info();
+                         >( dev ).get_info();
 }
 
 /// \ingroup IO

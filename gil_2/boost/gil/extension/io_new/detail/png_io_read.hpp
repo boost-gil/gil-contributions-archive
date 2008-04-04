@@ -22,6 +22,7 @@
 #include <boost/gil/extension/io_new/png_tags.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 #include <boost/gil/extension/io_new/detail/png_supported_types.hpp>
 

@@ -19,6 +19,12 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/mpl/not.hpp>
+#include <boost/type_traits/is_same.hpp>
+
+#include <boost/gil/channel.hpp>
+#include <boost/gil/color_base.hpp>
+#include <boost/gil/extension/io_new/io.hpp>
 
 namespace boost { namespace gil { namespace detail {
 
@@ -50,6 +56,15 @@ struct jpeg_rw_support<bits8, gray_t>
 };
 
 } // namespace detail
+
+template<typename PixelType>
+struct is_supported<PixelType,jpeg_tag>
+    : mpl::bool_<detail::jpeg_rw_support<
+                    typename channel_type<PixelType>::type,
+                    typename color_space_type<PixelType>::type
+                    >::is_supported>
+{};
+
 } // namespace gil
 } // namespace boost
 

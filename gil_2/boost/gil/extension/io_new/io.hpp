@@ -103,9 +103,6 @@
  * 
  */
 
-
-
-
 #include "read_image.hpp"
 #include "read_view.hpp"
 #include "read_image_info.hpp"

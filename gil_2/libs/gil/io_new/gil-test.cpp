@@ -2,10 +2,9 @@
 
 #include <iostream>
 #include <boost/type_traits/is_same.hpp>
-#include <boost/gil/extension/io_new/io.hpp>
-#include <boost/gil/extension/io_new/png.hpp>
-#include <boost/gil/extension/io_new/jpeg.hpp>
-#include <boost/gil/extension/io_new/tiff.hpp>
+#include <boost/gil/extension/io_new/png_all.hpp>
+#include <boost/gil/extension/io_new/jpeg_all.hpp>
+#include <boost/gil/extension/io_new/tiff_all.hpp>
 #include <boost/gil/gil_all.hpp>
 #include <iterator>
 #include <algorithm>
@@ -61,6 +60,7 @@ void read_test_impl( const String& file_name )
 
 int main(int argc, char *argv[])
 {
+/*   
    using namespace boost::gil;
    using namespace boost::mpl;
    namespace fs = boost::filesystem;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
       }
 
    }
-
+*/
 /*
 
    fs::path in_full_path  = fs::system_complete( fs::path( in_path, fs::native ) );

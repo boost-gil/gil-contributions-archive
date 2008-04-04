@@ -28,11 +28,6 @@
 #include <boost/gil/extension/io_new/detail/path_spec.hpp>
 #include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 
-#include <boost/gil/extension/io_new/detail/jpeg_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/png_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/tiff_io_read.hpp>
-
-
 namespace boost{ namespace gil {
 
 // ----- View --- Reader --------- With ColorConverter -----------------

@@ -28,10 +28,6 @@
 #include <boost/gil/extension/io_new/detail/path_spec.hpp>
 #include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 
-#include <boost/gil/extension/io_new/detail/jpeg_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/png_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/tiff_io_read.hpp>
-
 namespace boost{ namespace gil {
 
 // ------ Image --- Reader -------- no conversion -----------
@@ -137,12 +133,12 @@ void read_image( Device& file
                , Image& img
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
-                                                                       , typename is_format_tag          < FormatTag >::type
-                                                                       , typename is_supported           < typename Image::value_type
-                                                                                                         , FormatTag 
-                                                                                                         >::type 
-                                                                       >::type 
-                                                   >::type* ptr = 0 
+                                                       , typename is_format_tag          < FormatTag >::type
+                                                       , typename is_supported           < typename Image::value_type
+                                                                                         , FormatTag 
+                                                                                         >::type 
+                                                       >::type 
+                                   >::type* ptr = 0 
                )
 {
     read_image( file
@@ -194,12 +190,12 @@ void read_image( const String&    file_name
                , Image&           img
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
-                                                                     , typename is_format_tag< FormatTag >::type
-                                                                     , typename is_supported< typename Image::value_type
-                                                                                            , FormatTag
-                                                                                            >::type
-                                                                     >::type
-                                                 >::type* ptrdiff_t = 0
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_supported< typename Image::value_type
+                                                                              , FormatTag
+                                                                              >::type
+                                                       >::type
+                                   >::type* ptrdiff_t = 0
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )

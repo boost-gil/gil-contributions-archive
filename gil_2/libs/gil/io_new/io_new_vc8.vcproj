@@ -181,7 +181,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg.hpp"
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_all.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_read.hpp"
 				>
 			</File>
 			<File
@@ -189,11 +193,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\png.hpp"
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_write.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\png_all.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\png_read.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\png_tags.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\png_write.hpp"
 				>
 			</File>
 			<File
@@ -217,11 +233,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\tiff.hpp"
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_all.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_read.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_tags.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_write.hpp"
 				>
 			</File>
 			<File
@@ -269,6 +293,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\png_supported_types.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io_device.hpp"
 					>
 				</File>
 				<File

@@ -19,9 +19,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
-#include <png.h>
-}
+
 
 #include <boost/gil/channel.hpp>
 #include <boost/gil/color_base.hpp>
@@ -31,14 +29,7 @@ extern "C" {
 
 namespace boost{ namespace gil {
 
-template<typename PixelType>
-struct is_supported<PixelType,png_tag>
-    //!\todo this should be lazy: -- channel_type is undefined for non-homogenous pixel types
-    : mpl::bool_<detail::png_rw_support<
-                    typename channel_type<PixelType>::type,
-                    typename color_space_type<PixelType>::type
-                    >::is_supported>
-{};
+
 
 } // namespace gil
 } // namespace boost

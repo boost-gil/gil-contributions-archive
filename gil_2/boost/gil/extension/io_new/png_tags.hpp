@@ -131,7 +131,6 @@ struct image_write_info<png_tag>
     png_y_resolution::type _y_res;
     png_significant_bits::type _sbits;
 };
- 
 
 } // namespace gil
 } // namespace boost

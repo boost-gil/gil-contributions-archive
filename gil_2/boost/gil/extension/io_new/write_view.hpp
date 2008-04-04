@@ -7,21 +7,17 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_WRITE_IMAGE_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_WRITE_IMAGE_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP_INCLUDED
 
 #include <boost/type_traits/is_base_and_derived.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <boost/gil/extension/io_new/detail/base.hpp>
-#include <boost/gil/extension/io_new/detail/io_device.hpp>
-#include <boost/gil/extension/io_new/detail/path_spec.hpp>
-#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
-
-#include <boost/gil/extension/io_new/detail/jpeg_io_write.hpp>
-#include <boost/gil/extension/io_new/detail/png_io_write.hpp>
-#include <boost/gil/extension/io_new/detail/tiff_io_write.hpp>
+#include "detail/base.hpp"
+#include "detail/io_device.hpp"
+#include "detail/path_spec.hpp"
+#include "detail/conversion_policies.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
@@ -192,4 +188,4 @@ void write_view( const String&                        file_name
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_WRITE_IMAGE_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP_INCLUDED
