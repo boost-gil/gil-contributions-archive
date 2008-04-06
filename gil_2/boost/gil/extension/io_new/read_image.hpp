@@ -42,7 +42,7 @@ inline
 void read_image( Device&          file
                , Image&           img
                , const point_t&   top_left
-               , const point_t&   bottom_right
+               , const point_t&   dim
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
                                                                        , typename is_format_tag          < FormatTag >::type
@@ -60,7 +60,7 @@ void read_image( Device&          file
 
     reader.read_image( img
                      , top_left
-                     , bottom_right );
+                     , dim );
 }
 
 template < typename Device
@@ -70,7 +70,7 @@ template < typename Device
 inline void read_image( Device&          file
                       , Image&           img
                       , const point_t&   top_left
-                      , const point_t&   bottom_right
+                      , const point_t&   dim
                       , const FormatTag& tag
                       , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
                                                                                                                          , Device
@@ -89,7 +89,7 @@ inline void read_image( Device&          file
 
     reader.read_image( img
                      , top_left
-                     , bottom_right );
+                     , dim );
 }
 
 template < typename String
@@ -100,7 +100,7 @@ inline
 void read_image( const String& file_name
                , Image& img
                , const point_t& top_left
-               , const point_t& bottom_right
+               , const point_t& dim
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                                      , typename is_format_tag< FormatTag >::type
@@ -118,7 +118,7 @@ void read_image( const String& file_name
     read_image( device
               , img
               , top_left
-              , bottom_right
+              , dim
               , tag
               );
 }

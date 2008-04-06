@@ -21,12 +21,11 @@
 
 #include <boost/gil/extension/io_new/png_tags.hpp>
 
-#include <boost/gil/extension/io_new/detail/base.hpp>
-#include <boost/gil/extension/io_new/detail/io_device.hpp>
-#include <boost/gil/extension/io_new/detail/typedefs.hpp>
-#include <boost/gil/extension/io_new/detail/png_supported_types.hpp>
-
-
+#include "base.hpp"
+#include "reader_base.hpp"
+#include "io_device.hpp"
+#include "typedefs.hpp"
+#include "png_supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -80,14 +79,17 @@ template< typename Device
 class reader< Device
             , png_tag
             , ConversionPolicy
-            > : public png_io_base< Device >
+            >
+    : public png_io_base< Device >
+    , public reader_base< png_tag
+                        , ConversionPolicy >
 {
 public:
 
     reader( Device& io_dev )
     : png_io_base< Device >( io_dev )
-    , _png_ptr ( 0 )
-    , _info_ptr( 0 )
+    , _png_ptr ( NULL )
+    , _info_ptr( NULL )
     {
         this->check();
         init_reader();
@@ -96,7 +98,8 @@ public:
     reader( Device& io_dev
           , const typename ConversionPolicy::color_converter_type& cc )
     : png_io_base< Device >( io_dev )
-    , cc_policy( cc )
+    , reader_base< png_tag
+                 , ConversionPolicy >( cc )
     , _png_ptr ( 0 )
     , _info_ptr( 0 )
     {
@@ -106,7 +109,10 @@ public:
 
     ~reader()
     {
-        png_destroy_read_struct(&_png_ptr,&_info_ptr,png_infopp_NULL);
+        png_destroy_read_struct( &_png_ptr
+                               , &_info_ptr
+                               , png_infopp_NULL
+                               );
     }
 
     image_read_info<png_tag> get_info() const
@@ -133,87 +139,48 @@ public:
     template<typename Image>
     void read_image( Image&         image
                    , const point_t& top_left
-                   , const point_t& bottom_right
+                   , const point_t& dim
                    )
     {
-        image_read_info< png_tag > info( get_info() );
+        _info = get_info();
 
-        check_coordinates( top_left
-                         , bottom_right
-                         , info
-                         );
+        setup( top_left
+             , dim );
 
-        point_t _bottom_right;
+        image.recreate( _dim.x - _top_left.x
+                      , _dim.y - _top_left.y );
 
-        if( bottom_right == point_t( 0, 0 ))
-        {
-            _bottom_right.x = info._width  - 1;
-            _bottom_right.y = info._height - 1;
-        }
-        else
-        {
-            _bottom_right = bottom_right;
-        }
-
-        image.recreate( ( _bottom_right.x + 1 ) - top_left.x
-                      , ( _bottom_right.y + 1 ) - top_left.y );
-
-        read_data( view( image )
-                 , top_left
-                 , _bottom_right
-                 , info
-                 );
+        read_data( view( image ));
     }
 
     template<typename View>
     void read_view( const View&    view
                   , const point_t& top_left
-                  , const point_t& bottom_right
+                  , const point_t& dim
                   )
     {
-        image_read_info<png_tag> info(get_info());
+        _info = get_info();
 
-        check_coordinates( top_left
-                         , bottom_right
-                         , info
-                         );
+        setup( top_left
+             , dim );
 
-        point_t _bottom_right;
-
-        if( bottom_right == point_t( 0, 0 ))
-        {
-            _bottom_right.x = info._width  - 1;
-            _bottom_right.y = info._height - 1;
-        }
-        else
-        {
-            _bottom_right = bottom_right;
-        }
-
-        read_data( view
-                 , top_left
-                 , _bottom_right
-                 , info
-                 );
+        read_data( view );
     }
 
 private:
     template<typename View>
-    void read_data( const View&                       view
-                  , const point_t&                    top_left
-                  , const point_t&                    bottom_right
-                  , const image_read_info< png_tag >& info
-                  )
+    void read_data( const View& view )
     {
-        if (little_endian() )
+        if( little_endian() )
         {   
-            if( info._bit_depth == 16 )
+            if( _info._bit_depth == 16 )
                 png_set_swap(_png_ptr);
-            if( info._bit_depth < 8 )
+            if( _info._bit_depth < 8 )
                 png_set_packswap(_png_ptr);
         }
-        png_bitdepth::type bit_depth = info._bit_depth;
-        png_color_type::type color_type = info._color_type;
+
+        png_bitdepth::type bit_depth = _info._bit_depth;
+        png_color_type::type color_type = _info._color_type;
         
         if(color_type == PNG_COLOR_TYPE_PALETTE)
         {
@@ -238,11 +205,11 @@ private:
             {
                 switch( bit_depth )
                 {
-                    case 1: read_rows< gray_1b >       ( view, top_left, bottom_right, info ); break;
-                    case 2: read_rows< gray_2b >       ( view, top_left, bottom_right, info ); break;
-                    case 4: read_rows< gray_4b >       ( view, top_left, bottom_right, info ); break;
-                    case 8: read_rows< gray8_pixel_t > ( view, top_left, bottom_right, info ); break;
-                    case 16:read_rows< gray16_pixel_t >( view, top_left, bottom_right, info ); break;
+                    case 1: read_rows< gray_1b >       ( view ); break;
+                    case 2: read_rows< gray_2b >       ( view ); break;
+                    case 4: read_rows< gray_4b >       ( view ); break;
+                    case 8: read_rows< gray8_pixel_t > ( view ); break;
+                    case 16:read_rows< gray16_pixel_t >( view ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -252,8 +219,8 @@ private:
             {
                 switch( bit_depth )
                 {
-                    case 8: read_rows< gray_alpha8_pixel_t > ( view, top_left, bottom_right, info ); break;
-                    case 16:read_rows< gray_alpha16_pixel_t >( view, top_left, bottom_right, info ); break;
+                    case 8: read_rows< gray_alpha8_pixel_t > ( view ); break;
+                    case 16:read_rows< gray_alpha16_pixel_t >( view ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -263,8 +230,8 @@ private:
             {
                 switch (bit_depth)
                 {
-                    case 8:  read_rows< rgb8_pixel_t > ( view, top_left, bottom_right, info ); break;
-                    case 16: read_rows< rgb16_pixel_t >( view, top_left, bottom_right, info ); break;
+                    case 8:  read_rows< rgb8_pixel_t > ( view ); break;
+                    case 16: read_rows< rgb16_pixel_t >( view ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -274,8 +241,8 @@ private:
             {
                 switch( bit_depth )
                 {
-                    case 8 : read_rows< rgba8_pixel_t > ( view,top_left, bottom_right, info ); break;
-                    case 16: read_rows< rgba16_pixel_t >( view,top_left, bottom_right, info ); break;
+                    case 8 : read_rows< rgba8_pixel_t > ( view ); break;
+                    case 16: read_rows< rgba16_pixel_t >( view ); break;
                     default: io_error("png_reader_color_convert::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -292,11 +259,7 @@ private:
     template< typename ImagePixel
             , typename View
             >
-    void read_rows( const View&                       view
-                  , const point_t&                    top_left
-                  , const point_t&                    bottom_right
-                  , const image_read_info< png_tag >& info
-                  )
+    void read_rows( const View& view )
     {
         io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
                                                             , typename View::value_type
@@ -304,10 +267,10 @@ private:
                     , "User provided view has incorrect color space or channel type."
                     );
 
-        row_buffer_helper<ImagePixel> buffer( static_cast<int>( info._width ));
+        row_buffer_helper<ImagePixel> buffer( static_cast<int>( _info._width ));
 
         // skip rows
-        for( int y = 0; y < top_left.y; ++y )
+        for( int y = 0; y < _top_left.y; ++y )
         {
             png_read_row( _png_ptr
                         , reinterpret_cast< png_bytep >( buffer.data() )
@@ -322,10 +285,10 @@ private:
                         , 0
                         );
 
-            cc_policy.read( buffer.begin() + top_left.x
-                          , buffer.begin() + bottom_right.x + 1
-                          , view.row_begin( y )
-                          );
+            _cc_policy.read( buffer.begin() + _top_left.x
+                           , buffer.begin() + _dim.x
+                           , view.row_begin( y )
+                           );
         }
     }
 
@@ -359,7 +322,6 @@ private:
                 static_cast<void(*)(png_structp, png_bytep, png_size_t)>(&png_io_base<Device>::read_data));
     }
 
-    ConversionPolicy cc_policy;
     png_structp _png_ptr;
     png_infop _info_ptr;
 };

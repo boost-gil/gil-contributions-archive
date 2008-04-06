@@ -23,10 +23,10 @@
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <boost/gil/extension/io_new/detail/base.hpp>
-#include <boost/gil/extension/io_new/detail/io_device.hpp>
-#include <boost/gil/extension/io_new/detail/path_spec.hpp>
-#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
+#include "base.hpp"
+#include "io_device.hpp"
+#include "path_spec.hpp"
+#include "conversion_policies.hpp"
 
 namespace boost{ namespace gil {
 
@@ -42,7 +42,7 @@ inline
 void read_and_convert_image( Device&               file
                            , Image&                img
                            , const point_t&        top_left
-                           , const point_t&        bottom_right
+                           , const point_t&        dim
                            , const ColorConverter& cc
                            , const FormatTag&      tag
                            , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
@@ -62,7 +62,7 @@ void read_and_convert_image( Device&               file
 
     reader.read_image( img
                      , top_left
-                     , bottom_right
+                     , dim
                      );
 }
 
@@ -75,7 +75,7 @@ inline
 void read_and_convert_image( Device&               file
                            , Image&                img
                            , const point_t&        top_left
-                           , const point_t&        bottom_right
+                           , const point_t&        dim
                            , const ColorConverter& cc
                            , const FormatTag&      tag
                            , typename enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
@@ -94,7 +94,7 @@ void read_and_convert_image( Device&               file
     read_and_convert_image( dev
                           , img
                           , top_left
-                          , bottom_right
+                          , dim
                           , cc
                           , tag
                           );
@@ -109,7 +109,7 @@ inline
 void read_and_convert_image( const String& file_name
                            , Image& img
                            , const point_t& top_left
-                           , const point_t& bottom_right
+                           , const point_t& dim
                            , const ColorConverter& cc
                            , const FormatTag& tag
                            , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
@@ -125,7 +125,7 @@ void read_and_convert_image( const String& file_name
     read_and_convert_image( device
                           , img
                           , top_left
-                          , bottom_right
+                          , dim
                           , cc
                           , tag
                           );
@@ -195,7 +195,7 @@ inline
 void read_and_convert_image( const String&    file_name
                            , Image&           img
                            , const point_t&   top_left
-                           , const point_t&   bottom_right
+                           , const point_t&   dim
                            , const FormatTag& tag
                            , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
                                                                  , typename detail::is_supported_path_spec< String >::type
@@ -206,7 +206,7 @@ void read_and_convert_image( const String&    file_name
    read_and_convert_image( file_name
                          , img
                          , top_left
-                         , bottom_right
+                         , dim
                          , default_color_converter()
                          , tag
                          );
@@ -220,7 +220,7 @@ inline
 void read_and_convert_image( Device& device
                            , Image& img
                            , const point_t& top_left
-                           , const point_t& bottom_right 
+                           , const point_t& dim 
                            , const FormatTag& tag
                            , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
                                                                                       , typename detail::is_adaptable_input_device< FormatTag
@@ -235,7 +235,7 @@ void read_and_convert_image( Device& device
    read_and_convert_image( device
                          , img
                          , top_left
-                         , bottom_right
+                         , dim
                          , default_color_converter()
                          , tag
                          );

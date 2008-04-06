@@ -23,6 +23,8 @@
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 #include <boost/gil/extension/io_new/detail/jpeg_supported_types.hpp>
 
+#include "reader_base.hpp"
+
 namespace boost { namespace gil { namespace detail {
 
 template<typename Device>
@@ -145,18 +147,26 @@ private:
 template< typename Device
         , typename ConversionPolicy
         >
-class reader<Device,jpeg_tag,ConversionPolicy> 
-    : jpeg_decompress_mgr<Device>
+class reader< Device
+            , jpeg_tag
+            , ConversionPolicy
+            > 
+    : public jpeg_decompress_mgr< Device >
+    , public reader_base< jpeg_tag
+                        , ConversionPolicy >
 {
 public:
-    reader( Device & device )
-        : jpeg_decompress_mgr<Device>(device)
+    reader( Device& device )
+    : jpeg_decompress_mgr<Device>( device )
     {}
 
-    reader( Device & device, typename ConversionPolicy::color_converter_type const& cc )
-        : jpeg_decompress_mgr<Device>(device), cc_policy(cc)
-    {
-    }
+    reader( Device& device
+          , const typename ConversionPolicy::color_converter_type& cc
+          )
+    : jpeg_decompress_mgr< Device >( device )
+    , reader_base< jpeg_tag
+                 , ConversionPolicy >( cc )
+    {}
 
     image_read_info<jpeg_tag> get_info()
     {
@@ -171,98 +181,65 @@ public:
     }
 
     template<typename Image>
-    void read_image( Image&         image
+    void read_image( Image&         img
                    , const point_t& top_left
-                   , const point_t& bottom_right
+                   , const point_t& dim
                    )
     {
-        image_read_info<jpeg_tag> info( get_info() );
+        _info = get_info();
 
-        check_coordinates( top_left
-                         , bottom_right
-                         , info
-                         );
+        setup( top_left
+             , dim );
 
-        _top_left = top_left;
+        img.recreate( _dim.x - top_left.x
+                    , _dim.y - top_left.y );
 
-        if( bottom_right == point_t( 0, 0 ))
-        {
-            _bottom_right.x = info._width  - 1;
-            _bottom_right.y = info._height - 1;
-        }
-        else
-        {
-            _bottom_right = bottom_right;
-        }
-
-        image.recreate( ( _bottom_right.x + 1 ) - top_left.x
-                      , ( _bottom_right.y + 1 ) - top_left.y );
-
-        apply_impl( view( image )
-                  , info
-                  );
+        apply_impl( view( img ));
     }
 
     template<typename View>
     void read_view( const View&    view
                   , const point_t& top_left
-                  , const point_t& bottom_right
+                  , const point_t& dim
                   )
     {
-        image_read_info<jpeg_tag> info(get_info());
+        _info = get_info();
 
-        check_coordinates( top_left
-                         , bottom_right
-                         , info
-                         );
+        setup( top_left
+             , dim );
 
-        _top_left = top_left;
-
-        if( bottom_right == point_t( 0, 0 ))
-        {
-            _bottom_right.x = info._width  - 1;
-            _bottom_right.y = info._height - 1;
-        }
-        else
-        {
-            _bottom_right = bottom_right;
-        }
-
-        apply_impl( view
-                  , info
-                  );
+        apply_impl( view );
     }
 private:
 
     template<typename View>
-    void apply_impl( const View& view
-                   , const image_read_info<jpeg_tag>& info )
+    void apply_impl( const View& view )
     {
         start_decompress();
 
-        switch( info._color_space )
+        switch( _info._color_space )
         {
         case JCS_GRAYSCALE:
-            io_error_if(info._num_components!=1,"reader<jpeg>: error in image data");
-            read_rows<gray8_pixel_t>( view, info );
+            io_error_if(_info._num_components!=1,"reader<jpeg>: error in image data");
+            read_rows<gray8_pixel_t>( view );
             break;
         case JCS_RGB:
-            io_error_if(info._num_components!=3,"reader<jpeg>: error in image data");
-            read_rows<rgb8_pixel_t>( view, info );
+            io_error_if(_info._num_components!=3,"reader<jpeg>: error in image data");
+            read_rows<rgb8_pixel_t>( view );
         case JCS_YCbCr:
-            io_error_if(info._num_components!=3,"reader<jpeg>: error in image data");
+            io_error_if(_info._num_components!=3,"reader<jpeg>: error in image data");
             //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
-            read_rows<rgb8_pixel_t>( view, info );
+            read_rows<rgb8_pixel_t>( view );
             break;
         case JCS_CMYK:
-            io_error_if(info._num_components!=4,"reader<jpeg>: error in image data");
-            read_rows<cmyk8_pixel_t>( view, info );
+            io_error_if(_info._num_components!=4,"reader<jpeg>: error in image data");
+            read_rows<cmyk8_pixel_t>( view );
             break;
         case JCS_YCCK:
-            io_error_if(info._num_components!=4,"reader<jpeg>: error in image data");
+            io_error_if(_info._num_components!=4,"reader<jpeg>: error in image data");
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             this->_cinfo.out_color_space = JCS_CMYK;
-            read_rows<cmyk8_pixel_t>( view, info );
+            read_rows<cmyk8_pixel_t>( view );
             break;
         default:
             break;
@@ -275,9 +252,7 @@ private:
     template< typename ImagePixel
             , typename View
             >
-   void read_rows( const View&                      view
-                 , const image_read_info<jpeg_tag>& info
-                 )
+   void read_rows( const View& view )
    {
       io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
                                                          , typename View::value_type
@@ -286,7 +261,7 @@ private:
                 );
 
       
-      std::vector<ImagePixel> buffer( info._width );
+      std::vector<ImagePixel> buffer( _info._width );
 
       JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
 
@@ -309,10 +284,10 @@ private:
                                          ) !=1
                     , "jpeg_read_scanlines: fail to read JPEG file" );
 
-         cc_policy.read( buffer.begin() + _top_left.x
-                       , buffer.begin() + _bottom_right.x + 1
-                       , view.row_begin( y )
-                       );
+         _cc_policy.read( buffer.begin() + _top_left.x
+                        , buffer.begin() + _dim.x
+                        , view.row_begin( y )
+                        );
       }
 
       //@todo: Finish up. There might be a better way to do that.
@@ -326,11 +301,6 @@ private:
       }
 
    }
-
-    point_t _top_left;
-    point_t _bottom_right;
-
-    ConversionPolicy cc_policy;
 };
 
 } // detail

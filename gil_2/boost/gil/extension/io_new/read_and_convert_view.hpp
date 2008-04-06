@@ -42,7 +42,7 @@ inline
 void read_and_convert_view( Device&               file
                           , const View&           view
                           , const point_t&        top_left
-                          , const point_t&        bottom_right
+                          , const point_t&        dim
                           , const ColorConverter& cc
                           , const FormatTag&      tag
                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
@@ -62,7 +62,7 @@ void read_and_convert_view( Device&               file
 
     reader.read_view( view
                      , top_left
-                     , bottom_right
+                     , dim
                      );
 }
 
@@ -75,7 +75,7 @@ inline
 void read_and_convert_view( Device&               file
                           , const View&           view
                           , const point_t&        top_left
-                          , const point_t&        bottom_right  
+                          , const point_t&        dim  
                           , const ColorConverter& cc
                           , const FormatTag&      tag
                           , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
@@ -95,7 +95,7 @@ void read_and_convert_view( Device&               file
     read_and_convert_view( dev
                          , view
                          , top_left
-                         , bottom_right
+                         , dim
                          , cc
                          , tag
                          );
@@ -110,7 +110,7 @@ inline
 void read_and_convert_view( const String&         file_name
                           , const View&           view
                           , const point_t&        top_left
-                          , const point_t&        bottom_right
+                          , const point_t&        dim
                           , const ColorConverter& cc
                           , const FormatTag&      tag
                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
@@ -126,7 +126,7 @@ void read_and_convert_view( const String&         file_name
     read_and_convert_view( device
                          , view
                          , top_left
-                         , bottom_right
+                         , dim
                          , cc
                          , tag
                          );
@@ -196,7 +196,7 @@ inline
 void read_and_convert_view( const String&    file_name
                           , const View&      view
                           , const point_t&   top_left
-                          , const point_t&   bottom_right
+                          , const point_t&   dim
                           , const FormatTag& tag
                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
                                                                  , typename detail::is_supported_path_spec< String >::type
@@ -207,7 +207,7 @@ void read_and_convert_view( const String&    file_name
    read_and_convert_view( file_name
                         , view
                         , top_left
-                        , bottom_right
+                        , dim
                         , default_color_converter()
                         , tag
                         );
@@ -221,7 +221,7 @@ inline
 void read_and_convert_view( Device&          device
                           , const View&      view
                           , const point_t&   top_left
-                          , const point_t&   bottom_right 
+                          , const point_t&   dim 
                           , const FormatTag& tag
                           , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
                                                                                       , typename detail::is_adaptable_input_device< FormatTag
@@ -236,7 +236,7 @@ void read_and_convert_view( Device&          device
    read_and_convert_view( device
                         , view
                         , top_left
-                        , bottom_right
+                        , dim
                         , default_color_converter()
                         , tag
                         );

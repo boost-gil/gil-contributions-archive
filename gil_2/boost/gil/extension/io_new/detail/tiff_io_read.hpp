@@ -76,21 +76,21 @@ template< typename Device
 class reader< Device
             , tiff_tag
             , ConversionPolicy
-            > 
+            >
+    : public reader_base< tiff_tag
+                        , ConversionPolicy >
 {
 public:
 
    reader( Device& device )
    : _io_dev( device )
-   , _cc_policy()
-   , _info()
    {}
 
    reader( Device&                                                device
          , typename const ConversionPolicy::color_converter_type& cc     )
    : _io_dev   ( device )
-   , _cc_policy( cc     )
-   , _info()
+    , reader_base< tiff_tag
+                 , ConversionPolicy >( cc )
    {}
 
    image_read_info<tiff_tag> get_info()
@@ -120,60 +120,30 @@ public:
     template< typename Image >
     void read_image( Image&         image
                    , const point_t& top_left
-                   , const point_t& bottom_right
+                   , const point_t& dim
                    )
     {
         _info = get_info();
 
-        check_coordinates( top_left
-                         , bottom_right
-                         , _info
-                         );
+        setup( _top_left
+             , _dim );
 
-        _top_left = top_left;
-
-        if( bottom_right == point_t( 0, 0 ))
-        {
-            _bottom_right.x = _info._width  - 1;
-            _bottom_right.y = _info._height - 1;
-        }
-        else
-        {
-            _bottom_right = bottom_right;
-        }
-
-
-        image.recreate( ( _bottom_right.x + 1 ) - _top_left.x
-                      , ( _bottom_right.y + 1 ) - _top_left.y );
+        image.recreate( _dim.x - _top_left.x
+                      , _dim.y - _top_left.y );
 
         apply_impl( view( image ));
     }
 
     template<typename View>
     void read_view( View&          view
-                  , const point_t& top_left     // src image coordinates
-                  , const point_t& bottom_right // src image coordinates
+                  , const point_t& top_left
+                  , const point_t& dim
                   )
     {
         _info = get_info();
 
-        check_coordinates( top_left
-                         , bottom_right
-                         , _info
-                         );
-
-
-        _top_left = top_left;
-
-        if( bottom_right == point_t( 0, 0 ))
-        {
-            _bottom_right.x = _info._width  - 1;
-            _bottom_right.y = _info._height - 1;
-        }
-        else
-        {
-            _bottom_right = bottom_right;
-        }
+        setup( _top_left
+             , _dim );
 
         apply_impl( view );
     }
@@ -444,14 +414,15 @@ private:
       read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
 
       read_helper_t::iterator_t first = begin + _top_left.x;
-      read_helper_t::iterator_t last  = begin + _bottom_right.x + 1; // one after last element
+      read_helper_t::iterator_t last  = begin + _dim.x; // one after last element
 
       skip_over_rows( buffer, plane );
 
       swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( _io_dev );
 
+      point_t::value_type num_rows = _dim.y - _top_left.y;
       for( std::ptrdiff_t row = _top_left.y
-         ; row <= ( _bottom_right.y - _top_left.y )
+         ; row < num_rows
          ; ++row
          )
       {
@@ -522,13 +493,6 @@ private:
 private:
 
    Device& _io_dev;
-
-   ConversionPolicy _cc_policy;
-
-   image_read_info<tiff_tag> _info;
-
-   point_t _top_left;
-   point_t _bottom_right;
 
    template < int K > friend struct plane_recursion;
 };
