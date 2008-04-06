@@ -45,15 +45,14 @@ inline
 void read_view( Device&          file
               , const View&      view
               , const point_t&   top_left
-              , const point_t&   dim
               , const FormatTag& tag
               , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
-                                                                       , typename is_format_tag          < FormatTag >::type
-                                                                       , typename is_supported           < typename View::value_type
-                                                                                                         , FormatTag 
-                                                                                                         >::type 
-                                                                       >::type 
-                                                   >::type* ptr = 0 
+                                                       , typename is_format_tag          < FormatTag >::type
+                                                       , typename is_supported           < typename View::value_type
+                                                                                         , FormatTag 
+                                                                                         >::type 
+                                                       >::type 
+                               >::type* ptr = 0 
               )
 {
     detail::reader< Device
@@ -63,7 +62,6 @@ void read_view( Device&          file
 
     reader.read_view( view
                     , top_left
-                    , dim
                     );
 }
 
@@ -75,7 +73,6 @@ inline
 void read_view( Device&          file
               , const View&      view
               , const point_t&   top_left
-              , const point_t&   dim
               , const FormatTag& tag
               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
                                                                                                                          , Device
@@ -101,7 +98,6 @@ void read_view( Device&          file
 
     reader.read_view( view
                     , top_left
-                    , dim
                     );
 }
 
@@ -113,7 +109,6 @@ inline
 void read_view( const String& file_name
               , const View& view
               , const point_t& top_left
-              , const point_t& dim
               , const FormatTag& tag
               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                                      , typename is_format_tag< FormatTag >::type
@@ -131,7 +126,6 @@ void read_view( const String& file_name
     read_view( device
              , view
              , top_left
-             , dim
              , tag
              );
 }
@@ -158,7 +152,6 @@ void read_view( const String&    file_name
     read_view( file_name
              , view
              , point_t( 0, 0 )
-             , point_t( 0, 0 )
              , tag
              );
 }
@@ -184,7 +177,6 @@ void read_view( Device&          device
 {
     read_view( device
              , view
-             , point_t(0,0)
              , point_t(0,0)
              , tag
              );

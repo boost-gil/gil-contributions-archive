@@ -126,7 +126,7 @@ public:
         _info = get_info();
 
         setup( _top_left
-             , _dim );
+             , dim );
 
         image.recreate( _dim.x - _top_left.x
                       , _dim.y - _top_left.y );
@@ -137,13 +137,12 @@ public:
     template<typename View>
     void read_view( View&          view
                   , const point_t& top_left
-                  , const point_t& dim
                   )
     {
         _info = get_info();
 
         setup( _top_left
-             , _dim );
+             , view.dimensions() );
 
         apply_impl( view );
     }

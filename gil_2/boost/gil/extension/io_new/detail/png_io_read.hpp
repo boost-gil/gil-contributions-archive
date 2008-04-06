@@ -156,13 +156,12 @@ public:
     template<typename View>
     void read_view( const View&    view
                   , const point_t& top_left
-                  , const point_t& dim
                   )
     {
         _info = get_info();
 
         setup( top_left
-             , dim );
+             , view.dimensions() );
 
         read_data( view );
     }
