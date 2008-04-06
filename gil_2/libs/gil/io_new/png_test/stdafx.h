@@ -14,5 +14,3 @@
 
 #include <fstream>
 #include <iostream>
-
-#include <boost/gil/extension/io_new/png_all.hpp>

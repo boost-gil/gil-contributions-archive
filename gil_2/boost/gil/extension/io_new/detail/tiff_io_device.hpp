@@ -64,6 +64,11 @@ public:
         _tiff_file = tiff_file_t( tiff, TIFFClose );
     }
 
+    file_stream_device( TIFF* tiff_file )
+    : _tiff_file( tiff_file
+                , TIFFClose ) {}
+
+
     unsigned int get_default_strip_size()
     {
         return TIFFDefaultStripSize( _tiff_file.get()
@@ -155,8 +160,30 @@ private:
    tiff_file_t _tiff_file;
 };
 
+/*
 template< typename T, typename D >
 struct is_adaptable_input_device< tiff_tag, T, D > : mpl::false_{};
+*/
+
+template< typename FormatTag >
+struct is_adaptable_input_device< FormatTag
+                                , TIFF*
+                                , void
+                                >
+    : mpl::true_
+{
+    typedef file_stream_device< FormatTag > device_type;
+};
+
+template< typename FormatTag >
+struct is_adaptable_output_device< FormatTag
+                                 , TIFF*
+                                 , void
+                                 >
+    : mpl::true_
+{
+    typedef file_stream_device< FormatTag > device_type;
+};
 
 } // namespace detail
 } // namespace gil

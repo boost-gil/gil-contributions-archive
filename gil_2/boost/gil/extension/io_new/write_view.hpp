@@ -73,10 +73,15 @@ void write_view( Device&          device
                                                           >::type* ptr = 0
         )
 {
-    typename detail::is_adaptable_output_device< Device >::device_type dev( device );
+    typedef typename detail::is_adaptable_output_device< FormatTag
+                                                       , Device
+                                                       >::device_type dev_t;                                               
+    dev_t dev( device );
 
     write_view( dev
-              , view );
+              , view
+              , tag
+              );
 }
 
 template< typename String

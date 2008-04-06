@@ -176,7 +176,7 @@ public:
                    , const point_t& bottom_right
                    )
     {
-        image_read_info<jpeg_tag> info(get_info());
+        image_read_info<jpeg_tag> info( get_info() );
 
         check_coordinates( top_left
                          , bottom_right

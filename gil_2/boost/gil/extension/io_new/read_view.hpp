@@ -88,7 +88,10 @@ void read_view( Device&          file
                                                          >::type* ptr = 0 
               )
 {
-    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    typedef typename detail::is_adaptable_input_device< FormatTag
+                                                      , Device
+                                                      >::device_type device_type;
+
     device_type dev( file );
 
     detail::reader< device_type
@@ -152,7 +155,12 @@ void read_view( const String&    file_name
                                                  >::type* ptrdiff_t = 0
               )
 {
-    read_view( file_name, view, point_t(0,0), tag);
+    read_view( file_name
+             , view
+             , point_t( 0, 0 )
+             , point_t( 0, 0 )
+             , tag
+             );
 }
 
 template< typename Device

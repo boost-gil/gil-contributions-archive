@@ -175,7 +175,7 @@ public:
 
         check_coordinates( top_left
                          , bottom_right
-                         , _info
+                         , info
                          );
 
         point_t _bottom_right;
@@ -301,7 +301,7 @@ private:
         io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
                                                             , typename View::value_type
                                                             >::type::value
-                    , "User provided view has incorrect size."
+                    , "User provided view has incorrect color space or channel type."
                     );
 
         row_buffer_helper<ImagePixel> buffer( static_cast<int>( info._width ));

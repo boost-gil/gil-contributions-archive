@@ -237,7 +237,7 @@ private:
       tiff_color_map::red_t   red   = NULL;
       tiff_color_map::green_t green = NULL;
       tiff_color_map::blue_t  blue  = NULL;
-      _io_dev.get_field_defaulted( red, green, blue );
+      int ret = _io_dev.get_field_defaulted( red, green, blue );
 
       typedef channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
       int num_colors = channel_traits< channel_t >::max_value();

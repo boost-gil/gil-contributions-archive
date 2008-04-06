@@ -21,8 +21,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< tag_t > info = read_image_info( filename
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 256 );
-        BOOST_CHECK_EQUAL( info._height, 192 );
+        BOOST_CHECK_EQUAL( info._width , 200 );
+        BOOST_CHECK_EQUAL( info._height, 133 );
     }
 
     {
@@ -37,7 +37,36 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
+        TIFF* file = TIFFOpen( filename.c_str(), "r" );
 
+        image_read_info< tag_t > info = read_image_info( file
+                                                       , tag_t() );
+        
+        BOOST_CHECK_EQUAL( info._width , 200 );
+        BOOST_CHECK_EQUAL( info._height, 133 );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( read_image_test )
+{
+    string filename( "..\\test_images\\tiff\\test.tif" );
+
+    {
+        rgb8_image_t img;
+        read_image( filename, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
+    }
+
+    {
+        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+
+        rgb8_image_t img;
+        read_image( file, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
     }
 }
 
@@ -48,18 +77,77 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     {
         rgb8_image_t img;
         read_and_convert_image( filename, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
     }
 
     {
+        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+
+        rgb8_image_t img;
+        read_and_convert_image( file, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( read_view_test )
+{
+    string filename( "..\\test_images\\tiff\\test.tif" );
+
+    {
+        rgb8_image_t img( 200, 133 );
+        read_view( filename, view( img ), tag_t() );
+    }
+
+    {
+        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+
+        rgb8_image_t img( 200, 133 );
+        read_view( file, view( img ), tag_t() );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
+{
+    string filename( "..\\test_images\\tiff\\test.tif" );
+
+    {
+        rgb8_image_t img( 200, 133 );
+        //read_and_convert_view( filename, view( img ), tag_t() );
+    }
+
+    {
+        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+
+        rgb8_image_t img( 200, 133 );
+        //read_and_convert_view( file, view( img ), tag_t() );
     }
 }
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
+
     {
-        string filename( "..\\test\\tiff\\test.tif" );
+        string filename( "..\\test\\tiff\\test1.tif" );
 
         gray8_image_t img( 320, 240 );
         write_view( filename, view( img ), tiff_tag() );
+    }
+
+    {
+        // An ofstream cannot be used to construct a device_type.
+        // There is no way to get a TIFF* from a ofstream.
+    }
+
+    {
+        string filename( "..\\test\\tiff\\test2.tif" );
+
+        TIFF* file = TIFFOpen( filename.c_str(), "w" );
+        
+        rgb8_image_t img( 320, 240 );
+        write_view( file, view( img ), tag_t() );
     }
 }

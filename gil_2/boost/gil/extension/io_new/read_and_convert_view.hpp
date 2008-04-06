@@ -66,7 +66,6 @@ void read_and_convert_view( Device&               file
                      );
 }
 
-
 template< typename Device
         , typename View
         , typename ColorConverter
@@ -87,12 +86,16 @@ void read_and_convert_view( Device&               file
                                               >::type* ptr = 0
                           )
 {
-    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    typedef typename detail::is_adaptable_input_device< FormatTag
+                                                      , Device
+                                                      >::device_type device_type;
+
     device_type dev( file );
 
     read_and_convert_view( dev
                          , view
                          , top_left
+                         , bottom_right
                          , cc
                          , tag
                          );
@@ -249,13 +252,13 @@ void read_and_convert_view( const String&    file_name
                           , const View&      view
                           , const FormatTag& tag
                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
-                                            >::type* ptr = 0
+                                                                  , typename detail::is_supported_path_spec< String >::type
+                                                                  >::type
+                                              >::type* ptr = 0
                           )
 {
    read_and_convert_view( file_name
-                        , img
+                        , view
                         , point_t( 0, 0 )
                         , point_t( 0, 0 )
                         , default_color_converter()
@@ -272,9 +275,9 @@ void read_and_convert_view( Device&          device
                           , const View&      view
                           , const FormatTag& tag
                           , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                      , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                  , Device
-                                                                                                                                  >::type
+                                                                                     , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                                 , Device
+                                                                                                                                 >::type
                                                                                       >::type
                                                                    , typename is_format_tag< FormatTag >::type
                                                                    >::type
