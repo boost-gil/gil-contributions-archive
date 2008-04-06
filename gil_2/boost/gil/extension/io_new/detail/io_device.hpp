@@ -119,8 +119,8 @@ public:
    istream_device( std::istream& in )
    : _in( in ) {}
 
-    size_t read( unsigned char* data
-               , std::size_t    count )
+    std::size_t read( unsigned char* data
+                    , std::size_t    count )
     {
         std::streamsize cr = 0;
 
@@ -134,7 +134,7 @@ public:
             data += c;
             cr += c;
 
-        } while(count && _in );
+        } while( count && _in );
 
         return static_cast< std::size_t >( cr );
     }
@@ -213,24 +213,34 @@ private:
  * Metafunction to detect input devices. 
  * Should be replaced by an external facility in the future.
  */
-template< typename IODevice> struct is_input_device : mpl::false_{};
-template<typename FormatTag> struct is_input_device<file_stream_device< FormatTag > > : mpl::true_{};
-template<> struct is_input_device<istream_device> : mpl::true_{};
+template< typename IODevice  > struct is_input_device : mpl::false_{};
+template< typename FormatTag > struct is_input_device< file_stream_device< FormatTag > > : mpl::true_{};
+template<> struct is_input_device< istream_device > : mpl::true_{};
 
 template< typename FormatTag, typename T, typename D = void >
 struct is_adaptable_input_device : mpl::false_{};
 
-template<typename FormatTag, typename T>
-struct is_adaptable_input_device<FormatTag, T,
-    typename enable_if<is_base_and_derived<std::istream,T> >::type
-    >
-  : mpl::true_
+template< typename FormatTag
+        , typename T
+        >
+struct is_adaptable_input_device< FormatTag
+                                , T
+                                , typename enable_if< is_base_and_derived< std::istream
+                                                                         , T
+                                                                         >
+                                                    >::type
+                                >
+    : mpl::true_
 {
     typedef istream_device device_type;
 };
 
-template<typename FormatTag>
-struct is_adaptable_input_device<FormatTag,FILE*,void> : mpl::true_
+template< typename FormatTag >
+struct is_adaptable_input_device< FormatTag
+                                , FILE*
+                                , void
+                                >
+    : mpl::true_
 {
     typedef file_stream_device< FormatTag > device_type;
 };

@@ -26,13 +26,31 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
+        // An ifstream cannot be used to construct a device_type.
+        // There is no way to get a TIFF* from a ifstream.
+
+/*
         ifstream in( filename.c_str(), ios::in | ios::binary );
+        image_read_info< tag_t > info = read_image_info( in
+                                                       , tag_t() );
+*/
+    }
 
-        image_read_info< tag_t > info = boost::gil::read_image_info( in
-                                                                   , tag_t() );
+    {
 
-        BOOST_CHECK_EQUAL( info._width , 256 );
-        BOOST_CHECK_EQUAL( info._height, 192 );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
+{
+    string filename( "..\\test_images\\tiff\\test.tif" );
+
+    {
+        rgb8_image_t img;
+        read_and_convert_image( filename, img, tag_t() );
+    }
+
+    {
     }
 }
 

@@ -31,6 +31,33 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
         BOOST_CHECK_EQUAL( info._width , 320 );
         BOOST_CHECK_EQUAL( info._height, 240 );
     }
+
+    {
+        FILE* file = fopen( filename.c_str(), "rb" );
+        
+        image_read_info< tag_t > info = boost::gil::read_image_info( file
+                                                                   , tag_t() );
+
+        BOOST_CHECK_EQUAL( info._width , 320 );
+        BOOST_CHECK_EQUAL( info._height, 240 );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
+{
+    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
+
+    {
+        rgb8_image_t img;
+        read_and_convert_image( filename, img, tag_t() );
+    }
+
+    {
+        ifstream in( filename.c_str(), ios::in | ios::binary );
+
+        rgb8_image_t img;
+        read_and_convert_image( in, img, tag_t() );
+    }
 }
 
 BOOST_AUTO_TEST_CASE( write_view_test )
@@ -38,7 +65,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     {
         string filename( "..\\test\\png\\write_view_test.jpg" );
 
-        gray8_image_t img;
+        gray8_image_t img( 320, 240 );
         write_view( filename, view( img ), tag_t() );
     }
 }

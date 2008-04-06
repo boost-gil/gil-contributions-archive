@@ -169,7 +169,7 @@ void read_image( Device&          file
                                                          >::type* ptr = 0 
                )
 {
-    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    typedef typename detail::is_adaptable_input_device< FormatTag, Device >::device_type device_type;
     device_type dev( file );
 
     read_image( dev

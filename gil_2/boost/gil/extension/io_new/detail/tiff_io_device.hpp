@@ -155,6 +155,9 @@ private:
    tiff_file_t _tiff_file;
 };
 
+template< typename T, typename D >
+struct is_adaptable_input_device< tiff_tag, T, D > : mpl::false_{};
+
 } // namespace detail
 } // namespace gil
 } // namespace boost

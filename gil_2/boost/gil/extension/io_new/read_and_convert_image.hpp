@@ -39,15 +39,15 @@ template< typename Device
         , typename FormatTag
         >
 inline
-void read_and_convert_image( Device&        file
-                           , Image&         img
-                           , const point_t& top_left
-                           , const point_t& bottom_right
+void read_and_convert_image( Device&               file
+                           , Image&                img
+                           , const point_t&        top_left
+                           , const point_t&        bottom_right
                            , const ColorConverter& cc
-                           , const FormatTag& tag
+                           , const FormatTag&      tag
                            , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                    , typename detail::is_input_device<Device>::type
-                                                                    >::type
+                                                                   , typename detail::is_input_device< Device >::type
+                                                                   >::type
                                                 >::type* ptr = 0
                            )
 {
@@ -86,12 +86,15 @@ void read_and_convert_image( Device&               file
                                                      >::type* ptr = 0
                            )
 {
-    typedef typename detail::is_adaptable_input_device< Device >::device_type device_type;
+    typedef typename detail::is_adaptable_input_device< FormatTag
+                                                      , Device
+                                                      >::device_type device_type;
     device_type dev( file );
 
     read_and_convert_image( dev
                           , img
                           , top_left
+                          , bottom_right
                           , cc
                           , tag
                           );
