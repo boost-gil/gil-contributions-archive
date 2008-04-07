@@ -6,6 +6,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
+#include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
 using namespace std;

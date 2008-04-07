@@ -23,14 +23,9 @@
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <boost/gil/extension/io_new/detail/base.hpp>
-#include <boost/gil/extension/io_new/detail/io_device.hpp>
-#include <boost/gil/extension/io_new/detail/path_spec.hpp>
-#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
-
-#include <boost/gil/extension/io_new/detail/jpeg_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/png_io_read.hpp>
-#include <boost/gil/extension/io_new/detail/tiff_io_read.hpp>
+#include "detail/base.hpp"
+#include "detail/io_device.hpp"
+#include "detail/path_spec.hpp"
 
 namespace boost{ namespace gil {
 

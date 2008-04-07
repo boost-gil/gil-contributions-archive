@@ -185,6 +185,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_io_old.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_read.hpp"
 				>
 			</File>
@@ -198,6 +202,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\png_all.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\png_io_old.hpp"
 				>
 			</File>
 			<File
@@ -234,6 +242,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_all.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_io_old.hpp"
 				>
 			</File>
 			<File

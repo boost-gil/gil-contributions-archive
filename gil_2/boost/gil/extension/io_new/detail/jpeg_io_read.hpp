@@ -23,7 +23,11 @@
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 #include <boost/gil/extension/io_new/detail/jpeg_supported_types.hpp>
 
+#include "base.hpp"
 #include "reader_base.hpp"
+#include "io_device.hpp"
+#include "typedefs.hpp"
+#include "jpeg_supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
 

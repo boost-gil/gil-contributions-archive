@@ -30,6 +30,9 @@ extern "C" {
 #include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "base.hpp"
+#include "io_device.hpp"
+#include "reader_base.hpp"
 #include "tiff_io_device.hpp"
 #include "tiff_supported_read_types.hpp"
 

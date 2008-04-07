@@ -24,7 +24,6 @@
 
 #include <boost/gil/channel.hpp>
 #include <boost/gil/color_base.hpp>
-#include <boost/gil/extension/io_new/io.hpp>
 
 namespace boost{ namespace gil {
 

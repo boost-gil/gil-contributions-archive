@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 
+#include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/png_all.hpp>
 
 #define BOOST_TEST_MAIN
