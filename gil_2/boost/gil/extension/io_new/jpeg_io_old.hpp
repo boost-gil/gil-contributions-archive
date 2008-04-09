@@ -23,6 +23,8 @@
 
 namespace boost { namespace gil {
 
+typedef jpeg_tag tag_t;
+
 /// \ingroup JPEG_IO
 /// \brief Returns the width and height of the JPEG file at the specified location.
 /// Throws std::ios_base::failure if the location does not correspond to a valid JPEG file
@@ -30,7 +32,13 @@ template< typename String >
 inline
 point2< std::ptrdiff_t > jpeg_read_dimensions( const String& filename )
 {
-    return point2< std::ptrdiff_t >();
+    image_read_info< tag_t > info = read_image_info( filename
+                                                   , tag_t()
+                                                   );
+
+    return point2< std::ptrdiff_t >( info._width
+                                   , info._height
+                                   );
 }
 
 
@@ -47,6 +55,10 @@ void jpeg_read_view( const String& filename
                    , const View&   view
                    )
 {
+    read_view( filename
+             , view
+             , tag_t()
+             );
 }
 
 /// \ingroup JPEG_IO
@@ -62,6 +74,10 @@ void jpeg_read_image( const String& filename
                     , Image&        img
                     )
 {
+    read_image( filename
+              , img
+              , tag_t()
+              );
 }
 
 /// \ingroup JPEG_IO
@@ -77,6 +93,11 @@ void jpeg_read_and_convert_view( const String& filename
                                , CC            cc
                                )
 {
+    read_and_convert_view( filename
+                         , view
+                         , cc
+                         , tag_t()
+                         );
 }
 
 /// \ingroup JPEG_IO
@@ -90,6 +111,10 @@ void jpeg_read_and_convert_view( const String& filename
                                , const View&   view
                                )
 {
+    read_and_convert_view( filename
+                         , view
+                         , tag_t()
+                         );
 }
 
 /// \ingroup JPEG_IO
@@ -105,6 +130,11 @@ void jpeg_read_and_convert_image( const String& filename
                                 , CC     cc
                                 )
 {
+    read_and_convert_image( filename
+                          , img
+                          , cc
+                          , tag_t()
+                          );
 }
 
 /// \ingroup JPEG_IO
@@ -112,13 +142,16 @@ void jpeg_read_and_convert_image( const String& filename
 /// Throws std::ios_base::failure if the file is not a valid JPEG file
 template< typename String
         , typename Image
-        , typename CC
         >
 inline 
 void jpeg_read_and_convert_image( const String filename
                                 , Image&       img
                                 )
 {
+    read_and_convert_image( filename
+                          , img
+                          , tag_t()
+                          );
 }
 
 
@@ -135,10 +168,13 @@ void jpeg_write_view( const String& filename
                     , int   quality=100
                     )
 {
+    write_view( filename
+              , view
+              , tag_t()
+              );
 }
 
 } // namespace gil
 } // namespace boost
-
 
 #endif // BOOST_GIL_EXTENSION_IO_JPEG_IO_OLD_HPP_INCLUDED
