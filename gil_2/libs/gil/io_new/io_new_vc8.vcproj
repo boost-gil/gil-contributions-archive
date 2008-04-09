@@ -177,10 +177,6 @@
 			Name="io"
 			>
 			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\io.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\jpeg_all.hpp"
 				>
 			</File>
@@ -221,26 +217,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\read_and_convert_image.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\read_and_convert_view.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\read_image.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\read_image_info.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\read_view.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_all.hpp"
 				>
 			</File>
@@ -260,10 +236,6 @@
 				RelativePath="..\..\..\boost\gil\extension\io_new\tiff_write.hpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\boost\gil\extension\io_new\write_view.hpp"
-				>
-			</File>
 			<Filter
 				Name="detail"
 				>
@@ -273,6 +245,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\conversion_policies.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\io.hpp"
 					>
 				</File>
 				<File
@@ -308,6 +284,26 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\read_and_convert_image.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\read_and_convert_view.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\read_image.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\read_image_info.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\read_view.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\reader_base.hpp"
 					>
 				</File>
@@ -333,6 +329,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\typedefs.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\write_view.hpp"
 					>
 				</File>
 			</Filter>

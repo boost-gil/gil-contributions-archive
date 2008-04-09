@@ -23,11 +23,11 @@
 #include "detail/png_supported_types.hpp"
 #include "detail/png_io_read.hpp"
 
-#include "read_image.hpp"
-#include "read_view.hpp"
-#include "read_image_info.hpp"
-#include "read_and_convert_image.hpp"
-#include "read_and_convert_view.hpp"
+#include "detail/read_image.hpp"
+#include "detail/read_view.hpp"
+#include "detail/read_image_info.hpp"
+#include "detail/read_and_convert_image.hpp"
+#include "detail/read_and_convert_view.hpp"
 
 
 #endif // BOOST_GIL_EXTENSION_IO_PNG_READ_HPP_INCLUDED
