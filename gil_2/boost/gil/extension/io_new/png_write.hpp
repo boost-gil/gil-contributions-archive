@@ -23,6 +23,6 @@
 #include "detail/png_supported_types.hpp"
 #include "detail/png_io_write.hpp"
 
-#include "write_view.hpp"
+#include "detail/write_view.hpp"
 
 #endif // BOOST_GIL_EXTENSION_IO_PNG_WRITE_HPP_INCLUDED

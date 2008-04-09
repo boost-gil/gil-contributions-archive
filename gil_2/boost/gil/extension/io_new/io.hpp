@@ -103,12 +103,4 @@
  * 
  */
 
-#include "read_image.hpp"
-#include "read_view.hpp"
-#include "read_image_info.hpp"
-#include "read_and_convert_image.hpp"
-#include "read_and_convert_view.hpp"
-
-#include "write_view.hpp"
-
 #endif // BOOST_GIL_EXTENSION_IO_IO_HPP_INCLUDED

@@ -23,6 +23,6 @@
 #include "detail/jpeg_supported_types.hpp"
 #include "detail/jpeg_io_write.hpp"
 
-#include "write_view.hpp"
+#include "detail/write_view.hpp"
 
 #endif // BOOST_GIL_EXTENSION_IO_JPEG_WRITE_HPP_INCLUDED

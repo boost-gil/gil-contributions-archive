@@ -28,7 +28,7 @@ extern "C" {
 #include "tiff.h"
 }
 
-#include <boost/gil/extension/io_new/detail/base.hpp>
+#include "detail/base.hpp"
 
 namespace boost { namespace gil {
 

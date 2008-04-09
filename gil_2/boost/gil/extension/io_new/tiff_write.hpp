@@ -23,7 +23,7 @@
 #include "detail/tiff_io.hpp"
 #include "detail/tiff_io_write.hpp"
 
-#include "write_view.hpp"
+#include "detail/write_view.hpp"
 
 
 #endif // BOOST_GIL_EXTENSION_IO_TIFF_WRITE_HPP_INCLUDED

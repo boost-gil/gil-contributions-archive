@@ -23,10 +23,10 @@
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include "detail/base.hpp"
-#include "detail/io_device.hpp"
-#include "detail/path_spec.hpp"
-#include "detail/conversion_policies.hpp"
+#include "base.hpp"
+#include "io_device.hpp"
+#include "path_spec.hpp"
+#include "conversion_policies.hpp"
 
 namespace boost{ namespace gil {
 
