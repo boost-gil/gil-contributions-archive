@@ -3,13 +3,18 @@
 
 #include "stdafx.h"
 
+#include <boost/filesystem/path.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 #include <boost/gil/gil_all.hpp>
+
+#define ADD_FS_PATH_SUPPORT
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
 using namespace std;
 using namespace boost::gil;
+using namespace boost::filesystem;
 
 typedef jpeg_tag tag_t;
 
@@ -46,6 +51,17 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         BOOST_CHECK_EQUAL( info._width , 136 );
         BOOST_CHECK_EQUAL( info._height, 98  );
     }
+
+    {
+        path my_path( filename );
+        image_read_info< tag_t > info = boost::gil::read_image_info( my_path
+                                                                   , tag_t() );
+
+        BOOST_CHECK_EQUAL( info._width , 136 );
+        BOOST_CHECK_EQUAL( info._height, 98  );
+    }
+
+
 }
 
 BOOST_AUTO_TEST_CASE( read_image_test )
@@ -79,6 +95,15 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         BOOST_CHECK_EQUAL( img.width() , 136 );
         BOOST_CHECK_EQUAL( img.height(), 98 );
     }
+
+    {
+        rgb8_image_t img;
+        read_image( filename, img, point_t( 0,0 ), point_t( 10, 10 ), tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 10 );
+        BOOST_CHECK_EQUAL( img.height(), 10 );
+    }
+
 }
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
