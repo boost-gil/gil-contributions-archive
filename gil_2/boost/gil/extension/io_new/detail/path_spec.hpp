@@ -69,7 +69,7 @@ inline std::string convert_to_string( char* str )
 template<typename String, typename T>
 inline std::string convert_to_string( filesystem::basic_path<String,T> const& path )
 {
-    return convert_to_string( T::to_internal(path) );
+    return convert_to_string( path.string() );
 }
 #endif // ADD_FS_PATH_SUPPORT
 
