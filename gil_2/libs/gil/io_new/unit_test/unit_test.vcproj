@@ -198,6 +198,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\tiff_file_format_test.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\tiff_old_test.cpp"
 			>
 		</File>

@@ -1,9 +1,8 @@
 #include "stdafx.h"
-/*
+
 #include <iostream>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/gil/extension/io_new/png_all.hpp>
-#include <boost/gil/extension/io_new/jpeg_all.hpp>
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 #include <boost/gil/gil_all.hpp>
 #include <iterator>
@@ -57,7 +56,7 @@ void read_test_impl( const String& file_name )
    assert( view( src ).dimensions() == point_t( 100, 100 ));
    for_each_pixel( view( src ), eval_to<0>() );
 }
-*/
+
 int main(int argc, char *argv[])
 {
 /*   

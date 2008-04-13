@@ -23,9 +23,9 @@ extern "C" {
 #include <png.h>
 }
 
-#include <boost/gil/extension/io_new/detail/typedefs.hpp>
-#include <boost/gil/extension/io_new/detail/base.hpp>
-#include <boost/gil/extension/io_new/png_tags.hpp>
+#include "typedefs.hpp"
+#include "base.hpp"
+#include "png_io_base.hpp"
 
 namespace boost { namespace gil { namespace detail {
 

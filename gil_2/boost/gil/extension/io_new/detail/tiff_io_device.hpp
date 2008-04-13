@@ -126,9 +126,9 @@ public:
    }
 
 
-   int get_field_defaulted( boost::uint16_t* red
-                          , boost::uint16_t* green
-                          , boost::uint16_t* blue  )
+   int get_field_defaulted( boost::uint16_t*& red
+                          , boost::uint16_t*& green
+                          , boost::uint16_t*& blue  )
    {
       return TIFFGetFieldDefaulted( _tiff_file.get()
                                   , TIFFTAG_COLORMAP
