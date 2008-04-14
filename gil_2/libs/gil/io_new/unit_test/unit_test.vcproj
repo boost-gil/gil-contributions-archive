@@ -190,6 +190,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\readme.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\stdafx.cpp"
 			>
 		</File>

@@ -19,19 +19,12 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
-#include "tiff.h"
-#include "tiffio.h"
-}
-
 #include <cassert>
 
 #include <boost/shared_ptr.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/gil/extension/io_new/detail/base.hpp>
-
-#include "tiff_tags.hpp"
 
 namespace boost { namespace gil { namespace detail {
 /*!

@@ -22,8 +22,6 @@
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/gil/utilities.hpp>
 
-#include "detail/base.hpp"
-
 namespace boost { namespace gil { namespace detail {
 
 ///@todo We should use boost::preprocessor here.

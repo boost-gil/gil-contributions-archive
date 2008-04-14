@@ -32,6 +32,7 @@ namespace boost{ namespace gil {
 
 // ----- View --- Reader --------- With ColorConverter -----------------
 
+
 /// \ingroup IO
 template< typename Device
         , typename View

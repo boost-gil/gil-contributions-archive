@@ -23,9 +23,9 @@
 #include "detail/tiff_io.hpp"
 #include "detail/tiff_io_read.hpp"
 
-#include "detail/read_image.hpp"
-#include "detail/read_view.hpp"
 #include "detail/read_image_info.hpp"
+#include "detail/read_view.hpp"
+#include "detail/read_image.hpp"
 #include "detail/read_and_convert_image.hpp"
 #include "detail/read_and_convert_view.hpp"
 

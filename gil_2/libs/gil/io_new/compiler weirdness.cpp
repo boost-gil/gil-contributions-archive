@@ -14,7 +14,7 @@
 #include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 
 namespace boost{ namespace gil {
-
+/*
 namespace detail {
     template<typename Device, typename FormatTag, typename ConversionPolicy>
     struct reader;
@@ -547,10 +547,9 @@ void read_and_convert_view( Device&          device
                         , tag
                         );
 }
-
+*/
 } // namespace gil
 } // namespace boost
-
 
 
 int main(int argc, char *argv[])
