@@ -1,6 +1,5 @@
 todo list
 
-* change name from io_new_2 to io_new
 * move all potential core gil stuff into a single header
 * add doxygen comments to library interface
 
@@ -9,3 +8,5 @@ todo list
 * add bmp support
 * add dynamic io
 * consider run-time dispatching for minimizing code bloat 
+* add 24 bit support
+* add planar bit_aligned image support

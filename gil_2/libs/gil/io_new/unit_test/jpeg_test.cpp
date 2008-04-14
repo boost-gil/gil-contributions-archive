@@ -154,6 +154,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
         rgb8_image_t img( 136, 98 );
 
         ///@todo: weird compiler error
+        // see readme.txt
         //read_and_convert_view( filename, view( img ), tag_t() );
     }
 
@@ -163,8 +164,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
         rgb8_image_t img( 136, 98 );
 
         ///@todo: weird compiler error
-        //  boost::gil::read_and_convert_view' : cannot convert parameter 6 from 
-        // 'const boost::gil::png_tag' to 'boost::type *
+        // see readme.txt
         //read_and_convert_view( in, view( img ), tag_t() );
     }
 

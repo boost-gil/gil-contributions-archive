@@ -67,6 +67,7 @@ BOOST_AUTO_TEST_CASE( png_read_and_convert_view_test )
 
     {
         rgb8_image_t img( 320, 240 );
+        // see readme.txt
         //png_read_and_convert_view( filename, view( img ) );
     }
 }
