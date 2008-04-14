@@ -478,8 +478,6 @@ private:
 
       std::size_t element_size = sizeof( Pixel );
 
-      std::max( 1, 1 );
-
       return  std::max( width
                       , (( scanline_size_in_bytes + element_size - 1 ) / element_size ));
    }
