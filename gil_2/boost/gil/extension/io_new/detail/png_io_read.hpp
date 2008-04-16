@@ -93,39 +93,15 @@ public:
         return ret;
     }
 
-    template<typename Image>
-    void read_image( Image&         image
-                   , const point_t& top_left
-                   , const point_t& dim
-                   )
-    {
-        _info = get_info();
-
-        setup( top_left
-             , dim );
-
-        image.recreate( _dim.x - _top_left.x
-                      , _dim.y - _top_left.y );
-
-        read_data( view( image ));
-    }
-
     template<typename View>
-    void read_view( const View&    view
-                  , const point_t& top_left
-                  )
+    void apply( const View& view )
     {
-        _info = get_info();
-
-        setup( top_left
-             , view.dimensions() );
-
-        read_data( view );
+        apply_impl( view );
     }
 
 private:
     template<typename View>
-    void read_data( const View& view )
+    void apply_impl( const View& view )
     {
         if( little_endian() )
         {   

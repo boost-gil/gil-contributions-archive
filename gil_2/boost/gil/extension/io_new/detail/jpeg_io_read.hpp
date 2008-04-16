@@ -184,33 +184,9 @@ public:
         return ret;
     }
 
-    template<typename Image>
-    void read_image( Image&         img
-                   , const point_t& top_left
-                   , const point_t& dim
-                   )
-    {
-        _info = get_info();
-
-        setup( top_left
-             , dim );
-
-        img.recreate( _dim.x - top_left.x
-                    , _dim.y - top_left.y );
-
-        apply_impl( view( img ));
-    }
-
     template<typename View>
-    void read_view( const View&    view
-                  , const point_t& top_left
-                  )
+    void apply( const View& view )
     {
-        _info = get_info();
-
-        setup( top_left
-             , view.dimensions() );
-
         apply_impl( view );
     }
 private:

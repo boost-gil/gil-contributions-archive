@@ -1,6 +1,6 @@
 
 The problem with read_and_convert_view is probably not because of an interface error, but
-rather the fact that the compiler screws up. The following test app serves as proof:
+rather the fact that the compiler screws up. The following test app serves as a proof:
 
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/tiff_read.hpp>
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
    return 0;
 }
 
-Compiling will produce errors on my MSVC 8. 
+Compiling will produce errors using MSVC 8. 
 
 1>c:\gil\gil_2\boost\gil\extension\io_new\detail\tiff_io_read.hpp(103) : error C2039: 'get_property' : is not a member of 'std::basic_string<_Elem,_Traits,_Ax>'
 [snip]

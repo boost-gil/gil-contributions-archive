@@ -55,9 +55,12 @@ void read_view( Device&          file
                   , detail::read_and_no_convert
                   > reader( file );
 
-    reader.read_view( view
+    reader.init_view( view
                     , top_left
+                    , reader.get_info()
                     );
+
+    reader.apply( view );
 }
 
 template < typename Device
@@ -91,9 +94,12 @@ void read_view( Device&          file
                   , detail::read_and_no_convert
                   > reader(dev);
 
-    reader.read_view( view
+    reader.init_view( view
                     , top_left
+                    , reader.get_info()
                     );
+
+    reader.apply( view );
 }
 
 template < typename String

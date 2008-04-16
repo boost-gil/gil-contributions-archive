@@ -60,9 +60,12 @@ void read_and_convert_view( Device&               file
                           , cc
                           );
 
-    reader.read_view( view
-                     , top_left
-                     );
+    reader.init_view( view
+                    , top_left
+                    , reader.get_info()
+                    );
+
+    reader.apply( view );
 }
 
 template< typename Device

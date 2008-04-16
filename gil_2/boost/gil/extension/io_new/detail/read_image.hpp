@@ -57,9 +57,13 @@ void read_image( Device&          file
                   , detail::read_and_no_convert
                   > reader( file );
 
-    reader.read_image( img
+    reader.init_image( img
                      , top_left
-                     , dim );
+                     , dim
+                     , reader.get_info()
+                     );
+
+    reader.apply( view( img ));
 }
 
 template < typename Device
@@ -86,9 +90,13 @@ inline void read_image( Device&          file
     device_type dev(file);
     detail::reader<device_type,FormatTag,detail::read_and_no_convert> reader(dev);
 
-    reader.read_image( img
+    reader.init_image( img
                      , top_left
-                     , dim );
+                     , dim
+                     , reader.get_info
+                     );
+
+    reader.apply( view( img ));
 }
 
 template < typename String

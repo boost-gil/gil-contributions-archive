@@ -60,10 +60,13 @@ void read_and_convert_image( Device&               file
                           , cc
                           );
 
-    reader.read_image( img
+    reader.init_image( img
                      , top_left
                      , dim
+                     , reader.get_info()
                      );
+
+    reader.apply( view( img ));
 }
 
 template< typename Device

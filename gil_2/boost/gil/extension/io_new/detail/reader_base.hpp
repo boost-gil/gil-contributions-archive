@@ -28,13 +28,39 @@ template< typename FormatTag
         >
 struct reader_base
 {
+public:
+
+    template< typename Image >
+    void init_image( Image&                              img
+                   , const point_t&                      top_left
+                   , const point_t&                      dim 
+                   , const image_read_info< FormatTag >& info )
+    {
+        _info = info;
+
+        setup( _top_left, dim );
+
+        img.recreate( _dim.x - _top_left.x
+                    , _dim.y - _top_left.y );
+    }
+
+    template< typename View >
+    void init_view( const View&                         view
+                  , const point_t&                      top_left
+                  , const image_read_info< FormatTag >& info )
+    {
+        _info = info;
+
+        setup( _top_left
+             , view.dimensions() );
+    }
+
 protected:
 
     reader_base() {}
     reader_base( const typename ConversionPolicy::color_converter_type& cc )
     : _cc_policy( cc )
     {}
-
 
     void setup( const point_t& top_left
               , const point_t& dim
