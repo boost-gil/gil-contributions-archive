@@ -23,7 +23,7 @@
 
 #ifdef ADD_FS_PATH_SUPPORT
 #include <boost/filesystem/path.hpp>
-#endif 
+#endif // ADD_FS_PATH_SUPPORT
 namespace boost{ namespace gil{ namespace detail{
 
 template<typename P> struct is_supported_path_spec       : mpl::false_ {};
@@ -39,7 +39,7 @@ template<int i> struct is_supported_path_spec<char [i]> : mpl::true_ {};
 template<typename String, typename Traits>
 struct is_supported_path_spec<filesystem::basic_path<String,Traits> > : mpl::true_
 {};
-#endif
+#endif // ADD_FS_PATH_SUPPORT
 
 inline std::string convert_to_string( std::string const& obj)
 {
