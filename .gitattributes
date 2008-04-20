@@ -271,9 +271,6 @@ gil_2/libs/gil/io_new/test_images/tiff/libtiffpic/ycbcr-cat.tif svn_mime_002dtyp
 gil_2/libs/gil/io_new/test_images/tiff/libtiffpic/zackthecat.tif svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io_new/test_images/tiff/test.tif svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/io_new/unit_test/Debug/zlib1.dll svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/unit_test/libjpeg.lib svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/unit_test/libpngd.lib svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/unit_test/zlib1.lib svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/opencv/rgb.bmp svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/sdl/documentation.odt svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/sdl/flower.bmp svn_mime_002dtype=application%2Foctet-stream

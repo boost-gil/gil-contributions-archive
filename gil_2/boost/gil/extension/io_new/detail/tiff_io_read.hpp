@@ -232,79 +232,89 @@ private:
    {
       switch( _info._samples_per_pixel )
       {
-         case 1: { read_bits_per_sample< gray_layout_t >( dst_view ); break; }
-         case 3: { read_bits_per_sample< rgb_layout_t  >( dst_view ); break; }
-         case 4: { read_bits_per_sample< rgba_layout_t >( dst_view ); break; }
+         case 1: { read_bits_per_sample< 1 >( dst_view ); break; }
+         case 2: { read_bits_per_sample< 2 >( dst_view ); break; }
+         case 3: { read_bits_per_sample< 3 >( dst_view ); break; }
+         case 4: { read_bits_per_sample< 4 >( dst_view ); break; }
 
          default: { io_error( "Samples_Per_Pixel not supported." ); }
       }
    }
 
-   template< typename Layout
+   template< int      SamplesPerPixel
            , typename View
            >
    void read_bits_per_sample( const View& dst_view )
    {
       switch( _info._bits_per_sample )
       {
-         case 1:  { read_sample_format<  1, Layout >( dst_view ); break; }
-         case 2:  { read_sample_format<  2, Layout >( dst_view ); break; }
-         case 4:  { read_sample_format<  4, Layout >( dst_view ); break; }
-         case 8:  { read_sample_format<  8, Layout >( dst_view ); break; }
-         case 16: { read_sample_format< 16, Layout >( dst_view ); break; }
-         case 32: { read_sample_format< 32, Layout >( dst_view ); break; }
-         case 64: { read_sample_format< 64, Layout >( dst_view ); break; }
+         case 1 : { read_sample_format< SamplesPerPixel, 1  >( dst_view ); break; }
+         case 2 : { read_sample_format< SamplesPerPixel, 2  >( dst_view ); break; }
+         case 4 : { read_sample_format< SamplesPerPixel, 4  >( dst_view ); break; }
+         case 6 : { read_sample_format< SamplesPerPixel, 6  >( dst_view ); break; }
+         case 8 : { read_sample_format< SamplesPerPixel, 8  >( dst_view ); break; }
+         case 10: { read_sample_format< SamplesPerPixel, 10 >( dst_view ); break; }
+         case 12: { read_sample_format< SamplesPerPixel, 12 >( dst_view ); break; }
+         case 14: { read_sample_format< SamplesPerPixel, 14 >( dst_view ); break; }
+         case 16: { read_sample_format< SamplesPerPixel, 16 >( dst_view ); break; }
+         case 24: { read_sample_format< SamplesPerPixel, 24 >( dst_view ); break; }
+         case 32: { read_sample_format< SamplesPerPixel, 32 >( dst_view ); break; }
+         case 64: { read_sample_format< SamplesPerPixel, 64 >( dst_view ); break; }
 
          default: { io_error( "Bits_Per_Sample not supported." ); }
       }
    }
 
-   template< int      BitsPerSample
-           , typename Layout
+   template< int      SamplesPerPixel
+           , int      BitsPerSample
            , typename View
            >
    void read_sample_format( const View& dst_view )
    {
       switch( _info._sample_format )
       {
-         case SAMPLEFORMAT_UINT:   { read_planar< BitsPerSample, SAMPLEFORMAT_UINT, Layout   >( dst_view ); break; }
-         case SAMPLEFORMAT_INT:    { read_planar< BitsPerSample, SAMPLEFORMAT_INT, Layout    >( dst_view ); break; }
-         case SAMPLEFORMAT_IEEEFP: { read_planar< BitsPerSample, SAMPLEFORMAT_IEEEFP, Layout >( dst_view ); break; }
+         case SAMPLEFORMAT_UINT:   { read_planar< SamplesPerPixel, BitsPerSample, 1 >( dst_view ); break; }
+         case SAMPLEFORMAT_INT:    { read_planar< SamplesPerPixel, BitsPerSample, 2 >( dst_view ); break; }
+         case SAMPLEFORMAT_IEEEFP: { read_planar< SamplesPerPixel, BitsPerSample, 3 >( dst_view ); break; }
 
          default: { io_error( "Sample format not supported." ); }
       }
    }
 
-   template< int      BitsPerSample
+   template< int      SamplesPerPixel
+           , int      BitsPerSample
            , int      SampleFormat
-           , typename Layout
            , typename View
            >
    void read_planar( const View& dst_view )
    {
-      typedef pixel_type_factory< BitsPerSample, SampleFormat, Layout >::type pixel_t;
-
       if( _info._planar_configuration == PLANARCONFIG_CONTIG )
       {
-         typedef image_type_factory< pixel_t, false >::type image_t;
+         typedef tiff_format< SamplesPerPixel
+                            , BitsPerSample
+                            , SampleFormat
+                            , true
+                            > format_t;
 
-         typedef mpl::or_< is_same< pixel_t, not_allowed_t >::type
-                         , is_same< image_t, not_allowed_t >::type
-                         >::type unspecified_t;
+         typedef format_t::type image_t;
+         typedef is_same< format_t::type, not_supported >::type not_supported_t;
 
          read_rows_interleaved< image_t >( dst_view
-                                         , unspecified_t() );
+                                         , not_supported_t() );
       }
       else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
       {
-         typedef image_type_factory< pixel_t, true >::type image_t;
+        typedef tiff_format< SamplesPerPixel
+                           , BitsPerSample
+                           , SampleFormat
+                           , false
+                           > format_t;
 
-         typedef mpl::or_< is_same< pixel_t, not_allowed_t >::type
-                         , is_same< image_t, not_allowed_t >::type
-                         >::type unspecified_t;
+         typedef format_t::type image_t;
+         typedef is_same< format_t::type, not_supported >::type not_supported_t;
 
          read_rows_planar< image_t >( dst_view
-                                    , unspecified_t() );
+                                    , not_supported_t() );
       }
       else
       {

@@ -20,7 +20,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/type_traits/is_base_of.hpp>
+
+#include <boost/gil/image.hpp>
 #include <boost/gil/utilities.hpp>
+
+#include <boost/gil/extension/toolbox/gray_alpha.hpp>
 
 namespace boost { namespace gil { namespace detail {
 
@@ -35,6 +39,20 @@ typedef bit_aligned_pixel_reference<byte,mpl::vector_c<int,4>,gray_layout_t,true
 typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
 typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
 typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;
+
+typedef pixel< double, gray_layout_t       > gray64f_pixel_t;
+typedef pixel< double, gray_alpha_layout_t > gray_alpha64f_pixel_t;
+typedef pixel< double, rgb_layout_t        > rgb64f_pixel_t;
+typedef pixel< double, rgba_layout_t       > rgba64f_pixel_t;
+
+typedef image< gray64f_pixel_t      , false > gray64f_image_t;
+typedef image< gray64f_pixel_t      , true  > gray64f_planar_image_t;
+typedef image< gray_alpha64f_pixel_t, false > gray_alpha64f_image_t;
+typedef image< gray_alpha64f_pixel_t, true  > gray_alpha64f_planar_image_t;
+typedef image< rgb64f_pixel_t       , false > rgb64f_image_t;
+typedef image< rgb64f_pixel_t       , true  > rgb64f_planar_image_t;
+typedef image< rgba64f_pixel_t      , false > rgba64f_image_t;
+typedef image< rgba64f_pixel_t      , true  > rgba64f_planar_image_t;
 
 } // namespace details
 } // namespace gil

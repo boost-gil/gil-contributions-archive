@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;C:\Program Files\GnuWin32\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,11 +62,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpngd.lib zlib1.lib libtiff.lib"
+				AdditionalDependencies="libjpeg.lib libpngd.lib zlibd.lib libtiff.lib boost_unit_test_framework-vc80-mt.lib boost_system-vc80-mt.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="c:\boost\stage\lib;C:\Program Files\GnuWin32\lib"
+				AdditionalLibraryDirectories="c:\boost\stage\lib;C:\Program Files\GnuWin32\lib;C:\gil\image libs\debug"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -119,11 +119,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				Optimization="1"
+				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;C:\Program Files\GnuWin32\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -137,7 +139,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libjpeg.lib libpng.lib zlib.lib libtiff.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="c:\boost\stage\lib;C:\Program Files\GnuWin32\lib;C:\gil\image libs\release"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
