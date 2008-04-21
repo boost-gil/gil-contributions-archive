@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;C:\Program Files\GnuWin32\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;BOOST_ALL_NO_LIB"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,11 +62,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpngd.lib zlibd.lib libtiff.lib boost_unit_test_framework-vc80-mt.lib boost_system-vc80-mt.lib"
+				AdditionalDependencies="libjpeg.lib libpngd.lib zlibd.lib libtiff.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="c:\boost\stage\lib;C:\Program Files\GnuWin32\lib;C:\gil\image libs\debug"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -183,6 +183,10 @@
 		</File>
 		<File
 			RelativePath=".\jpeg_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\png_file_format_test.cpp"
 			>
 		</File>
 		<File

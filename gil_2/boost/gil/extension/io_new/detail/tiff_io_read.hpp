@@ -293,11 +293,11 @@ private:
          typedef tiff_format< SamplesPerPixel
                             , BitsPerSample
                             , SampleFormat
-                            , true
+                            , false
                             > format_t;
 
          typedef format_t::type image_t;
-         typedef is_same< format_t::type, not_supported >::type not_supported_t;
+         typedef is_same< image_t, not_supported >::type not_supported_t;
 
          read_rows_interleaved< image_t >( dst_view
                                          , not_supported_t() );
@@ -307,11 +307,11 @@ private:
         typedef tiff_format< SamplesPerPixel
                            , BitsPerSample
                            , SampleFormat
-                           , false
+                           , true
                            > format_t;
 
          typedef format_t::type image_t;
-         typedef is_same< format_t::type, not_supported >::type not_supported_t;
+         typedef is_same< image_t, not_supported >::type not_supported_t;
 
          read_rows_planar< image_t >( dst_view
                                     , not_supported_t() );

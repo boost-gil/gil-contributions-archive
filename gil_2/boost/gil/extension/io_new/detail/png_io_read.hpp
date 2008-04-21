@@ -217,10 +217,12 @@ private:
                         , 0
                         );
 
+/*
             _cc_policy.read( buffer.begin() + _top_left.x
                            , buffer.begin() + _dim.x
                            , view.row_begin( y )
                            );
+*/
         }
     }
 
