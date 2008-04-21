@@ -2,8 +2,7 @@
 
 #define ADD_FS_PATH_SUPPORT
 
-#include <boost/gil/extension/io_new/png_read.hpp>
-#include <boost/gil/extension/io_new/png_write.hpp>
+#include <boost/gil/extension/io_new/png_all.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -11,9 +10,9 @@ using namespace std;
 using namespace boost::gil;
 namespace fs = boost::filesystem;
 
-namespace png_test {
-
 typedef png_tag tag_t;
+
+namespace png_test {
 
 // Test will loop through the "in" folder to read and convert
 // the png's to rgb8_image_t's. Which then will be written in
@@ -29,11 +28,11 @@ typedef png_tag tag_t;
 // |+--------- parameter of test (in this case gamma-value)
 // +---------- test feature (in this case gamma)
 
-BOOST_AUTO_TEST_CASE( png_file_format_test )
+BOOST_AUTO_TEST_CASE( my_png_file_format_test )
 {
-   string in ( "..\\test_images\\png\\" );
+   string in ( "..\\test_images\\png\\PngSuite\\" );
    string out( "..\\test\\png\\" );
-   
+
    fs::path in_path = fs::system_complete( fs::path( in, fs::native ) );
 
    if ( fs::is_directory( in_path ) )
@@ -49,7 +48,7 @@ BOOST_AUTO_TEST_CASE( png_file_format_test )
          {
             rgb8_image_t img;
             string filename = in + dir_itr->path().leaf();
-            read_and_convert_image( filename, img, png_tag() );
+            read_and_convert_image( filename, img, tag_t() );
 
             write_view( out + fs::basename( dir_itr->path() ) + ".png"
                       , view( img )

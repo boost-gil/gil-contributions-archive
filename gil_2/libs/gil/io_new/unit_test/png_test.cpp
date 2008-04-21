@@ -22,8 +22,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
     std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
 
     {
-        image_read_info< png_tag > info = boost::gil::read_image_info( filename
-                                                                     , tag_t() );
+        image_read_info< png_tag > info = read_image_info( filename
+                                                         , tag_t() );
         BOOST_CHECK_EQUAL( info._width , 320 );
         BOOST_CHECK_EQUAL( info._height, 240 );
     }
@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
     {
         ifstream in( filename.c_str(), ios::in | ios::binary );
 
-        image_read_info< tag_t > info = boost::gil::read_image_info( in
-                                                                   , tag_t() );
+        image_read_info< tag_t > info = read_image_info( in
+                                                       , tag_t() );
 
         BOOST_CHECK_EQUAL( info._width , 320 );
         BOOST_CHECK_EQUAL( info._height, 240 );
@@ -41,8 +41,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
     {
         FILE* file = fopen( filename.c_str(), "rb" );
         
-        image_read_info< tag_t > info = boost::gil::read_image_info( file
-                                                                   , tag_t() );
+        image_read_info< tag_t > info = read_image_info( file
+                                                       , tag_t() );
 
         BOOST_CHECK_EQUAL( info._width , 320 );
         BOOST_CHECK_EQUAL( info._height, 240 );

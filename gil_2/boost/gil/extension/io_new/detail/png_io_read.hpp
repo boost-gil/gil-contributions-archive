@@ -21,6 +21,8 @@
 
 #include <boost/gil/extension/io_new/png_tags.hpp>
 
+#include <boost/gil/gil_all.hpp>
+
 #include "base.hpp"
 #include "reader_base.hpp"
 #include "io_device.hpp"
@@ -137,9 +139,9 @@ private:
             {
                 switch( bit_depth )
                 {
-                    case 1: read_rows< gray_1b >       ( view ); break;
-                    case 2: read_rows< gray_2b >       ( view ); break;
-                    case 4: read_rows< gray_4b >       ( view ); break;
+                    case 1: read_rows< gray1_image_t::view_t::reference >( view ); break;
+                    case 2: read_rows< gray2_image_t::view_t::reference >( view ); break;
+                    case 4: read_rows< gray4_image_t::view_t::reference >( view ); break;
                     case 8: read_rows< gray8_pixel_t > ( view ); break;
                     case 16:read_rows< gray16_pixel_t >( view ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
@@ -217,12 +219,10 @@ private:
                         , 0
                         );
 
-/*
             _cc_policy.read( buffer.begin() + _top_left.x
                            , buffer.begin() + _dim.x
                            , view.row_begin( y )
                            );
-*/
         }
     }
 
