@@ -11,8 +11,8 @@ using namespace gil;
 
 int main(int argc, char *argv[])
 {
-   rgb8_image_t img;
-   read_and_convert_image( "", img, png_tag() );
+    typedef bit_aligned_image3_type< 24, 24, 24, rgb_layout_t >::type image_t;
+    image_t img;
 
    return 0;
 }

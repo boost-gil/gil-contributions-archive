@@ -47,6 +47,7 @@ template<> struct tiff_format< 1, 12, 1, false > { typedef bit_aligned_image1_ty
 template<> struct tiff_format< 1, 14, 1, false > { typedef bit_aligned_image1_type< 14, gray_layout_t >::type type; };
 template<> struct tiff_format< 1, 24, 1, false > { typedef bit_aligned_image1_type< 24, gray_layout_t >::type type; };
 
+#ifdef ENABLE_GRAY_ALPHA
 template<> struct tiff_format< 2,  1, 1, false > { typedef bit_aligned_image2_type<  1,  1, gray_alpha_layout_t >::type type; };
 template<> struct tiff_format< 2,  2, 1, false > { typedef bit_aligned_image2_type<  2,  2, gray_alpha_layout_t >::type type; };
 template<> struct tiff_format< 2,  4, 1, false > { typedef bit_aligned_image2_type<  4,  4, gray_alpha_layout_t >::type type; };
@@ -55,6 +56,7 @@ template<> struct tiff_format< 2, 10, 1, false > { typedef bit_aligned_image2_ty
 template<> struct tiff_format< 2, 12, 1, false > { typedef bit_aligned_image2_type< 12, 12, gray_alpha_layout_t >::type type; };
 template<> struct tiff_format< 2, 14, 1, false > { typedef bit_aligned_image2_type< 14, 14, gray_alpha_layout_t >::type type; };
 template<> struct tiff_format< 2, 24, 1, false > { typedef bit_aligned_image2_type< 24, 24, gray_alpha_layout_t >::type type; };
+#endif // ENABLE_GRAY_ALPHA
 
 template<> struct tiff_format< 3,  1, 1, false > { typedef bit_aligned_image3_type<  1,  1,  1, rgb_layout_t >::type type; };
 template<> struct tiff_format< 3,  2, 1, false > { typedef bit_aligned_image3_type<  2,  2,  2, rgb_layout_t >::type type; };
@@ -83,6 +85,7 @@ template<> struct tiff_format< 1, 32, 2, false > { typedef gray32s_image_t type;
 template<> struct tiff_format< 1, 32, 3, false > { typedef gray32f_image_t type; };
 template<> struct tiff_format< 1, 64, 3, false > { typedef gray64f_image_t type; };
 
+#ifdef ENABLE_GRAY_ALPHA
 template<> struct tiff_format< 2,  8, 1, false > { typedef gray_alpha8_image_t type; };
 template<> struct tiff_format< 2, 16, 1, false > { typedef gray_alpha16_image_t type; };
 template<> struct tiff_format< 2, 32, 1, false > { typedef gray_alpha32_image_t type; };
@@ -100,6 +103,7 @@ template<> struct tiff_format< 2, 16, 2, true > { typedef gray_alpha16s_planar_i
 template<> struct tiff_format< 2, 32, 2, true > { typedef gray_alpha32s_planar_image_t type; };
 template<> struct tiff_format< 2, 32, 3, true > { typedef gray_alpha32f_planar_image_t type; };
 template<> struct tiff_format< 2, 64, 3, true > { typedef gray_alpha64f_planar_image_t type; };
+#endif // ENABLE_GRAY_ALPHA
 
 template<> struct tiff_format< 3,  8, 1, false > { typedef rgb8_image_t type; };
 template<> struct tiff_format< 3, 16, 1, false > { typedef rgb16_image_t type; };

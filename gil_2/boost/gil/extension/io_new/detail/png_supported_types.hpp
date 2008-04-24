@@ -19,7 +19,9 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef ENABLE_GRAY_ALPHA
 #include "boost/gil/extension/toolbox/gray_alpha.hpp"
+#endif // ENABLE_GRAY_ALPHA
 
 namespace boost { namespace gil { namespace detail {
 
@@ -56,12 +58,14 @@ struct png_rw_support<bits8,gray_t> {
     BOOST_STATIC_CONSTANT(int,color_type=PNG_COLOR_TYPE_GRAY);
 };
 
+#ifdef ENABLE_GRAY_ALPHA
 template <>
 struct png_rw_support<bits8,gray_alpha_t> {
     BOOST_STATIC_CONSTANT(bool,is_supported=true);
     BOOST_STATIC_CONSTANT(int,bit_depth=8);
     BOOST_STATIC_CONSTANT(int,color_type=PNG_COLOR_TYPE_GA);
 };
+#endif // ENABLE_GRAY_ALPHA
 
 template <>
 struct png_rw_support<bits8,rgb_t> {
@@ -94,12 +98,15 @@ struct png_rw_support<bits16,rgba_t> {
     BOOST_STATIC_CONSTANT(int,bit_depth=16);
     BOOST_STATIC_CONSTANT(int,color_type=PNG_COLOR_TYPE_RGBA);
 };
+
+#ifdef ENABLE_GRAY_ALPHA
 template <>
 struct png_rw_support<bits16,gray_alpha_t> {
     BOOST_STATIC_CONSTANT(bool,is_supported=true);
     BOOST_STATIC_CONSTANT(int,bit_depth=16);
     BOOST_STATIC_CONSTANT(int,color_type=PNG_COLOR_TYPE_GA);
 };
+#endif // ENABLE_GRAY_ALPHA
 
 } // namespace detail
 

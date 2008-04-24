@@ -151,12 +151,17 @@ private:
             }
             case PNG_COLOR_TYPE_GA:
             {
+                #ifdef ENABLE_GRAY_ALPHA
                 switch( bit_depth )
                 {
                     case 8: read_rows< gray_alpha8_pixel_t > ( view ); break;
                     case 16:read_rows< gray_alpha16_pixel_t >( view ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
+                #else
+                    io_error("gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application.");
+                #endif // ENABLE_GRAY_ALPHA
+                
 
                 break;
             }
