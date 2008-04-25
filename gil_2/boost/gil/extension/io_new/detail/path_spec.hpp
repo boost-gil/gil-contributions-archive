@@ -75,4 +75,4 @@ inline std::string convert_to_string( filesystem::basic_path<String,T> const& pa
 
 }}}
 
-#endif BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED
