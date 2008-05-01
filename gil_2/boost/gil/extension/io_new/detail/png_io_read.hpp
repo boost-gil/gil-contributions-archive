@@ -107,14 +107,14 @@ private:
     {
         if( little_endian() )
         {   
-            if( _info._bit_depth == 16 )
+            if( this->_info._bit_depth == 16 )
                 png_set_swap(_png_ptr);
-            if( _info._bit_depth < 8 )
+            if( this->_info._bit_depth < 8 )
                 png_set_packswap(_png_ptr);
         }
 
-        png_bitdepth::type bit_depth = _info._bit_depth;
-        png_color_type::type color_type = _info._color_type;
+        png_bitdepth::type bit_depth = this->_info._bit_depth;
+        png_color_type::type color_type = this->_info._color_type;
         
         if(color_type == PNG_COLOR_TYPE_PALETTE)
         {
@@ -206,10 +206,10 @@ private:
                     , "User provided view has incorrect color space or channel type."
                     );
 
-        row_buffer_helper<ImagePixel> buffer( static_cast<int>( _info._width ));
+        row_buffer_helper<ImagePixel> buffer( static_cast<int>( this->_info._width ));
 
         // skip rows
-        for( int y = 0; y < _top_left.y; ++y )
+        for( int y = 0; y < this->_top_left.y; ++y )
         {
             png_read_row( _png_ptr
                         , reinterpret_cast< png_bytep >( buffer.data() )
@@ -224,10 +224,10 @@ private:
                         , 0
                         );
 
-            _cc_policy.read( buffer.begin() + _top_left.x
-                           , buffer.begin() + _dim.x
-                           , view.row_begin( y )
-                           );
+            this->_cc_policy.read( buffer.begin() + this->_top_left.x
+                                 , buffer.begin() + this->_dim.x
+                                 , view.row_begin( y )
+                                 );
         }
     }
 

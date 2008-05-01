@@ -131,7 +131,7 @@ private:
    template< typename View >
    void apply_impl( View& dst_view )
    {
-      if( _info._photometric_interpretation == PHOTOMETRIC_PALETTE )
+      if( this->_info._photometric_interpretation == PHOTOMETRIC_PALETTE )
       {
          // Steps:
          // 1. Read indices. It's an array of grayX_pixel_t.
@@ -141,7 +141,7 @@ private:
          //    be a good first solution.
 
          unsigned int num_colors = 0;
-         switch( _info._bits_per_sample )
+         switch( this->_info._bits_per_sample )
          {
             case 1:  { read_palette_image< gray1_image_t  >( dst_view ); break; }
             case 2:  { read_palette_image< gray2_image_t  >( dst_view ); break; }
@@ -164,8 +164,8 @@ private:
            >
    void read_palette_image( const View& dst_view )
    {
-      PaletteImage indices( _info._width  - _top_left.x
-                          , _info._height - _top_left.y );
+      PaletteImage indices( this->_info._width  - this->_top_left.x
+                          , this->_info._height - this->_top_left.y );
 
       read_samples_per_pixel( view( indices ));
 
@@ -230,7 +230,7 @@ private:
    template< typename View >
    void read_samples_per_pixel( const View& dst_view )
    {
-      switch( _info._samples_per_pixel )
+      switch( this->_info._samples_per_pixel )
       {
          case 1: { read_bits_per_sample< 1 >( dst_view ); break; }
          case 2: { read_bits_per_sample< 2 >( dst_view ); break; }
@@ -246,7 +246,7 @@ private:
            >
    void read_bits_per_sample( const View& dst_view )
    {
-      switch( _info._bits_per_sample )
+      switch( this->_info._bits_per_sample )
       {
          case 1 : { read_sample_format< SamplesPerPixel, 1  >( dst_view ); break; }
          case 2 : { read_sample_format< SamplesPerPixel, 2  >( dst_view ); break; }
@@ -271,7 +271,7 @@ private:
            >
    void read_sample_format( const View& dst_view )
    {
-      switch( _info._sample_format )
+      switch( this->_info._sample_format )
       {
          case SAMPLEFORMAT_UINT:   { read_planar< SamplesPerPixel, BitsPerSample, 1 >( dst_view ); break; }
          case SAMPLEFORMAT_INT:    { read_planar< SamplesPerPixel, BitsPerSample, 2 >( dst_view ); break; }
@@ -288,7 +288,7 @@ private:
            >
    void read_planar( const View& dst_view )
    {
-      if( _info._planar_configuration == PLANARCONFIG_CONTIG )
+      if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
       {
          typedef tiff_format< SamplesPerPixel
                             , BitsPerSample
@@ -302,7 +302,7 @@ private:
          read_rows_interleaved< image_t >( dst_view
                                          , not_supported_t() );
       }
-      else if( _info._planar_configuration == PLANARCONFIG_SEPARATE )
+      else if( this->_info._planar_configuration == PLANARCONFIG_SEPARATE )
       {
         typedef tiff_format< SamplesPerPixel
                            , BitsPerSample
@@ -371,11 +371,11 @@ private:
    void skip_over_rows( Buffer& buffer
                       , uint32  plane  )
    {
-      if( _info._compression != COMPRESSION_NONE )
+      if( this->_info._compression != COMPRESSION_NONE )
       {
          // Skipping over rows is not possible for compressed images(  no random access ). See man
          // page ( diagnostics section ) for more information.
-         for( std::ptrdiff_t row = 0; row < _top_left.y; ++row )
+         for( std::ptrdiff_t row = 0; row < this->_top_left.y; ++row )
          {
             _io_dev.read_scaline( buffer
                                 , row
@@ -401,15 +401,15 @@ private:
       buffer_t buffer( size_to_allocate );
       read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
 
-      read_helper_t::iterator_t first = begin + _top_left.x;
-      read_helper_t::iterator_t last  = begin + _dim.x; // one after last element
+      read_helper_t::iterator_t first = begin + this->_top_left.x;
+      read_helper_t::iterator_t last  = begin + this->_dim.x; // one after last element
 
       skip_over_rows( buffer, plane );
 
       swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( _io_dev );
 
-      point_t::value_type num_rows = _dim.y - _top_left.y;
-      for( std::ptrdiff_t row = _top_left.y
+      point_t::value_type num_rows = this->_dim.y - this->_top_left.y;
+      for( std::ptrdiff_t row = this->_top_left.y
          ; row < num_rows
          ; ++row
          )
@@ -420,9 +420,9 @@ private:
 
          sb( buffer );
 
-         _cc_policy.read( first
-                        , last
-                        , dst_view.row_begin( row ));
+         this->_cc_policy.read( first
+                              , last
+                              , dst_view.row_begin( row ));
       }
    }
 

@@ -62,6 +62,8 @@ protected:
     : _cc_policy( cc )
     {}
 
+private:
+
     void setup( const point_t& top_left
               , const point_t& dim
               )

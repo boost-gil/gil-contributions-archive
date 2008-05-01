@@ -138,12 +138,16 @@ private:
 protected:
     jpeg_decompress_struct _cinfo;
     jpeg_error_mgr         _jerr;
+
 private:
     Device &in;
-    struct gil_jpeg_source_mgr{
-        jpeg_source_mgr _jsrc;
-        jpeg_decompress_mgr * _this;
+
+    struct gil_jpeg_source_mgr
+    {
+        jpeg_source_mgr      _jsrc;
+        jpeg_decompress_mgr* _this;
     };
+
     gil_jpeg_source_mgr _src;
     JOCTET buffer[1024];
 };
@@ -194,28 +198,28 @@ private:
     template<typename View>
     void apply_impl( const View& view )
     {
-        start_decompress();
+        this->start_decompress();
 
-        switch( _info._color_space )
+        switch( this->_info._color_space )
         {
         case JCS_GRAYSCALE:
-            io_error_if(_info._num_components!=1,"reader<jpeg>: error in image data");
+            io_error_if(this->_info._num_components!=1,"reader<jpeg>: error in image data");
             read_rows<gray8_pixel_t>( view );
             break;
         case JCS_RGB:
-            io_error_if(_info._num_components!=3,"reader<jpeg>: error in image data");
+            io_error_if(this->_info._num_components!=3,"reader<jpeg>: error in image data");
             read_rows<rgb8_pixel_t>( view );
         case JCS_YCbCr:
-            io_error_if(_info._num_components!=3,"reader<jpeg>: error in image data");
+            io_error_if(this->_info._num_components!=3,"reader<jpeg>: error in image data");
             //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
             read_rows<rgb8_pixel_t>( view );
             break;
         case JCS_CMYK:
-            io_error_if(_info._num_components!=4,"reader<jpeg>: error in image data");
+            io_error_if(this->_info._num_components!=4,"reader<jpeg>: error in image data");
             read_rows<cmyk8_pixel_t>( view );
             break;
         case JCS_YCCK:
-            io_error_if(_info._num_components!=4,"reader<jpeg>: error in image data");
+            io_error_if(this->_info._num_components!=4,"reader<jpeg>: error in image data");
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             this->_cinfo.out_color_space = JCS_CMYK;
             read_rows<cmyk8_pixel_t>( view );
@@ -225,29 +229,29 @@ private:
             // unknown
         }
 
-        finish_decompress();
+        this->finish_decompress();
     }
 
     template< typename ImagePixel
             , typename View
             >
-   void read_rows( const View& view )
-   {
-      io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
-                                                         , typename View::value_type
-                                                         >::type::value
-                , "User provided view has incorrect color space or channel type."
-                );
+    void read_rows( const View& view )
+    {
+        io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
+                                                            , typename View::value_type
+                                                            >::type::value
+                   , "User provided view has incorrect color space or channel type."
+                   );
 
       
-      std::vector<ImagePixel> buffer( _info._width );
+      std::vector<ImagePixel> buffer( this->_info._width );
 
       JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
 
       //Skip scanlines if necessary.
-      for( int y = 0; y <  _top_left.y; ++y )
+      for( int y = 0; y <  this->_top_left.y; ++y )
       {
-         io_error_if( jpeg_read_scanlines( &_cinfo
+         io_error_if( jpeg_read_scanlines( &this->_cinfo
                                          , &row_adr
                                          , 1
                                          ) !=1
@@ -257,22 +261,22 @@ private:
       // Read data.
       for( int y = 0; y < view.height(); ++y )
       {
-         io_error_if( jpeg_read_scanlines( &_cinfo
+         io_error_if( jpeg_read_scanlines( &this->_cinfo
                                          , &row_adr
                                          , 1
                                          ) !=1
                     , "jpeg_read_scanlines: fail to read JPEG file" );
 
-         _cc_policy.read( buffer.begin() + _top_left.x
-                        , buffer.begin() + _dim.x
-                        , view.row_begin( y )
-                        );
+         this->_cc_policy.read( buffer.begin() + this->_top_left.x
+                              , buffer.begin() + this->_dim.x
+                              , view.row_begin( y )
+                              );
       }
 
       //@todo: Finish up. There might be a better way to do that.
-      while( _cinfo.output_scanline <  _cinfo.image_height )
+      while( this->_cinfo.output_scanline <  this->_cinfo.image_height )
       {
-         io_error_if( jpeg_read_scanlines( &_cinfo
+         io_error_if( jpeg_read_scanlines( &this->_cinfo
                                          , &row_adr
                                          , 1
                                          ) !=1

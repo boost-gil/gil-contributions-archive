@@ -9,5 +9,5 @@ todo list
 * add dynamic io
 * consider run-time dispatching for minimizing code bloat 
 * fix read_and_convert_view( ... ) compilation issue
-* add 24 bit support
-* add planar bit_aligned image support
+* add planar bit_aligned image support - not so easy
+* when reading an indexed tiff image, it's better to use a virtual view.

@@ -26,7 +26,9 @@
 namespace boost { namespace gil { namespace detail {
 
 template< typename Device >
-class writer<Device,jpeg_tag> 
+class writer< Device
+            , jpeg_tag
+            > 
 {
 public:
 
