@@ -7,8 +7,7 @@
 
 #include <boost/gil/gil_all.hpp>
 
-namespace boost { namespace gil {
-namespace opencv {
+namespace boost { namespace gil { namespace opencv {
 
 typedef gil::point2<ptrdiff_t> point_t;
 typedef std::vector< point_t > curve_t;

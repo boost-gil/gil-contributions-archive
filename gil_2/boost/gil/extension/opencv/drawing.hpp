@@ -1,175 +1,217 @@
 #ifndef DRAWING_HPP
 #define DRAWING_HPP
 
+#include <boost\scoped_array.hpp>
+
 #include "ipl_image_wrapper.hpp"
 
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/at.hpp>
+namespace boost { namespace gil { namespace opencv {
 
-namespace boost { namespace gil {
-namespace opencv {
+struct four_connected_line  : boost::mpl::int_< 4 > {};
+struct eight_connected_line : boost::mpl::int_< 8 > {};
+
+struct cv_fill : boost::mpl::int_< CV_FILLED > {};
+
+struct cv_aa : boost::mpl::int_< CV_AA > {};
+
+
+/// When chaining operators we don't want to reconvert to
+/// ipl_image all the time.
 
 /// rectangle
 
-template< class PIXEL >
+// Use cv_fill as thickness to fill the rectangle.
+
+template< typename Color
+        , typename Line_Type
+        >
 void drawRectangle( ipl_image_wrapper&  ipl_image
                   , point_t             start
                   , point_t             end
-                  , PIXEL               pixel
-                  , std::size_t         line_width )
+                  , const Color&        color
+                  , std::size_t         thickness
+                  , const Line_Type&    
+                  )
 {
    cvRectangle( ipl_image.get()
-              , make_cvPoint( start )
-              , make_cvPoint( end   )
-              , make_cvScalar( pixel )
-              , static_cast<int>( line_width ));
+              , make_cvPoint ( start )
+              , make_cvPoint ( end   )
+              , make_cvScalar( color )
+              , thickness
+              , typename Line_Type::type::value
+              );
 }
 
-template<class VIEW>
-void drawRectangle( VIEW&                  view
-                  , point_t                start
-                  , point_t                end
-                  , typename VIEW::pixel_t pixel
-                  , std::size_t            line_width )
+template< typename View
+        , typename Line_Type
+        >
+void drawRectangle( View                      view
+                  , point_t                   start
+                  , point_t                   end
+                  , typename View::value_type color
+                  , std::size_t               thickness
+                  , const Line_Type&          line_type )
 {
    drawRectangle( create_ipl_image( view )
                 , start
                 , end
-                , pixel
-                , static_cast<int>( line_width ));
+                , color
+                , thickness
+                , line_type
+                );
 }
 
 /// circle
 
-template< class PIXEL >
+template< typename Color
+        , typename Line_Type
+        >
 void drawCircle( ipl_image_wrapper& ipl_image
-               , point_t            center
+               , const point_t&     center
                , std::size_t        radius
-               , PIXEL              color
-               , std::size_t        line_width )
+               , const Color&       color
+               , std::size_t        thickness
+               , const Line_Type&
+               )
 {
    cvCircle( ipl_image.get()
            , make_cvPoint( center )
-           , static_cast<int>( radius )
+           , radius
            , make_cvScalar( color )
-           , static_cast<int>( line_width ));
+           , thickness
+           , typename Line_Type::type::value
+           );
 }
 
-template<class VIEW>
-void drawCircle( VIEW&                  view
-               , point_t                center
-               , std::size_t            radius
-               , typename VIEW::pixel_t color
-               , std::size_t            line_width )
+template< typename View
+        , typename Line_Type
+        >
+void drawCircle( View                      view
+               , point_t                   center
+               , std::size_t               radius
+               , typename View::value_type color
+               , std::size_t               thickness
+               , const Line_Type&          line_type
+               )
 {
    drawCircle( create_ipl_image( view )
              , center
-             , static_cast<int>( radius )
+             , radius
              , color
-             , static_cast<int>( line_width ));
+             , thickness
+             , line_type
+             );
 }
 
 /// line
 
-struct eight_connected_Line{};
-struct four_connected_Line{};
-struct anti_aliased_Line{};
 
-typedef boost::mpl::map< boost::mpl::pair< eight_connected_Line, boost::mpl::int_< 8    > >
-                       , boost::mpl::pair< four_connected_Line , boost::mpl::int_< 4    > >
-                       , boost::mpl::pair< anti_aliased_Line   , boost::mpl::int_<CV_AA > > 
-                       > line_type_map;
-
-
-template< class PIXEL
-        , class LINE_TYPE
+template< typename Color
+        , typename Line_Type
         >
 void drawLine( ipl_image_wrapper& ipl_image
              , point_t            start
              , point_t            end
-             , PIXEL              color
+             , Color              color
              , std::size_t        line_width
-             , LINE_TYPE                      )
+             , const Line_Type&
+             )
 {
    cvLine( ipl_image.get()
          , make_cvPoint( start )
          , make_cvPoint( end )
          , make_cvScalar( color )
-         , static_cast<int>( line_width )
-         , boost::mpl::at< line_type_map
-                         , LINE_TYPE
-                         >::type::value   );
+         , line_width
+         , Line_Type::type::value
+         );
 }
 
-template< class VIEW >
-void drawLine( VIEW&                  view
-             , point_t                start
-             , point_t                end
-             , typename VIEW::pixel_t color
-             , std::size_t            line_width )
+template< typename View
+        , typename Line_Type
+        >
+void drawLine( View&                     view
+             , point_t                   start
+             , point_t                   end
+             , typename View::value_type color
+             , std::size_t               line_width
+             , const Line_Type&          line_type
+             )
 {
    drawLine( create_ipl_image( view )
            , start
            , end
            , color
-           , static_cast<int>( line_width ));
+           , line_width
+           , line_type
+           );
 }
 
 /// polyline
 
-template<class PIXEL>
+template< typename Color
+        , typename Line_Type
+        >
 void drawPolyLine( ipl_image_wrapper& ipl_image
                  , const curve_vec_t& curves
                  , bool               is_closed
-                 , PIXEL              color
-                 , std::size_t        line_width )
+                 , Color              color
+                 , std::size_t        thickness
+                 , const Line_Type&
+                 )
 {
-   const std::size_t num_curves = curves.size();
+    const std::size_t num_curves = curves.size();
 
-   boost::scoped_array<int> num_points_per_curve( new int[num_curves] );
+    std::vector<int> num_points_per_curve( num_curves );
 
-   std::size_t total_num_points = 0;
-   for( std::size_t i = 0; i < num_curves; ++i )
-   {
-      num_points_per_curve[i] = static_cast<int>( curves[i].size() );
-   }
+    std::size_t total_num_points = 0;
+    for( std::size_t i = 0; i < num_curves; ++i )
+    {
+      num_points_per_curve[i] = curves[i].size();
+    }
 
-   // The curve array vector will deallocate all memory by itself.
-   cvpoint_array_vec_t pp( num_curves );
+    cvpoint_array_vec_t pp( num_curves );
 
-   CvPoint** curve_array = new CvPoint*[num_curves];
+    boost::scoped_array<CvPoint*> curve_array( new CvPoint*[num_curves] );
 
-   for( std::size_t i = 0; i < num_curves; ++i )
-   {
-      pp[i] = make_cvPoint_array( curves[i] );
+    for( std::size_t i = 0; i < num_curves; ++i )
+    {
+        pp[i] = make_cvPoint_array( curves[i] );
 
-      curve_array[i] = pp[i].get();
-   }
+        curve_array[i] = pp[i].get();
+    }
    
    cvPolyLine( ipl_image.get()
-             , curve_array  // needs to be pointer to C array of CvPoints.
-             , num_points_per_curve.get()// int array that contains number of points of each curve.
-             , static_cast<int>( curves.size() )
+             , curve_array.get()  // needs to be pointer to C array of CvPoints.
+             , &num_points_per_curve.front()
+             , curves.size()
              , is_closed
              , make_cvScalar( color )
-             , static_cast<int>( line_width ));
-
+             , thickness
+             , Line_Type::type::value
+             );
 }
 
-template<class VIEW>
-void drawPolyLine( VIEW&                  view
-                 , const curve_vec_t&     curves
-                 , bool                   is_closed
-                 , typename VIEW::pixel_t color
-                 , std::size_t            line_width )
+template< typename View
+        , typename Line_Type
+        >
+void drawPolyLine( View&                     view
+                 , const curve_vec_t&        curves
+                 , bool                      is_closed
+                 , typename View::value_type color
+                 , std::size_t               thickness
+                 , const Line_Type&          line_type
+                 )
 {
    drawPolyLine( create_ipl_image( view )
                , curves
                , is_closed
                , color
-               , line_width               );
+               , thickness
+               , line_type
+               );
 }
 
+/*
 template< class PIXEL >
 void drawFillPoly( ipl_image_wrapper& ipl_image
                  , const curve_vec_t& curves
@@ -213,7 +255,7 @@ void drawFillPoly( VIEW&                  view
                , curves
                , color                    );
 }
-
+*/
 
 } // namespace opencv
 } // namespace gil
