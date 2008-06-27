@@ -4,7 +4,6 @@
 
 #include <boost\test\unit_test.hpp>
 
-#include <boost\gil\extension\opencv\ipl_image_wrapper.hpp>
 #include <boost\gil\extension\opencv\drawing.hpp>
 
 #include <boost\gil\extension\io_new\png_write.hpp>
@@ -84,6 +83,7 @@ BOOST_AUTO_TEST_CASE( test_draw_rectangle )
     fill_pixels( view( img ), rgb8_pixel_t( 0, 0, 0 ));
 
     typedef boost::function< void (ipl_image_wrapper) > operation_t;
+
 /*
     draw< rgb8_view_t > d;
     d.add( draw_rectangle< rgb8_pixel_t
@@ -131,22 +131,28 @@ BOOST_AUTO_TEST_CASE( test_draw_rectangle )
     c.push_back( boost::gil::opencv::point_t( 100,10 ));
 
     curve_t c2;
-    c2.push_back( boost::gil::opencv::point_t( 30,30 ));
-    c2.push_back( boost::gil::opencv::point_t( 30,130 ));
-    c2.push_back( boost::gil::opencv::point_t( 130,130 ));
-    c2.push_back( boost::gil::opencv::point_t( 130,30 ));
-    c2.push_back( boost::gil::opencv::point_t( 150,10 ));
+    c2.push_back( boost::gil::opencv::point_t( 300,300 ));
+    c2.push_back( boost::gil::opencv::point_t( 300,330 ));
+    c2.push_back( boost::gil::opencv::point_t( 330,330 ));
+    c2.push_back( boost::gil::opencv::point_t( 330,300 ));
+    c2.push_back( boost::gil::opencv::point_t( 450,310 ));
     
     curve_vec_t cv;
     cv.push_back( c );
     cv.push_back( c2 );
-
+/*
     drawPolyLine( view( img )
                 , cv
                 , true
                 , rgb8_pixel_t( 245, 100, 33 )
                 , 2
                 , eight_connected_line()
+                );
+*/
+    drawFillPoly( view( img )
+                , cv
+                , rgb8_pixel_t( 245, 100, 33 )
+                , cv_aa()
                 );
 
     write_view( "..\\out\\rectangle.png", view( img ), png_tag() );

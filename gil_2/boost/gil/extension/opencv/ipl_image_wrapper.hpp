@@ -1,6 +1,8 @@
 #ifndef IPL_IMAGE_WRAPPER_HPP
 #define IPL_IMAGE_WRAPPER_HPP
 
+#include <boost\gil\gil_all.hpp>
+
 #include "utilities.hpp"
 
 namespace boost { namespace gil { namespace opencv {
@@ -50,18 +52,18 @@ private:
    IplImage* _img;
 };
 
-template<class VIEW>
+template< typename View >
 inline
-ipl_image_wrapper create_ipl_image( VIEW view )
+ipl_image_wrapper create_ipl_image( View view )
 {
-    typedef typename channel_type<VIEW>::type channel_t;
-    typedef typename color_space_type<VIEW>::type color_space_t;
+    typedef typename channel_type    < View >::type channel_t;
+    typedef typename color_space_type< View >::type color_space_t;
 
     IplImage* img;
 
     if(( img = cvCreateImageHeader( make_cvSize( view.dimensions() )
                                   , ipl_depth_type<channel_t>::type::value
-                                  , num_channels<VIEW>::value
+                                  , num_channels<View>::value
                                   )) == NULL )
     {
         throw std::runtime_error( "Cannot create IPL image." );
@@ -69,7 +71,7 @@ ipl_image_wrapper create_ipl_image( VIEW view )
 
     cvSetData( img
              , &view.begin()[0]
-             , num_channels<VIEW>::value * view.width() * sizeof( channel_t ) );
+             , num_channels<View>::value * view.width() * sizeof( channel_t ) );
 
     return ipl_image_wrapper( img );
 }

@@ -3,36 +3,41 @@
 
 #include "ipl_image_wrapper.hpp"
 
-namespace boost { namespace gil {
-namespace opencv {
+namespace boost { namespace gil { namespace opencv {
 
-struct nearest_neigbor{};
-struct bilinear{};
-struct bicubic{};
+struct nearest_neigbor : boost::mpl::int_< CV_INTER_NN >     {};
+struct bilinear        : boost::mpl::int_< CV_INTER_LINEAR > {};
+struct area            : boost::mpl::int_< CV_INTER_AREA >   {};
+struct bicubic         : boost::mpl::int_< CV_INTER_CUBIC >  {};
 
-// OpenCV doc: It is preferred method for image 
-// decimation that gives moire-free results.
-struct area{};
-
-typedef boost::mpl::map<
-  boost::mpl::pair< nearest_neigbor, boost::mpl::int_<CV_INTER_NN     > >
-, boost::mpl::pair< bilinear       , boost::mpl::int_<CV_INTER_LINEAR > >
-, boost::mpl::pair< area           , boost::mpl::int_<CV_INTER_AREA   > > 
-, boost::mpl::pair< bicubic	     , boost::mpl::int_<CV_INTER_CUBIC  > > 
-    > interpolation_method_map;
-
-
-template< class INTERPOLATION >
+template< class Interpolation >
 void resize( const ipl_image_wrapper& src
            , ipl_image_wrapper&       dst
-           , INTERPOLATION            )
+           , const Interpolation& 
+           )
 {
    cvResize( src.get()
            , dst.get()
-           , boost::mpl::at< interpolation_method_map
-                           , INTERPOLATION >::type::value  );
+           , Interpolation::type::value
+           );
 }
 
+template< typename View
+        , typename Interpolation
+        >
+void resize( View                 src
+           , View                 dst
+           , const Interpolation& interpolation
+           )
+{
+    ipl_image_wrapper src_ipl = create_ipl_image( src );
+    ipl_image_wrapper dst_ipl = create_ipl_image( dst );
+
+    resize( src_ipl
+          , dst_ipl
+          , interpolation
+          );
+}
 
 } // namespace opencv
 } // namespace gil

@@ -177,7 +177,15 @@
 			>
 		</File>
 		<File
+			RelativePath=".\edge_detection.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\ipl_image_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\resize.cpp"
 			>
 		</File>
 		<File
