@@ -11,13 +11,15 @@ using namespace boost::gil::opencv;
 
 BOOST_AUTO_TEST_CASE( test_sobel )
 {
-    rgb8_image_t src;
-    read_image( "..\\in\\in.png", src, png_tag() ); 
+    gray8_image_t src;
+    read_and_convert_image( "..\\in\\in.png", src, png_tag() ); 
 
-    rgb8_image_t dst( view( src ).dimensions() );
+    gray8_image_t dst( view( src ).dimensions() );
 
     sobel( view( src )
-         , view( dst ) );
+         , view( dst )
+         , aperture3()
+         );
 
     write_view( "..\\out\\sobel.png", view( dst ), png_tag() );
 }
@@ -30,10 +32,29 @@ BOOST_AUTO_TEST_CASE( test_laplace )
     rgb32f_image_t dst( view( src ).dimensions() );
 
     laplace( view( src )
-           , view( dst ) );
+           , view( dst )
+           , aperture3()
+           );
 
     write_view( "..\\out\\laplace.png"
               , color_converted_view< rgb8_pixel_t >( view( dst ))
               , png_tag()
               );
+}
+
+BOOST_AUTO_TEST_CASE( test_canny )
+{
+    gray8_image_t src;
+    read_and_convert_image( "..\\in\\in.png", src, png_tag() ); 
+
+    gray8_image_t edges( view( src ).dimensions() );
+
+    canny( view( src   )
+         , view( edges )
+         , 60
+         , 180
+         , aperture3()
+         );
+
+    write_view( "..\\out\\canny.png", view( edges ), png_tag() );
 }

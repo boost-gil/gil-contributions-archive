@@ -1,66 +1,149 @@
 #ifndef EDGE_DETECTION_HPP
 #define EDGE_DETECTION_HPP
 
+#include <boost/type_traits/is_base_of.hpp>
+
+#include <boost/utility/enable_if.hpp>
+
 #include "ipl_image_wrapper.hpp"
 
 namespace boost { namespace gil { namespace opencv {
 
+struct aperture_base {};
+
+struct aperture1 : aperture_base, boost::mpl::int_< 1 > {};
+struct aperture3 : aperture_base, boost::mpl::int_< 3 > {};
+struct aperture5 : aperture_base, boost::mpl::int_< 5 > {};
+struct aperture7 : aperture_base, boost::mpl::int_< 7 > {};
+struct aperture_scharr : aperture_base, boost::mpl::int_< CV_SCHARR > {};
+
+// default template parameter for function, only for classes
+template< typename Aperture >
 void sobel( const ipl_image_wrapper& src
           , ipl_image_wrapper&       dst
-          , size_t                   x_order       = 1
-          , size_t                   y_order       = 0
-          , size_t                   aperture_size = 3 )
+          , const Aperture&
+          , size_t                   x_order = 1
+          , size_t                   y_order = 0
+          , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                 , Aperture
+                                                                 >::type
+                                     >::type* ptr = 0
+          )
 {
    cvSobel( src.get()
           , dst.get()
           , x_order
           , y_order
-          , aperture_size
+          , Aperture::type::value
           );
 }
 
-template< typename View >
-void sobel( View        src
-          , View        dst
-          , std::size_t x_order       = 1
-          , std::size_t y_order       = 0
-          , std::size_t aperture_size = 3 )
+template< typename View
+        , typename Aperture
+        >
+void sobel( View                  src
+          , View                  dst
+          , const Aperture&       aperture
+          , std::size_t x_order = 1
+          , std::size_t y_order = 0
+          , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                 , Aperture
+                                                                 >::type
+                                     >::type* ptr = 0
+          )
 {
     ipl_image_wrapper src_ipl = create_ipl_image( src );
     ipl_image_wrapper dst_ipl = create_ipl_image( dst );
 
     sobel( src_ipl
          , dst_ipl
+         , aperture
          , x_order
          , y_order
-         , aperture_size
          );
 }
 
+template< typename Aperture >
 void laplace( const ipl_image_wrapper& src
             , ipl_image_wrapper&       dst
-            , size_t                   aperture_size = 3 )
+            , const Aperture&
+            , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                   , Aperture
+                                                                   >::type
+                                       >::type* ptr = 0
+            )
 {
    cvLaplace( src.get()
             , dst.get()
-            , aperture_size
+            , Aperture::type::value
             );
 }
 
 template< typename View_Src
         , typename View_Dst
+        , typename Aperture
         >
-void laplace( View_Src    src
-            , View_Dst    dst
-            , std::size_t aperture_size = 3 )
+void laplace( View_Src        src
+            , View_Dst        dst
+            , const Aperture& aperture
+            , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                   , Aperture
+                                                                   >::type
+                                       >::type* ptr = 0
+            )
 {
     ipl_image_wrapper src_ipl = create_ipl_image( src );
     ipl_image_wrapper dst_ipl = create_ipl_image( dst );
 
     laplace( src_ipl
            , dst_ipl
-           , aperture_size
+           , aperture
            );
+}
+
+template< typename Aperture >
+void canny( const ipl_image_wrapper& src
+          , ipl_image_wrapper&       dst
+          , double                   threshold1
+          , double                   threshold2
+          , const Aperture&
+          , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                 , Aperture
+                                                                 >::type
+                                       >::type* ptr = 0
+            )
+{
+   cvCanny( src.get()
+          , dst.get()
+          , threshold1
+          , threshold2
+          , Aperture::type::value
+          );
+}
+
+template< typename View
+        , typename Aperture
+        >
+void canny( View            src
+          , View            dst
+          , double          threshold1
+          , double          threshold2
+          , const Aperture& aperture
+          , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                 , Aperture
+                                                                 >::type
+                                     >::type* ptr = 0
+            )
+{
+    ipl_image_wrapper src_ipl = create_ipl_image( src );
+    ipl_image_wrapper dst_ipl = create_ipl_image( dst );
+
+    canny( src_ipl
+         , dst_ipl
+         , threshold1
+         , threshold2
+         , aperture
+         );
 }
 
 } // namespace opencv
