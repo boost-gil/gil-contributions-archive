@@ -3,8 +3,7 @@
 
 #include "ipl_image_wrapper.hpp"
 
-namespace boost { namespace gil {
-namespace opencv {
+namespace boost { namespace gil { namespace opencv {
 
 struct blur_no_scale{};
 struct blur{};

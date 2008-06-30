@@ -19,6 +19,7 @@ struct aperture_scharr : aperture_base, boost::mpl::int_< CV_SCHARR > {};
 
 // default template parameter for function, only for classes
 template< typename Aperture >
+inline
 void sobel( const ipl_image_wrapper& src
           , ipl_image_wrapper&       dst
           , const Aperture&
@@ -41,6 +42,7 @@ void sobel( const ipl_image_wrapper& src
 template< typename View
         , typename Aperture
         >
+inline
 void sobel( View                  src
           , View                  dst
           , const Aperture&       aperture
@@ -64,6 +66,7 @@ void sobel( View                  src
 }
 
 template< typename Aperture >
+inline
 void laplace( const ipl_image_wrapper& src
             , ipl_image_wrapper&       dst
             , const Aperture&
@@ -83,6 +86,7 @@ template< typename View_Src
         , typename View_Dst
         , typename Aperture
         >
+inline
 void laplace( View_Src        src
             , View_Dst        dst
             , const Aperture& aperture
@@ -102,6 +106,7 @@ void laplace( View_Src        src
 }
 
 template< typename Aperture >
+inline
 void canny( const ipl_image_wrapper& src
           , ipl_image_wrapper&       dst
           , double                   threshold1
@@ -124,6 +129,7 @@ void canny( const ipl_image_wrapper& src
 template< typename View
         , typename Aperture
         >
+inline
 void canny( View            src
           , View            dst
           , double          threshold1
@@ -144,6 +150,95 @@ void canny( View            src
          , threshold2
          , aperture
          );
+}
+
+template< typename Aperture >
+inline
+void precorner_detect( const ipl_image_wrapper& src
+                     , ipl_image_wrapper&       dst
+                     , const Aperture&
+                     , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                            , Aperture
+                                                                            >::type
+                                                >::type* ptr = 0
+                     )
+{
+   cvPreCornerDetect( src.get()
+                    , dst.get()
+                    , Aperture::type::value
+                    );
+}
+
+template< typename View_Src
+        , typename View_Dst
+        , typename Aperture
+        >
+inline
+void precorner_detect( View_Src        src
+                     , View_Dst        dst
+                     , const Aperture& aperture
+                     , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                            , Aperture
+                                                                            >::type
+                                                >::type* ptr = 0
+                      )
+{
+    ipl_image_wrapper src_ipl = create_ipl_image( src );
+    ipl_image_wrapper dst_ipl = create_ipl_image( dst );
+
+    precorner_detect( src_ipl
+                    , dst_ipl
+                    , aperture
+                    );
+}
+
+template< typename Aperture >
+inline
+void corner_eigen_vals_and_vecs( const ipl_image_wrapper& src
+                               , ipl_image_wrapper&       dst
+                               , const std::size_t        block_size
+                               , const Aperture&
+                               , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                                      , Aperture
+                                                                                      >::type
+                                                          >::type* ptr = 0
+                               )
+{
+    if( src.get()->width * 6 != dst.get()->width )
+    {
+        throw std::runtime_error( "Destination image must be 6 times wider." );
+    }
+
+    cvCornerEigenValsAndVecs( src.get()
+                            , dst.get()
+                            , block_size
+                            , Aperture::type::value
+                            );
+}
+
+template< typename View_Src
+        , typename View_Dst
+        , typename Aperture
+        >
+inline
+void corner_eigen_vals_and_vecs( View_Src          src
+                               , View_Dst          dst
+                               , const std::size_t block_size
+                               , const Aperture&   aperture
+                               , typename boost::enable_if< typename boost::is_base_of< aperture_base
+                                                                                      , Aperture
+                                                                                      >::type
+                                                          >::type* ptr = 0
+                               )
+{
+    ipl_image_wrapper src_ipl = create_ipl_image( src );
+    ipl_image_wrapper dst_ipl = create_ipl_image( dst );
+
+    corner_eigen_vals_and_vecs( src_ipl
+                              , dst_ipl
+                              , block_size
+                              , aperture
+                              );
 }
 
 } // namespace opencv
