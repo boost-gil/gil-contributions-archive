@@ -173,6 +173,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\convert_color.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\drawing_test.cpp"
 			>
 		</File>
@@ -186,6 +190,10 @@
 		</File>
 		<File
 			RelativePath=".\resize.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\smooth.cpp"
 			>
 		</File>
 		<File

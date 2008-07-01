@@ -5,15 +5,21 @@
 
 namespace boost { namespace gil { namespace opencv {
 
-struct nearest_neigbor : boost::mpl::int_< CV_INTER_NN >     {};
-struct bilinear        : boost::mpl::int_< CV_INTER_LINEAR > {};
-struct area            : boost::mpl::int_< CV_INTER_AREA >   {};
-struct bicubic         : boost::mpl::int_< CV_INTER_CUBIC >  {};
+struct interpolation_base {};
 
-template< class Interpolation >
+struct nearest_neigbor : interpolation_base, boost::mpl::int_< CV_INTER_NN >     {};
+struct bilinear        : interpolation_base, boost::mpl::int_< CV_INTER_LINEAR > {};
+struct area            : interpolation_base, boost::mpl::int_< CV_INTER_AREA >   {};
+struct bicubic         : interpolation_base, boost::mpl::int_< CV_INTER_CUBIC >  {};
+
+template< typename Interpolation >
 void resize( const ipl_image_wrapper& src
            , ipl_image_wrapper&       dst
            , const Interpolation& 
+           , typename boost::enable_if< typename boost::is_base_of< interpolation_base 
+                                                                  , Interpolation
+                                                                  >::type
+                                      >::type* ptr = 0
            )
 {
    cvResize( src.get()
@@ -28,6 +34,10 @@ template< typename View
 void resize( View                 src
            , View                 dst
            , const Interpolation& interpolation
+           , typename boost::enable_if< typename boost::is_base_of< interpolation_base 
+                                                                  , Interpolation
+                                                                  >::type
+                                      >::type* ptr = 0
            )
 {
     ipl_image_wrapper src_ipl = create_ipl_image( src );

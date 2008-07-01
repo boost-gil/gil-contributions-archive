@@ -7,25 +7,14 @@
 
 namespace boost { namespace gil { namespace opencv {
 
-struct undefined {};
-
-template < typename Channel > struct ipl_channel_type { typedef undefined type; };
-template<> struct ipl_channel_type< bits8 >   : public boost::mpl::int_< IPL_DEPTH_8U  > {};
-template<> struct ipl_channel_type< bits16 >  : public boost::mpl::int_< IPL_DEPTH_16U >  {};
-template<> struct ipl_channel_type< bits32f > : public boost::mpl::int_< IPL_DEPTH_32F > {};
-template<> struct ipl_channel_type< double >  : public boost::mpl::int_< IPL_DEPTH_64F > {};
-template<> struct ipl_channel_type< bits8s >  : public boost::mpl::int_< IPL_DEPTH_8S  > {};
-template<> struct ipl_channel_type< bits16s > : public boost::mpl::int_< IPL_DEPTH_16S > {};
-template<> struct ipl_channel_type< bits32s > : public boost::mpl::int_< IPL_DEPTH_32S > {};
-
-template < typename Depth > struct ipl_depth_type { typedef undefined type; };
-template<> struct ipl_depth_type< gil::bits8 >   : public boost::mpl::int_< IPL_DEPTH_8U  > {};
-template<> struct ipl_depth_type< gil::bits16 >  : public boost::mpl::int_< IPL_DEPTH_16U > {};
-template<> struct ipl_depth_type< gil::bits32f > : public boost::mpl::int_< IPL_DEPTH_32F > {};
-template<> struct ipl_depth_type< double >       : public boost::mpl::int_< IPL_DEPTH_64F > {};
-template<> struct ipl_depth_type< gil::bits8s >  : public boost::mpl::int_< IPL_DEPTH_8S  > {};
-template<> struct ipl_depth_type< gil::bits16s > : public boost::mpl::int_< IPL_DEPTH_16S > {};
-template<> struct ipl_depth_type< gil::bits32s > : public boost::mpl::int_< IPL_DEPTH_32S > {};
+template < typename Channel > struct ipl_channel_type : boost::mpl::false_ {};
+template<> struct ipl_channel_type< bits8 >   : boost::mpl::int_< IPL_DEPTH_8U  > {};
+template<> struct ipl_channel_type< bits16 >  : boost::mpl::int_< IPL_DEPTH_16U > {};
+template<> struct ipl_channel_type< bits32f > : boost::mpl::int_< IPL_DEPTH_32F > {};
+template<> struct ipl_channel_type< double >  : boost::mpl::int_< IPL_DEPTH_64F > {};
+template<> struct ipl_channel_type< bits8s >  : boost::mpl::int_< IPL_DEPTH_8S  > {};
+template<> struct ipl_channel_type< bits16s > : boost::mpl::int_< IPL_DEPTH_16S > {};
+template<> struct ipl_channel_type< bits32s > : boost::mpl::int_< IPL_DEPTH_32S > {};
 
 class ipl_image_wrapper
 {
@@ -56,13 +45,12 @@ template< typename View >
 inline
 ipl_image_wrapper create_ipl_image( View view )
 {
-    typedef typename channel_type    < View >::type channel_t;
-    typedef typename color_space_type< View >::type color_space_t;
+    typedef typename channel_type< View >::type channel_t;
 
     IplImage* img;
 
     if(( img = cvCreateImageHeader( make_cvSize( view.dimensions() )
-                                  , ipl_depth_type<channel_t>::type::value
+                                  , ipl_channel_type<channel_t>::type::value
                                   , num_channels<View>::value
                                   )) == NULL )
     {
