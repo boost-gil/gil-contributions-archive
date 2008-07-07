@@ -205,6 +205,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\text.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\unit_test.cpp"
 			>
 		</File>

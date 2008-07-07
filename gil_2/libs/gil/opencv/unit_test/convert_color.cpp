@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( test_convert_color_bit_aligned )
             );
 */
 }
-
+/*
 BOOST_AUTO_TEST_CASE( test_convert_color_using_xyz_colorspace )
 {
     xyz32f_image_t src;
@@ -54,3 +54,4 @@ BOOST_AUTO_TEST_CASE( test_convert_color_using_xyz_colorspace )
             , view( dst )
             );
 }
+*/

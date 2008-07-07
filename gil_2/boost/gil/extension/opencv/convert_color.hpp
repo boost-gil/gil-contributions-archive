@@ -281,6 +281,12 @@ template<> struct is_supported< hsl_layout_t, bgr_layout_t > : public boost::mpl
 template<> struct is_supported< hsl_layout_t, rgb_layout_t > : public boost::mpl::true_ 
 { static const int code = CV_HLS2RGB; };
 
+// Allowed channel types
+
+template< typename Channel > struct allowed_channel_type : boost::mpl::false_ {};
+template <> struct allowed_channel_type< bits8   > : boost::mpl::true_ {};
+template <> struct allowed_channel_type< bits16  > : boost::mpl::true_ {};
+template <> struct allowed_channel_type< bits32f > : boost::mpl::true_ {};
 
 template< typename Is_Supported >
 inline
@@ -364,6 +370,11 @@ void cvtcolor( View_Src src
     typedef typename channel_type< View_Src >::type src_channel_t;
     typedef typename channel_type< View_Dst >::type dst_channel_t;
 
+    // Only 8u, 16u, and 32f is allowed.
+    BOOST_STATIC_ASSERT(( boost::mpl::or_< allowed_channel_type< src_channel_t >
+                                         , allowed_channel_type< dst_channel_t >
+                                         >::value ));
+
     // Channel depths need to match.
     BOOST_STATIC_ASSERT(( boost::is_same< src_channel_t
                                         , dst_channel_t >::value ));
@@ -391,7 +402,7 @@ void cvtcolor( View_Src src
              )
 {
     if(  std::max( src.dimensions().x, dst.dimensions().x ) == 0
-      || std::max( src.dimensions().x, dst.dimensions().x ) == 0
+      && std::max( src.dimensions().y, dst.dimensions().y ) == 0
       )
     {
         throw std::exception( "Image doesn't have a dimension ( empty image )." );
