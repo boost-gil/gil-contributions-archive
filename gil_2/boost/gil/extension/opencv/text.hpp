@@ -1,5 +1,23 @@
-#ifndef TEXT_HPP
-#define TEXT_HPP
+/*
+    Copyright 2008 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
+#ifndef BOOST_GIL_EXTENSION_OPENCV_TEXT_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_OPENCV_TEXT_HPP_INCLUDED
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
+/// \brief
+/// \author Christian Henning \n
+///         
+/// \date 2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost\shared_ptr.hpp>
 
@@ -8,14 +26,14 @@
 
 namespace boost { namespace gil { namespace opencv {
 
-struct Font_Hershey_Simplex        : boost::mpl::int_< CV_FONT_HERSHEY_SIMPLEX > {};
-struct Font_Hershey_Plain          : boost::mpl::int_< CV_FONT_HERSHEY_PLAIN > {};
-struct Font_Hershey_Duplex         : boost::mpl::int_< CV_FONT_HERSHEY_DUPLEX > {};
-struct Font_Hershey_Complex        : boost::mpl::int_< CV_FONT_HERSHEY_COMPLEX > {};
-struct Font_Hershey_Triplex        : boost::mpl::int_< CV_FONT_HERSHEY_TRIPLEX > {};
-struct Font_Hershey_Complex_Small  : boost::mpl::int_< CV_FONT_HERSHEY_COMPLEX_SMALL > {};
-struct Font_Hershey_Script_Simplex : boost::mpl::int_< CV_FONT_HERSHEY_SCRIPT_SIMPLEX > {};
-struct Font_Hershey_Script_Complex : boost::mpl::int_< CV_FONT_HERSHEY_SCRIPT_COMPLEX > {};
+struct font_hershey_simplex        : boost::mpl::int_< CV_FONT_HERSHEY_SIMPLEX > {};
+struct font_hershey_plain          : boost::mpl::int_< CV_FONT_HERSHEY_PLAIN > {};
+struct font_hershey_duplex         : boost::mpl::int_< CV_FONT_HERSHEY_DUPLEX > {};
+struct font_hershey_complex        : boost::mpl::int_< CV_FONT_HERSHEY_COMPLEX > {};
+struct font_hershey_triplex        : boost::mpl::int_< CV_FONT_HERSHEY_TRIPLEX > {};
+struct font_hershey_complex_small  : boost::mpl::int_< CV_FONT_HERSHEY_COMPLEX_SMALL > {};
+struct font_hershey_script_simplex : boost::mpl::int_< CV_FONT_HERSHEY_SCRIPT_SIMPLEX > {};
+struct font_hershey_script_complex : boost::mpl::int_< CV_FONT_HERSHEY_SCRIPT_COMPLEX > {};
 
 
 typedef boost::shared_ptr< CvFont > ipl_font_wrapper;
@@ -28,12 +46,12 @@ inline
 ipl_font_wrapper create_ipl_font( const Font_Face& font_face
                                 , double           hscale
                                 , double           vscale
-                                , double           shear
-                                , std::size_t      thickness
                                 , const Line_Type& 
+                                , double           shear     = 0
+                                , std::size_t      thickness = 1
                                 )
 {
-    ipl_font_wrapper ipl_font;
+    ipl_font_wrapper ipl_font( new CvFont() );
 
     cvInitFont( ipl_font.get()
               , typename Font_Face::type::value
@@ -85,9 +103,28 @@ void putText( View                     v
            );
 }
 
+inline
+void getTextSize( const std::string&       text
+                , const ipl_font_wrapper&  ipl_font
+                , point_t&                 size
+                , int&                     baseline
+                )
+{
+    CvSize cv_size;
+
+    cvGetTextSize( text.c_str()
+                 , ipl_font.get()
+                 , &cv_size
+                 , &baseline
+                 );
+
+    size.x = cv_size.width;
+    size.y = cv_size.height;
+}
+
 } // namespace opencv
 } // namespace gil
 } // namespace boost
 
 
-#endif // TEXT_HPP
+#endif // BOOST_GIL_EXTENSION_OPENCV_TEXT_HPP_INCLUDED

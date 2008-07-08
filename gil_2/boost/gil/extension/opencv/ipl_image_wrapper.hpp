@@ -1,5 +1,23 @@
-#ifndef IPL_IMAGE_WRAPPER_HPP
-#define IPL_IMAGE_WRAPPER_HPP
+/*
+    Copyright 2008 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
+#ifndef BOOST_GIL_EXTENSION_OPENCV_IPL_IMAGE_WRAPPER_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_OPENCV_IPL_IMAGE_WRAPPER_HPP_INCLUDED
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
+/// \brief
+/// \author Christian Henning \n
+///         
+/// \date 2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost\gil\gil_all.hpp>
 
@@ -16,24 +34,16 @@ template<> struct ipl_channel_type< bits8s >  : boost::mpl::int_< IPL_DEPTH_8S  
 template<> struct ipl_channel_type< bits16s > : boost::mpl::int_< IPL_DEPTH_16S > {};
 template<> struct ipl_channel_type< bits32s > : boost::mpl::int_< IPL_DEPTH_32S > {};
 
+
+// doesn't work
+//typedef boost::shared_ptr< IplImage > ipl_image_wrapper;
+
 class ipl_image_wrapper
 {
 public:
     ipl_image_wrapper( IplImage* img ) : _img( img ) {}
 
-    ~ipl_image_wrapper()
-    {
-/*
-        if( _img )
-        {
-            cvReleaseData( &_img );
-            cvReleaseImageHeader( &_img );
-        }
-*/
-    }
-
-    IplImage* get() { return _img; }
-
+    IplImage*       get()       { return _img; }
     const IplImage* get() const { return _img; }
    
 private:
@@ -68,4 +78,4 @@ ipl_image_wrapper create_ipl_image( View view )
 } // namespace gil
 } // namespace boost
 
-#endif // IPL_IMAGE_WRAPPER_HPP
+#endif // BOOST_GIL_EXTENSION_OPENCV_IPL_IMAGE_WRAPPER_HPP_INCLUDED

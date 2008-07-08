@@ -177,6 +177,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\convert_scale.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\drawing_test.cpp"
 			>
 		</File>

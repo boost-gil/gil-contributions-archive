@@ -23,4 +23,3 @@ BOOST_AUTO_TEST_CASE( test_smooth_gaussian )
 
     write_view( "..\\out\\smooth_gaussian.png", view( dst ), png_tag() );
 }
-
