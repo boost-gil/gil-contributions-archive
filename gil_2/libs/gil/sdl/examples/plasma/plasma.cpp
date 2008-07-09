@@ -88,7 +88,7 @@ public:
 
          for( int x = 0; x < _view.width(); ++x, ++x_it )
          {
-            bits8 index = at_c<0>( _view_buffer( y, x ) );
+            bits8 index = at_c<0>( _view_buffer( x, y ) );
 
             index += _step;
             if( index >= 256 ) index -= 256;
@@ -138,7 +138,7 @@ private:
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-   point_t dims(200,200);
+   point_t dims(640,480);
 
    bgra8_image_t img( dims );
    fill_pixels( view( img )
@@ -162,7 +162,7 @@ int _tmain(int argc, _TCHAR* argv[])
                                  , rh_ptr ));
 
    win->my_timer_handler::set_img( view( img ));
-   win->set_timer( 200 );
+   win->set_timer( 20 );
 
 
    ss.add_window( win );
