@@ -2,7 +2,7 @@
 
 #include <boost\test\unit_test.hpp>
 
-#include <boost\gil\extension\opencv\convert_scale.hpp>
+#include <boost\gil\extension\opencv\opencv_all.hpp>
 
 #include <boost\gil\extension\io_new\png_all.hpp>
 

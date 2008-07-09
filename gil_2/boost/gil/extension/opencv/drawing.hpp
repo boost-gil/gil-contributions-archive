@@ -125,8 +125,63 @@ void drawCircle( View                      view
              );
 }
 
-/// line
+/// ellipse
 
+template< typename Color
+        , typename Line_Type
+        >
+inline
+void drawEllipse( ipl_image_wrapper& ipl_image
+                , const point_t&     center
+                , const point_t&     axes
+                , const double&      angle
+                , const double&      start_angle
+                , const double&      end_angle
+                , const Color&       color
+                , std::size_t        thickness
+                , const Line_Type&
+                )
+{
+   cvEllipse( ipl_image.get()
+            , make_cvPoint( center )
+            , make_cvSize ( axes   )
+            , angle
+            , start_angle
+            , end_angle
+            , make_cvScalar( color )
+            , thickness
+            , typename Line_Type::type::value
+            );
+}
+
+template< typename View
+        , typename Line_Type
+        >
+inline
+void drawEllipse( View                      view
+                , const point_t&            center
+                , const point_t&            axes
+                , const double&             angle
+                , const double&             start_angle
+                , const double&             end_angle
+                , typename View::value_type color
+                , std::size_t               thickness
+                , const Line_Type&          line_type
+                )
+{
+   drawEllipse( create_ipl_image( view )
+              , center
+              , axes
+              , angle
+              , start_angle
+              , end_angle
+              , color
+              , thickness
+              , line_type
+              );
+}
+
+/// line
 
 template< typename Color
         , typename Line_Type

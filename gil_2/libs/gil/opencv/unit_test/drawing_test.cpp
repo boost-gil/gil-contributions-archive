@@ -124,6 +124,17 @@ BOOST_AUTO_TEST_CASE( test_draw_rectangle )
             , eight_connected_line()
             );
 
+    drawEllipse( view( img )
+               , boost::gil::opencv::point_t( 400, 400 ) // center
+               , boost::gil::opencv::point_t( 50, 40 ) // axes
+               , 185
+               , 20
+               , 90
+               , rgb8_pixel_t( 25, 10, 88 )
+               , 25
+               , eight_connected_line()
+               );
+
     curve_t c;
     c.push_back( boost::gil::opencv::point_t( 10,10 ));
     c.push_back( boost::gil::opencv::point_t( 10,100 ));
