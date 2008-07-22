@@ -44,12 +44,12 @@ void read_image( Device&          file
                , const point_t&   dim
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
-                                                                       , typename is_format_tag          < FormatTag >::type
-                                                                       , typename is_supported           < typename Image::value_type
-                                                                                                         , FormatTag 
-                                                                                                         >::type 
+                                                       , typename is_format_tag          < FormatTag >::type
+                                                       , typename is_supported           < typename Image::value_type
+                                                                                         , FormatTag 
+                                                                                         >::type 
                                                                        >::type 
-                                                   >::type* ptr = 0
+                                   >::type* ptr = 0
                )
 {
     detail::reader< Device
