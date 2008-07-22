@@ -84,6 +84,8 @@ public:
                   {
                      add_message<detail::quit_event>();
 
+                     SDL_Delay( 200 );
+
                      return ;
                   }
 
@@ -96,9 +98,7 @@ public:
                {
                   add_message<detail::quit_event>();
 
-                  // todo: We should probably wait for the windows to
-                  // terminate.
-
+                  SDL_Delay( 200 );
                   return ;
                }
 

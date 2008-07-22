@@ -38,8 +38,6 @@ class sdl_window : virtual public sdl_window_base
                  , public KEYBOARD_EVENTS
                  , public QUIT_EVENT
 {
-private:
-
    typedef shared_ptr<REDRAW_EVENT> redraw_handler_t;
 
 public:
@@ -75,6 +73,7 @@ public:
       boost::mutex::scoped_lock oLock( _sentinel );
 
       _cancel = true;
+      std::cout << "cancel is true." << std::endl;
    }
 
 private:
@@ -87,7 +86,9 @@ private:
       {
          if( get_queue() )
          {
+            std::cout << "before get event." << std::endl;
             get_queue()->dequeue( e );
+            std::cout << "after get event." << std::endl;
 
             switch( e->type() )
             {
@@ -118,13 +119,16 @@ private:
 
                case detail::quit_event::type:
                {
-                  quit();
+                  std::cout << "received quit event." << std::endl;
 
-                  return;
+                  quit();
                }
             }
          }
       }
+
+
+      std::cout << "thread main is done." << std::endl;
    }
 
 private:

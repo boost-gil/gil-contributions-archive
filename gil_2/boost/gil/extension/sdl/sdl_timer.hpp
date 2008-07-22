@@ -25,7 +25,7 @@ class sdl_timer_base : virtual public sdl_window_base
 {
 private:
 
- typedef boost::shared_ptr<REDRAW_HANDLER> redraw_handler_t;
+   typedef boost::shared_ptr<REDRAW_HANDLER> redraw_handler_t;
 
 public:
 
@@ -43,8 +43,11 @@ public:
       if( _timer_init )
       {
          SDL_RemoveTimer( _timer_id );
+
+         std::cout << "timer is removed." << std::endl;
       }
    }
+
 
    // interval in ms
    void set_timer( unsigned int interval )
@@ -71,10 +74,12 @@ private:
    {
       sdl_timer_base* p = (sdl_timer_base*) param;
 
-
       if( p && p->time_elapsed() )
       {
          p->lock();
+
+         if( p->_screen->pixels == NULL )
+            return 0;
          p->_redraw_handler->redraw( wrap_sdl_image( p->_screen ));
          p->unlock();
       }
@@ -89,6 +94,7 @@ private:
    SDL_TimerID _timer_id;
 
    redraw_handler_t _redraw_handler;
+
 };
 
 } } } } // namespace boost::gil::sdl::detail
