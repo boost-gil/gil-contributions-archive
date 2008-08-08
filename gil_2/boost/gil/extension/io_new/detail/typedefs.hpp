@@ -28,6 +28,23 @@
 #include <boost/gil/extension/toolbox/gray_alpha.hpp>
 #endif // ENABLE_GRAY_ALPHA
 
+namespace boost { namespace gil { 
+
+struct double_zero { static double apply() { return 0.0; } };
+struct double_one  { static double apply() { return 1.0; } };
+
+typedef scoped_channel_value< double, double_zero, double_one > bits64f;
+
+} // namespace gil
+} // namespace boost
+
+namespace boost { 
+
+template<> struct is_floating_point< boost::gil::bits32f > : mpl::true_ {};
+template<> struct is_floating_point< boost::gil::bits64f > : mpl::true_ {};
+
+} // namespace boost
+
 namespace boost { namespace gil { namespace detail {
 
 ///@todo We should use boost::preprocessor here.
@@ -37,7 +54,6 @@ typedef unsigned char byte;
 typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
 typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
 typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;
-
 
 typedef pixel< double, gray_layout_t       > gray64f_pixel_t;
 #ifdef ENABLE_GRAY_ALPHA

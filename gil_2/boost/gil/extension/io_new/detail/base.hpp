@@ -66,9 +66,10 @@ struct rgb_to_luminance_fn< double, double, double, GrayChannelValue > {
    }
 };
 
-
+/*
 template < typename Channel >
 struct bits_per_sample : public mpl::int_< sizeof( Channel )* 8 / byte_to_memunit< Channel >::value > {};
+*/
 
 inline 
 void io_error( const std::string& descr )
@@ -217,15 +218,19 @@ struct is_homogeneous<const packed_pixel<B,C,L> >
 	: detail::is_homogeneous_impl_p<C,typename mpl::at_c<C,0>::type,1,mpl::size<C>::type::value>
 {};
 
-template <typename C, typename L>  
-struct is_homogeneous<pixel<C,L> > 
-	: mpl::true_
-{};
+// pixel
+template < typename C, typename L > struct is_homogeneous< pixel<C,L> > : mpl::true_ {};
+template < typename C, typename L > struct is_homogeneous<const pixel<C,L> > : mpl::true_ {};
+template < typename C, typename L > struct is_homogeneous< pixel<C,L>& > : mpl::true_ {};
+template < typename C, typename L > struct is_homogeneous<const pixel<C,L>& > : mpl::true_ {};
 
-template <typename C, typename L>  
-struct is_homogeneous<const pixel<C,L> > 
-	: mpl::true_
-{};
+// planar pixel reference
+template <typename Channel, typename ColorSpace>
+struct is_homogeneous< planar_pixel_reference< Channel, ColorSpace > > : mpl::true_ {};
+template <typename Channel, typename ColorSpace>
+struct is_homogeneous< const planar_pixel_reference< Channel, ColorSpace > > : mpl::true_ {};
+
+
 
 //! This implementation works for bit_algined_pixel_reference 
 //! with a homegeneous channel layout. 
@@ -418,6 +423,35 @@ struct swap_bits_fn< boost::mpl::true_
    boost::array< unsigned char, 256 > _lookup;
    bool _swap_bits;
 };
+
+
+template< typename Channel >
+int format_value( boost::mpl::true_ ) // is_bit_aligned
+{
+    return SAMPLEFORMAT_UINT;
+}
+
+template< typename Channel >
+int format_value( boost::mpl::false_ ) // is_bit_aligned
+{
+    if( is_unsigned< Channel >::value )
+    {
+        return SAMPLEFORMAT_UINT;
+    }
+    if( is_signed< Channel >::value )
+    {
+        return SAMPLEFORMAT_INT;
+    }
+    else if( is_floating_point< Channel >::value )
+    {
+        return SAMPLEFORMAT_IEEEFP;
+    }
+
+    throw std::runtime_error( "Unkown channel format." );
+
+    return 0;
+}
+
 
 } // namespace detail
 } // namespace gil

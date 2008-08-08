@@ -128,6 +128,50 @@ public:
 
 private:
 
+    // only works for homogeneous image types
+    template< typename View >
+    void apply_impl( View& dst_view )
+    {
+        if( this->_info._photometric_interpretation == PHOTOMETRIC_PALETTE )
+        {
+            /// @todo
+        }
+        else
+        {
+            std::vector< unsigned int > channel_sizes( _info._samples_per_pixel );
+            for( int i = 0; i < _info._samples_per_pixel; ++i )
+            {
+                channel_sizes[i] = _info._bits_per_sample;
+            }
+
+            // In case we only read the image the user's type and 
+            // the tiff type need to compatible. Which means:
+            // color_spaces_are_compatible && channels_are_pairwise_compatible
+            if( !_cc_policy.is_allowed< View >( _info._samples_per_pixel
+                                              , channel_sizes
+                                              , _info._sample_format      ) )
+            {
+                throw std::runtime_error( "Image type aren't compatible." );
+            }
+
+            if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
+            {
+                read_data( dst_view, 0 );
+            }
+            else if( this->_info._planar_configuration == PLANARCONFIG_SEPARATE )
+            {
+                plane_recursion< num_channels< View >::value - 1 >::read_plane( dst_view
+                                                                              , this
+                                                                              );
+            }
+            else
+            {
+             io_error( "Wrong planar configuration setting." );
+            }
+        }
+    }
+
+/*
    template< typename View >
    void apply_impl( View& dst_view )
    {
@@ -366,6 +410,7 @@ private:
       plane_recursion< num_channels< View >::value - 1 >::read_plane( dst_view
                                                                     , this      );
    }
+*/
 
    template< typename Buffer >
    void skip_over_rows( Buffer& buffer

@@ -5,52 +5,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "io_new_vc8", "io_new_vc8.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_test", "unit_test\unit_test.vcproj", "{A5C510F6-DAA5-4830-B339-03D02E4845A7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "io_new", "io_new", "{9602F863-649B-49DD-A040-F27C5001311B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "io_old", "io_old", "{0CA7BCAF-4C86-48CF-81DF-9E25F5DB91F6}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\boost\gil\extension\io_new\jpeg.hpp = ..\..\..\boost\gil\extension\io_new\jpeg.hpp
-		..\..\..\boost\gil\extension\io_new\jpeg_all.hpp = ..\..\..\boost\gil\extension\io_new\jpeg_all.hpp
-		..\..\..\boost\gil\extension\io_new\jpeg_io_old.hpp = ..\..\..\boost\gil\extension\io_new\jpeg_io_old.hpp
-		..\..\..\boost\gil\extension\io_new\jpeg_read.hpp = ..\..\..\boost\gil\extension\io_new\jpeg_read.hpp
-		..\..\..\boost\gil\extension\io_new\jpeg_tags.hpp = ..\..\..\boost\gil\extension\io_new\jpeg_tags.hpp
-		..\..\..\boost\gil\extension\io_new\jpeg_write.hpp = ..\..\..\boost\gil\extension\io_new\jpeg_write.hpp
-		..\..\..\boost\gil\extension\io_new\png.hpp = ..\..\..\boost\gil\extension\io_new\png.hpp
-		..\..\..\boost\gil\extension\io_new\png_all.hpp = ..\..\..\boost\gil\extension\io_new\png_all.hpp
-		..\..\..\boost\gil\extension\io_new\png_io_old.hpp = ..\..\..\boost\gil\extension\io_new\png_io_old.hpp
-		..\..\..\boost\gil\extension\io_new\png_read.hpp = ..\..\..\boost\gil\extension\io_new\png_read.hpp
-		..\..\..\boost\gil\extension\io_new\png_tags.hpp = ..\..\..\boost\gil\extension\io_new\png_tags.hpp
-		..\..\..\boost\gil\extension\io_new\png_write.hpp = ..\..\..\boost\gil\extension\io_new\png_write.hpp
-		..\..\..\boost\gil\extension\io_new\tiff_all.hpp = ..\..\..\boost\gil\extension\io_new\tiff_all.hpp
-		..\..\..\boost\gil\extension\io_new\tiff_io_old.hpp = ..\..\..\boost\gil\extension\io_new\tiff_io_old.hpp
-		..\..\..\boost\gil\extension\io_new\tiff_read.hpp = ..\..\..\boost\gil\extension\io_new\tiff_read.hpp
-		..\..\..\boost\gil\extension\io_new\tiff_tags.hpp = ..\..\..\boost\gil\extension\io_new\tiff_tags.hpp
-		..\..\..\boost\gil\extension\io_new\tiff_write.hpp = ..\..\..\boost\gil\extension\io_new\tiff_write.hpp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "detail", "detail", "{6CDE5674-A859-4298-BF18-C68E07570D9A}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\boost\gil\extension\io_new\detail\base.hpp = ..\..\..\boost\gil\extension\io_new\detail\base.hpp
-		..\..\..\boost\gil\extension\io_new\detail\conversion_policies.hpp = ..\..\..\boost\gil\extension\io_new\detail\conversion_policies.hpp
-		..\..\..\boost\gil\extension\io_new\detail\io.hpp = ..\..\..\boost\gil\extension\io_new\detail\io.hpp
-		..\..\..\boost\gil\extension\io_new\detail\io_device.hpp = ..\..\..\boost\gil\extension\io_new\detail\io_device.hpp
-		..\..\..\boost\gil\extension\io_new\detail\jpeg_io_read.hpp = ..\..\..\boost\gil\extension\io_new\detail\jpeg_io_read.hpp
-		..\..\..\boost\gil\extension\io_new\detail\jpeg_io_write.hpp = ..\..\..\boost\gil\extension\io_new\detail\jpeg_io_write.hpp
-		..\..\..\boost\gil\extension\io_new\detail\jpeg_supported_types.hpp = ..\..\..\boost\gil\extension\io_new\detail\jpeg_supported_types.hpp
-		..\..\..\boost\gil\extension\io_new\detail\png_io_read.hpp = ..\..\..\boost\gil\extension\io_new\detail\png_io_read.hpp
-		..\..\..\boost\gil\extension\io_new\detail\png_io_write.hpp = ..\..\..\boost\gil\extension\io_new\detail\png_io_write.hpp
-		..\..\..\boost\gil\extension\io_new\detail\png_supported_types.hpp = ..\..\..\boost\gil\extension\io_new\detail\png_supported_types.hpp
-		..\..\..\boost\gil\extension\io_new\detail\read_and_convert_image.hpp = ..\..\..\boost\gil\extension\io_new\detail\read_and_convert_image.hpp
-		..\..\..\boost\gil\extension\io_new\detail\read_and_convert_view.hpp = ..\..\..\boost\gil\extension\io_new\detail\read_and_convert_view.hpp
-		..\..\..\boost\gil\extension\io_new\detail\read_image.hpp = ..\..\..\boost\gil\extension\io_new\detail\read_image.hpp
-		..\..\..\boost\gil\extension\io_new\detail\read_image_info.hpp = ..\..\..\boost\gil\extension\io_new\detail\read_image_info.hpp
-		..\..\..\boost\gil\extension\io_new\detail\read_view.hpp = ..\..\..\boost\gil\extension\io_new\detail\read_view.hpp
-		..\..\..\boost\gil\extension\io_new\detail\reader_base.hpp = ..\..\..\boost\gil\extension\io_new\detail\reader_base.hpp
-		..\..\..\boost\gil\extension\io_new\detail\tiff_io.hpp = ..\..\..\boost\gil\extension\io_new\detail\tiff_io.hpp
-		..\..\..\boost\gil\extension\io_new\detail\tiff_io_device.hpp = ..\..\..\boost\gil\extension\io_new\detail\tiff_io_device.hpp
-		..\..\..\boost\gil\extension\io_new\detail\tiff_io_read.hpp = ..\..\..\boost\gil\extension\io_new\detail\tiff_io_read.hpp
-		..\..\..\boost\gil\extension\io_new\detail\tiff_io_write.hpp = ..\..\..\boost\gil\extension\io_new\detail\tiff_io_write.hpp
-		..\..\..\boost\gil\extension\io_new\detail\tiff_supported_read_types.hpp = ..\..\..\boost\gil\extension\io_new\detail\tiff_supported_read_types.hpp
-		..\..\..\boost\gil\extension\io_new\detail\typedefs.hpp = ..\..\..\boost\gil\extension\io_new\detail\typedefs.hpp
-		..\..\..\boost\gil\extension\io_new\detail\write_view.hpp = ..\..\..\boost\gil\extension\io_new\detail\write_view.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\dynamic_io.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\io_error.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\io_error.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\jpeg_dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\jpeg_dynamic_io.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io_private.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io_private.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\png_dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\png_dynamic_io.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\png_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\png_io.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\png_io_private.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\png_io_private.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\tiff_dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\tiff_dynamic_io.hpp
+		..\..\..\..\..\boost\boost\gil\extension\io\tiff_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\tiff_io.hpp
 	EndProjectSection
 EndProject
 Global
@@ -70,8 +36,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{6CDE5674-A859-4298-BF18-C68E07570D9A} = {9602F863-649B-49DD-A040-F27C5001311B}
 	EndGlobalSection
 EndGlobal
