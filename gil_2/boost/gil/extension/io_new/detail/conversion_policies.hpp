@@ -29,9 +29,9 @@ namespace boost{namespace gil{ namespace detail {
 // The following two functions look the same but are different since one is using
 // a pixel_t as template parameter whereas the other is using reference_t.
 template< typename View >
-bool compare_channel_sizes( std::vector< unsigned int > channel_sizes // in bits
-                          , mpl::false_                               // is_bit_aligned
-                          , mpl::true_                                // is_homogeneous
+bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // in bits
+                          , mpl::false_                                      // is_bit_aligned
+                          , mpl::true_                                       // is_homogeneous
                           ) 
 {
     typedef typename View::value_type pixel_t;
@@ -44,9 +44,9 @@ bool compare_channel_sizes( std::vector< unsigned int > channel_sizes // in bits
 
 
 template< typename View >
-bool compare_channel_sizes( std::vector< unsigned int > channel_sizes // in bits
-                          , mpl::true_                                // is_bit_aligned
-                          , mpl::true_                                // is_homogeneous
+bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // in bits
+                          , mpl::true_                                       // is_bit_aligned
+                          , mpl::true_                                       // is_homogeneous
                           ) 
 {
     typedef typename View::reference ref_t;
@@ -78,9 +78,9 @@ struct compare_channel_sizes_fn
 };
 
 template< typename View >
-bool compare_channel_sizes( std::vector< unsigned int > channel_sizes // in bits
-                          , mpl::true_                                // is_bit_aligned
-                          , mpl::false_                               // is_homogeneous
+bool compare_channel_sizes( std::vector< unsigned int >& channel_sizes // in bits
+                          , mpl::true_                                 // is_bit_aligned
+                          , mpl::false_                                // is_homogeneous
                           )
 {
     // loop through all channels and compare
@@ -100,9 +100,9 @@ public:
     typedef void* color_converter_type;
 
     template< typename View >
-    bool is_allowed( unsigned int                      src_n // num channels
-                   , const std::vector< unsigned int > src_s // array of channel sizes
-                   , unsigned int                      src_f // channel format
+    bool is_allowed( unsigned int                       src_n // num channels
+                   , const std::vector< unsigned int >& src_s // array of channel sizes
+                   , unsigned int                       src_f // channel format
                    )
     {
         typedef typename View::value_type pixel_t;
@@ -160,9 +160,9 @@ public:
     CC _cc;
 
     template< typename View >
-    bool is_allowed( unsigned int                      src_n // num channels
-                   , const std::vector< unsigned int > src_s // array of channel sizes
-                   , unsigned int                      src_f // channel format
+    bool is_allowed( unsigned int                       src_n // num channels
+                   , const std::vector< unsigned int >& src_s // array of channel sizes
+                   , unsigned int                       src_f // channel format
                    )
     {
         return true;

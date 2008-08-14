@@ -705,8 +705,7 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-08.tif" );
 
     {
-/*
-        typedef cmyk8_image_t image_t;
+        typedef rgba8_image_t image_t;
         image_t img;
 
         read_image( filename
@@ -718,7 +717,6 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_CMYK_image_test )
                   , color_converted_view< rgb8_pixel_t >( view( img ))
                   , png_tag()
                   );
-*/
     }
 }
 
@@ -728,8 +726,7 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-16.tif" );
 
     {
-/*
-        typedef cmyk16_image_t image_t;
+        typedef rgba16_image_t image_t;
         image_t img;
 
         read_image( filename
@@ -741,7 +738,6 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_CMYK_image_test )
                   , color_converted_view< rgb8_pixel_t >( view( img ))
                   , png_tag()
                   );
-*/
     }
 }
 
@@ -751,8 +747,7 @@ BOOST_AUTO_TEST_CASE( eight_bit_separated_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-planar-08.tif" );
 
     {
-/*
-        typedef cmyk8_planar_image_t image_t;
+        typedef rgba8_planar_image_t image_t;
         image_t img;
 
         read_image( filename
@@ -764,7 +759,6 @@ BOOST_AUTO_TEST_CASE( eight_bit_separated_CMYK_image_test )
                   , color_converted_view< rgb8_pixel_t >( view( img ))
                   , png_tag()
                   );
-*/
     }
 }
 
@@ -774,8 +768,7 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_separated_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-planar-16.tif" );
 
     {
-/*
-        typedef cmyk16_planar_image_t image_t;
+        typedef rgba16_planar_image_t image_t;
         image_t img;
 
         read_image( filename
@@ -787,7 +780,6 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_separated_CMYK_image_test )
                   , color_converted_view< rgb8_pixel_t >( view( img ))
                   , png_tag()
                   );
-*/
     }
 }
 

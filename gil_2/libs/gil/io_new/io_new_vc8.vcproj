@@ -61,10 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="zlib.lib jpeg.lib libpng.lib libtiff.lib"
+				AdditionalDependencies="libjpeg.lib libpngd.lib zlibd.lib libtiff.lib"
 				Version=""
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\Program Files\GnuWin32\lib;C:\boost\stage\lib"
+				AdditionalLibraryDirectories="C:\Program Files\boost\boost_1_35_0\lib;C:\Program Files\GnuWin32\lib;C:\gil\image libs\debug"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
