@@ -151,29 +151,46 @@ static inline FT_Error face_requester(FTC_FaceID id, FT_Library library, void* d
 template <typename view_t>
 struct glyph_layer
 {
-	typedef typename view_t::value_type color_t;
-
 	enum 
 	{ 
-		left = (0x1 << 0),  
-		center = (0x1 << 1),  
-		right = (0x1 << 2),  
-		top = (0x1 << 3),  
-		ftop = (0x1 << 4),  
+		left = (0x1 << 0),
+		center = (0x1 << 1),
+		right = (0x1 << 2),
+		top = (0x1 << 3),
+		ftop = (0x1 << 4),
 		middle = (0x1 << 5),  //when text is aligned adjacent to each other.
 		fmiddle = (0x1 << 6), //when the text is all by itself
-		bottom = (0x1 << 7), 
+		bottom = (0x1 << 7),
 	}; 
+
+	enum
+	{
+		fill = (0x1 << 0),
+		clipspecial = (0x1 << 1),
+		fillexcess =  (0x1 << 2),
+	};
+
+	typedef typename view_t::value_type color_t;
 
 	FTC_Manager manager;
 	std::string str;
 	int id;
 	int size;
 	int align;
+	int options;
+	char special;
 	color_t color;
+	std::vector<glyph> glyphs;
 
-	glyph_layer(FTC_Manager manager, std::string str, int id, int size, int align, color_t color) : 
-		manager(manager), str(str), id(id), size(size), align(align), color(color){}
+	glyph_layer(FTC_Manager manager, std::string str, color_t color, 
+		int id, int size, int align = center|middle, int options = 0, char special = '#') : 
+			manager(manager), str(str), id(id), size(size), align(align), 
+				color(color), options(options), special(special){}
+
+	glyph_layer(FTC_Manager manager, color_t color, 
+		int id, int size, int align = center|middle, int options = 0, char special = '#') : 
+			manager(manager), id(id), size(size), align(align), 
+				color(color), options(options), special(special){}
 
 	void operator()(view_t& view)
 	{
@@ -190,7 +207,6 @@ struct glyph_layer
 		if (error)
 			return;
 		
-		std::vector<glyph> glyphs;
 		for (int n = 0; n < str.size(); ++n)
 			glyphs.push_back(glyph(str[n],asize->face,color));
 
@@ -198,9 +214,69 @@ struct glyph_layer
 		std::transform(glyphs.begin(),glyphs.end(), std::back_inserter(m), make_metric());		
 
 		int mwidth = std::for_each(m.begin(), m.end(), make_width());
+
+		if (options & fill || (options & fillexcess && mwidth > view.width()))
+		{
+			glyphs.clear();
+			for (int n = 0; n < 500; ++n)
+				glyphs.push_back(glyph(special,asize->face,color));
+
+			m.clear();			
+			std::transform(glyphs.begin(),glyphs.end(),
+				std::back_inserter(m), make_metric());
+		}
+
+		if (options & clipspecial)
+		{
+			int pos = -1;
+			for (pos = 0; pos < glyphs.size(); ++pos)
+				if (glyphs[pos].ch == special)
+					break;
+		
+			if (pos >= 1 && pos < glyphs.size())
+			{
+				std::vector<glyph> front,back;
+				std::copy(glyphs.begin(), glyphs.begin()+pos, std::back_inserter(front));
+				std::copy(glyphs.begin()+pos, glyphs.end(), std::back_inserter(back));
+				glyphs.clear();
+		
+				while (true)
+				{
+					std::vector<glyph> glyphs2;
+					std::copy(front.begin(),front.end(), std::back_inserter(glyphs2));	
+					std::copy(back.begin(),back.end(), std::back_inserter(glyphs2));	
+		
+					std::vector<FT_Glyph_Metrics> metrics;		
+					std::transform(glyphs2.begin(),glyphs2.end(),
+						std::back_inserter(metrics), make_metric());
+		
+					std::vector<FT_Glyph_Metrics>::iterator it = 
+						std::find_if(metrics.begin(),metrics.end(),
+							find_last_fitted_glyph(view.width()));
+
+					if (it != metrics.end())
+						front.pop_back();
+					else
+						break;
+				}
+		
+				std::copy(front.begin(), front.end(), std::back_inserter(glyphs));
+				std::copy(back.begin(), back.end(), std::back_inserter(glyphs));
+			}
+		}
+
+		m.clear();		
+		std::transform(glyphs.begin(),glyphs.end(), std::back_inserter(m), make_metric());
+
+		mwidth = std::for_each(m.begin(), m.end(), make_width());
 		int mheight = std::for_each(m.begin(), m.end(), make_height());
 		int gheight = std::for_each(m.begin(), m.end(), make_glyph_height());
 
+		std::vector<FT_Glyph_Metrics>::iterator it = 
+			std::find_if(m.begin(), m.end(), find_last_fitted_glyph(view.width()));
+		int distance = (int)std::distance(it,m.end());
+		glyphs.erase(glyphs.end()-distance,glyphs.end());
+		
 		int x = 0;
 		if (align & center)
 			x = (view.width()-mwidth)/2;
@@ -215,9 +291,50 @@ struct glyph_layer
 		else if (align & bottom)
 			y = view.height()-mheight;
 		
-		std::for_each(glyphs.begin(), glyphs.end(), 
-			render_glyphs<view_t>(subimage_view(view,x,y,mwidth,mheight)));
+		BOOST_ASSERT(!glyphs.empty());
+		view = subimage_view(view,x,y,mwidth,mheight);
+		std::for_each(glyphs.begin(), glyphs.end(), render_glyphs<view_t>(view));
 	}
+};
+
+template <typename view_t>
+struct elipsed_layer
+{
+	typedef typename view_t::value_type color_t;
+
+	FTC_Manager manager;
+	std::string sfront;
+	std::string sback;
+	int id;
+	int size;
+	color_t color;
+	static const int dwidth = 30;
+
+	elipsed_layer(FTC_Manager manager, std::string sfront, std::string sback, color_t color, int id, int size) : 
+			manager(manager), sfront(sfront), sback(sback), id(id), size(size), color(color){}
+
+	void operator()(view_t& view)
+	{
+		typedef glyph_layer<view_t> glyph_layer_t;
+
+		glyph_layer_t lback(manager,sback,color,id,size,
+			glyph_layer_t::right|glyph_layer_t::bottom);
+		view_t vback = view;
+		lback(vback);
+		
+		glyph_layer_t lfront(manager,sfront,color,id,size,
+			glyph_layer_t::left|glyph_layer_t::bottom);
+		int width = view.width()-vback.width()-dwidth;
+		view_t vfront = subimage_view(view,0,0,width,view.height());
+		lfront(vfront);
+
+		glyph_layer_t ldots(manager,color,id,size,	
+			glyph_layer_t::center|glyph_layer_t::bottom,glyph_layer_t::fill,'.');
+		width = view.width()-vfront.width()-vback.width();
+		view_t vdots = subimage_view(view,vfront.width()+5,0,width-10,view.height());		
+		printf("%d,%d,%d,%d\n",vfront.width(),0,vdots.width(),vdots.height());
+		ldots(vdots);
+	}	
 };
 
 #endif

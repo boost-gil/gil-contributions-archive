@@ -15,7 +15,8 @@ struct test1
 		int height = 200;
 		unsigned char* buffer = new unsigned char[width * height * 3];
 		memset(buffer, 255, width * height * 3);	
-		rgb8_view_t view = interleaved_view(width,height,(rgb8_pixel_t*)buffer,width*3);
+		rgb8_view_t view2 = interleaved_view(width,height,(rgb8_pixel_t*)buffer,width*3);
+		rgb8_view_t view = subimage_view(view2,0,0,width-5,height-5);
 
 		const char* fontnames [] = {"/Mini/MINIHHB_.TTF","/Mini/MINXB___.TTF"};
 		int size = sizeof(fontnames)/sizeof(const char*);
@@ -38,9 +39,10 @@ struct test1
 		FTC_Manager_New(library,0,0,0,face_requester,fonts,&manager);
 
 		typedef glyph_layer<rgb8_view_t> glyph_layer_t;
-		glyph_layer_t layer(manager,"Hello",0,12,
-			glyph_layer_t::center|glyph_layer_t::middle,
-				rgb8_view_t::value_type(0,0,0));
+		typedef elipsed_layer<rgb8_view_t> elipsed_layer_t;
+		rgb8_view_t::value_type black(0,0,0);
+//		glyph_layer_t layer(manager,"Hello",black,0,12);
+		elipsed_layer_t layer(manager,"Hello","333.333",black,0,12);
 		layer(view);
 
 		for (int n = 0; n < size; ++n)
