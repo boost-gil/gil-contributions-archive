@@ -1,7 +1,7 @@
 #ifndef _wuline_hpp_
 #define _wuline_hpp_
 
-#include "gil.hpp"
+#include "blend.hpp"
 
 template <typename view_t, typename value_type_t> inline 
 void wuline(const view_t& view, const value_type_t& pixel, 
@@ -88,11 +88,11 @@ void wuline(const view_t& view, const value_type_t& pixel,
 	
 			value_type_t dst = pixel;
 			static_for_each(dst,view(X0,Y0), 
-				alpha_blend((Weighting ^ WeightingComplementMask)));
+				alpha24_blend((Weighting ^ WeightingComplementMask)));
 			view(X0,Y0) = dst;
 
 			dst = pixel;
-			static_for_each(dst,view(X0 + XDir, Y0), alpha_blend(Weighting));
+			static_for_each(dst,view(X0 + XDir, Y0), alpha24_blend(Weighting));
 			view(X0 + XDir, Y0) = dst;
   		}
 
@@ -101,6 +101,7 @@ void wuline(const view_t& view, const value_type_t& pixel,
 	}
 
 	ErrorAdj = ((unsigned long) DeltaY << 16) / (unsigned long) DeltaX;
+
 	while (--DeltaX) 
 	{
 		ErrorAccTemp = ErrorAcc;   
@@ -115,12 +116,12 @@ void wuline(const view_t& view, const value_type_t& pixel,
 
 		value_type_t dst = pixel;
 		static_for_each(dst,view(X0,Y0), 
-			alpha_blend(Weighting ^ WeightingComplementMask));
+			alpha24_blend(Weighting ^ WeightingComplementMask));
 		view(X0,Y0) = dst;
 	
 		dst = pixel;
 		static_for_each(dst,view(X0, Y0 + 1), 
-			alpha_blend(Weighting));
+			alpha24_blend(Weighting));
 		view(X0, Y0 + 1) = dst;
 	}
 
