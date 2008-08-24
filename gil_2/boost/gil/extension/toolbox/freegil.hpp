@@ -11,12 +11,8 @@
 
 struct glyph
 {
-	glyph(char ch, 
-		FT_Face face, 
-		boost::gil::rgb8_pixel_t pixel = boost::gil::rgb8_pixel_t(0,0,0)) :
-		ch(ch), 
-		face(face), 
-		pixel(pixel){}
+	glyph(char ch, FT_Face face, boost::gil::rgb8_pixel_t pixel) :
+		ch(ch), face(face), pixel(pixel){}
 
 	char ch;
 	FT_Face face;
@@ -25,14 +21,13 @@ struct glyph
 
 struct make_metric
 {
-	template <typename glyph_t>
-	FT_Glyph_Metrics operator()(glyph_t glyph)
+	FT_Glyph_Metrics operator()(glyph& glyph)
 	{
-		BOOST_ASSERT(glyph->face);
+		BOOST_ASSERT(glyph.face);
 		int load_flags = FT_LOAD_DEFAULT;
-		int index = FT_Get_Char_Index(glyph->face,glyph->ch);
-		FT_Load_Glyph(glyph->face, index, load_flags);
-		return glyph->face->glyph->metrics;
+		int index = FT_Get_Char_Index(glyph.face,glyph.ch);
+		FT_Load_Glyph(glyph.face, index, load_flags);
+		return glyph.face->glyph->metrics;
 	}
 };
 
@@ -111,22 +106,21 @@ struct find_last_fitted_glyph
 };
 
 template <typename view_t>
-struct render_gray_glyph
+struct render_glyphs
 {
 	int x;
 	const view_t& view;
-	render_gray_glyph(const view_t& view) : view(view), x(0) {}	
+	render_glyphs(const view_t& view) : view(view), x(0) {}	
 
-	template <typename glyph_t>
-	void operator()(glyph_t glyph)
+	void operator()(glyph& glyph)
 	{
 		using namespace boost::gil;
 		
-		FT_GlyphSlot glyphslot = glyph->face->glyph; 
-		FT_Face face = glyph->face;			
+		FT_GlyphSlot glyphslot = glyph.face->glyph; 
+		FT_Face face = glyph.face;			
 
 		int load_flags = FT_LOAD_DEFAULT;
-		int index = FT_Get_Char_Index(face,glyph->ch);
+		int index = FT_Get_Char_Index(face,glyph.ch);
 		FT_Load_Glyph(face, index, load_flags);
 		FT_Render_Glyph(glyphslot, FT_RENDER_MODE_NORMAL);
 
@@ -142,8 +136,87 @@ struct render_gray_glyph
 		gray8c_view_t gray = interleaved_view(width,height,
 			(gray8_pixel_t*)glyphslot->bitmap.buffer,glyphslot->bitmap.width);
 
-		copy<alpha24_blend>(glyph->pixel,gray,subimage_view(view,x,y,width,height));
+		copy<alpha24_blend>(glyph.pixel,gray,subimage_view(view,x,y,width,height));
 		x += xadvance; 
+	}
+};
+
+static inline FT_Error face_requester(FTC_FaceID id, FT_Library library, void* data, FT_Face* face)
+{
+	char** paths = (char**)data;
+	char* path = paths[(long)id]; 
+	return FT_New_Face(library, path, 0, face);
+}
+
+template <typename view_t>
+struct glyph_layer
+{
+	typedef typename view_t::value_type color_t;
+
+	enum 
+	{ 
+		left = (0x1 << 0),  
+		center = (0x1 << 1),  
+		right = (0x1 << 2),  
+		top = (0x1 << 3),  
+		ftop = (0x1 << 4),  
+		middle = (0x1 << 5),  //when text is aligned adjacent to each other.
+		fmiddle = (0x1 << 6), //when the text is all by itself
+		bottom = (0x1 << 7), 
+	}; 
+
+	FTC_Manager manager;
+	std::string str;
+	int id;
+	int size;
+	int align;
+	color_t color;
+
+	glyph_layer(FTC_Manager manager, std::string str, int id, int size, int align, color_t color) : 
+		manager(manager), str(str), id(id), size(size), align(align), color(color){}
+
+	void operator()(view_t& view)
+	{
+		FTC_ScalerRec_ scaler;
+		scaler.face_id = (FTC_FaceID)id;
+		scaler.width = size;
+		scaler.height = size;
+		scaler.pixel = 1;
+		scaler.x_res = 0;
+		scaler.y_res = 0;
+		
+		FT_Size asize;
+		FT_Error error = FTC_Manager_LookupSize(manager, &scaler, &asize);
+		if (error)
+			return;
+		
+		std::vector<glyph> glyphs;
+		for (int n = 0; n < str.size(); ++n)
+			glyphs.push_back(glyph(str[n],asize->face,color));
+
+		std::vector<FT_Glyph_Metrics> m;			
+		std::transform(glyphs.begin(),glyphs.end(), std::back_inserter(m), make_metric());		
+
+		int mwidth = std::for_each(m.begin(), m.end(), make_width());
+		int mheight = std::for_each(m.begin(), m.end(), make_height());
+		int gheight = std::for_each(m.begin(), m.end(), make_glyph_height());
+
+		int x = 0;
+		if (align & center)
+			x = (view.width()-mwidth)/2;
+		else if (align & right)
+			x = view.width()-mwidth;
+	
+		int y = 0;
+		if (align & middle)
+			y = (view.height()-mheight-gheight)/2;
+		else if (align & fmiddle)
+			y = (view.height()-mheight)/2;
+		else if (align & bottom)
+			y = view.height()-mheight;
+		
+		std::for_each(glyphs.begin(), glyphs.end(), 
+			render_glyphs<view_t>(subimage_view(view,x,y,mwidth,mheight)));
 	}
 };
 

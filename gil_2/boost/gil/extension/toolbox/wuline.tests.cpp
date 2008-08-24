@@ -15,8 +15,7 @@ struct test1
 		int height = 200;
 		unsigned char* buffer = new unsigned char[width * height * 3];
 		memset(buffer, 255, width * height * 3);	
-		boost::gil::rgb8_view_t view = boost::gil::
-			interleaved_view(width,height,(rgb8_pixel_t*)buffer,width*3);
+		rgb8_view_t view = interleaved_view(width,height,(rgb8_pixel_t*)buffer,width*3);
 
 		double phase = 0;
 		for (double theta = phase; theta < 360 + phase; theta += 10)
