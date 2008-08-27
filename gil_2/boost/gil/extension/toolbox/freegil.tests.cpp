@@ -38,12 +38,10 @@ struct test1
 		FT_Init_FreeType(&library);
 		FTC_Manager_New(library,0,0,0,face_requester,fonts,&manager);
 
-		typedef glyph_layer<rgb8_view_t> glyph_layer_t;
-		typedef elipsed_layer<rgb8_view_t> elipsed_layer_t;
+		typedef layer::text<rgb8_view_t> text_t;
 		rgb8_view_t::value_type black(0,0,0);
-//		glyph_layer_t layer(manager,"Hello",black,0,12);
-		elipsed_layer_t layer(manager,"Hello","333.333",black,0,12);
-		layer(view);
+		text_t text(manager,"Hello",black,0,12);
+		text(view);
 
 		for (int n = 0; n < size; ++n)
 			free(fonts[n]);
