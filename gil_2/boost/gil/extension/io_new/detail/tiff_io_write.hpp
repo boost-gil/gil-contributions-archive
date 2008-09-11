@@ -55,7 +55,7 @@ template< typename Channel
         , typename Layout
         , bool Mutable
         >
-struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< uint8_t
+struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< unsigned char
                                                                                                  , Channel
                                                                                                  , Layout
                                                                                                  , Mutable
@@ -146,7 +146,6 @@ private:
 
         // get the type of the first channel (heterogeneous pixels might be broken for now!)
         typedef typename channel_traits< typename element_type< pixel_t >::type >::value_type channel_t;
-        typedef my_interleaved_pixel_iterator_type_from_pixel_reference<typename View::reference>::type x_iterator;
 
         // write dimensions
         tiff_image_width::type width   = src_view.width();
@@ -187,26 +186,68 @@ private:
         // write rows per strip
         _io_dev.set_property<tiff_rows_per_strip>( _io_dev.get_default_strip_size() );
 
-        // write the data
-        std::size_t row_size_in_bytes = (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8;
+        write_data( src_view
+              , info
+              , (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8
+              , is_bit_aligned< pixel_t >::type()
+              );
+    }
 
+    template< typename View >
+    void write_data( const View&   src_view
+                   , const info_t& info
+                   , std::size_t   row_size_in_bytes
+                   , const mpl::true_&    // bit_aligned
+                   )
+    {
         std::vector< unsigned char > row( row_size_in_bytes );
+
+        typedef typename View::x_iterator x_it_t;
+        x_it_t row_it = x_it_t( &(*row.begin()));
+
+        for( View::y_coord_t y = 0; y < src_view.height(); ++y )
+        {
+            std::copy( src_view.row_begin( y )
+                     , src_view.row_end( y )
+                     , row_it
+                     );
+
+            _io_dev.write_scaline( row
+                                 , y
+                                 , 0
+                                 );
+
+            // @todo: do optional bit swapping here if you need to...
+        }
+    }
+
+    template< typename View >
+    void write_data( const View&   src_view
+                   , const info_t& info
+                   , std::size_t   row_size_in_bytes
+                   , const mpl::false_&    // bit_aligned
+                   )
+    {
+        std::vector< unsigned char > row( row_size_in_bytes );
+
+        typedef my_interleaved_pixel_iterator_type_from_pixel_reference< typename View::reference
+                                                                       >::type x_iterator;
 
         x_iterator row_it = x_iterator( &(*row.begin()));
 
         for( View::y_coord_t y = 0; y < src_view.height(); ++y )
         {
-         std::copy( src_view.row_begin( y )
-                  , src_view.row_end( y )
-                  , row_it
-                  );
+            std::copy( src_view.row_begin( y )
+                     , src_view.row_end( y )
+                     , row_it
+                     );
 
-         _io_dev.write_scaline( row
-                              , y
-                              , 0
-                              );
+            _io_dev.write_scaline( row
+                                 , y
+                                 , 0
+                                 );
 
-          // @todo: do optional bit swapping here if you need to...
+            // @todo: do optional bit swapping here if you need to...
         }
     }
 

@@ -108,12 +108,13 @@ public:
                      , std::ptrdiff_t row
                      , tsample_t      plane   )
     {
-      io_error_if( TIFFReadScanline( _tiff_file.get()
-                                   , &buffer.front()
-                                   , (uint32) row
-                                   , plane           ) == -1
-                  , "Read error."                             );
-   }
+        io_error_if( TIFFReadScanline( _tiff_file.get()
+                                     , &buffer.front()
+                                     , (uint32) row
+                                     , plane           ) == -1
+                   , "Read error."
+                   );
+    }
 
    bool are_bytes_swapped()
    {

@@ -52,6 +52,8 @@ bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // 
     typedef typename View::reference ref_t;
 
     typedef channel_traits< element_type< ref_t >::type >::value_type channel_t;
+    channel_t c;
+
     unsigned int s = boost::gil::detail::unsigned_integral_num_bits< channel_t >::value;
 
     return ( s == channel_sizes[0] );

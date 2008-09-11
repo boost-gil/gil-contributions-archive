@@ -705,7 +705,7 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-08.tif" );
 
     {
-        typedef rgba8_image_t image_t;
+        typedef cmyk8_image_t image_t;
         image_t img;
 
         read_image( filename
