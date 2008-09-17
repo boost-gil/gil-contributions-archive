@@ -200,11 +200,12 @@ private:
             >
     void read_rows( const View& view )
     {
-        io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
-                                                            , typename View::value_type
-                                                            >::type::value
-                    , "User provided view has incorrect color space or channel type."
-                    );
+        if( !_cc_policy.is_allowed< View >( _info._num_channels
+                                          , _info._bit_depth
+                                          , _info._sample_format      ) )
+        {
+            throw std::runtime_error( "Image type aren't compatible." );
+        }
 
         row_buffer_helper<ImagePixel> buffer( static_cast<int>( this->_info._width ));
 

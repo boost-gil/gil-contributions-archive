@@ -35,6 +35,7 @@ extern "C" {
 #include "reader_base.hpp"
 #include "tiff_io_device.hpp"
 #include "tiff_supported_read_types.hpp"
+#include "tiff_io_is_allowed.hpp"
 
 
 namespace boost { namespace gil { namespace detail {
@@ -134,7 +135,26 @@ private:
     {
         if( this->_info._photometric_interpretation == PHOTOMETRIC_PALETTE )
         {
-            /// @todo
+            // Steps:
+            // 1. Read indices. It's an array of grayX_pixel_t.
+            // 2. Read palette. It's an array of rgb16_pixel_t.
+            // 3. ??? Create virtual image or transform the two arrays
+            //    into a rgb16_image_t object. The latter might
+            //    be a good first solution.
+
+            switch( this->_info._bits_per_sample )
+            {
+                case 1:  { read_palette_image< gray1_image_t  >( dst_view ); break; }
+                case 2:  { read_palette_image< gray2_image_t  >( dst_view ); break; }
+                case 4:  { read_palette_image< gray4_image_t  >( dst_view ); break; }
+                case 8:  { read_palette_image< gray8_image_t  >( dst_view ); break; }
+                case 16: { read_palette_image< gray16_image_t >( dst_view ); break; }
+
+                default: { io_error( "Not supported palette " ); }
+            }
+
+            return;
+
         }
         else
         {
@@ -147,9 +167,14 @@ private:
             // In case we only read the image the user's type and 
             // the tiff type need to compatible. Which means:
             // color_spaces_are_compatible && channels_are_pairwise_compatible
-            if( !_cc_policy.is_allowed< View >( _info._samples_per_pixel
-                                              , channel_sizes
-                                              , _info._sample_format      ) )
+
+            if( !is_allowed< View >( _info._samples_per_pixel
+                                   , channel_sizes
+                                   , _info._sample_format
+                                   , boost::is_same< ConversionPolicy
+                                                   , read_and_no_convert
+                                                   >::type()
+                                   ))
             {
                 throw std::runtime_error( "Image type aren't compatible." );
             }
@@ -166,42 +191,10 @@ private:
             }
             else
             {
-             io_error( "Wrong planar configuration setting." );
+                io_error( "Wrong planar configuration setting." );
             }
         }
     }
-
-/*
-   template< typename View >
-   void apply_impl( View& dst_view )
-   {
-      if( this->_info._photometric_interpretation == PHOTOMETRIC_PALETTE )
-      {
-         // Steps:
-         // 1. Read indices. It's an array of grayX_pixel_t.
-         // 2. Read palette. It's an array of rgb16_pixel_t.
-         // 3. ??? Create virtual image or transform the two arrays
-         //    into a rgb16_image_t object. The latter might
-         //    be a good first solution.
-
-         unsigned int num_colors = 0;
-         switch( this->_info._bits_per_sample )
-         {
-            case 1:  { read_palette_image< gray1_image_t  >( dst_view ); break; }
-            case 2:  { read_palette_image< gray2_image_t  >( dst_view ); break; }
-            case 4:  { read_palette_image< gray4_image_t  >( dst_view ); break; }
-            case 8:  { read_palette_image< gray8_image_t  >( dst_view ); break; }
-            case 16: { read_palette_image< gray16_image_t >( dst_view ); break; }
-
-            default: { io_error( "Not supported palette " ); }
-         }
-
-         return;
-      } //if
-
-      // tiff image is not a palette image
-      read_samples_per_pixel( dst_view );
-   }
 
    template< typename PaletteImage
            , typename View
@@ -211,7 +204,7 @@ private:
       PaletteImage indices( this->_info._width  - this->_top_left.x
                           , this->_info._height - this->_top_left.y );
 
-      read_samples_per_pixel( view( indices ));
+      read_data( view( indices ), 0 );
 
       read_palette_image( dst_view
                         , view( indices )
@@ -270,147 +263,6 @@ private:
    {
       io_error( "User supplied image type must be rgb16_image_t." );
    }
-
-   template< typename View >
-   void read_samples_per_pixel( const View& dst_view )
-   {
-      switch( this->_info._samples_per_pixel )
-      {
-         case 1: { read_bits_per_sample< 1 >( dst_view ); break; }
-         case 2: { read_bits_per_sample< 2 >( dst_view ); break; }
-         case 3: { read_bits_per_sample< 3 >( dst_view ); break; }
-         case 4: { read_bits_per_sample< 4 >( dst_view ); break; }
-
-         default: { io_error( "Samples_Per_Pixel not supported." ); }
-      }
-   }
-
-   template< int      SamplesPerPixel
-           , typename View
-           >
-   void read_bits_per_sample( const View& dst_view )
-   {
-      switch( this->_info._bits_per_sample )
-      {
-         case 1 : { read_sample_format< SamplesPerPixel, 1  >( dst_view ); break; }
-         case 2 : { read_sample_format< SamplesPerPixel, 2  >( dst_view ); break; }
-         case 4 : { read_sample_format< SamplesPerPixel, 4  >( dst_view ); break; }
-         case 6 : { read_sample_format< SamplesPerPixel, 6  >( dst_view ); break; }
-         case 8 : { read_sample_format< SamplesPerPixel, 8  >( dst_view ); break; }
-         case 10: { read_sample_format< SamplesPerPixel, 10 >( dst_view ); break; }
-         case 12: { read_sample_format< SamplesPerPixel, 12 >( dst_view ); break; }
-         case 14: { read_sample_format< SamplesPerPixel, 14 >( dst_view ); break; }
-         case 16: { read_sample_format< SamplesPerPixel, 16 >( dst_view ); break; }
-         case 24: { read_sample_format< SamplesPerPixel, 24 >( dst_view ); break; }
-         case 32: { read_sample_format< SamplesPerPixel, 32 >( dst_view ); break; }
-         case 64: { read_sample_format< SamplesPerPixel, 64 >( dst_view ); break; }
-
-         default: { io_error( "Bits_Per_Sample not supported." ); }
-      }
-   }
-
-   template< int      SamplesPerPixel
-           , int      BitsPerSample
-           , typename View
-           >
-   void read_sample_format( const View& dst_view )
-   {
-      switch( this->_info._sample_format )
-      {
-         case SAMPLEFORMAT_UINT:   { read_planar< SamplesPerPixel, BitsPerSample, 1 >( dst_view ); break; }
-         case SAMPLEFORMAT_INT:    { read_planar< SamplesPerPixel, BitsPerSample, 2 >( dst_view ); break; }
-         case SAMPLEFORMAT_IEEEFP: { read_planar< SamplesPerPixel, BitsPerSample, 3 >( dst_view ); break; }
-
-         default: { io_error( "Sample format not supported." ); }
-      }
-   }
-
-   template< int      SamplesPerPixel
-           , int      BitsPerSample
-           , int      SampleFormat
-           , typename View
-           >
-   void read_planar( const View& dst_view )
-   {
-      if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
-      {
-         typedef tiff_format< SamplesPerPixel
-                            , BitsPerSample
-                            , SampleFormat
-                            , false
-                            > format_t;
-
-         typedef format_t::type image_t;
-         typedef is_same< image_t, not_supported >::type not_supported_t;
-
-         read_rows_interleaved< image_t >( dst_view
-                                         , not_supported_t() );
-      }
-      else if( this->_info._planar_configuration == PLANARCONFIG_SEPARATE )
-      {
-        typedef tiff_format< SamplesPerPixel
-                           , BitsPerSample
-                           , SampleFormat
-                           , true
-                           > format_t;
-
-         typedef format_t::type image_t;
-         typedef is_same< image_t, not_supported >::type not_supported_t;
-
-         read_rows_planar< image_t >( dst_view
-                                    , not_supported_t() );
-      }
-      else
-      {
-         io_error( "Wrong planar configuration setting." );
-      }
-   }
-
-   // specializations for unspecified image types.
-   template< typename Tiff_Image, typename View > void read_rows_interleaved( View& dst_view, mpl::true_ ) { io_error( "Tiff image type isn't supported." ); }
-   template< typename Tiff_Image, typename View > void read_rows_planar( View& dst_view, mpl::true_ ) { io_error( "Tiff image type isn't supported." ); }
-
-   template< typename Tiff_Image
-           , typename View
-           >
-   void read_rows_interleaved( View&       dst_view
-                             , mpl::false_ // unspecified image type
-                             )
-   {
-      typedef typename Tiff_Image::view_t      tiff_view_t;
-      typedef typename tiff_view_t::value_type tiff_pixel_t;
-
-      typedef typename View::value_type user_pixel_t;
-
-      io_error_if( !ConversionPolicy::template is_allowed< tiff_pixel_t
-                                                         , user_pixel_t 
-                                                         >::type::value
-                 , "User provided view has incorrect color space or channel type." );
-
-      read_data( dst_view, 0 );
-   }
-
-   template< typename Tiff_Image
-           , typename View
-           >
-   void read_rows_planar( View&       dst_view
-                        , mpl::false_ // unspecified image type
-                        )
-   {
-      typedef typename Tiff_Image::view_t      tiff_view_t;
-      typedef typename tiff_view_t::value_type tiff_pixel_t;
-
-      typedef typename View::value_type user_pixel_t;
-
-      io_error_if( !ConversionPolicy::template is_allowed< tiff_pixel_t
-                                                         , user_pixel_t 
-                                                         >::type::value
-                 , "User provided view has incorrect color space or channel type." );
-
-      plane_recursion< num_channels< View >::value - 1 >::read_plane( dst_view
-                                                                    , this      );
-   }
-*/
 
    template< typename Buffer >
    void skip_over_rows( Buffer& buffer
