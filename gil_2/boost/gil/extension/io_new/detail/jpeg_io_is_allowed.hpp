@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_JPEG_IS_SUPPORTED_HPP
-#define BOOST_GIL_EXTENSION_IO_JPEG_IS_SUPPORTED_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_JPEG_IS_ALLOWED_HPP
+#define BOOST_GIL_EXTENSION_IO_JPEG_IS_ALLOWED_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
@@ -21,10 +21,23 @@
 
 namespace boost { namespace gil { namespace detail {
 
+template< typename View >
+bool is_allowed( boost::mpl::true_ // is read_and_no_convert
+               )
+{
+    return true;
+}
+
+template< typename View >
+bool is_allowed( boost::mpl::false_ // is read_and_convert
+               )
+{
+    return true;
+}
 
 } // namespace detail
 } // namespace gil
 } // namespace boost
 
 
-#endif // BOOST_GIL_EXTENSION_IO_JPEG_IS_SUPPORTED_HPP
+#endif // BOOST_GIL_EXTENSION_IO_JPEG_IS_ALLOWED_HPP

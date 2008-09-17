@@ -1,5 +1,10 @@
-// tiff_test.cpp : Defines the entry point for the console application.
-//
+/**************************************************
+ *
+ * This test file will only test the old library's
+ * interface. It's more of a compile time test
+ * than a runtime test.
+ *
+ **************************************************/
 
 #include "stdafx.h"
 

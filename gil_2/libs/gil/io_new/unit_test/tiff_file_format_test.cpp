@@ -1,10 +1,13 @@
-// tiff_test.cpp : Defines the entry point for the console application.
-//
+/**************************************************
+ *
+ * This test file will read and write various
+ * tiff formats. 
+ *
+ **************************************************/
 
 #include "stdafx.h"
 
-#include <boost/gil/extension/io_new/tiff_read.hpp>
-#include <boost/gil/extension/io_new/png_write.hpp>
+#include <boost/gil/extension/io_new/tiff_all.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -29,9 +32,9 @@ BOOST_AUTO_TEST_CASE( two_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test4.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test4.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -50,9 +53,9 @@ BOOST_AUTO_TEST_CASE( four_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test5.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test5.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -71,9 +74,9 @@ BOOST_AUTO_TEST_CASE( six_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test6.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test6.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -92,9 +95,9 @@ BOOST_AUTO_TEST_CASE( eight_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test7.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test7.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -113,9 +116,9 @@ BOOST_AUTO_TEST_CASE( ten_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test8.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test8.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -134,9 +137,9 @@ BOOST_AUTO_TEST_CASE( twelve_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test9.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test9.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -155,9 +158,9 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test10.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test10.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -176,9 +179,9 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test11.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test11.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -197,9 +200,9 @@ BOOST_AUTO_TEST_CASE( twentyfour_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test12.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test12.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -218,9 +221,9 @@ BOOST_AUTO_TEST_CASE( thirtytwo_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test13.png"
-                  , color_converted_view< gray8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test13.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -239,9 +242,9 @@ BOOST_AUTO_TEST_CASE( four_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test13.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test14.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -260,9 +263,9 @@ BOOST_AUTO_TEST_CASE( sixteen_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test14.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test15.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -281,9 +284,9 @@ BOOST_AUTO_TEST_CASE( twohundred_twenty_five_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test15.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test16.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -302,9 +305,9 @@ BOOST_AUTO_TEST_CASE( sixtyfive_thousand_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test16.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test17.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -323,9 +326,9 @@ BOOST_AUTO_TEST_CASE( two_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test17.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test18.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -344,9 +347,9 @@ BOOST_AUTO_TEST_CASE( four_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test18.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test19.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -365,9 +368,9 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test19.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test20.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -386,9 +389,9 @@ BOOST_AUTO_TEST_CASE( ten_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test20.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test21.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -407,9 +410,9 @@ BOOST_AUTO_TEST_CASE( twelve_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test21.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test22.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -428,9 +431,9 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test22.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test23.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -449,9 +452,9 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test23.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test24.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -470,9 +473,9 @@ BOOST_AUTO_TEST_CASE( twenty_four_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test24.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test25.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -491,9 +494,9 @@ BOOST_AUTO_TEST_CASE( thirty_two_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test25.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test26.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -504,7 +507,6 @@ BOOST_AUTO_TEST_CASE( two_bit_seperated_RGB_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-planar-02.tif" );
 
     {
-/*
         typedef bit_aligned_image3_type< 2, 2, 2, rgb_layout_t >::type image_t;
         image_t img;
 
@@ -513,11 +515,10 @@ BOOST_AUTO_TEST_CASE( two_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test26.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test27.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
-*/
     }
 }
 
@@ -527,7 +528,6 @@ BOOST_AUTO_TEST_CASE( four_bit_seperated_RGB_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-planar-04.tif" );
 
     {
-/*
         typedef bit_aligned_image3_type< 4, 4, 4, rgb_layout_t >::type image_t;
         image_t img;
 
@@ -536,11 +536,10 @@ BOOST_AUTO_TEST_CASE( four_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test27.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test28.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
-*/
     }
 }
 
@@ -558,9 +557,9 @@ BOOST_AUTO_TEST_CASE( eight_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test28.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test29.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -571,7 +570,6 @@ BOOST_AUTO_TEST_CASE( ten_bit_seperated_RGB_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-planar-10.tif" );
 
     {
-/*
         typedef bit_aligned_image3_type< 10, 10, 10, rgb_layout_t >::type image_t;
         image_t img;
 
@@ -580,11 +578,10 @@ BOOST_AUTO_TEST_CASE( ten_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test29.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test30.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
-*/
     }
 }
 
@@ -603,9 +600,9 @@ BOOST_AUTO_TEST_CASE( twelve_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test30.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test31.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
 */
     }
@@ -626,9 +623,9 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test31.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test32.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
 */
     }
@@ -648,9 +645,9 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test32.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test33.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -670,9 +667,9 @@ BOOST_AUTO_TEST_CASE( twenty_four_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test33.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test34.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
 */
     }
@@ -692,9 +689,9 @@ BOOST_AUTO_TEST_CASE( thirty_two_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test34.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test35.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -713,9 +710,9 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test35.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test36.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -726,7 +723,7 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-16.tif" );
 
     {
-        typedef rgba16_image_t image_t;
+        typedef cmyk16_image_t image_t;
         image_t img;
 
         read_image( filename
@@ -734,9 +731,9 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test36.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test37.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -747,7 +744,7 @@ BOOST_AUTO_TEST_CASE( eight_bit_separated_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-planar-08.tif" );
 
     {
-        typedef rgba8_planar_image_t image_t;
+        typedef cmyk8_planar_image_t image_t;
         image_t img;
 
         read_image( filename
@@ -755,9 +752,9 @@ BOOST_AUTO_TEST_CASE( eight_bit_separated_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test37.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test38.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }
@@ -768,7 +765,7 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_separated_CMYK_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-planar-16.tif" );
 
     {
-        typedef rgba16_planar_image_t image_t;
+        typedef cmyk16_planar_image_t image_t;
         image_t img;
 
         read_image( filename
@@ -776,9 +773,9 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_separated_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\png\\test38.png"
-                  , color_converted_view< rgb8_pixel_t >( view( img ))
-                  , png_tag()
+        write_view( "..\\test\\tiff\\test39.tif"
+                  , view( img )
+                  , tiff_tag()
                   );
     }
 }

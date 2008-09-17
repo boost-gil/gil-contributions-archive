@@ -29,6 +29,7 @@
 #include "typedefs.hpp"
 #include "png_io_base.hpp"
 #include "png_supported_types.hpp"
+#include "png_io_is_allowed.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -200,9 +201,10 @@ private:
             >
     void read_rows( const View& view )
     {
-        if( !_cc_policy.is_allowed< View >( _info._num_channels
-                                          , _info._bit_depth
-                                          , _info._sample_format      ) )
+        if( !is_allowed< View >( boost::is_same< ConversionPolicy
+                                               , read_and_no_convert
+                                               >::type()
+                               ))
         {
             throw std::runtime_error( "Image type aren't compatible." );
         }

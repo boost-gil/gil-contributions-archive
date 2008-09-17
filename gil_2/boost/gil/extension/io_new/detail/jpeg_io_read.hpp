@@ -21,7 +21,8 @@
 
 #include <vector>
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
-#include <boost/gil/extension/io_new/detail/jpeg_supported_types.hpp>
+#include "jpeg_supported_types.hpp"
+#include "jpeg_io_is_allowed.hpp"
 
 #include "base.hpp"
 #include "reader_base.hpp"
@@ -237,12 +238,13 @@ private:
             >
     void read_rows( const View& view )
     {
-        io_error_if( ! ConversionPolicy::template is_allowed< ImagePixel
-                                                            , typename View::value_type
-                                                            >::type::value
-                   , "User provided view has incorrect color space or channel type."
-                   );
-
+        if( !is_allowed< View >( boost::is_same< ConversionPolicy
+                                               , read_and_no_convert
+                                               >::type()
+                               ))
+        {
+            throw std::runtime_error( "Image type aren't compatible." );
+        }
       
       std::vector<ImagePixel> buffer( this->_info._width );
 
