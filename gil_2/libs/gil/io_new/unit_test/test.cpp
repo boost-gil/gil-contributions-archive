@@ -17,7 +17,7 @@ typedef tiff_tag tag_t;
 
 namespace tiff_test {
 
-BOOST_AUTO_TEST_CASE( read_image_info_test )
+BOOST_AUTO_TEST_CASE( quicktest )
 {
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-06.tif" );
 

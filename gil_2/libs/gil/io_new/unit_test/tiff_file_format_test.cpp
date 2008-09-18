@@ -591,7 +591,6 @@ BOOST_AUTO_TEST_CASE( twelve_bit_seperated_RGB_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-planar-12.tif" );
 
     {
-/*
         typedef bit_aligned_image3_type< 12, 12, 12, rgb_layout_t >::type image_t;
         image_t img;
 
@@ -604,7 +603,6 @@ BOOST_AUTO_TEST_CASE( twelve_bit_seperated_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
-*/
     }
 }
 
@@ -614,7 +612,6 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_seperated_RGB_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-planar-14.tif" );
 
     {
-/*
         typedef bit_aligned_image3_type< 14, 14, 14, rgb_layout_t >::type image_t;
         image_t img;
 
@@ -627,7 +624,6 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_seperated_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
-*/
     }
 }
 
@@ -658,7 +654,6 @@ BOOST_AUTO_TEST_CASE( twenty_four_bit_seperated_RGB_image_test )
     std::string filename( "..\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-planar-24.tif" );
 
     {
-/*
         typedef bit_aligned_image3_type< 24, 24, 24, rgb_layout_t >::type image_t;
         image_t img;
 
@@ -671,7 +666,6 @@ BOOST_AUTO_TEST_CASE( twenty_four_bit_seperated_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
-*/
     }
 }
 
