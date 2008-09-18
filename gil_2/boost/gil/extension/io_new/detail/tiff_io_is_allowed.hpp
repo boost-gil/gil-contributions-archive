@@ -21,6 +21,32 @@
 
 namespace boost { namespace gil { namespace detail {
 
+template< typename Channel >
+int format_value( boost::mpl::true_ ) // is_bit_aligned
+{
+    return SAMPLEFORMAT_UINT;
+}
+
+template< typename Channel >
+int format_value( boost::mpl::false_ ) // is_bit_aligned
+{
+    if( is_unsigned< Channel >::value )
+    {
+        return SAMPLEFORMAT_UINT;
+    }
+    if( is_signed< Channel >::value )
+    {
+        return SAMPLEFORMAT_INT;
+    }
+    else if( is_floating_point< Channel >::value )
+    {
+        return SAMPLEFORMAT_IEEEFP;
+    }
+
+    throw std::runtime_error( "Unkown channel format." );
+
+    return 0;
+}
 
 // The following two functions look the same but are different since one is using
 // a pixel_t as template parameter whereas the other is using reference_t.

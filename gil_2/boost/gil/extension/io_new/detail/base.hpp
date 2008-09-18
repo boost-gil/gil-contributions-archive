@@ -33,6 +33,7 @@
 #include <boost/gil/bit_aligned_pixel_iterator.hpp>
 
 #include "typedefs.hpp"
+#include "gil_extensions.hpp"
 
 namespace boost { namespace gil {
 
@@ -54,23 +55,6 @@ template<typename FormatTag> struct image_write_info;
 
 namespace detail {
 
-// - performance specialization double
-// - to eliminate compiler warning 4244
-template <typename GrayChannelValue>
-struct rgb_to_luminance_fn< double, double, double, GrayChannelValue > {
-    GrayChannelValue operator()( const double& red
-                               , const double& green
-                               , const double& blue    ) const
-   {
-      return channel_convert<GrayChannelValue>( red * 0.30 + green * 0.59 + blue * 0.11 );
-   }
-};
-
-/*
-template < typename Channel >
-struct bits_per_sample : public mpl::int_< sizeof( Channel )* 8 / byte_to_memunit< Channel >::value > {};
-*/
-
 inline 
 void io_error( const std::string& descr )
 {
@@ -83,22 +67,6 @@ void io_error_if( bool expr, const std::string& descr )
    if( expr ) 
       io_error( descr );
 }
-
-template< typename PixelRefT>
-struct is_bit_aligned : mpl::false_{};
-
-template <typename B, typename C, typename L, bool M>  
-struct is_bit_aligned<bit_aligned_pixel_reference<B,C,L,M> > : mpl::true_{};
-
-template <typename B, typename C, typename L, bool M>  
-struct is_bit_aligned<const bit_aligned_pixel_reference<B,C,L,M> > : mpl::true_{};
-
-template <typename B, typename C, typename L>  
-struct is_bit_aligned<packed_pixel<B,C,L> > : mpl::true_{};
-
-template <typename B, typename C, typename L>  
-struct is_bit_aligned<const packed_pixel<B,C,L> > : mpl::true_{};
-
 
 inline
 unsigned char swap_bits( unsigned char c )
@@ -113,162 +81,6 @@ unsigned char swap_bits( unsigned char c )
 
    return result;
 }
-
-
-template <typename B, typename C, typename L, bool M>  
-struct gen_chan_ref
-{
-	typedef packed_dynamic_channel_reference<B,mpl::at_c<C,0>::type::value,M> type;
-};
-
-template<typename C,typename CMP, int Next, int Last>
-struct is_homogeneous_impl;
-
-
-template<typename C,typename CMP, int Last>
-struct is_homogeneous_impl<C,CMP,Last,Last> : mpl::true_{};
-
-
-template<typename C,typename CMP, int Next, int Last>
-struct is_homogeneous_impl
-	: mpl::and_<
-		is_homogeneous_impl<C,CMP,Next+1,Last>,
-		is_same<CMP,typename mpl::at_c<C,Next>::type> 
-		> {};
-
-} // namespace boost::gil::detail
-
-template <typename P>
-struct is_homogeneous;
-
-template <typename B, typename C, typename L, bool M>  
-struct is_homogeneous<bit_aligned_pixel_reference<B,C,L,M> > 
-	: detail::is_homogeneous_impl<C,typename mpl::at_c<C,0>::type,1,mpl::size<C>::type::value>
-{};
-
-template <typename B, typename C, typename L, bool M>  
-struct is_homogeneous<const bit_aligned_pixel_reference<B,C,L,M> > 
-	: detail::is_homogeneous_impl<C,typename mpl::at_c<C,0>::type,1,mpl::size<C>::type::value>
-{};
-
-
-namespace detail
-{
-
-template<typename A, typename B>
-struct is_similar
-    : mpl::false_
-{};
-
-template<typename A>
-struct is_similar<A,A>
-    : mpl::true_
-{};
-
-template<typename B,int I, int S, bool M, int I2>
-struct is_similar<packed_channel_reference<B,I,S,M>, packed_channel_reference<B,I2,S,M> >
-    : mpl::true_
-{};
-
-template<typename C,typename CMP, int I,int Last>
-struct is_homogeneous_impl_p;
-
-template<typename C,typename CMP, int Last>
-struct is_homogeneous_impl_p<C,CMP,Last,Last> : mpl::true_{};
-
-template<typename C,typename CMP, int Next, int Last>
-struct is_homogeneous_impl_p
-	: mpl::and_<
-		is_homogeneous_impl_p<C,CMP,Next+1,Last>,
-		is_similar<CMP,typename mpl::at_c<C,Next>::type> 
-		> {};
-
-template <typename T>
-struct get_num_bits;
-template<typename B,int I, int S, bool M>
-struct get_num_bits<packed_channel_reference<B,I,S,M> >
-{
-    BOOST_STATIC_CONSTANT(int,value=S);
-};
-template<typename B,int I, int S, bool M>
-struct get_num_bits<const packed_channel_reference<B,I,S,M> >
-{
-    BOOST_STATIC_CONSTANT(int,value=S);
-};
-
-template <typename B, typename C, typename L>  
-struct gen_chan_ref_p
-{
-	typedef packed_dynamic_channel_reference<
-        B,
-        get_num_bits<typename mpl::at_c<C,0>::type>::value,
-        true> type;
-};
-
-}
-
-// for packed_pixel
-template <typename B, typename C, typename L>  
-struct is_homogeneous<packed_pixel<B,C,L> > 
-	: detail::is_homogeneous_impl_p<C,typename mpl::at_c<C,0>::type,1,mpl::size<C>::type::value>
-{};
-
-template <typename B, typename C, typename L>  
-struct is_homogeneous<const packed_pixel<B,C,L> > 
-	: detail::is_homogeneous_impl_p<C,typename mpl::at_c<C,0>::type,1,mpl::size<C>::type::value>
-{};
-
-// pixel
-template < typename C, typename L > struct is_homogeneous< pixel<C,L> > : mpl::true_ {};
-template < typename C, typename L > struct is_homogeneous<const pixel<C,L> > : mpl::true_ {};
-template < typename C, typename L > struct is_homogeneous< pixel<C,L>& > : mpl::true_ {};
-template < typename C, typename L > struct is_homogeneous<const pixel<C,L>& > : mpl::true_ {};
-
-// planar pixel reference
-template <typename Channel, typename ColorSpace>
-struct is_homogeneous< planar_pixel_reference< Channel, ColorSpace > > : mpl::true_ {};
-template <typename Channel, typename ColorSpace>
-struct is_homogeneous< const planar_pixel_reference< Channel, ColorSpace > > : mpl::true_ {};
-
-
-
-//! This implementation works for bit_algined_pixel_reference 
-//! with a homegeneous channel layout. 
-//! The result type will be a packed_dynamic_channel_reference, since the 
-//! offset info will be missing. 
-template <typename B, typename C, typename L, bool M>  
-struct channel_type<bit_aligned_pixel_reference<B,C,L,M> > 
-	: boost::lazy_enable_if< 
-		is_homogeneous<bit_aligned_pixel_reference<B,C,L,M> >,
-		detail::gen_chan_ref<B,C,L,M>
-		>
-{};
-
-template <typename B, typename C, typename L, bool M>  
-struct channel_type<const bit_aligned_pixel_reference<B,C,L,M> > 
-	: boost::lazy_enable_if< 
-		is_homogeneous<bit_aligned_pixel_reference<B,C,L,M> >,
-		detail::gen_chan_ref<B,C,L,M>
-		>
-{};
-
-template <typename B, typename C, typename L>  
-struct channel_type<packed_pixel<B,C,L> > 
-	: boost::lazy_enable_if< 
-		is_homogeneous<packed_pixel<B,C,L> >,
-		detail::gen_chan_ref_p<B,C,L>
-		>
-{};
-
-template <typename B, typename C, typename L>  
-struct channel_type<const packed_pixel<B,C,L> > 
-	: boost::lazy_enable_if< 
-		is_homogeneous<packed_pixel<B,C,L> >,
-		detail::gen_chan_ref_p<B,C,L>
-		>
-{};
-
-namespace detail{
 
 template<typename PixelT,typename DummyT = void >
 struct row_buffer_helper
@@ -423,35 +235,6 @@ struct swap_bits_fn< boost::mpl::true_
    boost::array< unsigned char, 256 > _lookup;
    bool _swap_bits;
 };
-
-
-template< typename Channel >
-int format_value( boost::mpl::true_ ) // is_bit_aligned
-{
-    return SAMPLEFORMAT_UINT;
-}
-
-template< typename Channel >
-int format_value( boost::mpl::false_ ) // is_bit_aligned
-{
-    if( is_unsigned< Channel >::value )
-    {
-        return SAMPLEFORMAT_UINT;
-    }
-    if( is_signed< Channel >::value )
-    {
-        return SAMPLEFORMAT_INT;
-    }
-    else if( is_floating_point< Channel >::value )
-    {
-        return SAMPLEFORMAT_IEEEFP;
-    }
-
-    throw std::runtime_error( "Unkown channel format." );
-
-    return 0;
-}
-
 
 } // namespace detail
 } // namespace gil

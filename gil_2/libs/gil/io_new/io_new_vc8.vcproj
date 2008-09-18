@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;"
+				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;C:\Program Files\GnuWin32\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -246,6 +246,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\conversion_policies.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\gil_extensions.hpp"
 					>
 				</File>
 				<File

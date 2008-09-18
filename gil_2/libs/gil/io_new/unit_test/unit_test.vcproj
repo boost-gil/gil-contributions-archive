@@ -178,6 +178,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\jpeg_file_format_test.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\jpeg_old_test.cpp"
 			>
 		</File>
