@@ -31,28 +31,30 @@ struct reader_base
 public:
 
     template< typename Image >
-    void init_image( Image&                              img
-                   , const point_t&                      top_left
-                   , const point_t&                      dim 
-                   , const image_read_info< FormatTag >& info )
+    void init_image( Image&                                  img
+                   , const image_read_settings< FormatTag >& settings
+                   , const image_read_info< FormatTag >&     info
+                   )
     {
-        _info = info;
+        _settings = settings;
+        _info     = info;
 
-        setup( _top_left, dim );
+        setup( _settings._dim );
 
-        img.recreate( _dim.x - _top_left.x
-                    , _dim.y - _top_left.y );
+        img.recreate( _settings._dim.x - settings._top_left.x
+                    , _settings._dim.y - settings._top_left.y );
     }
 
     template< typename View >
-    void init_view( const View&                         view
-                  , const point_t&                      top_left
-                  , const image_read_info< FormatTag >& info )
+    void init_view( const View&                             view
+                  , const image_read_settings< FormatTag >& settings
+                  , const image_read_info< FormatTag >&     info
+                  )
     {
-        _info = info;
+        _settings = settings;
+        _info     = info;
 
-        setup( _top_left
-             , view.dimensions() );
+        setup( view.dimensions() );
     }
 
 protected:
@@ -64,61 +66,49 @@ protected:
 
 private:
 
-    void setup( const point_t& top_left
-              , const point_t& dim
-              )
+    void setup( const point_t& dim )
     {
-        check_coordinates( top_left
-                         , dim
-                         , _info
-                         );
-
-        _top_left = top_left;
+        check_coordinates( dim );
 
         if( dim == point_t( 0, 0 ))
         {
-            _dim.x = _info._width;
-            _dim.y = _info._height;
+            _settings._dim.x = _info._width;
+            _settings._dim.y = _info._height;
         }
         else
         {
-            _dim = dim;
+            _settings._dim = dim;
         }
     }
 
-    template< typename Info >
-    void check_coordinates( const point_t& top_left
-                          , const point_t& dim
-                          , const Info&    image_info )
+    void check_coordinates( const point_t& dim )
     {
        typedef point_t::value_type int_t;
 
-       int_t width  = static_cast<int_t>( image_info._width  );
-       int_t height = static_cast<int_t>( image_info._height );
+       int_t width  = static_cast<int_t>( _info._width  );
+       int_t height = static_cast<int_t>( _info._height );
 
-       io_error_if( (  ( width  ) <  top_left.x
+       io_error_if( (  ( width  ) <  _settings._top_left.x
                     && ( width  ) <= dim.x
-                    && ( height ) <  top_left.y
+                    && ( height ) <  _settings._top_left.y
                     && ( height ) <= dim.y  )
                  , "User provided view has incorrect size."       );
 
-       io_error_if( (  top_left.x > dim.x
-                    && top_left.y > dim.y
+       io_error_if( (  _settings._top_left.x > dim.x
+                    && _settings._top_left.y > dim.y
                     )
                  , "User provided view has incorrect size." );
 
-       io_error_if( (  ( dim.x - top_left.x ) > width
-                    || ( dim.y - top_left.y ) > height
+       io_error_if( (  ( dim.x - _settings._top_left.x ) > width
+                    || ( dim.y - _settings._top_left.y ) > height
                    )
                  , "User provided view has incorrect size." );
     }
 
 protected:
 
-    point_t _top_left;
-    point_t _dim;
-
-    image_read_info< FormatTag > _info;
+    image_read_settings< FormatTag > _settings;
+    image_read_info< FormatTag >     _info;
 
     ConversionPolicy _cc_policy;
 };

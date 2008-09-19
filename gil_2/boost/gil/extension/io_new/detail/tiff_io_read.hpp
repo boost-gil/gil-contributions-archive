@@ -200,8 +200,8 @@ private:
            >
    void read_palette_image( const View& dst_view )
    {
-      PaletteImage indices( this->_info._width  - this->_top_left.x
-                          , this->_info._height - this->_top_left.y );
+      PaletteImage indices( this->_info._width  - this->_settings._top_left.x
+                          , this->_info._height - this->_settings._top_left.y );
 
       read_data( view( indices ), 0 );
 
@@ -271,7 +271,7 @@ private:
       {
          // Skipping over rows is not possible for compressed images(  no random access ). See man
          // page ( diagnostics section ) for more information.
-         for( std::ptrdiff_t row = 0; row < this->_top_left.y; ++row )
+         for( std::ptrdiff_t row = 0; row < this->_settings._top_left.y; ++row )
          {
             _io_dev.read_scaline( buffer
                                 , row
@@ -297,15 +297,15 @@ private:
       buffer_t buffer( size_to_allocate );
       read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
 
-      read_helper_t::iterator_t first = begin + this->_top_left.x;
-      read_helper_t::iterator_t last  = begin + this->_dim.x; // one after last element
+      read_helper_t::iterator_t first = begin + this->_settings._top_left.x;
+      read_helper_t::iterator_t last  = begin + this->_settings._dim.x; // one after last element
 
       skip_over_rows( buffer, plane );
 
       swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( _io_dev );
 
-      point_t::value_type num_rows = this->_dim.y - this->_top_left.y;
-      for( std::ptrdiff_t row = this->_top_left.y
+      point_t::value_type num_rows = this->_settings._dim.y - this->_settings._top_left.y;
+      for( std::ptrdiff_t row = this->_settings._top_left.y
          ; row < num_rows
          ; ++row
          )

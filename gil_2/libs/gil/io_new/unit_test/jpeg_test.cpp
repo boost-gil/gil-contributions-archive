@@ -98,7 +98,13 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
     {
         rgb8_image_t img;
-        read_image( filename, img, point_t( 0,0 ), point_t( 10, 10 ), tag_t() );
+
+        image_read_settings< jpeg_tag > settings( point_t(  0,  0 )
+                                                , point_t( 10, 10 )
+                                                , jpeg_dct_method::slow
+                                                );
+
+        read_image( filename, img, settings );
 
         BOOST_CHECK_EQUAL( img.width() , 10 );
         BOOST_CHECK_EQUAL( img.height(), 10 );

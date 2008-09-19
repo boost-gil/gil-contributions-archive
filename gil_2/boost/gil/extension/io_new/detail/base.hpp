@@ -50,6 +50,29 @@ template<typename PixelType, typename FormatTag> struct is_supported;
 
 template<typename FormatTag> struct is_format_tag : is_base_and_derived<format_tag,FormatTag> {};
 template<typename FormatTag> struct image_read_info;
+
+struct image_read_settings_base
+{
+protected:
+
+    image_read_settings_base()
+    : _top_left  ( 0, 0 )
+    , _dim       ( 0, 0 )
+    {}
+
+    image_read_settings_base( const point_t& top_left
+                            , const point_t& dim
+                            )
+    : _top_left( top_left )
+    , _dim     ( dim      )
+    {}
+
+public:
+
+    point_t _top_left;
+    point_t _dim;
+};
+
 template<typename FormatTag> struct image_read_settings;
 template<typename FormatTag> struct image_write_info;
 

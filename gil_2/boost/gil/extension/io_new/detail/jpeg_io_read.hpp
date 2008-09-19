@@ -199,6 +199,9 @@ private:
     template<typename View>
     void apply_impl( const View& view )
     {
+        jpeg_decompress_struct& cinfo = get();
+        cinfo.dct_method = this->_settings._dct_method;
+
         this->start_decompress();
 
         switch( this->_info._color_space )
@@ -251,7 +254,7 @@ private:
       JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
 
       //Skip scanlines if necessary.
-      for( int y = 0; y <  this->_top_left.y; ++y )
+      for( int y = 0; y <  this->_settings._top_left.y; ++y )
       {
          io_error_if( jpeg_read_scanlines( &this->_cinfo
                                          , &row_adr
@@ -269,8 +272,8 @@ private:
                                          ) !=1
                     , "jpeg_read_scanlines: fail to read JPEG file" );
 
-         this->_cc_policy.read( buffer.begin() + this->_top_left.x
-                              , buffer.begin() + this->_dim.x
+         this->_cc_policy.read( buffer.begin() + this->_settings._top_left.x
+                              , buffer.begin() + this->_settings._dim.x
                               , view.row_begin( y )
                               );
       }

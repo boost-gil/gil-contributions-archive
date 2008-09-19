@@ -120,6 +120,23 @@ struct image_read_info<png_tag>
 };
 
 template<>
+struct image_read_settings< png_tag > : public image_read_settings_base
+{
+    image_read_settings< png_tag >()
+    : image_read_settings_base()
+    {}
+
+    image_read_settings( const point_t& top_left
+                       , const point_t& dim
+                       )
+    : image_read_settings_base( top_left
+                              , dim
+                              )
+    {}
+
+};
+
+template<>
 struct image_write_info<png_tag>
 {
     png_interlace_method::type _interlace_method;

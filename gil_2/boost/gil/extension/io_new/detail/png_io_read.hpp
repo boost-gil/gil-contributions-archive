@@ -212,7 +212,7 @@ private:
         row_buffer_helper<ImagePixel> buffer( static_cast<int>( this->_info._width ));
 
         // skip rows
-        for( int y = 0; y < this->_top_left.y; ++y )
+        for( int y = 0; y < this->_settings._top_left.y; ++y )
         {
             png_read_row( _png_ptr
                         , reinterpret_cast< png_bytep >( buffer.data() )
@@ -227,8 +227,8 @@ private:
                         , 0
                         );
 
-            this->_cc_policy.read( buffer.begin() + this->_top_left.x
-                                 , buffer.begin() + this->_dim.x
+            this->_cc_policy.read( buffer.begin() + this->_settings._top_left.x
+                                 , buffer.begin() + this->_settings._dim.x
                                  , view.row_begin( y )
                                  );
         }

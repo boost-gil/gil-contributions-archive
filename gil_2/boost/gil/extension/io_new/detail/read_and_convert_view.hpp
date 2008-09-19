@@ -40,11 +40,10 @@ template< typename Device
         , typename FormatTag
         >
 inline
-void read_and_convert_view( Device&               file
-                          , const View&           view
-                          , const point_t&        top_left
-                          , const ColorConverter& cc
-                          , const FormatTag&      tag
+void read_and_convert_view( Device&                                 file
+                          , const View&                             view
+                          , const image_read_settings< FormatTag >& settings
+                          , const ColorConverter&                   cc
                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
                                                                   , typename detail::is_input_device< Device >::type
                                                                   >::type
@@ -61,7 +60,7 @@ void read_and_convert_view( Device&               file
                           );
 
     reader.init_view( view
-                    , top_left
+                    , settings
                     , reader.get_info()
                     );
 
@@ -74,11 +73,10 @@ template< typename Device
         , typename FormatTag
         >
 inline
-void read_and_convert_view( Device&               file
-                          , const View&           view
-                          , const point_t&        top_left
-                          , const ColorConverter& cc
-                          , const FormatTag&      tag
+void read_and_convert_view( Device&                                 file
+                          , const View&                             view
+                          , const image_read_settings< FormatTag >& settings
+                          , const ColorConverter&                   cc
                           , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
                                                                                                               , Device
                                                                                                               >::type
@@ -95,9 +93,8 @@ void read_and_convert_view( Device&               file
 
     read_and_convert_view( dev
                          , view
-                         , top_left
+                         , settings
                          , cc
-                         , tag
                          );
 }
 
@@ -107,14 +104,13 @@ template < typename String
          , typename FormatTag
          >
 inline
-void read_and_convert_view( const String&         file_name
-                          , const View&           view
-                          , const point_t&        top_left
-                          , const ColorConverter& cc
-                          , const FormatTag&      tag
+void read_and_convert_view( const String&                           file_name
+                          , const View&                             view
+                          , const image_read_settings< FormatTag >& settings
+                          , const ColorConverter&                   cc
                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
+                                                                  , typename detail::is_supported_path_spec< String >::type
+                                                                  >::type
                                             >::type* ptr = 0
                           )
 {
@@ -124,9 +120,8 @@ void read_and_convert_view( const String&         file_name
 
     read_and_convert_view( device
                          , view
-                         , top_left
+                         , settings
                          , cc
-                         , tag
                          );
 }
 
@@ -149,9 +144,8 @@ void read_and_convert_view( const String&         file_name
 {
     read_and_convert_view( file_name
                          , view
-                         , point_t( 0, 0 )
+                         , image_read_settings< FormatTag >()
                          , cc
-                         , tag
                          );
 }
 
@@ -177,9 +171,8 @@ void read_and_convert_view( Device&               device
 {
     read_and_convert_view( device
                          , view
-                         , point_t( 0, 0 )
+                         , image_read_settings< FormatTag >()
                          , cc
-                         , tag
                          );
 }
 
@@ -189,10 +182,9 @@ template < typename String
          , typename FormatTag
          >
 inline
-void read_and_convert_view( const String&    file_name
-                          , const View&      view
-                          , const point_t&   top_left
-                          , const FormatTag& tag
+void read_and_convert_view( const String&                           file_name
+                          , const View&                             view
+                          , const image_read_settings< FormatTag >& settings
                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
                                                                  , typename detail::is_supported_path_spec< String >::type
                                                                  >::type
@@ -201,9 +193,8 @@ void read_and_convert_view( const String&    file_name
 {
    read_and_convert_view( file_name
                         , view
-                        , top_left
+                        , settings
                         , default_color_converter()
-                        , tag
                         );
 }
 
@@ -212,10 +203,9 @@ template < typename Device
          , typename FormatTag
          >
 inline
-void read_and_convert_view( Device&          device
-                          , const View&      view
-                          , const point_t&   top_left
-                          , const FormatTag& tag
+void read_and_convert_view( Device&                                 device
+                          , const View&                             view
+                          , const image_read_settings< FormatTag >& settings
                           , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
                                                                                      , typename detail::is_adaptable_input_device< FormatTag
                                                                                                                                  , Device
@@ -228,9 +218,8 @@ void read_and_convert_view( Device&          device
 {
    read_and_convert_view( device
                         , view
-                        , top_left
+                        , settings
                         , default_color_converter()
-                        , tag
                         );
 }
 
@@ -251,9 +240,8 @@ void read_and_convert_view( const String&    file_name
 {
    read_and_convert_view( file_name
                         , view
-                        , point_t( 0, 0 )
+                        , image_read_settings< FormatTag >()
                         , default_color_converter()
-                        , tag
                         );
 }
 
@@ -277,9 +265,8 @@ void read_and_convert_view( Device&          device
 {
    read_and_convert_view( device
                         , view
-                        , point_t( 0, 0 )
+                        , image_read_settings< FormatTag >()
                         , default_color_converter()
-                        , tag
                         );
 }
 

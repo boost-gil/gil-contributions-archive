@@ -38,11 +38,9 @@ template < typename Device
          , typename FormatTag
          > 
 inline 
-void read_image( Device&          file
-               , Image&           img
-               , const point_t&   top_left
-               , const point_t&   dim
-               , const FormatTag& tag
+void read_image( Device&                                 file
+               , Image&                                  img
+               , const image_read_settings< FormatTag >& settings
                , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
                                                        , typename is_format_tag          < FormatTag >::type
                                                        , typename is_supported           < typename Image::value_type
@@ -58,8 +56,7 @@ void read_image( Device&          file
                   > reader( file );
 
     reader.init_image( img
-                     , top_left
-                     , dim
+                     , settings
                      , reader.get_info()
                      );
 
@@ -70,20 +67,19 @@ template < typename Device
          , typename Image
          , typename FormatTag
          > 
-inline void read_image( Device&          file
-                      , Image&           img
-                      , const point_t&   top_left
-                      , const point_t&   dim
-                      , const FormatTag& tag
-                      , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                         , Device
-                                                                                                                         >::type
-                                                                             , typename is_format_tag<FormatTag>::type
-                                                                             , typename is_supported< typename Image::value_type
-                                                                                                    , FormatTag
-                                                                                                    >::type 
-                                                                             >::type
-                                                         >::type* ptr = 0
+inline 
+void read_image( Device&                                 file
+               , Image&                                  img
+               , const image_read_settings< FormatTag >& settings
+               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
+                                                                                                   , Device
+                                                                                                   >::type
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_supported< typename Image::value_type
+                                                                              , FormatTag
+                                                                              >::type 
+                                                       >::type
+                                   >::type* ptr = 0
                       )
 {
     typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
@@ -91,8 +87,7 @@ inline void read_image( Device&          file
     detail::reader<device_type,FormatTag,detail::read_and_no_convert> reader(dev);
 
     reader.init_image( img
-                     , top_left
-                     , dim
+                     , settings
                      , reader.get_info
                      );
 
@@ -104,11 +99,9 @@ template < typename String
          , typename FormatTag
          > 
 inline 
-void read_image( const String& file_name
-               , Image& img
-               , const point_t& top_left
-               , const point_t& dim
-               , const FormatTag& tag
+void read_image( const String&                           file_name
+               , Image&                                  img
+               , const image_read_settings< FormatTag >& settings
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                                      , typename is_format_tag< FormatTag >::type
                                                                      , typename is_supported< typename Image::value_type
@@ -124,9 +117,7 @@ void read_image( const String& file_name
 
     read_image( device
               , img
-              , top_left
-              , dim
-              , tag
+              , settings
               );
 }
 
@@ -150,9 +141,7 @@ void read_image( Device&          file
 {
     read_image( file
               , img
-              , point_t( 0, 0 )
-              , point_t( 0, 0 )
-              , tag
+              , image_read_settings< FormatTag >()
               );
 }
 
@@ -181,9 +170,7 @@ void read_image( Device&          file
 
     read_image( dev
               , img
-              , point_t( 0, 0 )
-              , point_t( 0, 0 )
-              , tag
+              , image_read_settings< FormatTag >()
               );
 }
 
@@ -211,9 +198,7 @@ void read_image( const String&    file_name
 
     read_image( device
               , img
-              , point_t( 0, 0 )
-              , point_t( 0, 0 )
-              , tag
+              , image_read_settings< FormatTag >()
               );
 }
 

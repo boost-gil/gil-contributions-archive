@@ -63,10 +63,10 @@ struct jpeg_dct_method
 {
     typedef J_DCT_METHOD type;
 
-    static const unsigned int slow        = JDCT_ISLOW;
-    static const unsigned int fast        = JDCT_IFAST;
-    static const unsigned int floating_pt = JDCT_FLOAT;
-}
+    static const type slow        = JDCT_ISLOW;
+    static const type fast        = JDCT_IFAST;
+    static const type floating_pt = JDCT_FLOAT;
+};
 
 template<>
 struct image_read_info<jpeg_tag> 
@@ -82,23 +82,29 @@ struct image_read_info<jpeg_tag>
 
 
 template<>
-struct image_read_settings<jpeg_tag> 
+struct image_read_settings< jpeg_tag > : public image_read_settings_base
 {
     image_read_settings<jpeg_tag>()
-    : _top_left  ( 0, 0 )
-    , _dim       ( 0, 0 )
-    , _dct_method( slow )
+    : image_read_settings_base()
+    , _dct_method( jpeg_dct_method::slow )
     {}
 
-    point_t _top_left;
-    point_t _dim;
+    image_read_settings( const point_t&               top_left
+                       , const point_t&               dim
+                       , const jpeg_dct_method::type& dct_method
+                       )
+    : image_read_settings_base( top_left
+                              , dim
+                              )
+    , _dct_method()
+    {}
 
     jpeg_dct_method::type _dct_method;
 };
 
 
 template<>
-struct image_write_info<jpeg_tag>
+struct image_write_info< jpeg_tag >
 {
    jpeg_quality::type _quality;
 };
