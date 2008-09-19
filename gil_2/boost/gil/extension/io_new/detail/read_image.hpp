@@ -136,8 +136,8 @@ template < typename Device
          , typename FormatTag
          > 
 inline
-void read_image( Device& file
-               , Image& img
+void read_image( Device&          file
+               , Image&           img
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
                                                        , typename is_format_tag          < FormatTag >::type

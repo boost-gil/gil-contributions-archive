@@ -34,7 +34,6 @@ extern "C" {
 #include "io_device.hpp"
 #include "reader_base.hpp"
 #include "tiff_io_device.hpp"
-#include "tiff_supported_read_types.hpp"
 #include "tiff_io_is_allowed.hpp"
 
 

@@ -33,7 +33,6 @@ extern "C" {
 #include "tiff_tags.hpp"
 #include "detail/base.hpp"
 #include "detail/io_device.hpp"
-#include "detail/tiff_supported_read_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
 

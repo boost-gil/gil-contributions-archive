@@ -59,6 +59,15 @@ struct jpeg_data_precision
    typedef int type;
 };
 
+struct jpeg_dct_method
+{
+    typedef J_DCT_METHOD type;
+
+    static const unsigned int slow        = JDCT_ISLOW;
+    static const unsigned int fast        = JDCT_IFAST;
+    static const unsigned int floating_pt = JDCT_FLOAT;
+}
+
 template<>
 struct image_read_info<jpeg_tag> 
 {
@@ -70,6 +79,23 @@ struct image_read_info<jpeg_tag>
 
    jpeg_data_precision::type _data_precision;
 };
+
+
+template<>
+struct image_read_settings<jpeg_tag> 
+{
+    image_read_settings<jpeg_tag>()
+    : _top_left  ( 0, 0 )
+    , _dim       ( 0, 0 )
+    , _dct_method( slow )
+    {}
+
+    point_t _top_left;
+    point_t _dim;
+
+    jpeg_dct_method::type _dct_method;
+};
+
 
 template<>
 struct image_write_info<jpeg_tag>
