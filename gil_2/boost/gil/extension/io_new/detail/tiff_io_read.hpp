@@ -120,17 +120,9 @@ public:
       return info;
    }
 
-    template<typename View>
-    void apply( View& view )
-    {
-        apply_impl( view );
-    }
-
-private:
-
     // only works for homogeneous image types
     template< typename View >
-    void apply_impl( View& dst_view )
+    void apply( View& dst_view )
     {
         if( this->_info._photometric_interpretation == PHOTOMETRIC_PALETTE )
         {
@@ -194,6 +186,8 @@ private:
             }
         }
     }
+
+private:
 
    template< typename PaletteImage
            , typename View

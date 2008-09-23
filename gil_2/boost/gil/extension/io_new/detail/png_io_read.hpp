@@ -99,13 +99,6 @@ public:
     template<typename View>
     void apply( const View& view )
     {
-        apply_impl( view );
-    }
-
-private:
-    template<typename View>
-    void apply_impl( const View& view )
-    {
         if( little_endian() )
         {   
             if( this->_info._bit_depth == 16 )
@@ -195,6 +188,8 @@ private:
                     , NULL
                     );
     }
+
+private:
 
     template< typename ImagePixel
             , typename View

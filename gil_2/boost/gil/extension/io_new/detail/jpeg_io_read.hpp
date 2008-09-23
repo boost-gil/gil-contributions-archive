@@ -192,13 +192,6 @@ public:
     template<typename View>
     void apply( const View& view )
     {
-        apply_impl( view );
-    }
-private:
-
-    template<typename View>
-    void apply_impl( const View& view )
-    {
         jpeg_decompress_struct& cinfo = get();
         cinfo.dct_method = this->_settings._dct_method;
 
@@ -235,6 +228,8 @@ private:
 
         this->finish_decompress();
     }
+
+private:
 
     template< typename ImagePixel
             , typename View

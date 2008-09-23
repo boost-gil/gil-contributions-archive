@@ -139,9 +139,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng.lib zlib.lib libtiff.lib"
+				AdditionalDependencies="libjpeg.lib libpng_chh.lib zlib.lib libtiff.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="c:\boost\stage\lib;C:\Program Files\GnuWin32\lib;C:\gil\image libs\release"
+				AdditionalLibraryDirectories="c:\boost\stage\lib;C:\Program Files\GnuWin32\lib;C:\gil\image libs\release;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -235,6 +235,10 @@
 		</File>
 		<File
 			RelativePath=".\tiff_file_format_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\tiff_file_format_test_2.cpp"
 			>
 		</File>
 		<File
