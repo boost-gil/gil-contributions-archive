@@ -43,6 +43,14 @@ class ipl_image_wrapper
 public:
     ipl_image_wrapper( IplImage* img ) : _img( img ) {}
 
+    ~ipl_image_wrapper()
+    {
+        if( _img )
+        {
+            cvReleaseImageHeader( &_img );
+        }
+    }
+
     IplImage*       get()       { return _img; }
     const IplImage* get() const { return _img; }
    

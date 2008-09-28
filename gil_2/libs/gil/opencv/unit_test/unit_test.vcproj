@@ -118,12 +118,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;C:\Program Files\OpenCV\cv\include\;C:\Program Files\OpenCV\cxcore\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -136,7 +137,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="cv.lib cxcore.lib libpngd.lib zlibd.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\boost\stage\lib;C:\Program Files\OpenCV\lib;C:\gil\image libs\debug"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"

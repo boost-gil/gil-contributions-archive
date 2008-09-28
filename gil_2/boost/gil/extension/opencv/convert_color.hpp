@@ -423,7 +423,7 @@ void cvtcolor( View_Src src
       && std::max( src.dimensions().y, dst.dimensions().y ) == 0
       )
     {
-        throw std::exception( "Image doesn't have a dimension ( empty image )." );
+        throw std::exception( "Image doesn't have dimensions ( empty image )." );
     }
     
 
