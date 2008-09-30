@@ -35,28 +35,35 @@ template<> struct ipl_channel_type< bits16s > : boost::mpl::int_< IPL_DEPTH_16S 
 template<> struct ipl_channel_type< bits32s > : boost::mpl::int_< IPL_DEPTH_32S > {};
 
 
-// doesn't work
-//typedef boost::shared_ptr< IplImage > ipl_image_wrapper;
-
+/**
+ *
+ * ipl_image_wrapper encloses a IplImage pointer. Value semantics, like
+ * copying, are supported by using shared_ptr.
+ *
+ **/
 class ipl_image_wrapper
 {
 public:
-    ipl_image_wrapper( IplImage* img ) : _img( img ) {}
 
-    ~ipl_image_wrapper()
+    typedef boost::shared_ptr< IplImage > ipl_image_ptr_t;
+
+public:
+    ipl_image_wrapper( IplImage* img ) : _img( img, ipl_deleter ) {}
+
+    IplImage*       get()       { return _img.get(); }
+    const IplImage* get() const { return _img.get(); }
+
+private:
+
+    static void ipl_deleter( IplImage* ipl_img )
     {
-        if( _img )
+        if( ipl_img )
         {
-            cvReleaseImageHeader( &_img );
+            cvReleaseImageHeader( &ipl_img );
         }
     }
 
-    IplImage*       get()       { return _img; }
-    const IplImage* get() const { return _img; }
-   
-private:
-
-   IplImage* _img;
+   ipl_image_ptr_t _img;
 };
 
 template< typename View >

@@ -31,47 +31,54 @@ struct bmp_property_base
     typedef Property type;
 }
 
+// the size of this header:
+// - 40 bytes for Windows V3 header
+// - 12 bytes for OS/2 V1 header
+struct bmp_header_size : bmp_property_base< uint32_t > {};
+
 // The bitmap width in pixels (signed integer).
-struct bmp_image_width : bmp_property_base< bits32s > {};
+struct bmp_image_width : bmp_property_base< int32_t > {};
 
 // The bitmap height in pixels (signed integer).
-struct bmp_image_height : bmp_property_base< bits32s > {};
+struct bmp_image_height : bmp_property_base< int32_t > {};
 
 // The number of bits per pixel, which is the color depth of the image.
 // Typical values are 1, 4, 8, 16, 24 and 32.
-struct bmp_bits_per_pixel : bmp_property_base< bits16 > {};
+struct bmp_bits_per_pixel : bmp_property_base< uint16_t > {};
 
 // The compression method being used.
-template< int Compression > struct compression_type : public mpl::false_ {};
-template<> struct compression_type< 0 > : public mpl::int_< 0 > {}; // RGB without compression
-template<> struct compression_type< 1 > : public mpl::int_< 1 > {}; // 8 bit index with RLE compression
-template<> struct compression_type< 2 > : public mpl::int_< 2 > {}; // 4 bit index with RLE compression
-template<> struct compression_type< 3 > : public mpl::int_< 3 > {}; // 16 or 32 bit fields without compression
 
-struct bmp_compression : bmp_property_base< bits32 > {};
+static const uint32_t ct_rgb = 0;     // RGB without compression
+static const uint32_t ct_rle8 = 1;    // 8 bit index with RLE compression
+static const uint32_t ct_rle4 = 2;    // 4 bit index with RLE compression
+static const uint32_t ct_bitfield = 3;// 16 or 32 bit fields without compression
+
+struct bmp_compression : bmp_property_base< uint32_t > {};
 
 // The image size. This is the size of the raw bitmap data (see below), 
 // and should not be confused with the file size.
-struct bmp_image_size : bmp_property_base< bits32 > {};
+struct bmp_image_size : bmp_property_base< uint32_t > {};
 
 // The horizontal resolution of the image. (pixel per meter, signed integer)
-struct bmp_horizontal_resolution : bmp_property_base< bits32s > {};
+struct bmp_horizontal_resolution : bmp_property_base< int32_t > {};
 
 // The vertical resolution of the image. (pixel per meter, signed integer)
-struct bmp_vertical_resolution : bmp_property_base< bits32s > {};
+struct bmp_vertical_resolution : bmp_property_base< int32_t > {};
 
 // The number of colors in the color palette, or 0 to default to 2^n - 1.
-struct bmp_num_colors : bmp_property_base< bits32 > {};
+struct bmp_num_colors : bmp_property_base< uint32_t > {};
 
 
 // The number of important colors used, or 0 when every color is important; 
 // generally ignored.
-struct bmp_num_important_colors : bmp_property_base< bits32 > {};
+struct bmp_num_important_colors : bmp_property_base< uint32_t > {};
 
 
 template<>
 struct image_read_info< bmp_tag >
 {
+    bmp_header_size::type _header_size;
+
     bmp_image_width::type  _width;
     bmp_image_height::type _height;
 

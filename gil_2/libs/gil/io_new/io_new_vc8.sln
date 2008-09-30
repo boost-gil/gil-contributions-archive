@@ -7,7 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_test", "unit_test\unit
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "io_old", "io_old", "{0CA7BCAF-4C86-48CF-81DF-9E25F5DB91F6}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\..\boost\gil\extension\io\bmp_dynamic_io.hpp = ..\..\..\boost\gil\extension\io\bmp_dynamic_io.hpp
+		..\..\..\boost\gil\extension\io\bmp_io.hpp = ..\..\..\boost\gil\extension\io\bmp_io.hpp
+		..\..\..\boost\gil\extension\io\bmp_io_private.hpp = ..\..\..\boost\gil\extension\io\bmp_io_private.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\dynamic_io.hpp
+		..\..\..\boost\gil\extension\io\io_base.hpp = ..\..\..\boost\gil\extension\io\io_base.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\io_error.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\io_error.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\jpeg_dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\jpeg_dynamic_io.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\jpeg_io.hpp
@@ -15,6 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "io_old", "io_old", "{0CA7BC
 		..\..\..\..\..\boost\boost\gil\extension\io\png_dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\png_dynamic_io.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\png_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\png_io.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\png_io_private.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\png_io_private.hpp
+		..\..\..\boost\gil\extension\io\pnm_dynamic_io.hpp = ..\..\..\boost\gil\extension\io\pnm_dynamic_io.hpp
+		..\..\..\boost\gil\extension\io\pnm_io.hpp = ..\..\..\boost\gil\extension\io\pnm_io.hpp
+		..\..\..\boost\gil\extension\io\pnm_io_private.hpp = ..\..\..\boost\gil\extension\io\pnm_io_private.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\tiff_dynamic_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\tiff_dynamic_io.hpp
 		..\..\..\..\..\boost\boost\gil\extension\io\tiff_io.hpp = ..\..\..\..\..\boost\boost\gil\extension\io\tiff_io.hpp
 	EndProjectSection

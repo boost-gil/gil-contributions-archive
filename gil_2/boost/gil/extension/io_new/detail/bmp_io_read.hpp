@@ -35,36 +35,6 @@ static const int win32_info_size = 40;
 static const int os2_info_size   = 12;
 static const int bm_signature    = 0x4D42;
 
-template< int Compression > struct compression_type : public mpl::false_ {};
-template<> struct compression_type< 0 > : public mpl::int_< 0 > {}; // RGB without compression
-template<> struct compression_type< 1 > : public mpl::int_< 1 > {}; // 8 bit index with RLE compression
-template<> struct compression_type< 2 > : public mpl::int_< 2 > {}; // 4 bit index with RLE compression
-template<> struct compression_type< 3 > : public mpl::int_< 3 > {}; // 16 or 32 bit fields without compression
-
-/// BMP file header
-struct file_header
-{
-    bits16 type;   // File type
-    bits32 size;   // File size in bytes
-    bits32 offset; // Pixels file offset
-};
-
-/// BMP information (Windows) or core (OS2) header
-struct info_header
-{
-    bits32  size;    // the size of this header (40 bytes)
-    bits32s width;   // the bitmap width in pixels (signed integer).
-    bits32s width;   // the bitmap height in pixels (signed integer).
-    bits16 num_color_planes; // the number of color planes being used. Must be set to 1.
-    bits16 num_color_planes; // the number of bits per pixel, which is the color depth of the image. Typical values are 1, 4, 8, 16, 24 and 32.
-    bits32 compression; // the compression method being used. See the next table for a list of possible values.
-    bits32 image_size;  // the image size. This is the size of the raw bitmap data (see below), and should not be confused with the file size.
-    bits32s horizontal_resolution; // the horizontal resolution of the image. (pixel per meter, signed integer)
-    bits32  vertical_resolution; // the vertical resolution of the image. (pixel per meter, signed integer)
-    bits32  num_colors; // the number of colors in the color palette, or 0 to default to 2n.
-    bits32 num_important_colors; //the number of important colors used, or 0 when every color is important; generally ignored.
-};
-
 /// BMP color palette
 struct color_map {
 	unsigned	blue;	///< Blue bits mask
@@ -117,14 +87,120 @@ public:
 
     image_read_info< bmp_tag > get_info()
     {
-        image_read_info< bmp_tag > ret;
-        return ret;
+        // read file header
+
+        // the magic number used to identify the BMP file: 
+        // 0x42 0x4D (ASCII code points for B and M)
+        if( _io_dev.read_int16() == 0x4D42 )
+        {
+            io_error( "Wrong magic number for bmp file." );
+        }
+
+        // the size of the BMP file in bytes
+        uint32_t size = _io_dev.read_int32();
+
+        // reserved; actual value depends on the application that creates the image
+        _io_dev.read_int16()
+        // reserved; actual value depends on the application that creates the image
+        _io_dev.read_int16()
+        
+        // the offset, i.e. starting address, of the byte where the bitmap data can be found.
+        uint32_t size = _io_dev.read_int32();
+
+
+        // bitmap information
+
+        // the size of this header ( 40 bytes )
+        _info._header_size = read_int32();
+
+        if( ret._header_size == win32_info_size );
+        {
+            _info._width  = read_int32();
+            _info._height = read_int32();
+
+            // the number of color planes being used. Must be set to 1.
+            read_int16();
+
+            _info._bits_per_pixel = read_int16();
+
+            _info._compression = read_int32();
+
+            _info._image_size = read_int32();
+
+            _info._horizontal_resolution = read_int32();
+            _info._vertical_resolution   = read_int32();
+
+            _info._num_colors           = read_int32();
+            _info._num_important_colors = read_int32();
+
+            //
+            if(  )
+
+        }
+        else if( ret._header_size == os2_info_size )
+        {
+            _info._width  = static_cast< bmp_image_width::type  >( read_int16() );
+            _info._height = static_cast< bmp_image_height::type >( read_int16() );
+
+            // the number of color planes being used. Must be set to 1.
+            read_int16();
+
+            _info._bits_per_pixel = read_int16();
+
+            _info._compression = rgb;
+
+            _info._image_size = read_int32();
+
+            // not used
+            _info._image_size            = 0;
+            _info._horizontal_resolution = 0;
+            _info._vertical_resolution   = 0;
+            _info._num_colors            = 0;
+            _info._num_important_colors  = 0;
+        }
+        else
+        {
+            io_error( "Invalid BMP info header." );
+        }
+
+        _info.valid = true;
+
+        return _info;
     }
 
-    template<typename View>
+    template< typename View >
     void apply( const View& view )
     {
+        if( !_info.valid )
+        {
+            get_info();
+        }
+
+
+        // read the color masks
+        color_mask mask;
+        if( _info_header.what == ct_bitfield )
+        {
+            mask.red.mask    = _io_dev.read_int32();
+            mask.green.mask  = _io_dev.read_int32();
+            mask.blue.mask   = _io_dev.read_int32();
+
+            mask.red.width   = count_ones( mask.red.mask   );
+            mask.green.width = count_ones( mask.green.mask );
+            mask.blue.width  = count_ones( mask.blue.mask  );
+
+            mask.red.shift   = trailing_zeros( mask.red.mask   );
+            mask.green.shift = trailing_zeros( mask.green.mask );
+            mask.blue.shift  = trailing_zeros( mask.blue.mask  );
+        }
+
+
     }
+
+private:
+
+    Device& _io_dev;
+    image_read_info< bmp_tag > _info;
 };
 
 } // detail
