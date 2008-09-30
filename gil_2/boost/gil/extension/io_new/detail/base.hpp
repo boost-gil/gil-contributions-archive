@@ -48,7 +48,10 @@ struct format_tag {};
  */
 template<typename PixelType, typename FormatTag> struct is_supported;
 
-template<typename FormatTag> struct is_format_tag : is_base_and_derived<format_tag,FormatTag> {};
+template<typename FormatTag> struct is_format_tag : is_base_and_derived< format_tag
+                                                                       , FormatTag
+                                                                       > {};
+
 template<typename FormatTag> struct image_read_info;
 
 struct image_read_settings_base

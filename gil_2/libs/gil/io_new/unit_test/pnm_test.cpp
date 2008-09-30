@@ -1,4 +1,4 @@
-// png_test.cpp : Defines the entry point for the console application.
+// pnm_test.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -13,16 +13,16 @@
 using namespace std;
 using namespace boost::gil;
 
-typedef png_tag tag_t;
+typedef pnm_tag tag_t;
 
-namespace png_test {
+namespace pnm_test {
+
+const string filename( "..\\test_images\\pnm\\wikipedia\\rgb.pnm" );
 
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
-        image_read_info< png_tag > info = read_image_info( filename
+        image_read_info< pnm_tag > info = read_image_info( filename
                                                          , tag_t() );
         BOOST_CHECK_EQUAL( info._width , 320 );
         BOOST_CHECK_EQUAL( info._height, 240 );
@@ -51,8 +51,6 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 
 BOOST_AUTO_TEST_CASE( read_image_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgba8_image_t img;
         read_image( filename, img, tag_t() );
@@ -84,8 +82,6 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgb8_image_t img;
         read_and_convert_image( filename, img, tag_t() );
@@ -117,8 +113,6 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgba8_image_t img( 320, 240 );
         read_view( filename, view( img ), tag_t() );
@@ -141,8 +135,6 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 
 BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgb8_image_t img( 320, 240 );
 
@@ -178,14 +170,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
-        string filename( "..\\test\\png\\test1.png" );
+        string filename( "..\\test\\pnm\\test1.pnm" );
 
         gray8_image_t img( 320, 240 );
         write_view( filename, view( img ), tag_t() );
     }
 
     {
-        string filename( "..\\test\\png\\test2.png" );
+        string filename( "..\\test\\pnm\\test2.pnm" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
@@ -194,7 +186,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
-        string filename( "..\\test\\png\\test3.png" );
+        string filename( "..\\test\\pnm\\test3.pnm" );
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
@@ -203,4 +195,4 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 }
 
-} // namespace png_test
+} // namespace pnm_test

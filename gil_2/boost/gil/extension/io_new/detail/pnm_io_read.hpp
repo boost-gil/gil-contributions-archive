@@ -36,8 +36,7 @@ class reader< Device
             , pnm_tag
             , ConversionPolicy
             > 
-    : public jpeg_decompress_mgr< Device >
-    , public reader_base< pnm_tag
+    : public reader_base< pnm_tag
                         , ConversionPolicy
                         >
 {

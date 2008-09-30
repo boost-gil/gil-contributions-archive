@@ -25,14 +25,14 @@ namespace boost { namespace gil {
 
 struct pnm_tag : format_tag {};
 
-struct jpeg_image_width
+struct pnm_image_width
 {
-   typedef ??? type;
+   typedef unsigned int type;
 };
 
-struct jpeg_image_height
+struct pnm_image_height
 {
-   typedef ??? type;
+   typedef unsigned int type;
 };
 
 template<>

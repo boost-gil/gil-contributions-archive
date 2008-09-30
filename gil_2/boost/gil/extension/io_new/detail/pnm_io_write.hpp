@@ -32,7 +32,7 @@ class writer< Device
 public:
 
     writer( Device & file )
-        : out(file)
+        : _out( file )
     {
     }
 
@@ -46,10 +46,14 @@ public:
     }
 
     template<typename View>
-    void apply( const View&                       view
+    void apply( const View&                      view
               , const image_write_info<pnm_tag>& info )
     {
     }
+
+private:
+
+    Device& _out;
 };
 
 } // detail

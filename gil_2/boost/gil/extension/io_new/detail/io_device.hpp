@@ -78,47 +78,14 @@ public:
         return fread( data, 1, static_cast<int>( count ), file );
     }
 
-    /// Reads array
-    template< typename T
-            , int      N
-            >
-    size_t read( T (&buf)[N] )
-    {
-	    return read( buf, N );
-    }
-
-
-    /// Reads byte
-    boost::uint8_t read_int8() throw()
-    {
-	    byte_t m[1];
-
-	    read( m );
-	    return m[0];
-    }
-
-    /// Reads 16 bit little endian integer
-    boost::uint16_t read_int16() throw()
-    {
-	    byte_t m[2];
-
-	    read( m );
-	    return (m[1] << 8) | m[0];
-    }
-
-    /// Reads 32 bit little endian integer
-    boost::uint32_t read_int32() throw()
-    {
-	    byte_t m[4];
-
-	    read( m );
-	    return (m[3] << 24) | (m[2] << 16) | (m[1] << 8) | m[0];
-    }
-
     void write( const unsigned char* data
               , std::size_t          count )
     {
-        fwrite(data, 1, static_cast<int>( count ), file);
+        fwrite( data
+              , 1
+              , static_cast< int >( count )
+              , file
+              );
     }
 
     //!\todo replace with std::ios::seekdir?
@@ -127,16 +94,21 @@ public:
         fseek(file, count, whence );
     }
 
-
     void flush()
     {
-        fflush(file);
+        fflush( file );
     }
+
 private:
+
     file_stream_device( file_stream_device const& );
     file_stream_device& operator=( file_stream_device const& );
+
+    //@todo: why not fstream?
     FILE* file;
+
     bool _close;
+
 };
 
 
@@ -145,6 +117,8 @@ private:
  */
 class istream_device
 {
+   typedef unsigned char byte_t;
+
 public:
    istream_device( std::istream& in )
    : _in( in ) {}
@@ -167,6 +141,42 @@ public:
         } while( count && _in );
 
         return static_cast< std::size_t >( cr );
+    }
+
+    /// Reads array
+    template< typename T
+            , int      N
+            >
+    size_t read( T (&buf)[N] )
+    {
+	    return read( buf, N );
+    }
+
+    /// Reads byte
+    boost::uint8_t read_int8() throw()
+    {
+        byte_t m[1];
+
+        read( m );
+        return m[0];
+    }
+
+    /// Reads 16 bit little endian integer
+    boost::uint16_t read_int16() throw()
+    {
+        byte_t m[2];
+
+        read( m );
+        return (m[1] << 8) | m[0];
+    }
+
+    /// Reads 32 bit little endian integer
+    boost::uint32_t read_int32() throw()
+    {
+        byte_t m[4];
+
+        read( m );
+        return (m[3] << 24) | (m[2] << 16) | (m[1] << 8) | m[0];
     }
 
     void seek( long count, int whence )

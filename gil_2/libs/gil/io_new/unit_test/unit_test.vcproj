@@ -178,6 +178,18 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\bmp_file_format_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\bmp_old_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\bmp_test.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\jpeg_file_format_test.cpp"
 			>
 		</File>
@@ -199,6 +211,18 @@
 		</File>
 		<File
 			RelativePath=".\png_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\pnm_file_format_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\pnm_old_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\pnm_test.cpp"
 			>
 		</File>
 		<File

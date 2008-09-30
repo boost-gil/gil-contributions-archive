@@ -27,12 +27,13 @@
 
 namespace boost { namespace gil { namespace detail {
 
+/// @todo add specializations
 template< typename Channel
         , typename ColorSpace
         >
 struct pnm_rw_support
 {
-    BOOST_STATIC_CONSTANT( bool, is_supported = false );
+    BOOST_STATIC_CONSTANT( bool, is_supported = true );
 };
 
 } // namespace detail
@@ -41,7 +42,7 @@ template< typename Pixel >
 struct is_supported< Pixel
                    , pnm_tag
                    >
-: mpl::bool_< detail::bmp_rw_support< typename channel_type    < Pixel >::type
+: mpl::bool_< detail::pnm_rw_support< typename channel_type    < Pixel >::type
                                     , typename color_space_type< Pixel >::type
                                     >::is_supported
             >

@@ -30,31 +30,72 @@
 
 namespace boost { namespace gil { namespace detail {
 
+/// Compute the consecutive zero bits on the right
+template< typename T >
+inline
+unsigned trailing_zeros( T x )
+throw()
+{
+    unsigned n = 0;
+
+    x = ~x & (x - 1);
+
+    while( x )
+    {
+        n = n + 1;
+        x = x >> 1;
+    }
+
+    return n;
+}
+
+/// Counts a bit-set
+template< typename T >
+inline
+unsigned count_ones( T x )
+throw()
+{
+    unsigned n = 0;
+
+    while( x )
+    {
+	    // clear the least significant bit set
+	    x &= x - 1;
+	    ++n
+    }
+
+    return n;
+}
+
+
 static const int header_size     = 14;
 static const int win32_info_size = 40;
 static const int os2_info_size   = 12;
 static const int bm_signature    = 0x4D42;
 
-/// BMP color palette
-struct color_map {
-	unsigned	blue;	///< Blue bits mask
-	unsigned	green;	///< Green bits mask
-	unsigned	red;	///< Red bits mask
-	unsigned	unused;	///< Reserved
+
+struct color_map
+{
+    unsigned int blue;   // Blue bits mask
+    unsigned int green;  // Green bits mask
+    unsigned int red;    // Red bits mask
+    unsigned int unused; // Reserved
 };
 
 /// Color channel mask
-struct bit_field {
-	unsigned	mask;	///< Bit mask at corresponding position
-	unsigned	width;	///< Bit width of the mask
-	unsigned	shift;	///< Bit position from right to left
+struct bit_field
+{
+    unsigned int mask;  // Bit mask at corresponding position
+    unsigned int width; // Bit width of the mask
+    unsigned int shift; // Bit position from right to left
 };
 
 /// BMP color masks
-struct color_mask {
-	bit_field	red;	 ///< Red bits
-	bit_field	green; ///< Green bits
-	bit_field	blue;	 ///< Blue bits
+struct color_mask
+{
+    bit_field red;   // Red bits
+    bit_field green; // Green bits
+    bit_field blue;  // Blue bits
 };
 
 
@@ -74,13 +115,16 @@ private:
     typedef typename ConversionPolicy::color_converter_type cc_t;
 
 public:
+
     reader( Device& device )
+    : _io_dev( device )
     {}
 
     reader( Device&     device
           , const cc_t& cc
           )
-    : reader_base< bmp_tag
+    : _io_dev( device )
+    , reader_base< bmp_tag
                  , ConversionPolicy
                  >( cc )
     {}
@@ -100,56 +144,52 @@ public:
         uint32_t size = _io_dev.read_int32();
 
         // reserved; actual value depends on the application that creates the image
-        _io_dev.read_int16()
+        _io_dev.read_int16();
         // reserved; actual value depends on the application that creates the image
-        _io_dev.read_int16()
+        _io_dev.read_int16();
         
-        // the offset, i.e. starting address, of the byte where the bitmap data can be found.
-        uint32_t size = _io_dev.read_int32();
+        _info._offset = _io_dev.read_int32();
 
 
         // bitmap information
 
         // the size of this header ( 40 bytes )
-        _info._header_size = read_int32();
+        _info._header_size = _io_dev.read_int32();
 
-        if( ret._header_size == win32_info_size );
+        if( _info._header_size == win32_info_size )
         {
-            _info._width  = read_int32();
-            _info._height = read_int32();
+            _info._width  = _io_dev.read_int32();
+            _info._height = _io_dev.read_int32();
 
             // the number of color planes being used. Must be set to 1.
-            read_int16();
+            _io_dev.read_int16();
 
-            _info._bits_per_pixel = read_int16();
+            _info._bits_per_pixel = _io_dev.read_int16();
 
-            _info._compression = read_int32();
+            _info._compression = _io_dev.read_int32();
 
-            _info._image_size = read_int32();
+            _info._image_size = _io_dev.read_int32();
 
-            _info._horizontal_resolution = read_int32();
-            _info._vertical_resolution   = read_int32();
+            _info._horizontal_resolution = _io_dev.read_int32();
+            _info._vertical_resolution   = _io_dev.read_int32();
 
-            _info._num_colors           = read_int32();
-            _info._num_important_colors = read_int32();
-
-            //
-            if(  )
+            _info._num_colors           = _io_dev.read_int32();
+            _info._num_important_colors = _io_dev.read_int32();
 
         }
-        else if( ret._header_size == os2_info_size )
+        else if( _info._header_size == os2_info_size )
         {
-            _info._width  = static_cast< bmp_image_width::type  >( read_int16() );
-            _info._height = static_cast< bmp_image_height::type >( read_int16() );
+            _info._width  = static_cast< bmp_image_width::type  >( _io_dev.read_int16() );
+            _info._height = static_cast< bmp_image_height::type >( _io_dev.read_int16() );
 
             // the number of color planes being used. Must be set to 1.
-            read_int16();
+            _io_dev.read_int16();
 
-            _info._bits_per_pixel = read_int16();
+            _info._bits_per_pixel = _io_dev.read_int16();
 
-            _info._compression = rgb;
+            _info._compression = ct_rgb;
 
-            _info._image_size = read_int32();
+            _info._image_size = _io_dev.read_int32();
 
             // not used
             _info._image_size            = 0;
@@ -163,7 +203,7 @@ public:
             io_error( "Invalid BMP info header." );
         }
 
-        _info.valid = true;
+        _info._valid = true;
 
         return _info;
     }
@@ -175,7 +215,6 @@ public:
         {
             get_info();
         }
-
 
         // read the color masks
         color_mask mask;
@@ -193,8 +232,109 @@ public:
             mask.green.shift = trailing_zeros( mask.green.mask );
             mask.blue.shift  = trailing_zeros( mask.blue.mask  );
         }
+        else if( _info_header.what == ct_rgb )
+        {
+            switch( _info_header.bpp )
+            {
+                case 15:
+                case 16:
+                {
+                    mask.red.mask   = 0x007C00; mask.red.width   = 5; mask.red.shift   = 10;
+                    mask.green.mask = 0x0003E0; mask.green.width = 5; mask.green.shift =  5;
+                    mask.blue.mask  = 0x00001F; mask.blue.width  = 5; mask.blue.shift  =  0;
+                    break;
+                }
+
+                case 24:
+                case 32:
+                {
+                    mask.red.mask   = 0xFF0000; mask.red.width   = 8; mask.red.shift   = 16;
+                    mask.green.mask = 0x00FF00; mask.green.width = 8; mask.green.shift =  8;
+                    mask.blue.mask  = 0x0000FF; mask.blue.width  = 8; mask.blue.shift  =  0;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            io_error( "bmp_reader::apply(): unsupported BMP compression" );
+        }
+
+        // Read the color map.
+        std::vector<color_map> palette;
+
+        if( _info_header.bits_per_plane <= 8 )
+        {
+            int entries = _info_header.colors;
+
+            if( entries == 0 )
+            {
+                entries = 1 << _info.bits_per_plane;
+            }
+
+            palette.resize( entries );
+
+            for( int i = 0; i < entries; ++i )
+            {
+                palette[i].blue  = read_int8();
+                palette[i].green = read_int8();
+                palette[i].red   = read_int8();
+
+                if( _info.entry > 3 )
+                {
+                    read_int8();
+                }
+
+            } // for
+        } // if
 
 
+        // go to first byte of bitmap data
+        _io_dev.seek( _info._offset );
+
+
+        // the row pitch must be multiple 4 bytes
+        int pitch;
+
+        if( _info_header.bpp < 8 )
+        {
+            pitch = ((_info_header.width * _info_header.bpp) + 7) >> 3;
+        }
+        else
+        {
+            pitch = _info_header.width * ((_info_header.bpp + 7) >> 3);
+        }
+
+        pitch = (pitch + 3) & ~3;
+
+        // read the raster
+        std::vector<byte_t> row(pitch);
+
+        int ybeg = 0;
+        int yend = _info_header.height;
+        int yinc = 1;
+
+        if( _info._height > 0 )
+        {
+            // the image is upside down
+            ybeg = _info._height - 1;
+            yend = -1;
+            yinc = -1;
+        }
+
+        const color_map* pal = 0;
+
+		if( palette.size() > 0 )
+		{
+			pal = &palette.front();
+		}
+
+        for( int y = ybeg; y != yend; y += yinc )
+        {
+            typedef typename color_space_type< View >::type Spc;
+
+            read( &row.front(), pitch );
+        }
     }
 
 private:

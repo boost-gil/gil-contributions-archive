@@ -25,11 +25,14 @@ namespace boost { namespace gil {
 
 struct bmp_tag : format_tag {};
 
-template< Property > 
+template< typename Property > 
 struct bmp_property_base
 {
     typedef Property type;
-}
+};
+
+// the offset, i.e. starting address, of the byte where the bitmap data can be found.
+struct bmp_offset : bmp_property_base< uint32_t > {};
 
 // the size of this header:
 // - 40 bytes for Windows V3 header
@@ -77,6 +80,12 @@ struct bmp_num_important_colors : bmp_property_base< uint32_t > {};
 template<>
 struct image_read_info< bmp_tag >
 {
+    image_read_info< bmp_tag >()
+    : _valid( false )
+    {}
+
+    bmp_offset::type _offset;
+
     bmp_header_size::type _header_size;
 
     bmp_image_width::type  _width;
@@ -93,6 +102,8 @@ struct image_read_info< bmp_tag >
 
     bmp_num_colors::type            _num_colors;
     bmp_num_important_colors::type  _num_important_colors;
+
+    bool _valid;
 };
 
 

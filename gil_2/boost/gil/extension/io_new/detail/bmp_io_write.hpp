@@ -50,6 +50,10 @@ public:
               , const image_write_info<jpeg_tag>& info )
     {
     }
+
+private:
+
+    Device& _out;
 };
 
 } // detail

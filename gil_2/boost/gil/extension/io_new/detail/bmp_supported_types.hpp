@@ -27,12 +27,13 @@
 
 namespace boost { namespace gil { namespace detail {
 
+/// @todo add specializations
 template< typename Channel
         , typename ColorSpace
         >
 struct bmp_rw_support
 {
-    BOOST_STATIC_CONSTANT( bool, is_supported = false );
+    BOOST_STATIC_CONSTANT( bool, is_supported = true );
 };
 
 } // namespace detail
