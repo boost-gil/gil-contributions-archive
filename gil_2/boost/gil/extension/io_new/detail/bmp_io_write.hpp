@@ -32,7 +32,7 @@ class writer< Device
 public:
 
     writer( Device & file )
-        : out(file)
+    : _out( file )
     {
     }
 

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 
 #include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/io_new/pnm_all.hpp>
+#include <boost/gil/extension/io_new/png_all.hpp>
 
 #include <boost/test/unit_test.hpp>
 

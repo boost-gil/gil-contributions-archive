@@ -61,7 +61,7 @@ throw()
     {
 	    // clear the least significant bit set
 	    x &= x - 1;
-	    ++n
+	    ++n;
     }
 
     return n;
@@ -106,7 +106,7 @@ class reader< Device
             , bmp_tag
             , ConversionPolicy
             > 
-    : public reader_base< jpeg_tag
+    : public reader_base< bmp_tag
                         , ConversionPolicy
                         >
 {
@@ -135,7 +135,7 @@ public:
 
         // the magic number used to identify the BMP file: 
         // 0x42 0x4D (ASCII code points for B and M)
-        if( _io_dev.read_int16() == 0x4D42 )
+        if( _io_dev.read_int16() == 0x424D )
         {
             io_error( "Wrong magic number for bmp file." );
         }
@@ -209,16 +209,16 @@ public:
     }
 
     template< typename View >
-    void apply( const View& view )
+    void apply( const View& dst_view )
     {
-        if( !_info.valid )
+        if( !_info._valid )
         {
             get_info();
         }
 
         // read the color masks
         color_mask mask;
-        if( _info_header.what == ct_bitfield )
+        if( _info._compression == ct_bitfield )
         {
             mask.red.mask    = _io_dev.read_int32();
             mask.green.mask  = _io_dev.read_int32();
@@ -232,9 +232,9 @@ public:
             mask.green.shift = trailing_zeros( mask.green.mask );
             mask.blue.shift  = trailing_zeros( mask.blue.mask  );
         }
-        else if( _info_header.what == ct_rgb )
+        else if( _info._compression == ct_rgb )
         {
-            switch( _info_header.bpp )
+            switch( _info._bits_per_pixel )
             {
                 case 15:
                 case 16:
@@ -263,26 +263,28 @@ public:
         // Read the color map.
         std::vector<color_map> palette;
 
-        if( _info_header.bits_per_plane <= 8 )
+        if( _info._bits_per_pixel <= 8 )
         {
-            int entries = _info_header.colors;
+            int entries = _info._num_colors;
 
             if( entries == 0 )
             {
-                entries = 1 << _info.bits_per_plane;
+                entries = 1 << _info._bits_per_pixel;
             }
 
             palette.resize( entries );
 
             for( int i = 0; i < entries; ++i )
             {
-                palette[i].blue  = read_int8();
-                palette[i].green = read_int8();
-                palette[i].red   = read_int8();
+                palette[i].blue  = _io_dev.read_int8();
+                palette[i].green = _io_dev.read_int8();
+                palette[i].red   = _io_dev.read_int8();
 
-                if( _info.entry > 3 )
+                // there are 4 entries when windows header
+                // but 3 for os2 header
+                if( _info._header_size == win32_info_size )
                 {
-                    read_int8();
+                    _io_dev.read_int8();
                 }
 
             } // for
@@ -296,22 +298,23 @@ public:
         // the row pitch must be multiple 4 bytes
         int pitch;
 
-        if( _info_header.bpp < 8 )
+        if( _info._bits_per_pixel < 8 )
         {
-            pitch = ((_info_header.width * _info_header.bpp) + 7) >> 3;
+            pitch = (( _info._width * _info._bits_per_pixel ) + 7 ) >> 3;
         }
         else
         {
-            pitch = _info_header.width * ((_info_header.bpp + 7) >> 3);
+            pitch = _info._width * (( _info._bits_per_pixel + 7 ) >> 3);
         }
 
         pitch = (pitch + 3) & ~3;
 
         // read the raster
-        std::vector<byte_t> row(pitch);
+        typedef unsigned char byte_t;
+        std::vector< byte_t > row( pitch );
 
         int ybeg = 0;
-        int yend = _info_header.height;
+        int yend = _info._height;
         int yinc = 1;
 
         if( _info._height > 0 )
@@ -331,9 +334,44 @@ public:
 
         for( int y = ybeg; y != yend; y += yinc )
         {
-            typedef typename color_space_type< View >::type Spc;
+            //typedef typename color_space_type< View >::type Spc;
 
-            read( &row.front(), pitch );
+            _io_dev.read( &row.front(), pitch );
+
+            switch( _info._bits_per_pixel )
+            {
+                case 24:
+                {
+                    rgb8_view_t v = interleaved_view( _info._width
+                                                    , _info._height
+                                                    , (rgb8_pixel_t*) &row.front()
+                                                    , _info._width * 3
+                                                    );
+
+                    this->_cc_policy.read( v.begin() + this->_settings._top_left.x
+                                         , v.begin() + this->_settings._dim.x
+                                         , dst_view.row_begin( y )
+                                         );
+
+                    break;
+                }
+
+
+                case 32:
+                {
+                    rgba8_view_t v = interleaved_view( _info._width
+                                                     , _info._height
+                                                     , (rgba8_pixel_t*) &row.front()
+                                                     , _info._width * 4
+                                                     );
+
+                    this->_cc_policy.read( v.begin() + this->_settings._top_left.x
+                                         , v.begin() + this->_settings._dim.x
+                                         , dst_view.row_begin( y )
+                                         );
+                    break;
+                }
+            }
         }
     }
 

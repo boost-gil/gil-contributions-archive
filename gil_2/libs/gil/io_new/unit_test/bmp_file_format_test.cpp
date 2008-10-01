@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
 
             write_view( out + fs::basename( dir_itr->path() ) + ".bmp"
                       , view( img )
-                      , png_tag()
+                      , tag_t()
                       );
          }
       }

@@ -40,6 +40,8 @@ namespace boost { namespace gil { namespace detail {
 template< typename FormatTag >
 class file_stream_device
 {
+   typedef unsigned char byte_t;
+
 public:
 
    typedef FormatTag _tag_t;
@@ -78,6 +80,42 @@ public:
         return fread( data, 1, static_cast<int>( count ), file );
     }
 
+    /// Reads array
+    template< typename T
+            , int      N
+            >
+    size_t read( T (&buf)[N] )
+    {
+	    return read( buf, N );
+    }
+
+    /// Reads byte
+    boost::uint8_t read_int8() throw()
+    {
+        byte_t m[1];
+
+        read( m );
+        return m[0];
+    }
+
+    /// Reads 16 bit little endian integer
+    boost::uint16_t read_int16() throw()
+    {
+        byte_t m[2];
+
+        read( m );
+        return (m[1] << 8) | m[0];
+    }
+
+    /// Reads 32 bit little endian integer
+    boost::uint32_t read_int32() throw()
+    {
+        byte_t m[4];
+
+        read( m );
+        return (m[3] << 24) | (m[2] << 16) | (m[1] << 8) | m[0];
+    }
+
     void write( const unsigned char* data
               , std::size_t          count )
     {
@@ -89,7 +127,7 @@ public:
     }
 
     //!\todo replace with std::ios::seekdir?
-    void seek( long count, int whence )
+    void seek( long count, int whence = SEEK_SET )
     {
         fseek(file, count, whence );
     }
@@ -179,7 +217,7 @@ public:
         return (m[3] << 24) | (m[2] << 16) | (m[1] << 8) | m[0];
     }
 
-    void seek( long count, int whence )
+    void seek( long count, int whence = SEEK_SET )
     {
         _in.seekg( count
                  , whence == SEEK_SET ? std::ios::beg
