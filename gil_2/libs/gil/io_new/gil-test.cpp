@@ -2,7 +2,8 @@
 
 #include <iostream>
 
-#include <boost/gil/extension/io_new/png_read.hpp>
+#include <boost/gil/extension/io_new/bmp_all.hpp>
+#include <boost/gil/extension/io_new/png_write.hpp>
 #include <boost/gil/gil_all.hpp>
 
 using namespace std;
@@ -11,8 +12,12 @@ using namespace gil;
 
 int main(int argc, char *argv[])
 {
-    typedef bit_aligned_image3_type< 24, 24, 24, rgb_layout_t >::type image_t;
-    image_t img;
+    const std::string filename( ".\\test_images\\bmp\\g01bg.bmp" );
 
-   return 0;
+    rgb8_image_t img;
+    read_image( filename, img, bmp_tag() );
+
+    write_view( ".\\test\\bmp\\test.png", view( img ), png_tag() );
+
+    return 0;
 }

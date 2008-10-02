@@ -340,11 +340,23 @@ public:
 
             switch( _info._bits_per_pixel )
             {
+                case 1:
+                {
+                    // row contains the indices
+                    typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
+                    typedef image_t::view_t::reference ref_t;
+                    typedef bit_aligned_pixel_iterator< ref_t > it_t;
+
+
+
+                    break;
+                }
+
                 case 24:
                 {
-                    rgb8_view_t v = interleaved_view( _info._width
+                    bgr8_view_t v = interleaved_view( _info._width
                                                     , _info._height
-                                                    , (rgb8_pixel_t*) &row.front()
+                                                    , (bgr8_pixel_t*) &row.front()
                                                     , _info._width * 3
                                                     );
 
@@ -359,9 +371,10 @@ public:
 
                 case 32:
                 {
-                    rgba8_view_t v = interleaved_view( _info._width
+                    // 8-8-8-8 BGR
+                    bgra8_view_t v = interleaved_view( _info._width
                                                      , _info._height
-                                                     , (rgba8_pixel_t*) &row.front()
+                                                     , (bgra8_pixel_t*) &row.front()
                                                      , _info._width * 4
                                                      );
 
