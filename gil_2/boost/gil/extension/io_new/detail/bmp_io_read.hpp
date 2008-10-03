@@ -73,15 +73,6 @@ static const int win32_info_size = 40;
 static const int os2_info_size   = 12;
 static const int bm_signature    = 0x4D42;
 
-
-struct color_map
-{
-    unsigned int blue;   // Blue bits mask
-    unsigned int green;  // Green bits mask
-    unsigned int red;    // Red bits mask
-    unsigned int unused; // Reserved
-};
-
 /// Color channel mask
 struct bit_field
 {
@@ -261,7 +252,7 @@ public:
         }
 
         // Read the color map.
-        std::vector<color_map> palette;
+        std::vector< rgb8_pixel_t > palette;
 
         if( _info._bits_per_pixel <= 8 )
         {
@@ -276,9 +267,9 @@ public:
 
             for( int i = 0; i < entries; ++i )
             {
-                palette[i].blue  = _io_dev.read_int8();
-                palette[i].green = _io_dev.read_int8();
-                palette[i].red   = _io_dev.read_int8();
+                get_color( palette[i], blue_t()  ) = _io_dev.read_int8();
+                get_color( palette[i], green_t() ) = _io_dev.read_int8();
+                get_color( palette[i], red_t()   ) = _io_dev.read_int8();
 
                 // there are 4 entries when windows header
                 // but 3 for os2 header
@@ -313,6 +304,7 @@ public:
         typedef unsigned char byte_t;
         std::vector< byte_t > row( pitch );
 
+        /// @todo make sure partial image reading is working
         int ybeg = 0;
         int yend = _info._height;
         int yinc = 1;
@@ -324,13 +316,6 @@ public:
             yend = -1;
             yinc = -1;
         }
-
-        const color_map* pal = 0;
-
-		if( palette.size() > 0 )
-		{
-			pal = &palette.front();
-		}
 
         for( int y = ybeg; y != yend; y += yinc )
         {
@@ -344,10 +329,18 @@ public:
                 {
                     // row contains the indices
                     typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-                    typedef image_t::view_t::reference ref_t;
-                    typedef bit_aligned_pixel_iterator< ref_t > it_t;
+                    typedef image_t::view_t::x_iterator it_t;
+                    
+                    it_t it( &row.front(), 0 );
+                    it_t end = it + _info._width;
 
+                    typename View::x_iterator dst_it = dst_view.row_begin( y );
 
+                    for( ; it != end; ++it, ++dst_it )
+                    {
+                        unsigned char c = get_color( *it, gray_color_t() );
+                        *dst_it = palette[ c ];
+                    }
 
                     break;
                 }
