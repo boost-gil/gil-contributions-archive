@@ -31,8 +31,9 @@ extern "C" {
 #include <boost/shared_ptr.hpp>
 
 #include "tiff_tags.hpp"
-#include "detail/base.hpp"
-#include "detail/io_device.hpp"
+#include "base.hpp"
+#include "io_device.hpp"
+#include "tiff_io_device.hpp"
 
 namespace boost { namespace gil { namespace detail {
 

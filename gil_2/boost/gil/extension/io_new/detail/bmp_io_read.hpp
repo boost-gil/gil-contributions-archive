@@ -67,6 +67,24 @@ throw()
     return n;
 }
 
+void swap_bits_( unsigned char& c )
+{
+   unsigned char result = 0;
+   for( int i = 0; i < 8; ++i )
+   {
+      result = result << 1;
+      result |= ( c & 1 );
+      c = c >> 1;
+   }
+
+   c = result;
+}
+
+void swap_half_bytes( unsigned char& c )
+{
+    unsigned char b = ( c & 0xF ) << 4;
+    c = ( c >> 4 ) | b;
+}
 
 static const int header_size     = 14;
 static const int win32_info_size = 40;
@@ -327,6 +345,10 @@ public:
             {
                 case 1:
                 {
+                    // we have to swap bits
+                    // 11101100 -> 00110111
+                    for_each( row.begin(), row.end(), swap_bits_ );
+
                     // row contains the indices
                     typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
                     typedef image_t::view_t::x_iterator it_t;
@@ -341,6 +363,88 @@ public:
                         unsigned char c = get_color( *it, gray_color_t() );
                         *dst_it = palette[ c ];
                     }
+
+                    break;
+                }
+
+                case 4:
+                {
+                    // we have to swap half bytes
+                    // 11101100 -> 11001110
+                    for_each( row.begin(), row.end(), swap_half_bytes );
+
+                    // row contains the indices
+                    typedef bit_aligned_image1_type< 4, gray_layout_t >::type image_t;
+                    typedef image_t::view_t::x_iterator it_t;
+
+                    it_t it( &row.front(), 0 );
+                    it_t end = it + _info._width;
+
+                    typename View::x_iterator dst_it = dst_view.row_begin( y );
+
+                    for( ; it != end; ++it, ++dst_it )
+                    {
+                        unsigned char c = get_color( *it, gray_color_t() );
+                        *dst_it = palette[ c ];
+                    }
+
+                    break;
+                }
+
+                case 8:
+                {
+                    // row contains the indices
+                    typedef gray8_image_t image_t;
+
+                    gray8_view_t v = interleaved_view( _info._width
+                                                     , _info._height
+                                                     , (gray8_pixel_t*) &row.front()
+                                                     , _info._width
+                                                     );
+
+                    gray8_view_t::x_iterator it  = v.row_begin( 0 );
+                    gray8_view_t::x_iterator end = v.row_end( 0 );
+
+
+                    typename View::x_iterator dst_it = dst_view.row_begin( y );
+
+                    for( ; it != end; ++it, ++dst_it )
+                    {
+                        unsigned char c = get_color( *it, gray_color_t() );
+                        *dst_it = palette[ c ];
+                    }
+
+
+                    break;
+                }
+
+                case 16:
+                {
+                    typedef rgb8_image_t image_t;
+                    typedef image_t::view_t::x_iterator it_t;
+
+                    image_t img_row( _info._width, 1 );
+                    image_t::view_t view_row = view( img_row );
+                    it_t it = view_row.row_begin( 0 );
+
+                    unsigned char* src = &row.front();
+                    for( unsigned int i = 0 ; i < _info._width; ++i, src += 2 )
+                    {
+				        int p = ( src[1] << 8 ) | src[0];
+
+				        int r = ((p & mask.red.mask)   >> mask.red.shift)   << (8 - mask.red.width);
+				        int g = ((p & mask.green.mask) >> mask.green.shift) << (8 - mask.green.width);
+				        int b = ((p & mask.blue.mask)  >> mask.blue.shift)  << (8 - mask.blue.width);
+
+                        get_color( it[i], red_t()   ) = r;
+                        get_color( it[i], green_t() ) = g;
+                        get_color( it[i], blue_t()  ) = b;
+                    }
+
+                    this->_cc_policy.read( view_row.row_begin( 0 )
+                                         , view_row.row_end( 0 )
+                                         , dst_view.row_begin( y )
+                                         );
 
                     break;
                 }
