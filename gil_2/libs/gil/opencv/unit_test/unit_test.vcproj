@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;C:\Program Files\GnuWin32\include;C:\Program Files\OpenCV\cv\include\;C:\Program Files\OpenCV\cxcore\include"
+				AdditionalIncludeDirectories="c:\boost;C:\gil\gil_2;C:\Program Files\GnuWin32\include;C:\Program Files\OpenCV\cv\include\;C:\Program Files\OpenCV\cxcore\include;C:\chh\geometry_library_preview_3\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -189,6 +189,10 @@
 		</File>
 		<File
 			RelativePath=".\edge_detection.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\geometry_test.cpp"
 			>
 		</File>
 		<File

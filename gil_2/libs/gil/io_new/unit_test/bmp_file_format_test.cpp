@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
-#include <boost/gil/extension/io_new/bmp_all.hpp>
+#include <boost/gil/extension/io_new/bmp_read.hpp>
+#include <boost/gil/extension/io_new/png_write.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -16,6 +17,20 @@ namespace bmp_test {
 // the png's to rgb8_image_t's. Which then will be written in
 // the "out" folder.
 // 
+
+
+// For rgba to rgb conversion. The default multiplies alpha with the color channels.
+// But in the test image alpha is 0.
+struct my_color_converter
+{
+    template <typename P1, typename P2>
+    void operator()(const P1& src, P2& dst) const
+    {
+        get_color( dst, red_t()   ) = get_color( src, red_t()   );
+        get_color( dst, green_t() ) = get_color( src, green_t() );
+        get_color( dst, blue_t()  ) = get_color( src, blue_t()  );
+    }
+};
 
 BOOST_AUTO_TEST_CASE( my_file_format_test )
 {
@@ -37,15 +52,29 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
          {
             rgb8_image_t img;
             string filename = in + dir_itr->path().leaf();
-            read_and_convert_image( filename, img, tag_t() );
+            
+            try
+            {
+                image_read_info< bmp_tag > info = read_image_info( filename, tag_t() );
 
-            write_view( out + fs::basename( dir_itr->path() ) + ".bmp"
-                      , view( img )
-                      , tag_t()
-                      );
+                if( info._bits_per_pixel == 32 )
+                {
+                    read_and_convert_image( filename, img, my_color_converter(), tag_t() );
+                }
+                else
+                {
+                    read_and_convert_image( filename, img, tag_t() );
+                }
+
+                write_view( out + fs::basename( dir_itr->path() ) + ".png"
+                          , view( img )
+                          , png_tag()
+                          );
+            }
+            catch( const std::ios_base::failure& ) {}
          }
       }
    }
 }
 
-} // namespace bmp
+} // namespace bmp_test

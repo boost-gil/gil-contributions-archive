@@ -270,7 +270,7 @@ public:
         }
 
         // Read the color map.
-        std::vector< rgb8_pixel_t > palette;
+        std::vector< rgba8_pixel_t > palette;
 
         if( _info._bits_per_pixel <= 8 )
         {
@@ -337,8 +337,6 @@ public:
 
         for( int y = ybeg; y != yend; y += yinc )
         {
-            //typedef typename color_space_type< View >::type Spc;
-
             _io_dev.read( &row.front(), pitch );
 
             switch( _info._bits_per_pixel )
@@ -428,7 +426,7 @@ public:
                     it_t it = view_row.row_begin( 0 );
 
                     unsigned char* src = &row.front();
-                    for( unsigned int i = 0 ; i < _info._width; ++i, src += 2 )
+                    for( int i = 0 ; i < _info._width; ++i, src += 2 )
                     {
 				        int p = ( src[1] << 8 ) | src[0];
 
