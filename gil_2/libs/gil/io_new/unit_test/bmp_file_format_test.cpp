@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
          {
             rgb8_image_t img;
             string filename = in + dir_itr->path().leaf();
-            
+
             try
             {
                 image_read_info< bmp_tag > info = read_image_info( filename, tag_t() );
@@ -75,6 +75,26 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
          }
       }
    }
+}
+
+BOOST_AUTO_TEST_CASE( partial_image_test )
+{
+    const std::string filename( "..\\test_images\\bmp\\rgb.bmp" );
+
+    {
+        rgba8_image_t img;
+        read_image( filename
+                  , img
+                  , image_read_settings< bmp_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
+                  );
+
+
+        write_view( "..\\test\\bmp\\rgb_partial.bmp"
+                  , view( img )
+                  , png_tag()
+                  );
+    }
+
 }
 
 } // namespace bmp_test

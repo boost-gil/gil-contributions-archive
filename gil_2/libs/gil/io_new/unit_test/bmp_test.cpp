@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 
     {
         image_read_info< tag_t > info = read_image_info( filename
-                                                         , tag_t() );
+                                                       , tag_t() );
         BOOST_CHECK_EQUAL( info._width , 127 );
         BOOST_CHECK_EQUAL( info._height, 64 );
     }

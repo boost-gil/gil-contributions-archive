@@ -59,8 +59,8 @@ struct image_read_settings_base
 protected:
 
     image_read_settings_base()
-    : _top_left  ( 0, 0 )
-    , _dim       ( 0, 0 )
+    : _top_left( 0, 0 )
+    , _dim     ( 0, 0 )
     {}
 
     image_read_settings_base( const point_t& top_left

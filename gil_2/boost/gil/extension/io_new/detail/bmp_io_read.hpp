@@ -67,6 +67,7 @@ throw()
     return n;
 }
 
+inline
 void swap_bits_( unsigned char& c )
 {
    unsigned char result = 0;
@@ -80,6 +81,7 @@ void swap_bits_( unsigned char& c )
    c = result;
 }
 
+inline
 void swap_half_bytes( unsigned char& c )
 {
     unsigned char b = ( c & 0xF ) << 4;
@@ -322,17 +324,20 @@ public:
         typedef unsigned char byte_t;
         std::vector< byte_t > row( pitch );
 
-        /// @todo make sure partial image reading is working
         int ybeg = 0;
-        int yend = _info._height;
+        int yend = this->_settings._top_left.y + this->_settings._dim.y;
         int yinc = 1;
 
         if( _info._height > 0 )
         {
             // the image is upside down
-            ybeg = _info._height - 1;
+            ybeg = this->_settings._dim.y - 1;
             yend = -1;
             yinc = -1;
+        }
+        else
+        {
+            _io_dev.seek( _info._offset );
         }
 
         for( int y = ybeg; y != yend; y += yinc )
@@ -343,6 +348,8 @@ public:
             {
                 case 1:
                 {
+                    // 2-bit indices
+
                     // we have to swap bits
                     // 11101100 -> 00110111
                     for_each( row.begin(), row.end(), swap_bits_ );
@@ -367,6 +374,8 @@ public:
 
                 case 4:
                 {
+                    // 4-bit indices
+
                     // we have to swap half bytes
                     // 11101100 -> 11001110
                     for_each( row.begin(), row.end(), swap_half_bytes );
@@ -391,7 +400,7 @@ public:
 
                 case 8:
                 {
-                    // row contains the indices
+                    // 8-bit indices
                     typedef gray8_image_t image_t;
 
                     gray8_view_t v = interleaved_view( _info._width
@@ -416,6 +425,7 @@ public:
                     break;
                 }
 
+                case 15:
                 case 16:
                 {
                     typedef rgb8_image_t image_t;
@@ -449,6 +459,7 @@ public:
 
                 case 24:
                 {
+                    // 8-8-8 BGR
                     bgr8_view_t v = interleaved_view( _info._width
                                                     , _info._height
                                                     , (bgr8_pixel_t*) &row.front()
@@ -466,7 +477,7 @@ public:
 
                 case 32:
                 {
-                    // 8-8-8-8 BGR
+                    // 8-8-8-8 BGRA
                     bgra8_view_t v = interleaved_view( _info._width
                                                      , _info._height
                                                      , (bgra8_pixel_t*) &row.front()
