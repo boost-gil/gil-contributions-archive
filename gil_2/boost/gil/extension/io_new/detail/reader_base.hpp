@@ -41,8 +41,9 @@ public:
 
         setup( _settings._dim );
 
-        img.recreate( _settings._dim.x - settings._top_left.x
-                    , _settings._dim.y - settings._top_left.y );
+        img.recreate( _settings._dim.x
+                    , _settings._dim.y
+                    );
     }
 
     template< typename View >
@@ -85,8 +86,16 @@ private:
     {
        typedef point_t::value_type int_t;
 
-       int_t width  = static_cast<int_t>( _info._width  );
-       int_t height = static_cast<int_t>( _info._height );
+       int_t width  = static_cast< int_t >( _info._width  );
+       int_t height = static_cast< int_t >( _info._height );
+
+       io_error_if( (  _settings._top_left.x < 0
+                    || _settings._top_left.y < 0
+                    || dim.x < 0
+                    || dim.y < 0
+                    )
+                 , "User provided view has incorrect size." );
+
 
        io_error_if( (  ( width  ) <  _settings._top_left.x
                     && ( width  ) <= dim.x
@@ -99,10 +108,11 @@ private:
                     )
                  , "User provided view has incorrect size." );
 
-       io_error_if( (  ( dim.x - _settings._top_left.x ) > width
-                    || ( dim.y - _settings._top_left.y ) > height
+       io_error_if( (  ( _settings._top_left.x + dim.x ) > width
+                    || ( _settings._top_left.y + dim.y ) > height
                    )
                  , "User provided view has incorrect size." );
+
     }
 
 protected:

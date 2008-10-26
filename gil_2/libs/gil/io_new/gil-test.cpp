@@ -24,12 +24,18 @@ struct my_color_converter
 
 int main(int argc, char *argv[])
 {
-    const std::string filename( ".\\test_images\\bmp\\g32bf.bmp" );
+    const std::string filename( ".\\test_images\\bmp\\g24.bmp" );
 
     typedef rgb8_image_t image_t;
 
+    image_read_settings< bmp_tag > settings( point_t( 0, 5  )
+                                           , point_t( 30, 30 )
+                                           );
+
+
     image_t img;
-    read_and_convert_image( filename, img, my_color_converter(), bmp_tag() );
+    read_image( filename, img, settings );
+    //read_image( filename, img, bmp_tag() );
 
     write_view( ".\\test\\bmp\\test.png", view( img ), png_tag() );
 

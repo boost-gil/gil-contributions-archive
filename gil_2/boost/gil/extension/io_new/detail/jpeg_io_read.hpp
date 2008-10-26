@@ -244,46 +244,55 @@ private:
             throw std::runtime_error( "Image type aren't compatible." );
         }
       
-      std::vector<ImagePixel> buffer( this->_info._width );
+        std::vector<ImagePixel> buffer
 
-      JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
+        std::vector<ImagePixel> buffer( this->_info._width );
 
-      //Skip scanlines if necessary.
-      for( int y = 0; y <  this->_settings._top_left.y; ++y )
-      {
-         io_error_if( jpeg_read_scanlines( &this->_cinfo
+        JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
+
+        //Skip scanlines if necessary.
+        for( int y = 0; y <  this->_settings._top_left.y; ++y )
+        {
+            io_error_if( jpeg_read_scanlines( &this->_cinfo
                                          , &row_adr
                                          , 1
                                          ) !=1
-                    , "jpeg_read_scanlines: fail to read JPEG file" );
-      }
+                       , "jpeg_read_scanlines: fail to read JPEG file"
+                       );
+        }
 
-      // Read data.
-      for( int y = 0; y < view.height(); ++y )
-      {
-         io_error_if( jpeg_read_scanlines( &this->_cinfo
+        // Read data.
+        for( int y = 0; y < view.height(); ++y )
+        {
+            io_error_if( jpeg_read_scanlines( &this->_cinfo
                                          , &row_adr
                                          , 1
                                          ) !=1
-                    , "jpeg_read_scanlines: fail to read JPEG file" );
+                       , "jpeg_read_scanlines: fail to read JPEG file"
+                       );
 
-         this->_cc_policy.read( buffer.begin() + this->_settings._top_left.x
-                              , buffer.begin() + this->_settings._dim.x
-                              , view.row_begin( y )
-                              );
-      }
+            buffer_t::iterator beg = buffer.begin() + this->_settings._top_left.x;
+            buffer_t::iterator end = beg + this->_settings._dim.x;
 
-      //@todo: Finish up. There might be a better way to do that.
-      while( this->_cinfo.output_scanline <  this->_cinfo.image_height )
-      {
-         io_error_if( jpeg_read_scanlines( &this->_cinfo
-                                         , &row_adr
-                                         , 1
-                                         ) !=1
-                    , "jpeg_read_scanlines: fail to read JPEG file" );
-      }
 
-   }
+            this->_cc_policy.read( beg
+                                 , end
+                                 , view.row_begin( y )
+                                 );
+        }
+
+        //@todo: Finish up. There might be a better way to do that.
+        while( this->_cinfo.output_scanline <  this->_cinfo.image_height )
+        {
+            io_error_if( jpeg_read_scanlines( &this->_cinfo
+                                            , &row_adr
+                                            , 1
+                                            ) !=1
+                       , "jpeg_read_scanlines: fail to read JPEG file"
+                       );
+        }
+
+    }
 };
 
 } // detail

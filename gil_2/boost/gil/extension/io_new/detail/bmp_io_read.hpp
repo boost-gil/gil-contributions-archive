@@ -302,20 +302,16 @@ public:
         } // if
 
 
-        // go to first byte of bitmap data
-        _io_dev.seek( _info._offset );
-
-
         // the row pitch must be multiple 4 bytes
         int pitch;
 
         if( _info._bits_per_pixel < 8 )
         {
-            pitch = (( _info._width * _info._bits_per_pixel ) + 7 ) >> 3;
+            pitch = (( this->_info._width * this->_info._bits_per_pixel ) + 7 ) >> 3;
         }
         else
         {
-            pitch = _info._width * (( _info._bits_per_pixel + 7 ) >> 3);
+            pitch = _info._width * (( this->_info._bits_per_pixel + 7 ) >> 3);
         }
 
         pitch = (pitch + 3) & ~3;
@@ -325,7 +321,7 @@ public:
         std::vector< byte_t > row( pitch );
 
         int ybeg = 0;
-        int yend = this->_settings._top_left.y + this->_settings._dim.y;
+        int yend = this->_settings._dim.y;
         int yinc = 1;
 
         if( _info._height > 0 )
@@ -334,14 +330,30 @@ public:
             ybeg = this->_settings._dim.y - 1;
             yend = -1;
             yinc = -1;
+
+            // go to the first scanline to read
+            _io_dev.seek( _info._offset
+                        + (   this->_info._height 
+                            - this->_settings._top_left.y 
+                            - this->_settings._dim.y 
+                          ) * pitch
+                        );
+
         }
         else
         {
-            _io_dev.seek( _info._offset );
+            // go to the first scanline to read
+            _io_dev.seek( _info._offset
+                        + this->_settings._top_left.y * pitch
+                        );
+
         }
 
         for( int y = ybeg; y != yend; y += yinc )
         {
+            // @todo: For now we're reading the whole scanline which is
+            // slightly inefficient. Later versions should try to read
+            // only the bytes which are necessary.
             _io_dev.read( &row.front(), pitch );
 
             switch( _info._bits_per_pixel )
@@ -359,7 +371,8 @@ public:
                     typedef image_t::view_t::x_iterator it_t;
                     
                     it_t it( &row.front(), 0 );
-                    it_t end = it + _info._width;
+                    it += this->_settings._top_left.x;
+                    it_t end = it + this->_settings._dim.x;
 
                     typename View::x_iterator dst_it = dst_view.row_begin( y );
 
@@ -385,7 +398,8 @@ public:
                     typedef image_t::view_t::x_iterator it_t;
 
                     it_t it( &row.front(), 0 );
-                    it_t end = it + _info._width;
+                    it += this->_settings._top_left.x;
+                    it_t end = it + this->_settings._dim.x;
 
                     typename View::x_iterator dst_it = dst_view.row_begin( y );
 
@@ -404,13 +418,13 @@ public:
                     typedef gray8_image_t image_t;
 
                     gray8_view_t v = interleaved_view( _info._width
-                                                     , _info._height
+                                                     , 1
                                                      , (gray8_pixel_t*) &row.front()
                                                      , _info._width
                                                      );
 
-                    gray8_view_t::x_iterator it  = v.row_begin( 0 );
-                    gray8_view_t::x_iterator end = v.row_end( 0 );
+                    gray8_view_t::x_iterator it  = v.row_begin( 0 ) + this->_settings._top_left.x;
+                    gray8_view_t::x_iterator end = it + this->_settings._dim.x;
 
 
                     typename View::x_iterator dst_it = dst_view.row_begin( y );
@@ -432,8 +446,8 @@ public:
                     typedef image_t::view_t::x_iterator it_t;
 
                     image_t img_row( _info._width, 1 );
-                    image_t::view_t view_row = view( img_row );
-                    it_t it = view_row.row_begin( 0 );
+                    image_t::view_t v = view( img_row );
+                    it_t it = v.row_begin( 0 );
 
                     unsigned char* src = &row.front();
                     for( int i = 0 ; i < _info._width; ++i, src += 2 )
@@ -449,8 +463,11 @@ public:
                         get_color( it[i], blue_t()  ) = b;
                     }
 
-                    this->_cc_policy.read( view_row.row_begin( 0 )
-                                         , view_row.row_end( 0 )
+                    it_t beg = v.row_begin( 0 ) + this->_settings._top_left.x;
+                    it_t end = beg + this->_settings._dim.x;
+
+                    this->_cc_policy.read( beg
+                                         , end
                                          , dst_view.row_begin( y )
                                          );
 
@@ -461,13 +478,16 @@ public:
                 {
                     // 8-8-8 BGR
                     bgr8_view_t v = interleaved_view( _info._width
-                                                    , _info._height
+                                                    , 1
                                                     , (bgr8_pixel_t*) &row.front()
                                                     , _info._width * 3
                                                     );
 
-                    this->_cc_policy.read( v.begin() + this->_settings._top_left.x
-                                         , v.begin() + this->_settings._dim.x
+                    bgr8_view_t::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
+                    bgr8_view_t::x_iterator end = beg + this->_settings._dim.x;
+
+                    this->_cc_policy.read( beg
+                                         , end
                                          , dst_view.row_begin( y )
                                          );
 
@@ -479,15 +499,19 @@ public:
                 {
                     // 8-8-8-8 BGRA
                     bgra8_view_t v = interleaved_view( _info._width
-                                                     , _info._height
+                                                     , 1
                                                      , (bgra8_pixel_t*) &row.front()
                                                      , _info._width * 4
                                                      );
 
-                    this->_cc_policy.read( v.begin() + this->_settings._top_left.x
-                                         , v.begin() + this->_settings._dim.x
+                    bgra8_view_t::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
+                    bgra8_view_t::x_iterator end = beg + this->_settings._dim.x;
+
+                    this->_cc_policy.read( beg
+                                         , end
                                          , dst_view.row_begin( y )
                                          );
+
                     break;
                 }
             }
