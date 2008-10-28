@@ -20,13 +20,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
-#include <boost/gil/extension/io_new/jpeg_tags.hpp>
+#include <boost/gil/extension/io_new/bmp_tags.hpp>
 
 #include "base.hpp"
 #include "reader_base.hpp"
 #include "io_device.hpp"
 #include "typedefs.hpp"
-#include "jpeg_supported_types.hpp"
+#include "bmp_supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -88,10 +88,6 @@ void swap_half_bytes( unsigned char& c )
     c = ( c >> 4 ) | b;
 }
 
-static const int header_size     = 14;
-static const int win32_info_size = 40;
-static const int os2_info_size   = 12;
-static const int bm_signature    = 0x4D42;
 
 /// Color channel mask
 struct bit_field
@@ -317,7 +313,6 @@ public:
         pitch = (pitch + 3) & ~3;
 
         // read the raster
-        typedef unsigned char byte_t;
         std::vector< byte_t > row( pitch );
 
         int ybeg = 0;

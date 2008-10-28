@@ -223,7 +223,7 @@ private:
                         );
 
             this->_cc_policy.read( buffer.begin() + this->_settings._top_left.x
-                                 , buffer.begin() + this->_settings._dim.x
+                                 , buffer.begin() + this->_settings._top_left.x + this->_settings._dim.x
                                  , view.row_begin( y )
                                  );
         }

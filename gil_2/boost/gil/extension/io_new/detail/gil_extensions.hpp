@@ -91,10 +91,10 @@ struct is_homogeneous_impl_p;
 template <typename B, typename C, typename L >
 struct is_homogeneous<packed_pixel< B, C, L > > 
 	: is_homogeneous_impl_p< C 
-	                               , typename mpl::at_c< C, 0 >::type
-	                               , 1
-	                               , mpl::size< C >::type::value
-	                               > {};
+                           , typename mpl::at_c< C, 0 >::type
+                           , 1
+                           , mpl::size< C >::type::value
+                           > {};
 
 template <typename B, typename C, typename L>  
 struct is_homogeneous<const packed_pixel<B,C,L> > 

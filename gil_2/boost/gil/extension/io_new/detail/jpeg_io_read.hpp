@@ -274,7 +274,6 @@ private:
             buffer_t::iterator beg = buffer.begin() + this->_settings._top_left.x;
             buffer_t::iterator end = beg + this->_settings._dim.x;
 
-
             this->_cc_policy.read( beg
                                  , end
                                  , view.row_begin( y )

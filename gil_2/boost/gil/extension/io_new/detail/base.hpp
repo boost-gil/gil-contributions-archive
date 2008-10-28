@@ -37,6 +37,7 @@
 
 namespace boost { namespace gil {
 
+typedef unsigned char byte_t;
 typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
 struct format_tag {};

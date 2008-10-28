@@ -40,7 +40,15 @@ namespace boost { namespace gil { namespace detail {
 template< typename FormatTag >
 class file_stream_device
 {
-   typedef unsigned char byte_t;
+    template < typename T > struct buff_item
+    {
+	    static const unsigned int size = sizeof( T );
+    };
+
+    template <> struct buff_item< void >
+    {
+	    static const unsigned int size = 1;
+    };
 
 public:
 
@@ -49,6 +57,7 @@ public:
 public:
     struct read_tag {};
     struct write_tag {};
+
     file_stream_device( std::string const& file_name, read_tag )
         : file(0),_close(true)
     {
@@ -116,15 +125,53 @@ public:
         return (m[3] << 24) | (m[2] << 16) | (m[1] << 8) | m[0];
     }
 
-    void write( const unsigned char* data
-              , std::size_t          count )
+    /// Writes number of elements from a buffer
+    template < typename T >
+    size_t write(const T *buf, size_t cnt) throw()
     {
-        fwrite( data
-              , 1
-              , static_cast< int >( count )
-              , file
-              );
+        return fwrite( buf, buff_item<T>::size, cnt, file );
     }
+
+    /// Writes array
+    template < typename T
+             , size_t   N
+             >
+    size_t write( const T (&buf)[N] ) throw()
+    {
+        return write( buf, N );
+    }
+
+    /// Writes byte
+    void write_int8( boost::uint8_t x ) throw()
+    {
+	    byte_t m[1] = { x };
+	    write(m);
+    }
+
+    /// Writes 16 bit little endian integer
+    void write_int16( boost::uint16_t x ) throw()
+    {
+	    byte_t m[2];
+
+	    m[0] = byte_t( x >> 0 );
+	    m[1] = byte_t( x >> 8 );
+
+	    write( m );
+    }
+
+    /// Writes 32 bit little endian integer
+    void write_int32( boost::uint32_t x ) throw()
+    {
+	    byte_t m[4];
+
+	    m[0] = byte_t( x >>  0 );
+	    m[1] = byte_t( x >>  8 );
+	    m[2] = byte_t( x >> 16 );
+	    m[3] = byte_t( x >> 24 );
+
+	    write( m );
+    }
+
 
     //!\todo replace with std::ios::seekdir?
     void seek( long count, int whence = SEEK_SET )
@@ -244,9 +291,19 @@ private:
  */
 class ostream_device
 {
+    template < typename T > struct buff_item
+    {
+	    static const unsigned int size = sizeof( T );
+    };
+
+    template <> struct buff_item< void >
+    {
+	    static const unsigned int size = 1;
+    };
+
 public:
     ostream_device( std::ostream & out )
-        : out(out)
+        : _out( out )
     {
     }
 
@@ -258,32 +315,71 @@ public:
 
     void seek( long count, int whence )
     {
-        out.seekp(
-                count,
-                whence == SEEK_SET
-                ?std::ios::beg
-                :(whence == SEEK_CUR
-                    ?std::ios::cur
-                    :std::ios::end)
-                );
+        _out.seekp( count
+                  , whence == SEEK_SET
+                    ? std::ios::beg
+                    : ( whence == SEEK_CUR
+                        ?std::ios::cur
+                        :std::ios::end )
+                  );
     }
 
     void write( const unsigned char* data
               , std::size_t          count )
     {
-        out.write( reinterpret_cast<char const*>( data )
+        _out.write( reinterpret_cast<char const*>( data )
                  , static_cast<std::streamsize>( count )
                  );
     }
 
+    /// Writes array
+    template < typename T
+             , size_t   N
+             >
+    void write( const T (&buf)[N] ) throw()
+    {
+        write( buf, N );
+    }
+
+    /// Writes byte
+    void write_int8( boost::uint8_t x ) throw()
+    {
+	    byte_t m[1] = { x };
+	    write(m);
+    }
+
+    /// Writes 16 bit little endian integer
+    void write_int16( boost::uint16_t x ) throw()
+    {
+	    byte_t m[2];
+
+	    m[0] = byte_t( x >> 0 );
+	    m[1] = byte_t( x >> 8 );
+
+	    write( m );
+    }
+
+    /// Writes 32 bit little endian integer
+    void write_int32( boost::uint32_t x ) throw()
+    {
+	    byte_t m[4];
+
+	    m[0] = byte_t( x >>  0 );
+	    m[1] = byte_t( x >>  8 );
+	    m[2] = byte_t( x >> 16 );
+	    m[3] = byte_t( x >> 24 );
+
+	    write( m );
+    }
+
     void flush()
     {
-        out << std::flush;
+        _out << std::flush;
     }
 
 private:
 
-    std::ostream& out;
+    std::ostream& _out;
 };
 
 
