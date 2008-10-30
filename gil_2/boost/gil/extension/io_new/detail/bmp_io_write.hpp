@@ -24,6 +24,11 @@
 
 namespace boost { namespace gil { namespace detail {
 
+template < int N > struct get_bgr_cs {};
+template <> struct get_bgr_cs< 1 > { typedef gray8_view_t type; };
+template <> struct get_bgr_cs< 3 > { typedef bgr8_view_t type; };
+template <> struct get_bgr_cs< 4 > { typedef bgra8_view_t type; };
+
 template< typename Device >
 class writer< Device
             , bmp_tag
@@ -106,16 +111,29 @@ private:
         _out.write_int32( entries );
         _out.write_int32( 0 );
 
+        write_image< View
+                   , get_bgr_cs< num_channels< View >::value >::type
+                   >( view, spn );
+    }
 
+
+    template< typename View
+            , typename BMP_View
+            >
+    void write_image( const View&       view
+                    , const std::size_t spn
+                    )
+    {
         std::vector< byte_t > buffer( spn );
         std::fill( buffer.begin(), buffer.end(), 0 );
 
-        bgr8_view_t row = interleaved_view( spn / 3
-                                          , 1
-                                          , (bgr8_pixel_t*) &buffer.front()
-                                          , spn
-                                          );
-        
+
+        BMP_View row = interleaved_view( view.width()
+                                       , 1
+                                       , (typename BMP_View::value_type*) &buffer.front()
+                                       , spn
+                                       );
+
         for( int y = view.height() - 1; y > -1; --y  )
         {
             copy_pixels( subimage_view( view, 0, y, view.width(), 1 )
@@ -124,6 +142,7 @@ private:
 
             _out.write( &buffer.front(), spn );
         }
+
     }
 
 private:

@@ -25,19 +25,21 @@ int main(int argc, char *argv[])
 {
     std::ofstream o( "\\test.txt" );
 
-    const std::string filename( ".\\test_images\\bmp\\g24.bmp" );
+    const std::string filename( ".\\test_images\\bmp\\g08p64.bmp" );
 
-    typedef rgb8_image_t image_t;
+    typedef gray8_image_t image_t;
 
+/*
     image_read_settings< bmp_tag > settings( point_t( 0, 5  )
                                            , point_t( 30, 30 )
                                            );
-
+*/
 
     image_t img;
-    read_image( filename, img, settings );
+    //read_image( filename, img, settings );
+    read_image( filename, img, bmp_tag() );
 
-    write_view( ".\\test\\bmp\\test.bmp", view( img ), bmp_tag() );
+    write_view( ".\\test\\bmp\\test8.bmp", view( img ), bmp_tag() );
 
     return 0;
 }
