@@ -79,7 +79,7 @@ private:
         int entries = 0;
 
 /*
-        /// @todo: No supported for now. bit_aligned_images refer to indexed images 
+        /// @todo: Not supported for now. bit_aligned_images refer to indexed images 
         ///        in this context.
         if( bpp <= 8 )
         {

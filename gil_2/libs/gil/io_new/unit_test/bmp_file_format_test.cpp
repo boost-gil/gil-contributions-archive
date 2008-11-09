@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-#include <boost/gil/extension/io_new/bmp_read.hpp>
-#include <boost/gil/extension/io_new/png_write.hpp>
+#include <boost/gil/extension/io_new/bmp_all.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -66,9 +65,9 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
                     read_and_convert_image( filename, img, tag_t() );
                 }
 
-                write_view( out + fs::basename( dir_itr->path() ) + ".png"
+                write_view( out + fs::basename( dir_itr->path() ) + ".bmp"
                           , view( img )
-                          , png_tag()
+                          , tag_t()
                           );
             }
             catch( const std::ios_base::failure& ) {}
@@ -91,7 +90,7 @@ BOOST_AUTO_TEST_CASE( partial_image_test )
 
         write_view( "..\\test\\bmp\\rgb_partial.bmp"
                   , view( img )
-                  , png_tag()
+                  , tag_t()
                   );
     }
 

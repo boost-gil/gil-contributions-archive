@@ -243,10 +243,10 @@ private:
         {
             throw std::runtime_error( "Image type aren't compatible." );
         }
-      
-        std::vector<ImagePixel> buffer
 
-        std::vector<ImagePixel> buffer( this->_info._width );
+        typedef std::vector<ImagePixel> buffer_t;
+
+        buffer_t buffer( this->_info._width );
 
         JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
 

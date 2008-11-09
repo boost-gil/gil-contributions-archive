@@ -12,7 +12,6 @@
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
 using namespace std;

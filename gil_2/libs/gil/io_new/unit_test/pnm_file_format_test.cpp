@@ -37,12 +37,14 @@ BOOST_AUTO_TEST_CASE( file_format_test )
          {
             rgb8_image_t img;
             string filename = in + dir_itr->path().leaf();
+/*
             read_and_convert_image( filename, img, tag_t() );
 
             write_view( out + fs::basename( dir_itr->path() ) + ".pnm"
                       , view( img )
                       , pnm_tag()
                       );
+*/
          }
       }
    }
