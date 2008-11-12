@@ -29,7 +29,8 @@ The compiler should generate errors using MSVC 8.
 The reason is that the compiler is using the wrong io function which should be guarded by an enable_if
 statement. But it's not working here.
 
-To make the above code compile, one has to comment out some of the header file and viola it works!
+To make the above code compile, one has to comment out some of the header files in 
+tiff_read.hpp and viola it works!
 
 /*
 #include "detail/read_image_info.hpp"

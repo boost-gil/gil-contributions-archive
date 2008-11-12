@@ -83,6 +83,13 @@ template<typename FormatTag> struct image_write_info;
 
 namespace detail {
 
+template< typename Property > 
+struct property_base
+{
+    typedef Property type;
+};
+
+
 inline 
 void io_error( const std::string& descr )
 {

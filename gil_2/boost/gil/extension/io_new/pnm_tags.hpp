@@ -25,19 +25,21 @@ namespace boost { namespace gil {
 
 struct pnm_tag : format_tag {};
 
-struct pnm_image_width
-{
-   typedef unsigned int type;
-};
+static const uint32_t type_mono_asc	 = 1; // Monochrome ASCII encoding
+static const uint32_t type_gray_asc	 = 2; // Gray level ASCII encoding
+static const uint32_t type_color_asc = 3; // sRGB color ASCII encoding
+static const uint32_t type_mono_bin  = 4; // Monochrome binary encoding
+static const uint32_t type_gray_bin  = 5; // Gray level binary encoding
+static const uint32_t type_color_bin = 6; // sRGB color binary encoding
 
-struct pnm_image_height
-{
-   typedef unsigned int type;
-};
+struct pnm_image_type   : property_base< uint32_t > {};
+struct pnm_image_width  : property_base< uint32_t > {};
+struct pnm_image_height : property_base< uint32_t > {};
 
 template<>
 struct image_read_info< pnm_tag >
 {
+   pnm_image_type::type   _type;
    pnm_image_width::type  _width;
    pnm_image_height::type _height;
 };
