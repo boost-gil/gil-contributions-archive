@@ -192,7 +192,7 @@ public:
     template<typename View>
     void apply( const View& view )
     {
-        jpeg_decompress_struct& cinfo = get();
+        jpeg_decompress_struct& cinfo = this->get();
         cinfo.dct_method = this->_settings._dct_method;
 
         this->start_decompress();
@@ -236,6 +236,8 @@ private:
             >
     void read_rows( const View& view )
     {
+/*
+        /// @todo
         if( !is_allowed< View >( boost::is_same< ConversionPolicy
                                                , read_and_no_convert
                                                >::type()
@@ -243,6 +245,7 @@ private:
         {
             throw std::runtime_error( "Image type aren't compatible." );
         }
+*/
 
         typedef std::vector<ImagePixel> buffer_t;
 
@@ -271,8 +274,8 @@ private:
                        , "jpeg_read_scanlines: fail to read JPEG file"
                        );
 
-            buffer_t::iterator beg = buffer.begin() + this->_settings._top_left.x;
-            buffer_t::iterator end = beg + this->_settings._dim.x;
+            typename buffer_t::iterator beg = buffer.begin() + this->_settings._top_left.x;
+            typename buffer_t::iterator end = beg + this->_settings._dim.x;
 
             this->_cc_policy.read( beg
                                  , end

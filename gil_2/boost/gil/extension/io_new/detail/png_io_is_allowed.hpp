@@ -21,20 +21,6 @@
 
 namespace boost { namespace gil { namespace detail {
 
-template< typename View >
-bool is_allowed( boost::mpl::true_ // is read_and_no_convert
-               )
-{
-    return true;
-}
-
-template< typename View >
-bool is_allowed( boost::mpl::false_ // is read_and_convert
-               )
-{
-    return true;
-}
-
 } // namespace detail
 } // namespace gil
 } // namespace boost

@@ -82,9 +82,15 @@ void read_image( Device&                                 file
                                    >::type* ptr = 0
                       )
 {
-    typedef typename detail::is_adaptable_input_device<Device>::device_type device_type;
+    typedef typename detail::is_adaptable_input_device< FormatTag
+                                                      , Device
+                                                      >::device_type device_type;
+
     device_type dev(file);
-    detail::reader<device_type,FormatTag,detail::read_and_no_convert> reader(dev);
+    detail::reader< device_type
+                  , FormatTag
+                  , detail::read_and_no_convert
+                  > reader( dev );
 
     reader.init_image( img
                      , settings

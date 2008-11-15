@@ -51,7 +51,7 @@ struct plane_recursion
                                                 , tiff_tag
                                                 , ConversionPolicy >* p )
    {
-      typedef kth_channel_view_type< K, typename View >::type plane_t;
+      typedef typename kth_channel_view_type< K, typename View >::type plane_t;
       plane_t plane = kth_channel_view<K>( dst_view );
       p->read_data( plane, K );
 
@@ -85,36 +85,38 @@ class reader< Device
 {
 public:
 
-   reader( Device& device )
-   : _io_dev( device )
-   {}
+    reader( Device& device )
+    : _io_dev( device )
+    {}
 
-   reader( Device&                                                device
-         , typename const ConversionPolicy::color_converter_type& cc     )
-   : _io_dev   ( device )
-    , reader_base< tiff_tag
-                 , ConversionPolicy >( cc )
-   {}
+    reader( Device&                                                         device
+          , typename const typename ConversionPolicy::color_converter_type& cc
+          )
+    : reader_base< tiff_tag
+                 , ConversionPolicy
+                 >( cc )
+    , _io_dev( device )
+    {}
 
    image_read_info<tiff_tag> get_info()
    {
       image_read_info<tiff_tag> info;
 
-      io_error_if( _io_dev.get_property<tiff_image_width>               ( info._width ) == false
+      io_error_if( _io_dev.template get_property<tiff_image_width>               ( info._width ) == false
                  , "cannot read tiff tag." );
-      io_error_if( _io_dev.get_property<tiff_image_height>              ( info._height ) == false
+      io_error_if( _io_dev.template get_property<tiff_image_height>              ( info._height ) == false
                  , "cannot read tiff tag." );
-      io_error_if( _io_dev.get_property<tiff_compression>               ( info._compression ) == false
+      io_error_if( _io_dev.template get_property<tiff_compression>               ( info._compression ) == false
                  , "cannot read tiff tag." );
-      io_error_if( _io_dev.get_property<tiff_samples_per_pixel>         ( info._samples_per_pixel ) == false
+      io_error_if( _io_dev.template get_property<tiff_samples_per_pixel>         ( info._samples_per_pixel ) == false
                  , "cannot read tiff tag." );
-      io_error_if( _io_dev.get_property<tiff_bits_per_sample>           ( info._bits_per_sample ) == false
+      io_error_if( _io_dev.template get_property<tiff_bits_per_sample>           ( info._bits_per_sample ) == false
                  , "cannot read tiff tag." );
-      io_error_if( _io_dev.get_property<tiff_sample_format>             ( info._sample_format ) == false
+      io_error_if( _io_dev.template get_property<tiff_sample_format>             ( info._sample_format ) == false
                  , "cannot read tiff tag." );
-      io_error_if( _io_dev.get_property<tiff_planar_configuration>      ( info._planar_configuration ) == false
+      io_error_if( _io_dev.template get_property<tiff_planar_configuration>      ( info._planar_configuration ) == false
                  , "cannot read tiff tag." );
-      io_error_if( _io_dev.get_property<tiff_photometric_interpretation>( info._photometric_interpretation  ) == false
+      io_error_if( _io_dev.template get_property<tiff_photometric_interpretation>( info._photometric_interpretation  ) == false
                  , "cannot read tiff tag." );
 
       return info;
@@ -149,19 +151,19 @@ public:
         }
         else
         {
-            std::vector< unsigned int > channel_sizes( _info._samples_per_pixel );
-            for( int i = 0; i < _info._samples_per_pixel; ++i )
+            std::vector< unsigned int > channel_sizes( this->_info._samples_per_pixel );
+            for( int i = 0; i < this->_info._samples_per_pixel; ++i )
             {
-                channel_sizes[i] = _info._bits_per_sample;
+                channel_sizes[i] = this->_info._bits_per_sample;
             }
 
             // In case we only read the image the user's type and 
             // the tiff type need to compatible. Which means:
             // color_spaces_are_compatible && channels_are_pairwise_compatible
 
-            if( !is_allowed< View >( _info._samples_per_pixel
+            if( !is_allowed< View >( this->_info._samples_per_pixel
                                    , channel_sizes
-                                   , _info._sample_format
+                                   , this->_info._sample_format
                                    , boost::is_same< ConversionPolicy
                                                    , read_and_no_convert
                                                    >::type()
@@ -215,9 +217,10 @@ private:
       tiff_color_map::red_t   red   = NULL;
       tiff_color_map::green_t green = NULL;
       tiff_color_map::blue_t  blue  = NULL;
+
       int ret = _io_dev.get_field_defaulted( red, green, blue );
 
-      typedef channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
+      typedef typename channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
       int num_colors = channel_traits< channel_t >::max_value();
 
       rgb16_planar_view_t palette = planar_rgb_view( num_colors
@@ -227,12 +230,12 @@ private:
                                                    , blue
                                                    , sizeof( bits16 ) * num_colors );
 
-      rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
+      typename rgb16_planar_view_t::x_iterator palette_it = palette.row_begin( 0 );
 
-      for( rgb16_view_t::y_coord_t y = 0; y < dst_view.height(); ++y )
+      for( typename rgb16_view_t::y_coord_t y = 0; y < dst_view.height(); ++y )
       {
-         rgb16_view_t::x_iterator it  = dst_view.row_begin( y );
-         rgb16_view_t::x_iterator end = dst_view.row_end( y );
+         typename rgb16_view_t::x_iterator it  = dst_view.row_begin( y );
+         typename rgb16_view_t::x_iterator end = dst_view.row_end( y );
 
          typename Indices_View::x_iterator indices_it = indices_view.row_begin( y );
 
@@ -278,27 +281,30 @@ private:
    void read_data( const View& dst_view
                  , int         plane     )
    {
-      typedef is_bit_aligned< typename View::value_type >::type is_view_bit_aligned_t;
+      typedef typename is_bit_aligned< typename View::value_type >::type is_view_bit_aligned_t;
 
       typedef read_helper_for_compatible_views< is_view_bit_aligned_t
                                               , View
                                               > read_helper_t;
 
-      typedef read_helper_t::buffer_t buffer_t;
+      typedef typename read_helper_t::buffer_t buffer_t;
 
       std::size_t size_to_allocate = buffer_size< typename View::value_type >( dst_view.width()
                                                                              , is_view_bit_aligned_t() );
       buffer_t buffer( size_to_allocate );
-      read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
+      typename read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
 
-      read_helper_t::iterator_t first = begin + this->_settings._top_left.x;
-      read_helper_t::iterator_t last  = begin + this->_settings._dim.x; // one after last element
+      typename read_helper_t::iterator_t first = begin + this->_settings._top_left.x;
+      typename read_helper_t::iterator_t last  = begin + this->_settings._dim.x; // one after last element
 
       skip_over_rows( buffer, plane );
 
-      swap_bits_fn< is_bit_aligned< View >::type, buffer_t > sb( _io_dev );
+      swap_bits_fn< typename is_bit_aligned< View >::type
+                  , buffer_t
+                  > sb( _io_dev );
 
-      point_t::value_type num_rows = this->_settings._dim.y - this->_settings._top_left.y;
+      typename point_t::value_type num_rows = this->_settings._dim.y - this->_settings._top_left.y;
+
       for( std::ptrdiff_t row = this->_settings._top_left.y
          ; row < num_rows
          ; ++row
@@ -336,7 +342,7 @@ private:
    {
       typedef unsigned char element_t;
       typedef std::vector< element_t > buffer_t;
-      typedef typename bit_aligned_pixel_iterator< typename View::reference > iterator_t;
+      typedef bit_aligned_pixel_iterator< typename View::reference > iterator_t;
 
       static iterator_t begin( buffer_t& buffer )
       {

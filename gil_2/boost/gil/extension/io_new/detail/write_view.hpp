@@ -155,7 +155,9 @@ void write_view( Device&                              device
                                                           >::type* ptr = 0 
                )
 {
-    typename detail::is_adaptable_output_device< Device >::device_type dev( device );
+    typename detail::is_adaptable_output_device< FormatTag
+                                               , Device
+                                               >::device_type dev( device );
 
     write_view( dev
               , view

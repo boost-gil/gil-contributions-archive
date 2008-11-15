@@ -196,6 +196,8 @@ private:
             >
     void read_rows( const View& view )
     {
+/*
+        /// @todo
         if( !is_allowed< View >( boost::is_same< ConversionPolicy
                                                , read_and_no_convert
                                                >::type()
@@ -203,7 +205,7 @@ private:
         {
             throw std::runtime_error( "Image type aren't compatible." );
         }
-
+*/
         row_buffer_helper<ImagePixel> buffer( static_cast<int>( this->_info._width ));
 
         // skip rows

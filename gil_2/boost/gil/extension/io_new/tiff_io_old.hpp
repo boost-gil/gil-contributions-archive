@@ -23,8 +23,6 @@
 
 namespace boost { namespace gil {
 
-typedef tiff_tag tag_t;
-
 /// \ingroup TIFF_IO
 /// \brief Returns the width and height of the TIFF file at the specified location.
 /// Throws std::ios_base::failure if the location does not correspond to a valid TIFF file
@@ -32,9 +30,9 @@ template< typename String >
 inline
 point2< std::ptrdiff_t > tiff_read_dimensions( const String& filename )
 {
-    image_read_info< tag_t > info = read_image_info( filename
-                                                   , tag_t()
-                                                   );
+    image_read_info< tiff_tag > info = read_image_info( filename
+                                                      , tiff_tag()
+                                                      );
 
     return point2< std::ptrdiff_t >( info._width
                                    , info._height
@@ -56,7 +54,7 @@ void tiff_read_view( const String& filename
 {
     read_view( filename
              , view
-             , tag_t()
+             , tiff_tag()
              );
 }
 
@@ -75,7 +73,7 @@ void tiff_read_image( const String& filename
 {
     read_image( filename
               , img
-              , tag_t()
+              , tiff_tag()
               );
 }
 
@@ -95,7 +93,7 @@ void tiff_read_and_convert_view( const String& filename
     read_and_convert_view( filename
                          , view
                          , cc
-                         , tag_t()
+                         , tiff_tag()
                          );
 }
 
@@ -112,7 +110,7 @@ void tiff_read_and_convert_view( const String& filename
 {
     read_and_convert_view( filename
                          , view
-                         , tag_t()
+                         , tiff_tag()
                          );
 }
 
@@ -132,7 +130,7 @@ void tiff_read_and_convert_image( const String& filename
     read_and_convert_image( filename
                           , img
                           , cc
-                          , tag_t()
+                          , tiff_tag()
                           );
 }
 
@@ -149,7 +147,7 @@ void tiff_read_and_convert_image( const String filename
 {
     read_and_convert_image( filename
                           , img
-                          , tag_t()
+                          , tiff_tag()
                           );
 }
 
@@ -168,7 +166,7 @@ void tiff_write_view( const String& filename
 {
     write_view( filename
               , view
-              , tag_t()
+              , tiff_tag()
               );
 }
 

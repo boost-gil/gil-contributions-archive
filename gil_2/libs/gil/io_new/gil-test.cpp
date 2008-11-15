@@ -6,6 +6,12 @@
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 #include <boost/gil/gil_all.hpp>
 
+#include <boost/gil/extension/io_new/bmp_io_old.hpp>
+#include <boost/gil/extension/io_new/jpeg_io_old.hpp>
+#include <boost/gil/extension/io_new/pnm_io_old.hpp>
+#include <boost/gil/extension/io_new/png_io_old.hpp>
+#include <boost/gil/extension/io_new/tiff_io_old.hpp>
+
 using namespace std;
 using namespace boost;
 using namespace gil;

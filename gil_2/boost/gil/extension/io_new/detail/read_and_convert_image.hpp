@@ -184,14 +184,14 @@ void read_and_convert_image( const String&                           file_name
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
                            , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
+                                                                   , typename detail::is_supported_path_spec< String >::type
+                                                                   >::type
                                             >::type* ptr = 0
                            )
 {
    read_and_convert_image( file_name
+                         , img
                          , settings
-                         , dim
                          , default_color_converter()
                          );
 }

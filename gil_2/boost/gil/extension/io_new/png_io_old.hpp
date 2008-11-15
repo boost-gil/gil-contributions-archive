@@ -23,8 +23,6 @@
 
 namespace boost { namespace gil {
 
-typedef png_tag tag_t;
-
 /// \ingroup PNG_IO
 /// \brief Returns the width and height of the PNG file at the specified location.
 /// Throws std::ios_base::failure if the location does not correspond to a valid PNG file
@@ -32,9 +30,9 @@ template< typename String >
 inline
 point2< std::ptrdiff_t > png_read_dimensions( const String& filename )
 {
-    image_read_info< tag_t > info = read_image_info( filename
-                                                   , tag_t()
-                                                   );
+    image_read_info< png_tag > info = read_image_info( filename
+                                                     , png_tag()
+                                                     );
 
     return point2< std::ptrdiff_t >( info._width
                                    , info._height
@@ -56,7 +54,7 @@ void png_read_view( const String& filename
 {
     read_view( filename
              , view
-             , tag_t()
+             , png_tag()
              );
 }
 
@@ -75,7 +73,7 @@ void png_read_image( const String& filename
 {
     read_image( filename
               , img
-              , tag_t()
+              , png_tag()
               );
 }
 
@@ -95,7 +93,7 @@ void png_read_and_convert_view( const String& filename
     read_and_convert_view( filename
                          , view
                          , cc
-                         , tag_t()
+                         , png_tag()
                          );
 }
 
@@ -112,7 +110,7 @@ void png_read_and_convert_view( const String& filename
 {
     read_and_convert_view( filename
                          , view
-                         , tag_t()
+                         , png_tag()
                          );
 }
 
@@ -132,7 +130,7 @@ void png_read_and_convert_image( const String& filename
     read_and_convert_image( filename
                           , img
                           , cc
-                          , tag_t()
+                          , png_tag()
                           );
 }
 
@@ -149,7 +147,7 @@ void png_read_and_convert_image( const String filename
 {
     read_and_convert_image( filename
                           , img
-                          , tag_t()
+                          , png_tag()
                           );
 }
 
@@ -167,7 +165,7 @@ void png_write_view( const String& filename
 {
     write_view( filename
               , view
-              , tag_t()
+              , png_tag()
               );
 }
 

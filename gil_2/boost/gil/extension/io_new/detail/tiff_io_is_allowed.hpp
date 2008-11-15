@@ -57,8 +57,8 @@ bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // 
                           ) 
 {
     typedef typename View::value_type pixel_t;
+    typedef typename channel_traits< element_type< pixel_t >::type >::value_type channel_t;
 
-    typedef channel_traits< element_type< pixel_t >::type >::value_type channel_t;
     unsigned int s = boost::gil::detail::unsigned_integral_num_bits< channel_t >::value;
 
     return ( s == channel_sizes[0] );
@@ -127,7 +127,7 @@ bool is_allowed( unsigned int                       src_n // num channels
 {
     typedef typename View::value_type pixel_t;
     typedef typename View::reference  ref_t;
-    typedef channel_traits< element_type< pixel_t >::type >::value_type channel_t;
+    typedef typename channel_traits< element_type< pixel_t >::type >::value_type channel_t;
 
     int dst_n = num_channels< pixel_t >::value;
     int dst_f = format_value< channel_t >( is_bit_aligned< pixel_t >::type() );

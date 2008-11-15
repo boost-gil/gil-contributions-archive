@@ -24,9 +24,21 @@
 #include <boost/shared_ptr.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/gil/extension/io_new/detail/base.hpp>
+#include "./base.hpp"
 
 namespace boost { namespace gil { namespace detail {
+
+template < typename T > struct buff_item
+{
+    static const unsigned int size = sizeof( T );
+};
+
+template <> struct buff_item< void >
+{
+    static const unsigned int size = 1;
+};
+
+
 /*!
  * Implements the IODevice concept c.f. to \ref IODevice required by Image libraries like
  * libjpeg and libpng. 
@@ -40,16 +52,6 @@ namespace boost { namespace gil { namespace detail {
 template< typename FormatTag >
 class file_stream_device
 {
-    template < typename T > struct buff_item
-    {
-	    static const unsigned int size = sizeof( T );
-    };
-
-    template <> struct buff_item< void >
-    {
-	    static const unsigned int size = 1;
-    };
-
 public:
 
    typedef FormatTag _tag_t;
@@ -291,16 +293,6 @@ private:
  */
 class ostream_device
 {
-    template < typename T > struct buff_item
-    {
-	    static const unsigned int size = sizeof( T );
-    };
-
-    template <> struct buff_item< void >
-    {
-	    static const unsigned int size = 1;
-    };
-
 public:
     ostream_device( std::ostream & out )
         : _out( out )

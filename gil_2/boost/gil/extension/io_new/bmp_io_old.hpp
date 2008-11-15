@@ -23,8 +23,6 @@
 
 namespace boost { namespace gil {
 
-typedef bmp_tag tag_t;
-
 /// \ingroup BMP_IO
 /// \brief Returns the width and height of the BMP file at the specified location.
 /// Throws std::ios_base::failure if the location does not correspond to a valid BMP file
@@ -32,9 +30,9 @@ template< typename String >
 inline
 point2< std::ptrdiff_t > bmp_read_dimensions( const String& filename )
 {
-    image_read_info< tag_t > info = read_image_info( filename
-                                                   , tag_t()
-                                                   );
+    image_read_info< bmp_tag > info = read_image_info( filename
+                                                     , bmp_tag()
+                                                     );
 
     return point2< std::ptrdiff_t >( info._width
                                    , info._height
@@ -57,7 +55,7 @@ void bmp_read_view( const String& filename
 {
     read_view( filename
              , view
-             , tag_t()
+             , bmp_tag()
              );
 }
 
@@ -76,7 +74,7 @@ void bmp_read_image( const String& filename
 {
     read_image( filename
               , img
-              , tag_t()
+              , bmp_tag()
               );
 }
 
@@ -96,7 +94,7 @@ void bmp_read_and_convert_view( const String& filename
     read_and_convert_view( filename
                          , view
                          , cc
-                         , tag_t()
+                         , bmp_tag()
                          );
 }
 
@@ -113,7 +111,7 @@ void bmp_read_and_convert_view( const String& filename
 {
     read_and_convert_view( filename
                          , view
-                         , tag_t()
+                         , bmp_tag()
                          );
 }
 
@@ -133,7 +131,7 @@ void bmp_read_and_convert_image( const String& filename
     read_and_convert_image( filename
                           , img
                           , cc
-                          , tag_t()
+                          , bmp_tag()
                           );
 }
 
@@ -150,7 +148,7 @@ void bmp_read_and_convert_image( const String filename
 {
     read_and_convert_image( filename
                           , img
-                          , tag_t()
+                          , bmp_tag()
                           );
 }
 
@@ -169,7 +167,7 @@ void bmp_write_view( const String& filename
 {
     write_view( filename
               , view
-              , tag_t()
+              , bmp_tag()
               );
 }
 

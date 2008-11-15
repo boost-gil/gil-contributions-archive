@@ -151,40 +151,40 @@ private:
         tiff_image_width::type width   = src_view.width();
         tiff_image_height::type height = src_view.height();
 
-        _io_dev.set_property<tiff_image_width >( width  );
-        _io_dev.set_property<tiff_image_height>( height );
+        _io_dev.template set_property<tiff_image_width >( width  );
+        _io_dev.template set_property<tiff_image_height>( height );
 
         // write planar configuration
         if( is_bit_aligned<View>::value == false )
         {
-            _io_dev.set_property<tiff_planar_configuration>( info._planar_configuration );
+            _io_dev.template set_property<tiff_planar_configuration>( info._planar_configuration );
         }
 
         // write samples per pixel
         tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
-        _io_dev.set_property<tiff_samples_per_pixel>( samples_per_pixel );
+        _io_dev.template set_property<tiff_samples_per_pixel>( samples_per_pixel );
 
         // write bits per sample
         // @todo: Settings this value usually requires to write for each sample the bit
         // value seperately in case they are different, like rgb556.
         tiff_bits_per_sample::type bits_per_sample = unsigned_integral_num_bits<channel_t>::value;
-        _io_dev.set_property<tiff_bits_per_sample>( bits_per_sample );
+        _io_dev.template set_property<tiff_bits_per_sample>( bits_per_sample );
 
         // write sample format
         tiff_sample_format::type sampl_format = sample_format< channel_t >::type::value;
-        _io_dev.set_property<tiff_sample_format>( sampl_format );
+        _io_dev.template set_property<tiff_sample_format>( sampl_format );
 
         // write photometric format
-        _io_dev.set_property<tiff_photometric_interpretation>( info._photometric_interpretation );
+        _io_dev.template set_property<tiff_photometric_interpretation>( info._photometric_interpretation );
 
         // write compression
-        _io_dev.set_property<tiff_compression>( info._compression );
+        _io_dev.template set_property<tiff_compression>( info._compression );
 
         // write orientation
-        _io_dev.set_property<tiff_orientation>( info._orientation );
+        _io_dev.template set_property<tiff_orientation>( info._orientation );
 
         // write rows per strip
-        _io_dev.set_property<tiff_rows_per_strip>( _io_dev.get_default_strip_size() );
+        _io_dev.template set_property<tiff_rows_per_strip>( _io_dev.get_default_strip_size() );
 
         write_data( src_view
               , info
@@ -205,7 +205,7 @@ private:
         typedef typename View::x_iterator x_it_t;
         x_it_t row_it = x_it_t( &(*row.begin()));
 
-        for( View::y_coord_t y = 0; y < src_view.height(); ++y )
+        for( typename View::y_coord_t y = 0; y < src_view.height(); ++y )
         {
             std::copy( src_view.row_begin( y )
                      , src_view.row_end( y )
@@ -230,12 +230,12 @@ private:
     {
         std::vector< unsigned char > row( row_size_in_bytes );
 
-        typedef my_interleaved_pixel_iterator_type_from_pixel_reference< typename View::reference
-                                                                       >::type x_iterator;
+        typedef typename my_interleaved_pixel_iterator_type_from_pixel_reference< typename View::reference
+                                                                                >::type x_iterator;
 
         x_iterator row_it = x_iterator( &(*row.begin()));
 
-        for( View::y_coord_t y = 0; y < src_view.height(); ++y )
+        for( typename View::y_coord_t y = 0; y < src_view.height(); ++y )
         {
             std::copy( src_view.row_begin( y )
                      , src_view.row_end( y )
