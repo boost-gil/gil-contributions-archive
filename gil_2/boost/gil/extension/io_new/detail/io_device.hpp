@@ -85,6 +85,16 @@ public:
             fclose(file);
     }
 
+    char getc()
+    {
+        int ch;
+
+        if(( ch = getc( file )) == EOF )
+            io_error( "file_stream_device: unexpected EOF" );
+
+        return ( char ) ch;
+    }
+
     std::size_t read( unsigned char* data
                     , std::size_t    count )
     {

@@ -42,6 +42,12 @@ typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
 struct format_tag {};
 
+template< typename Property > 
+struct property_base
+{
+    typedef Property type;
+};
+
 /**
  * Boolean meta function, mpl::true_ if the pixel type \a PixelType is supported 
  * by the image format identified with \a FormatTag.
