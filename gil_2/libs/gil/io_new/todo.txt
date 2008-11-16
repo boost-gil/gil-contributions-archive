@@ -11,3 +11,4 @@ todo list
 * when reading an indexed tiff image, it's better to use a virtual view.
 * incorporate Phil Endecott suggestions ( email 04/27/2008 )
 * also add John Femiani suggestions ( same time )
+* ran dos2unix on all files, since they have an unpleasant mix of CR/LF and LF
