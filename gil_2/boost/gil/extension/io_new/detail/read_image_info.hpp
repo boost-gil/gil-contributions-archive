@@ -96,7 +96,7 @@ read_image_info( const String&    file_name
                )
 {
     detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )
-                                                  , detail::file_stream_device< FormatTag >::read_tag()
+                                                  , typename detail::file_stream_device< FormatTag >::read_tag()
                                                   );
 
     return read_image_info( reader

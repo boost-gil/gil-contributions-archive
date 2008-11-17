@@ -62,11 +62,11 @@ public:
         image_read_info<pnm_tag> ret;
 
         // read signature
-        io_error_if( read_char() != 'P' );
+        io_error_if( read_char() != 'P', "Invalid PNM signature" );
 
         ret._type = read_char() - '0';
 
-		io_error_if( ret._type < type_mono_asc || type > type_color_bin
+		io_error_if( ret._type < pnm_type_mono_asc || ret._type > pnm_type_color_bin
 		           , "Invalid PNM file (supports P1 to P6)"
 		           );
 
@@ -88,7 +88,7 @@ private:
     {
         char ch;
 
-        if(( type = _io_dev.getc() ) == '#' )
+        if(( ch = _io_dev.getc() ) == '#' )
         {
             // skip comment to EOL
             do
@@ -108,7 +108,7 @@ private:
         // skip whitespaces, tabs, and new lines
 		do
 		{
-			ch = _io_dev.read_char();
+			ch = _io_dev.getc();
 		}
 		while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
 
@@ -130,7 +130,7 @@ private:
 
 			val = val * 10 + dig;
 
-			ch = read_char();
+			ch = _io_dev.getc();
 		}
 		while( '0' <= ch && ch <= '9' );
 

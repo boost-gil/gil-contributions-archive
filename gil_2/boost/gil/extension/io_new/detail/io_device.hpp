@@ -89,7 +89,7 @@ public:
     {
         int ch;
 
-        if(( ch = getc( file )) == EOF )
+        if(( ch = std::getc( file )) == EOF )
             io_error( "file_stream_device: unexpected EOF" );
 
         return ( char ) ch;
@@ -453,5 +453,4 @@ template<typename Device, typename FormatTag> class writer;
 } // namespace gil
 } // namespace boost
 
-#endif
-
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_IO_DEVICE_HPP_INCLUDED

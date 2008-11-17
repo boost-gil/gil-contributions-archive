@@ -68,6 +68,4 @@ struct is_supported<PixelType,jpeg_tag>
 } // namespace boost
 
 
-#endif
-
-
+#endif // BOOST_GIL_EXTENSION_IO_JPEG_SUPPORTED_TYPES_HPP

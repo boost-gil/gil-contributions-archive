@@ -118,7 +118,7 @@ public:
 
    bool are_bytes_swapped()
    {
-      return TIFFIsByteSwapped( _tiff_file.get() );
+      return ( TIFFIsByteSwapped( _tiff_file.get() )) ? true : false;
    }
 
    std::size_t get_scanline_size()
