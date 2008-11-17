@@ -130,11 +130,11 @@ bool is_allowed( unsigned int                       src_n // num channels
     typedef typename channel_traits< element_type< pixel_t >::type >::value_type channel_t;
 
     int dst_n = num_channels< pixel_t >::value;
-    int dst_f = format_value< channel_t >( is_bit_aligned< pixel_t >::type() );
+    int dst_f = format_value< channel_t >( typename is_bit_aligned< pixel_t >::type() );
 
     bool s = compare_channel_sizes< View >( src_s
-                                          , is_bit_aligned< ref_t >::type()
-                                          , is_homogeneous< ref_t >::type() );
+                                          , typename is_bit_aligned< ref_t >::type()
+                                          , typename is_homogeneous< ref_t >::type() );
 
     return (  dst_n == src_n
            && s
