@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     typedef gray8_image_t image_t;
 
     image_t img;
-    read_image( filename, img, pnm_tag() );
+    image_read_info< pnm_tag > info = read_image_info( filename, pnm_tag() );
 
     return 0;
 }

@@ -38,12 +38,16 @@ struct pnm_image_width : property_base< uint32_t > {};
 
 struct pnm_image_height : property_base< uint32_t > {};
 
+struct pnm_image_max_value : property_base< uint32_t > {};
+
+
 template<>
 struct image_read_info< pnm_tag >
 {
-    pnm_image_type::type   _type;
-    pnm_image_width::type  _width;
-    pnm_image_height::type _height;
+    pnm_image_type::type      _type;
+    pnm_image_width::type     _width;
+    pnm_image_height::type    _height;
+    pnm_image_max_value::type _max_value;
 };
 
 template<>

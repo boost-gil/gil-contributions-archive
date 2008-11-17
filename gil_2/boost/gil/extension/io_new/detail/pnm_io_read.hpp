@@ -73,15 +73,56 @@ public:
         ret._width  = read_int();
         ret._height = read_int();
 
+        if( ret._type == pnm_type_mono_asc || ret._type == pnm_type_mono_bin )
+        {
+            ret._max_value = 1;
+        }
+        else
+        {
+            ret._max_value = read_int();
+
+		    io_error_if( ret._max_value > 255
+		               , "Unsupported PNM format (supports maximum value 255)"
+		               );
+        }
+
         return ret;
     }
 
     template<typename View>
     void apply( const View& view )
     {
+		switch( this->_info._type )
+		{
+			case pnm_type_mono_asc: 
+			case pnm_type_gray_asc:  { read_text_data< gray8_image_t >( view ); break; } 
+			case pnm_type_color_asc: { read_text_data< rgb8_image_t  >( view ); break; } 
+			
+			case pnm_type_mono_bin:  { read_bin_data< bit_aligned_image1< 1, gray_layout > >( view ); break; } channels = 1; bpp =  1; break;
+			case pnm_type_gray_bin:  { read_bin_data< gray8_image_t >( view ); break; } 
+			case pnm_type_color_bin: { read_bin_data< rgb88_image_t >( view ); break; }
+		}
     }
 
 private:
+
+    template< typename Img_Src
+            , typename View_Dst
+            >
+    void read_text_data( const View_Dst& view )
+    {
+        Img_Src src( this->_info._width, 1, (this->_info._width + 7) >> 3 );
+
+        
+    }
+
+    template< typename View_Src
+            , typename View_Dst
+            >
+    void read_bin_data( const View_Dst& view )
+    {
+        Img_Src src( this->_info._width, 1 );
+    }
 
     // Read a character and skip a comment if necessary.
     char read_char()
@@ -108,7 +149,7 @@ private:
         // skip whitespaces, tabs, and new lines
 		do
 		{
-			ch = _io_dev.getc();
+			ch = read_char();
 		}
 		while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
 
@@ -130,7 +171,7 @@ private:
 
 			val = val * 10 + dig;
 
-			ch = _io_dev.getc();
+			ch = read_char();
 		}
 		while( '0' <= ch && ch <= '9' );
 
