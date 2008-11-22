@@ -93,28 +93,40 @@ public:
     template<typename View>
     void apply( const View& view )
     {
+        typedef bit_aligned_image1_type< 1, gray_layout_t >::type mono_t;
 		switch( this->_info._type )
 		{
-			case pnm_type_mono_asc: 
-			case pnm_type_gray_asc:  { read_text_data< gray8_image_t >( view ); break; } 
+			case pnm_type_mono_asc:  { read_text_data< mono_t        >( view ); break; }
+			case pnm_type_gray_asc:  { read_text_data< gray8_image_t >( view ); break; }
 			case pnm_type_color_asc: { read_text_data< rgb8_image_t  >( view ); break; } 
 			
-			case pnm_type_mono_bin:  { read_bin_data< bit_aligned_image1_type< 1, gray_layout_t >::type >( view ); break; }
-			case pnm_type_gray_bin:  { read_bin_data< gray8_image_t >( view ); break; } 
-			case pnm_type_color_bin: { read_bin_data< rgb8_image_t >( view ); break; }
+			case pnm_type_mono_bin:  { read_bin_data< mono_t         >( view ); break; }
+			case pnm_type_gray_bin:  { read_bin_data< gray8_image_t  >( view ); break; } 
+			case pnm_type_color_bin: { read_bin_data< rgb8_image_t   >( view ); break; }
 		}
     }
 
 private:
+
+    template< typename View >
+    size_t get_pitch( const boost::mpl::true_& /* is_bit_aligned */  )
+    {
+        return (this->_info._width + 7) >> 3;
+    }
+
+    template< typename View >
+    size_t get_pitch( const boost::mpl::false_& /* is_bit_aligned */  )
+    {
+        return ( this->_info._width * num_channels< View >::value );
+    }
 
     template< typename Img_Src
             , typename View_Dst
             >
     void read_text_data( const View_Dst& view )
     {
-        Img_Src src( this->_info._width, 1, (this->_info._width + 7) >> 3 );
-
-        
+        typedef is_bit_aligned< View_Dst >::type is_bit_aligned_t;
+        Img_Src src( get_pitch< View_Dst >( is_bit_aligned_t() ), 1 );
     }
 
     template< typename Img_Src
@@ -122,7 +134,8 @@ private:
             >
     void read_bin_data( const View_Dst& view )
     {
-        Img_Src src( this->_info._width, 1 );
+        typedef is_bit_aligned< View_Dst >::type is_bit_aligned_t;
+        Img_Src src( get_pitch< View_Dst >( is_bit_aligned_t() ), 1 );
     }
 
     // Read a character and skip a comment if necessary.
