@@ -20,6 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+#include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
 #include "base.hpp"
@@ -98,9 +99,9 @@ public:
 			case pnm_type_gray_asc:  { read_text_data< gray8_image_t >( view ); break; } 
 			case pnm_type_color_asc: { read_text_data< rgb8_image_t  >( view ); break; } 
 			
-			case pnm_type_mono_bin:  { read_bin_data< bit_aligned_image1< 1, gray_layout > >( view ); break; } channels = 1; bpp =  1; break;
+			case pnm_type_mono_bin:  { read_bin_data< bit_aligned_image1_type< 1, gray_layout_t >::type >( view ); break; }
 			case pnm_type_gray_bin:  { read_bin_data< gray8_image_t >( view ); break; } 
-			case pnm_type_color_bin: { read_bin_data< rgb88_image_t >( view ); break; }
+			case pnm_type_color_bin: { read_bin_data< rgb8_image_t >( view ); break; }
 		}
     }
 
@@ -116,7 +117,7 @@ private:
         
     }
 
-    template< typename View_Src
+    template< typename Img_Src
             , typename View_Dst
             >
     void read_bin_data( const View_Dst& view )

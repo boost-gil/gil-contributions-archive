@@ -220,6 +220,16 @@ public:
    istream_device( std::istream& in )
    : _in( in ) {}
 
+    char getc()
+    {
+        int ch;
+
+        if(( ch = _in.get() ) == EOF )
+            io_error( "file_stream_device: unexpected EOF" );
+
+        return ( char ) ch;
+    }
+
     std::size_t read( unsigned char* data
                     , std::size_t    count )
     {
