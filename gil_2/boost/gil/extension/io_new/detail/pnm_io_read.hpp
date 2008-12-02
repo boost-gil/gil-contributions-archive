@@ -96,47 +96,162 @@ public:
         typedef bit_aligned_image1_type< 1, gray_layout_t >::type mono_t;
 		switch( this->_info._type )
 		{
-			case pnm_type_mono_asc:  { read_text_data< mono_t        >( view ); break; }
-			case pnm_type_gray_asc:  { read_text_data< gray8_image_t >( view ); break; }
-			case pnm_type_color_asc: { read_text_data< rgb8_image_t  >( view ); break; } 
+			case pnm_type_mono_asc:  { read_text_bit_aligned_data< mono_t::view_t >( view ); break; }
+			case pnm_type_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
+			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; } 
 			
-			case pnm_type_mono_bin:  { read_bin_data< mono_t         >( view ); break; }
-			case pnm_type_gray_bin:  { read_bin_data< gray8_image_t  >( view ); break; } 
-			case pnm_type_color_bin: { read_bin_data< rgb8_image_t   >( view ); break; }
+			case pnm_type_mono_bin:  { read_bin_bit_aligned_data< mono_t::view_t >( view ); break; }
+			case pnm_type_gray_bin:  { read_bin_data< gray8_view_t  >( view ); break; } 
+			case pnm_type_color_bin: { read_bin_data< rgb8_view_t   >( view ); break; }
 		}
     }
 
 private:
 
-    template< typename View >
-    size_t get_pitch( const boost::mpl::true_& /* is_bit_aligned */  )
-    {
-        return (this->_info._width + 7) >> 3;
-    }
-
-    template< typename View >
-    size_t get_pitch( const boost::mpl::false_& /* is_bit_aligned */  )
-    {
-        return ( this->_info._width * num_channels< View >::value );
-    }
-
-    template< typename Img_Src
+    template< typename View_Src
             , typename View_Dst
             >
     void read_text_data( const View_Dst& view )
     {
-        typedef is_bit_aligned< View_Dst >::type is_bit_aligned_t;
-        Img_Src src( get_pitch< View_Dst >( is_bit_aligned_t() ), 1 );
+        typedef typename View_Dst::y_coord_t y_t;
+
+        uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
+
+        std::vector< byte_t > row( pitch );
+        View_Src v = interleaved_view( _info._width
+                                     , 1
+                                     , (typename View_Src::value_type*) &row.front()
+                                     , pitch
+                                     );
+
+        typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
+        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
+
+        char buf[16];
+
+        for( y_t y = 0; y < view.height(); ++y )
+        {
+            for( uint32_t x = 0; x < pitch; ++x )
+            {
+                for( uint32_t k = 0; ; )
+                {
+					int ch = _io_dev.getc_unchecked();
+
+					if( isdigit( ch ))
+					{
+                        buf[ k++ ] = ch;
+					}
+					else if( k )
+					{
+						buf[ k ] = 0;
+						break;
+					}
+					else if( ch == EOF || !isspace( ch ))
+					{
+						return;
+					}
+                }
+
+                row[x] = atoi( buf );
+            }
+
+            this->_cc_policy.read( beg
+                                 , end
+                                 , view.row_begin( y )
+                                 );
+
+        }
+    }
+
+    template< typename View_Src
+            , typename View_Dst
+            >
+    void read_text_bit_aligned_data( const View_Dst& view )
+    {
+        typedef typename View_Dst::y_coord_t y_t;
+
+        uint32_t pitch = (this->_info._width + 7) >> 3;
+        std::vector< byte_t > row( pitch );
+
+        typedef typename View_Src::reference ref_t;
+        typedef bit_aligned_pixel_iterator<ref_t> iterator_t;
+
+        iterator_t beg = iterator_t( &row.front() , 0 ) + this->_settings._top_left.x;
+        iterator_t end = beg + this->_settings._dim.x;
+
+        char buf[16];
+
+        for( y_t y = 0; y < view.height(); ++y )
+        {
+            for( uint32_t x = 0; x < pitch; ++x )
+            {
+                for( uint32_t k = 0; ; )
+                {
+					int ch = _io_dev.getc_unchecked();
+
+					if( isdigit( ch ))
+					{
+                        buf[ k++ ] = ch;
+					}
+					else if( k )
+					{
+						buf[ k ] = 0;
+						break;
+					}
+					else if( ch == EOF || !isspace( ch ))
+					{
+						return;
+					}
+                }
+
+                row[x] = atoi( buf );
+            }
+
+            this->_cc_policy.read( beg
+                                 , end
+                                 , view.row_begin( y )
+                                 );
+        }
+    }
+
+    template< typename View_Src
+            , typename View_Dst
+            >
+    void read_bin_data( const View_Dst& view )
+    {
+        typedef typename View_Dst::y_coord_t y_t;
+
+        uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
+
+        std::vector< byte_t > row( pitch );
+        View_Src v = interleaved_view( _info._width
+                                     , 1
+                                     , (typename View_Src::value_type*) &row.front()
+                                     , pitch
+                                     );
+
+        typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
+        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
+
+        for( y_t y = 0; y < view.height(); ++y )
+        {
+            _io_dev.read( &row.front(), pitch );
+
+            this->_cc_policy.read( beg
+                                 , end
+                                 , view.row_begin( y )
+                                 );
+        }        
     }
 
     template< typename Img_Src
             , typename View_Dst
             >
-    void read_bin_data( const View_Dst& view )
+    void read_bin_bit_aligned_data( const View_Dst& view )
     {
-        typedef is_bit_aligned< View_Dst >::type is_bit_aligned_t;
-        Img_Src src( get_pitch< View_Dst >( is_bit_aligned_t() ), 1 );
     }
+
+
 
     // Read a character and skip a comment if necessary.
     char read_char()

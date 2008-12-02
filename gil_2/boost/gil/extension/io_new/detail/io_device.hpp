@@ -85,6 +85,11 @@ public:
             fclose(file);
     }
 
+    int getc_unchecked()
+    {
+        return std::getc( file );
+    }
+
     char getc()
     {
         int ch;
@@ -219,6 +224,11 @@ class istream_device
 public:
    istream_device( std::istream& in )
    : _in( in ) {}
+
+    int getc_unchecked()
+    {
+        return _in.get();
+    }
 
     char getc()
     {

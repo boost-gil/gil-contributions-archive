@@ -4,6 +4,8 @@
 #include <fstream>
 
 #include <boost/gil/extension/io_new/pnm_all.hpp>
+#include <boost/gil/extension/io_new/tiff_write.hpp>
+
 #include <boost/gil/gil_all.hpp>
 
 using namespace std;
@@ -14,10 +16,12 @@ int main(int argc, char *argv[])
 {
     const std::string filename( ".\\test_images\\pnm\\p1.pnm" );
 
-    typedef gray8_image_t image_t;
+    typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
 
     image_t img;
-    image_read_info< pnm_tag > info = read_image_info( filename, pnm_tag() );
+    read_image( filename, img, pnm_tag() );
+
+    write_view( ".\\test\\pnm\\p1.tif", view( img ), tiff_tag() );
 
     return 0;
 }
