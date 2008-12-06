@@ -301,7 +301,7 @@ private:
 
       swap_bits_fn< typename is_bit_aligned< View >::type
                   , buffer_t
-                  > sb( _io_dev );
+                  > sb( _io_dev.are_bytes_swapped() );
 
       typename point_t::value_type num_rows = this->_settings._dim.y - this->_settings._top_left.y;
 

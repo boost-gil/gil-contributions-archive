@@ -30,6 +30,13 @@
 
 namespace boost { namespace gil { namespace detail {
 
+inline
+void swap_bits_( unsigned char& c )
+{
+    c = ~c;
+}
+
+
 template< typename Device
         , typename ConversionPolicy
         >
@@ -96,7 +103,8 @@ public:
         typedef bit_aligned_image1_type< 1, gray_layout_t >::type mono_t;
 		switch( this->_info._type )
 		{
-			case pnm_type_mono_asc:  { read_text_bit_aligned_data< mono_t::view_t >( view ); break; }
+            // reading mono text is reading grayscale but with only two values
+			case pnm_type_mono_asc:  { read_text_bit_aligned_data< gray8_view_t >( view ); break; }
 			case pnm_type_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
 			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; } 
 			
@@ -170,14 +178,17 @@ private:
     {
         typedef typename View_Dst::y_coord_t y_t;
 
-        uint32_t pitch = (this->_info._width + 7) >> 3;
+        uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
+
         std::vector< byte_t > row( pitch );
+        View_Src v = interleaved_view( _info._width
+                                     , 1
+                                     , (typename View_Src::value_type*) &row.front()
+                                     , pitch
+                                     );
 
-        typedef typename View_Src::reference ref_t;
-        typedef bit_aligned_pixel_iterator<ref_t> iterator_t;
-
-        iterator_t beg = iterator_t( &row.front() , 0 ) + this->_settings._top_left.x;
-        iterator_t end = beg + this->_settings._dim.x;
+        typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
+        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
         char buf[16];
 
@@ -204,13 +215,15 @@ private:
 					}
                 }
 
-                row[x] = atoi( buf );
+                // 0 is white
+                row[x] = ( atoi( buf ) != 0 ) ? 0 : 255;
             }
 
             this->_cc_policy.read( beg
                                  , end
                                  , view.row_begin( y )
                                  );
+
         }
     }
 
@@ -241,14 +254,37 @@ private:
                                  , end
                                  , view.row_begin( y )
                                  );
-        }        
+        }
     }
 
-    template< typename Img_Src
+    template< typename View_Src
             , typename View_Dst
             >
     void read_bin_bit_aligned_data( const View_Dst& view )
     {
+        typedef typename View_Dst::y_coord_t y_t;
+
+        uint32_t pitch = (this->_info._width + 7) >> 3;
+        std::vector< byte_t > row( pitch );
+
+        typedef typename View_Src::reference ref_t;
+        typedef bit_aligned_pixel_iterator<ref_t> iterator_t;
+
+        iterator_t beg = iterator_t( &row.front() , 0 ) + this->_settings._top_left.x;
+        iterator_t end = beg + this->_settings._dim.x;
+
+        for( y_t y = 0; y < view.height(); ++y )
+        {
+            _io_dev.read( &row.front(), pitch );
+
+            // 0011 1111 -> 1100 0000
+            for_each( row.begin(), row.end(), swap_bits_ );
+
+            this->_cc_policy.read( beg
+                                 , end
+                                 , view.row_begin( y )
+                                 );
+        }
     }
 
 

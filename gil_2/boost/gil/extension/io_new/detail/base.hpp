@@ -230,8 +230,7 @@ template< typename IsBitAligned
         >
 struct swap_bits_fn
 {
-   template< typename Device >
-   swap_bits_fn( const Device& dev ) {}
+   swap_bits_fn( bool ) {}
 
    void operator() ( Buffer& ) {}
 };
@@ -240,15 +239,14 @@ template<>
 struct swap_bits_fn< boost::mpl::true_
                    , std::vector< unsigned char > >
 {
-   template< typename Device >
-   swap_bits_fn( const Device& dev )
+   swap_bits_fn( bool swap )
    {
       for( int i = 0; i < 256; ++i )
       {
          _lookup[i] = swap_bits( i );
       }
 
-      _swap_bits = ( dev.are_bytes_swapped() > 0 ) ? true : false;
+      _swap_bits = swap;
    }
 
    void operator() ( std::vector< unsigned char >& buffer )
