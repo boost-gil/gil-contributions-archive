@@ -20,6 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+#include <boost/bind.hpp>
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
@@ -30,11 +31,23 @@
 
 namespace boost { namespace gil { namespace detail {
 
-inline
-void swap_bits_( unsigned char& c )
+template< typename View, typename T >
+struct calc_pitch {};
+
+template< typename View >
+struct calc_pitch< View, mpl::false_ >
 {
-    c = ~c;
-}
+    static uint32_t do_it( uint32_t width )
+    {
+        return width * num_channels< View >::value;
+    }
+};
+
+template< typename View >
+struct calc_pitch< View, mpl::true_ >
+{
+    static uint32_t do_it( uint32_t width ) {  return ( width + 7) >> 3; }
+};
 
 
 template< typename Device
@@ -233,18 +246,15 @@ private:
     void read_bin_data( const View_Dst& view )
     {
         typedef typename View_Dst::y_coord_t y_t;
+        typedef is_bit_aligned< View_Src::value_type >::type is_bit_aligned_t;
 
-        uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
+        uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
 
-        std::vector< byte_t > row( pitch );
-        View_Src v = interleaved_view( _info._width
-                                     , 1
-                                     , (typename View_Src::value_type*) &row.front()
-                                     , pitch
-                                     );
+        typedef row_buffer_helper_< ViewSrc > rh_t;
+        rh_t rh( pitch );
 
-        typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
-        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
+        typename rh_t::iterator beg = rh.begin() + this->_settings._top_left.x;
+        typename rh_t::iterator end = beg + this->_settings._dim.x;
 
         for( y_t y = 0; y < view.height(); ++y )
         {
@@ -263,8 +273,10 @@ private:
     void read_bin_bit_aligned_data( const View_Dst& view )
     {
         typedef typename View_Dst::y_coord_t y_t;
+        typedef is_bit_aligned< View_Src::value_type >::type is_bit_aligned_t;
 
-        uint32_t pitch = (this->_info._width + 7) >> 3;
+        uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
+        
         std::vector< byte_t > row( pitch );
 
         typedef typename View_Src::reference ref_t;
@@ -277,8 +289,7 @@ private:
         {
             _io_dev.read( &row.front(), pitch );
 
-            // 0011 1111 -> 1100 0000
-            for_each( row.begin(), row.end(), swap_bits_ );
+            for_each( row.begin(), row.end(), bind( negate_bits< is_bit_aligned_t >::do_it, _1));
 
             this->_cc_policy.read( beg
                                  , end
@@ -288,6 +299,7 @@ private:
     }
 
 
+private:
 
     // Read a character and skip a comment if necessary.
     char read_char()

@@ -275,6 +275,19 @@ struct swap_bits_fn< boost::mpl::true_
    bool _swap_bits;
 };
 
+template< typename True >
+struct negate_bits
+{
+    static void do_it ( unsigned char& c ) {}
+};
+
+template<>
+struct negate_bits< mpl::true_ >
+{
+    // 0011 1111 -> 1100 0000
+    static void do_it ( unsigned char& c ) { c = ~c; }
+};
+
 } // namespace detail
 } // namespace gil
 } // namespace boost
