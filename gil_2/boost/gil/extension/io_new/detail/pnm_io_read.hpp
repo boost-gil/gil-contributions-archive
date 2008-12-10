@@ -41,7 +41,7 @@ struct row_buffer_helper_
     typedef typename buffer_t::iterator iterator_t;
 
     row_buffer_helper_( int size )
-        : row_buffer( size ) {}
+        : row_buffer( size / num_channels< View >::value ) {}
 
     iterator_t begin() { return row_buffer.begin(); }
     iterator_t end()   { return row_buffer.end();   }
@@ -137,22 +137,22 @@ struct row_buffer_helper_view_<View,
 };
 
 
-template< typename T >
+template< typename View, typename T >
 struct calc_pitch {};
 
-template<>
-struct calc_pitch< mpl::false_ >
+template< typename View >
+struct calc_pitch< View, mpl::false_ >
 {
     static uint32_t do_it( uint32_t width )
     {
-        return width;
+        return width * num_channels< View >::value;
     }
 };
 
-template<>
-struct calc_pitch< mpl::true_ >
+template< typename View >
+struct calc_pitch< View, mpl::true_ >
 {
-    static uint32_t do_it( uint32_t width ) {  return ( width + 7) >> 3; }
+    static uint32_t do_it( uint32_t width ) {  return ( width + 7 ) >> 3; }
 };
 
 
@@ -354,7 +354,7 @@ private:
         typedef typename View_Dst::y_coord_t y_t;
         typedef is_bit_aligned< View_Src::value_type >::type is_bit_aligned_t;
 
-        uint32_t pitch = calc_pitch< is_bit_aligned_t >::do_it( this->_info._width );
+        uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
 
         typedef row_buffer_helper_view_< View_Src > rh_t;
         rh_t rh( pitch );
