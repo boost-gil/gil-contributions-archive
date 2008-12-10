@@ -275,17 +275,17 @@ struct swap_bits_fn< boost::mpl::true_
    bool _swap_bits;
 };
 
-template< typename True >
+template< typename Element, typename True >
 struct negate_bits
 {
-    static void do_it ( unsigned char& c ) {}
+    static void do_it ( const Element& ) {}
 };
 
-template<>
-struct negate_bits< mpl::true_ >
+template< typename Element >
+struct negate_bits< Element, mpl::true_ >
 {
     // 0011 1111 -> 1100 0000
-    static void do_it ( unsigned char& c ) { c = ~c; }
+    static void do_it ( Element& c ) { int i = 9; /*c = ~c;*/ }
 };
 
 } // namespace detail

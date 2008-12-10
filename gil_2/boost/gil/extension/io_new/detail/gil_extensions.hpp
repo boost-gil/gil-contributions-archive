@@ -85,7 +85,7 @@ template <typename Channel, typename ColorSpace>
 struct is_homogeneous< const planar_pixel_reference< Channel, ColorSpace > > : mpl::true_ {};
 
 template<typename C,typename CMP, int I,int Last>
-struct is_homogeneous_impl_p;
+struct is_homogeneous_impl_p {};
 
 // for packed_pixel
 template <typename B, typename C, typename L >

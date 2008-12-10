@@ -5,7 +5,7 @@
 
 #include <boost/gil/gil_all.hpp>
 
-#include <boost/gil/extension/io_new/pnm_all.hpp>
+#include <boost/gil/extension/io_new/pnm_read.hpp>
 #include <boost/gil/extension/io_new/tiff_write.hpp>
 
 #include <boost/gil/gil_all.hpp>
@@ -28,25 +28,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
-/*
-#include <boost/gil/extension/io/bmp_io.hpp>
-#include <boost/gil/extension/io/pnm_io.hpp>
-
-using namespace std;
-using namespace boost;
-using namespace gil;
-
-int main(int argc, char *argv[])
-{
-    const std::string filename( ".\\test_images\\pnm\\p1.pnm" );
-
-    //typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-    typedef rgb8_image_t image_t;
-
-    image_t img;
-    pnm_read_image( filename, img );
-
-    return 0;
-}
-*/

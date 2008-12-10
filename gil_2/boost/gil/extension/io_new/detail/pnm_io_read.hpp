@@ -31,20 +31,119 @@
 
 namespace boost { namespace gil { namespace detail {
 
-template< typename View, typename T >
-struct calc_pitch {};
-
-template< typename View >
-struct calc_pitch< View, mpl::false_ >
+template< typename View
+        , typename DummyT = void // needed for enable_if
+        >
+struct row_buffer_helper_
 {
-    static uint32_t do_it( uint32_t width )
-    {
-        return width * num_channels< View >::value;
-    }
+    typedef typename View::value_type element_t;
+    typedef std::vector< element_t > buffer_t;
+    typedef typename buffer_t::iterator iterator_t;
+
+    row_buffer_helper_( int size )
+        : row_buffer( size ) {}
+
+    iterator_t begin() { return row_buffer.begin(); }
+    iterator_t end()   { return row_buffer.end();   }
+
+    element_t* data()  { return &row_buffer[0]; }
+
+private:
+
+    buffer_t row_buffer;
 };
 
 template< typename View >
-struct calc_pitch< View, mpl::true_ >
+struct row_buffer_helper_< View
+                        , typename enable_if
+                                < typename mpl::and_
+                                    < typename is_bit_aligned< typename View::reference >::type
+                                    , typename is_homogeneous< typename View::reference >::type
+                                    >::type
+                                >::type
+                        >
+{
+    typedef byte_t element_t;
+    typedef std::vector< element_t > buffer_t;
+    typedef bit_aligned_pixel_iterator< typename View::reference > iterator_t;
+
+
+    row_buffer_helper_( int size )
+    : row_buffer( size )
+    {
+        _c = ( size
+               * num_channels<typename View::reference>::type::value
+               * channel_type<typename View::reference>::type::num_bits
+             )
+             >> 3;
+
+
+        _r = size 
+           * num_channels<typename View::reference>::type::value
+           * channel_type<typename View::reference>::type::num_bits
+           - ( _c << 3 );
+    }
+
+    iterator_t begin()
+    {
+        return iterator_t( &row_buffer.front(), 0 );
+    }
+
+    iterator_t end()
+    {
+        return ( _r == 0 )
+               ? iterator_t( &row_buffer.back() + 1, 0  )
+               : iterator_t( &row_buffer.back()    , _r );
+    }
+
+    byte_t* data()
+    {
+        return &row_buffer[0];
+    }
+
+private:
+
+    buffer_t row_buffer;
+
+    int _c, _r;
+};
+
+template<typename View,typename D = void>
+struct row_buffer_helper_view_
+    : row_buffer_helper_<View>
+{
+    row_buffer_helper_view_( int width ) 
+      :  row_buffer_helper_<View>(width)
+    {}
+};
+
+
+template<typename View>
+struct row_buffer_helper_view_<View,
+    typename enable_if<typename is_bit_aligned< View >::type>::type
+    >
+    : row_buffer_helper_<View>
+{
+    row_buffer_helper_view_( int width ) 
+        : row_buffer_helper_<View>( width )
+    {}
+};
+
+
+template< typename T >
+struct calc_pitch {};
+
+template<>
+struct calc_pitch< mpl::false_ >
+{
+    static uint32_t do_it( uint32_t width )
+    {
+        return width;
+    }
+};
+
+template<>
+struct calc_pitch< mpl::true_ >
 {
     static uint32_t do_it( uint32_t width ) {  return ( width + 7) >> 3; }
 };
@@ -121,9 +220,9 @@ public:
 			case pnm_type_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
 			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; } 
 			
-			case pnm_type_mono_bin:  { read_bin_bit_aligned_data< mono_t::view_t >( view ); break; }
-			case pnm_type_gray_bin:  { read_bin_data< gray8_view_t  >( view ); break; } 
-			case pnm_type_color_bin: { read_bin_data< rgb8_view_t   >( view ); break; }
+			case pnm_type_mono_bin:  { read_bin_data< mono_t::view_t >( view ); break; }
+			case pnm_type_gray_bin:  { read_bin_data< gray8_view_t   >( view ); break; } 
+			case pnm_type_color_bin: { read_bin_data< rgb8_view_t    >( view ); break; }
 		}
     }
 
@@ -248,17 +347,29 @@ private:
         typedef typename View_Dst::y_coord_t y_t;
         typedef is_bit_aligned< View_Src::value_type >::type is_bit_aligned_t;
 
-        uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
+        uint32_t pitch = calc_pitch< is_bit_aligned_t >::do_it( this->_info._width );
 
-        typedef row_buffer_helper_< ViewSrc > rh_t;
+        typedef row_buffer_helper_view_< View_Src > rh_t;
         rh_t rh( pitch );
 
-        typename rh_t::iterator beg = rh.begin() + this->_settings._top_left.x;
-        typename rh_t::iterator end = beg + this->_settings._dim.x;
+        typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
+        typename rh_t::iterator_t end = beg + this->_settings._dim.x;
 
         for( y_t y = 0; y < view.height(); ++y )
         {
-            _io_dev.read( &row.front(), pitch );
+            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
+                        , pitch
+                        );
+
+            // for bit_aligned images we need to negate all bytes in the row_buffer
+            for_each( rh.begin()
+                    , rh.end()
+                    , bind( negate_bits< typename rh_t::element_t
+                                       , is_bit_aligned_t
+                                       >::do_it
+                          , _1
+                          )
+                    );
 
             this->_cc_policy.read( beg
                                  , end
@@ -266,38 +377,6 @@ private:
                                  );
         }
     }
-
-    template< typename View_Src
-            , typename View_Dst
-            >
-    void read_bin_bit_aligned_data( const View_Dst& view )
-    {
-        typedef typename View_Dst::y_coord_t y_t;
-        typedef is_bit_aligned< View_Src::value_type >::type is_bit_aligned_t;
-
-        uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
-        
-        std::vector< byte_t > row( pitch );
-
-        typedef typename View_Src::reference ref_t;
-        typedef bit_aligned_pixel_iterator<ref_t> iterator_t;
-
-        iterator_t beg = iterator_t( &row.front() , 0 ) + this->_settings._top_left.x;
-        iterator_t end = beg + this->_settings._dim.x;
-
-        for( y_t y = 0; y < view.height(); ++y )
-        {
-            _io_dev.read( &row.front(), pitch );
-
-            for_each( row.begin(), row.end(), bind( negate_bits< is_bit_aligned_t >::do_it, _1));
-
-            this->_cc_policy.read( beg
-                                 , end
-                                 , view.row_begin( y )
-                                 );
-        }
-    }
-
 
 private:
 
