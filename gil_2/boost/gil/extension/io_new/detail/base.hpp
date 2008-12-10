@@ -275,17 +275,27 @@ struct swap_bits_fn< boost::mpl::true_
    bool _swap_bits;
 };
 
-template< typename Element, typename True >
+// 0011 1111 -> 1100 0000
+void negate( byte_t& b )
+{
+    b = ~b;
+}
+
+template< typename T
+        , typename IsBitAligned
+        >
 struct negate_bits
 {
-    static void do_it ( const Element& ) {}
+    void operator() ( T*, T* ) {}
 };
 
-template< typename Element >
-struct negate_bits< Element, mpl::true_ >
+template< typename T >
+struct negate_bits< T, mpl::true_ >
 {
-    // 0011 1111 -> 1100 0000
-    static void do_it ( Element& c ) { int i = 9; /*c = ~c;*/ }
+    void operator() ( T* beg, T* end )
+    {
+        for_each( beg, end, bind( negate, _1 ));
+    }
 };
 
 } // namespace detail

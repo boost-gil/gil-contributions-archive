@@ -48,6 +48,8 @@ struct row_buffer_helper_
 
     element_t* data()  { return &row_buffer[0]; }
 
+    std::size_t size() { return row_buffer.size(); }
+
 private:
 
     buffer_t row_buffer;
@@ -96,9 +98,14 @@ struct row_buffer_helper_< View
                : iterator_t( &row_buffer.back()    , _r );
     }
 
-    byte_t* data()
+    element_t* data()
     {
         return &row_buffer[0];
+    }
+
+    std::size_t size()
+    {
+        return row_buffer.size();
     }
 
 private:
@@ -355,6 +362,8 @@ private:
         typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
         typename rh_t::iterator_t end = beg + this->_settings._dim.x;
 
+        negate_bits< rh_t::element_t, is_bit_aligned_t > neg;
+
         for( y_t y = 0; y < view.height(); ++y )
         {
             _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
@@ -362,14 +371,7 @@ private:
                         );
 
             // for bit_aligned images we need to negate all bytes in the row_buffer
-            for_each( rh.begin()
-                    , rh.end()
-                    , bind( negate_bits< typename rh_t::element_t
-                                       , is_bit_aligned_t
-                                       >::do_it
-                          , _1
-                          )
-                    );
+            neg( rh.data(), rh.data() + rh.size() );
 
             this->_cc_policy.read( beg
                                  , end
