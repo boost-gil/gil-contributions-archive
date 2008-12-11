@@ -48,7 +48,10 @@ struct row_buffer_helper_
 
     element_t* data()  { return &row_buffer[0]; }
 
-    std::size_t size() { return row_buffer.size(); }
+    buffer_t& buffer()
+    {
+        return row_buffer;
+    }
 
 private:
 
@@ -73,15 +76,17 @@ struct row_buffer_helper_< View
     row_buffer_helper_( int size )
     : row_buffer( size )
     {
+        // number of full bytes
         _c = ( size
-               * num_channels<typename View::reference>::type::value
+               * num_channels<typename View::reference>::value
                * channel_type<typename View::reference>::type::num_bits
              )
              >> 3;
 
 
+        // number of remaining bits
         _r = size 
-           * num_channels<typename View::reference>::type::value
+           * num_channels<typename View::reference>::value
            * channel_type<typename View::reference>::type::num_bits
            - ( _c << 3 );
     }
@@ -98,22 +103,25 @@ struct row_buffer_helper_< View
                : iterator_t( &row_buffer.back()    , _r );
     }
 
-    element_t* data()
-    {
-        return &row_buffer[0];
-    }
+    element_t* data()  { return &row_buffer[0]; }
 
-    std::size_t size()
-    {
-        return row_buffer.size();
-    }
+    buffer_t& buffer() { return row_buffer; }
 
 private:
 
     buffer_t row_buffer;
 
-    int _c, _r;
-};
+    // number of full bytes
+    int _c;
+
+    // number of remaining bits
+    int _r;
+
+    // For instance 25 pixels of rgb2 type would be:
+    // overall 25 pixels * 3 channels * 2 bits/channel = 150 bits
+    // c = 18 bytes
+    // r = 6 bits
+ };
 
 template<typename View,typename D = void>
 struct row_buffer_helper_view_
@@ -143,10 +151,7 @@ struct calc_pitch {};
 template< typename View >
 struct calc_pitch< View, mpl::false_ >
 {
-    static uint32_t do_it( uint32_t width )
-    {
-        return width * num_channels< View >::value;
-    }
+    static uint32_t do_it( uint32_t width ) { return width * num_channels< View >::value; }
 };
 
 template< typename View >
@@ -220,10 +225,11 @@ public:
     void apply( const View& view )
     {
         typedef bit_aligned_image1_type< 1, gray_layout_t >::type mono_t;
+
 		switch( this->_info._type )
 		{
             // reading mono text is reading grayscale but with only two values
-			case pnm_type_mono_asc:  { read_text_bit_aligned_data< gray8_view_t >( view ); break; }
+			case pnm_type_mono_asc:  { read_text_data< gray8_view_t >( view ); break; }
 			case pnm_type_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
 			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; } 
 			
@@ -234,7 +240,7 @@ public:
     }
 
 private:
-
+/*
     template< typename View_Src
             , typename View_Dst
             >
@@ -289,11 +295,11 @@ private:
 
         }
     }
-
+*/
     template< typename View_Src
             , typename View_Dst
             >
-    void read_text_bit_aligned_data( const View_Dst& view )
+    void read_text_data( const View_Dst& view )
     {
         typedef typename View_Dst::y_coord_t y_t;
 
@@ -334,8 +340,16 @@ private:
 					}
                 }
 
-                // 0 is white
-                row[x] = ( atoi( buf ) != 0 ) ? 0 : 255;
+                // when reading mono images we need to reverse the values.
+                if( this->_info._max_value == 1 )
+                {
+                    // 0 is white
+                    row[x] = ( atoi( buf ) != 0 ) ? 0 : 255;
+                }
+                else
+                {
+                    row[x] = atoi( buf );
+                }
             }
 
             this->_cc_policy.read( beg
@@ -362,7 +376,8 @@ private:
         typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
         typename rh_t::iterator_t end = beg + this->_settings._dim.x;
 
-        negate_bits< rh_t::element_t, is_bit_aligned_t > neg;
+        // for bit_aligned images we need to negate all bytes in the row_buffer
+        negate_bits< rh_t::buffer_t, is_bit_aligned_t > neg;
 
         for( y_t y = 0; y < view.height(); ++y )
         {
@@ -370,8 +385,7 @@ private:
                         , pitch
                         );
 
-            // for bit_aligned images we need to negate all bytes in the row_buffer
-            neg( rh.data(), rh.data() + rh.size() );
+            neg( rh.buffer() );
 
             this->_cc_policy.read( beg
                                  , end

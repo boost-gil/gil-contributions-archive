@@ -8,7 +8,9 @@
 #include <boost/gil/extension/io_new/pnm_read.hpp>
 #include <boost/gil/extension/io_new/tiff_write.hpp>
 
-#include <boost/gil/gil_all.hpp>
+using namespace std;
+using namespace boost::gil;
+namespace fs = boost::filesystem;
 
 using namespace std;
 using namespace boost;
@@ -16,15 +18,34 @@ using namespace gil;
 
 int main(int argc, char *argv[])
 {
-    const std::string filename( ".\\test_images\\pnm\\p6.pnm" );
+   string in ( ".\\test_images\\pnm\\" );
+   string out( ".\\test\\pnm\\" );
 
-    //typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-    typedef rgb8_image_t image_t;
+   fs::path in_path = fs::system_complete( fs::path( in, fs::native ) );
 
-    image_t img;
-    read_image( filename, img, pnm_tag() );
+   if ( fs::is_directory( in_path ) )
+   {
+      fs::directory_iterator end_iter;
+      for( fs::directory_iterator dir_itr( in_path )
+         ; dir_itr != end_iter
+         ; ++dir_itr
+         )
+      {
+         if ( fs::is_regular( dir_itr->status() ) 
+            && ( fs::extension( dir_itr->path() ) == ".pnm" ))
+         {
+            rgb8_image_t img;
+            string filename = in + dir_itr->path().leaf();
 
-    write_view( ".\\test\\pnm\\p6.tif", view( img ), tiff_tag() );
+            read_and_convert_image( filename, img, pnm_tag() );
 
-    return 0;
+            write_view( out + fs::basename( dir_itr->path() ) + ".tiff"
+                      , view( img )
+                      , tiff_tag()
+                      );
+         }
+      }
+   }
+
+   return 0;
 }

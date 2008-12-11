@@ -281,20 +281,20 @@ void negate( byte_t& b )
     b = ~b;
 }
 
-template< typename T
+template< typename Buffer
         , typename IsBitAligned
         >
 struct negate_bits
 {
-    void operator() ( T*, T* ) {}
+    void operator() ( Buffer& ) {}
 };
 
-template< typename T >
-struct negate_bits< T, mpl::true_ >
+template< typename Buffer >
+struct negate_bits< Buffer, mpl::true_ >
 {
-    void operator() ( T* beg, T* end )
+    void operator() ( Buffer& buf )
     {
-        for_each( beg, end, bind( negate, _1 ));
+        for_each( buf.begin(), buf.end(), bind( negate, _1 ));
     }
 };
 
