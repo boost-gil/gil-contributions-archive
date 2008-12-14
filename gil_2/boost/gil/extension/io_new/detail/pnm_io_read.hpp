@@ -376,7 +376,8 @@ private:
         typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
         typename rh_t::iterator_t end = beg + this->_settings._dim.x;
 
-        // for bit_aligned images we need to negate all bytes in the row_buffer
+        // For bit_aligned images we need to negate all bytes in the row_buffer
+        // to make sure that 0 is black and 255 is white.
         negate_bits< rh_t::buffer_t, is_bit_aligned_t > neg;
 
         for( y_t y = 0; y < view.height(); ++y )
