@@ -177,12 +177,24 @@ struct gen_chan_ref_p
 };
 
 // packed_pixel
-template <typename B, typename C, typename L>  
-struct channel_type<packed_pixel<B,C,L> > : boost::lazy_enable_if< 
-		is_homogeneous<packed_pixel<B,C,L> >,
-		gen_chan_ref_p<B,C,L>
-		>
-{};
+template < typename BitField
+         , typename ChannelRefVec
+         , typename Layout
+         >
+struct channel_type< packed_pixel< BitField
+                                 , ChannelRefVec
+                                 , Layout
+                                 >
+                   > : boost::lazy_enable_if< is_homogeneous< packed_pixel< BitField
+                                                                          , ChannelRefVec
+                                                                          , Layout
+                                                                          >
+                                                             >
+                                            , gen_chan_ref_p< BitField
+                                                            , ChannelRefVec
+                                                            , Layout
+                                                            >
+		                                    > {};
 
 template <typename B, typename C, typename L>  
 struct channel_type< const packed_pixel< B, C, L > > 
@@ -190,6 +202,17 @@ struct channel_type< const packed_pixel< B, C, L > >
 	                       , gen_chan_ref_p<B,C,L>
 		                   >
 {};
+
+/// get_pixel_type metafunction
+/// \brief Depending on Image this function generates either 
+///        the pixel type or the reference type in case
+///        the image is bit_aligned.
+template< typename Image >
+struct get_pixel_type : mpl::if_< typename is_bit_aligned< typename Image::view_t::reference >::type
+                                , typename Image::view_t::reference
+                                , typename Image::value_type
+                                > {};
+
 
 namespace detail {
 

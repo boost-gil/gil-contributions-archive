@@ -18,6 +18,9 @@ namespace pnm_test {
 // the "out" folder.
 // 
 
+// @todo When reading and converting from a 1-bit binary pnm the image
+// is incorrectly converted. See p4.pnm
+
 BOOST_AUTO_TEST_CASE( file_format_test )
 {
    string in ( "..\\test_images\\pnm\\" );

@@ -144,7 +144,6 @@ struct row_buffer_helper_view_<View,
     {}
 };
 
-
 template< typename View, typename T >
 struct calc_pitch {};
 
@@ -379,6 +378,7 @@ private:
         // For bit_aligned images we need to negate all bytes in the row_buffer
         // to make sure that 0 is black and 255 is white.
         negate_bits< rh_t::buffer_t, is_bit_aligned_t > neg;
+        swap_half_bytes< rh_t::buffer_t, is_bit_aligned_t > swhb;
 
         for( y_t y = 0; y < view.height(); ++y )
         {
@@ -387,6 +387,7 @@ private:
                         );
 
             neg( rh.buffer() );
+            swhb( rh.buffer() );
 
             this->_cc_policy.read( beg
                                  , end

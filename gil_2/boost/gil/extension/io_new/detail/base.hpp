@@ -276,7 +276,7 @@ struct swap_bits_fn< boost::mpl::true_
 };
 
 // 0011 1111 -> 1100 0000
-void negate( byte_t& b )
+inline void negate_impl( byte_t& b )
 {
     b = ~b;
 }
@@ -294,7 +294,32 @@ struct negate_bits< Buffer, mpl::true_ >
 {
     void operator() ( Buffer& buf )
     {
-        for_each( buf.begin(), buf.end(), bind( negate, _1 ));
+        for_each( buf.begin(), buf.end(), bind( negate_impl, _1 ));
+    }
+};
+
+
+// 11101100 -> 11001110
+inline void swap_half_bytes_impl( unsigned char& c )
+{
+    unsigned char b = ( c & 0xF ) << 4;
+    c = ( c >> 4 ) | b;
+}
+
+template< typename Buffer
+        , typename IsBitAligned
+        >
+struct swap_half_bytes
+{
+    void operator() ( Buffer& ) {}
+};
+
+template< typename Buffer >
+struct swap_half_bytes< Buffer, mpl::true_ >
+{
+    void operator() ( Buffer& buf )
+    {
+        for_each( buf.begin(), buf.end(), bind( swap_half_bytes_impl, _1 ));
     }
 };
 

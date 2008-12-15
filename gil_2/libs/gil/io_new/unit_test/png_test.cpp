@@ -80,6 +80,19 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         BOOST_CHECK_EQUAL( img.width() , 320 );
         BOOST_CHECK_EQUAL( img.height(), 240 );
     }
+
+    {
+        std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
+
+        typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
+        image_t img;
+
+        read_image( filename, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 320 );
+        BOOST_CHECK_EQUAL( img.height(), 240 );
+    }
+
 }
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )

@@ -139,7 +139,6 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
-
     {
         string filename( "..\\test\\tiff\\test1.tif" );
 
