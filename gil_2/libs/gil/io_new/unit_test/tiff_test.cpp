@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 
+#include <boost/gil/extension/io_new/pnm_read.hpp>
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 #include <boost/type_traits/is_same.hpp>
 
@@ -37,11 +38,10 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         // An ifstream cannot be used to construct a device_type.
         // There is no way to get a TIFF* from a ifstream.
 
-/*
-        ifstream in( filename.c_str(), ios::in | ios::binary );
-        image_read_info< tag_t > info = read_image_info( in
-                                                       , tag_t() );
-*/
+        //ifstream in( filename.c_str(), ios::in | ios::binary );
+        //image_read_info< tag_t > info = read_image_info( in
+        //                                               , tag_t() );
+
     }
 
     {

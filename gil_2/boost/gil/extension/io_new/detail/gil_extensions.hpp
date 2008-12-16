@@ -22,6 +22,8 @@
 
 #include <boost/gil/gil_all.hpp>
 
+#include <boost/mpl/if.hpp>
+
 namespace boost { namespace gil {
 
 /// is_bit_aligned metafunctions
@@ -207,10 +209,10 @@ struct channel_type< const packed_pixel< B, C, L > >
 /// \brief Depending on Image this function generates either 
 ///        the pixel type or the reference type in case
 ///        the image is bit_aligned.
-template< typename Image >
-struct get_pixel_type : mpl::if_< typename is_bit_aligned< typename Image::view_t::reference >::type
-                                , typename Image::view_t::reference
-                                , typename Image::value_type
+template< typename View >
+struct get_pixel_type : mpl::if_< typename is_bit_aligned< typename View::value_type >::type
+                                , typename View::reference
+                                , typename View::value_type
                                 > {};
 
 

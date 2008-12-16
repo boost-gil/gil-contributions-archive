@@ -41,12 +41,12 @@ void read_view( Device&                                 file
               , const View&                             view
               , const image_read_settings< FormatTag >& settings
               , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
-                                                       , typename is_format_tag          < FormatTag >::type
-                                                       , typename is_supported           < typename View::value_type
-                                                                                         , FormatTag 
-                                                                                         >::type 
+                                                      , typename is_format_tag          < FormatTag >::type
+                                                      , typename is_supported           < typename get_pixel_type< View >::type
+                                                                                        , FormatTag 
+                                                                                        >::type
                                                        >::type 
-                               >::type* ptr = 0 
+                                  >::type* ptr = 0 
               )
 {
     detail::reader< Device
@@ -71,14 +71,14 @@ void read_view( Device&                                 file
               , const View&                             view
               , const image_read_settings< FormatTag >& settings
               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                         , Device
-                                                                                                                         >::type
-                                                                             , typename is_format_tag<FormatTag>::type
-                                                                             , typename is_supported< typename View::value_type
-                                                                                                    , FormatTag
-                                                                                                    >::type 
-                                                                             >::type
-                                                         >::type* ptr = 0 
+                                                                                                  , Device
+                                                                                                  >::type
+                                                      , typename is_format_tag<FormatTag>::type
+                                                      , typename is_supported< typename get_pixel_type< View >::type
+                                                                             , FormatTag
+                                                                             >::type 
+                                                      >::type
+                                  >::type* ptr = 0 
               )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -109,12 +109,12 @@ void read_view( const String&                           file_name
               , const View&                             view
               , const image_read_settings< FormatTag >& settings
               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
-                                                                     , typename is_format_tag< FormatTag >::type
-                                                                     , typename is_supported< typename View::value_type
-                                                                                            , FormatTag
-                                                                                            >::type
-                                                                     >::type
-                                                 >::type* ptrdiff_t = 0
+                                                      , typename is_format_tag< FormatTag >::type
+                                                      , typename is_supported< typename get_pixel_type< View >::type
+                                                                             , FormatTag
+                                                                             >::type
+                                                      >::type
+                                  >::type* ptrdiff_t = 0
               )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -138,12 +138,12 @@ void read_view( const String&    file_name
               , const View&      view
               , const FormatTag& tag
               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
-                                                                     , typename is_format_tag< FormatTag >::type
-                                                                     , typename is_supported< typename View::value_type
-                                                                                            , FormatTag
-                                                                                            >::type
-                                                                     >::type
-                                                 >::type* ptrdiff_t = 0
+                                                      , typename is_format_tag< FormatTag >::type
+                                                      , typename is_supported< typename get_pixel_type< View >::type
+                                                                             , FormatTag
+                                                                             >::type
+                                                      >::type
+                                  >::type* ptrdiff_t = 0
               )
 {
     read_view( file_name
@@ -160,15 +160,17 @@ inline
 void read_view( Device&          device
               , const View&      view
               , const FormatTag& tag
-              , typename enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
-                                                                                       , typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                                          , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                                      , Device
-                                                                                                                                                      >::type
-                                                                                                          >::type
-                                                                                       , typename is_supported< typename View::value_type, FormatTag>::type
-                                                                                       >::type
-                                                                   >::type* ptr = 0
+              , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
+                                                      , typename mpl::or_< typename detail::is_input_device< Device >::type
+                                                                         , typename detail::is_adaptable_input_device< FormatTag
+                                                                                                                     , Device
+                                                                                                                     >::type
+                                                                         >::type
+                                                      , typename is_supported< typename get_pixel_type< View >::type
+                                                                             , FormatTag
+                                                                             >::type
+                                                      >::type
+                                  >::type* ptr = 0
               )
 {
     read_view( device

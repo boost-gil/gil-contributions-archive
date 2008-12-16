@@ -24,7 +24,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include "./base.hpp"
+#include "base.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -199,6 +199,12 @@ public:
     void flush()
     {
         fflush( file );
+    }
+
+    /// Prints formatted ASCII text
+    void print_line( const std::string& line )
+    {
+        fwrite( line.c_str(), sizeof( char ), line.size(), file );
     }
 
 private:
@@ -398,6 +404,14 @@ public:
     {
         _out << std::flush;
     }
+
+    /// Prints formatted ASCII text
+    void print_line( const std::string& line )
+    {
+        _out << line;
+    }
+
+
 
 private:
 

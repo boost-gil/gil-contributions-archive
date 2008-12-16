@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-#include <boost/gil/extension/io_new/pnm_read.hpp>
-#include <boost/gil/extension/io_new/bmp_write.hpp>
+#include <boost/gil/extension/io_new/pnm_all.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -44,9 +43,9 @@ BOOST_AUTO_TEST_CASE( file_format_test )
 
             read_and_convert_image( filename, img, tag_t() );
 
-            write_view( out + fs::basename( dir_itr->path() ) + ".bmp"
+            write_view( out + fs::basename( dir_itr->path() ) + ".pnm"
                       , view( img )
-                      , bmp_tag()
+                      , pnm_tag()
                       );
          }
       }
