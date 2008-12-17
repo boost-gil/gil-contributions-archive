@@ -4,7 +4,6 @@ todo list
 
 * ask people to compile on linux
 
-* add bmp support
 * add dynamic io
 * fix read_and_convert_view( ... ) compilation issue
 * add planar bit_aligned image support - not so easy

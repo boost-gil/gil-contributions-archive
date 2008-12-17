@@ -1,0 +1,65 @@
+BOOST::GIL::IO
+
+1. Overview
+2. Tutorial
+3. Using IO
+4. Reference
+
+1. Overview
+-----------
+
+
+1.1 Supported Platforms
+-----------------------
+All platforms that have a decent C++ and the following image libs available:
+    * libtiff
+    * libjpeg
+    * libpng
+
+The library is designed to support as many formats as required by the user.
+For instance, if the user only needs bmp support none of the above mentioned 
+dependencies are required.
+
+
+
+2. Tutorial
+-----------
+
+
+3. Using IO
+-----------
+
+
+3.1 Read Interface
+------------------
+
+
+3.2 Write Interface
+-------------------
+
+
+3.3. Supported Image Formats
+----------------------------
+
+3.3.1 BMP
+---------
+
+3.3.2 JPEG
+----------
+
+3.3.3 PNG
+---------
+
+3.3.4 PNM
+---------
+
+3.3.5 TIF
+----------
+
+
+3.4 Extending GIL::IO with new Formats
+--------------------------------------
+
+
+4. Reference
+------------
