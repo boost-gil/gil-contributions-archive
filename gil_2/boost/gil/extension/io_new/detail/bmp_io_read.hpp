@@ -163,7 +163,7 @@ public:
         // the size of this header ( 40 bytes )
         _info._header_size = _io_dev.read_int32();
 
-        if( _info._header_size == win32_info_size )
+        if( _info._header_size == bmp_win32_info_size )
         {
             _info._width  = _io_dev.read_int32();
             _info._height = _io_dev.read_int32();
@@ -184,7 +184,7 @@ public:
             _info._num_important_colors = _io_dev.read_int32();
 
         }
-        else if( _info._header_size == os2_info_size )
+        else if( _info._header_size == bmp_os2_info_size )
         {
             _info._width  = static_cast< bmp_image_width::type  >( _io_dev.read_int16() );
             _info._height = static_cast< bmp_image_height::type >( _io_dev.read_int16() );
@@ -289,7 +289,7 @@ public:
 
                 // there are 4 entries when windows header
                 // but 3 for os2 header
-                if( _info._header_size == win32_info_size )
+                if( _info._header_size == bmp_win32_info_size )
                 {
                     _io_dev.read_int8();
                 }

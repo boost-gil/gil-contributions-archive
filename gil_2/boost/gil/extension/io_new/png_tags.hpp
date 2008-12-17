@@ -28,75 +28,36 @@ namespace boost { namespace gil {
 
 struct png_tag : format_tag {};
 
-struct png_image_width
-{
-    typedef png_uint_32 type;
-};
+struct png_image_width : property_base< png_uint_32 > {};
 
-struct png_image_height
-{
-    typedef png_uint_32 type;
-};
+struct png_image_height : property_base< png_uint_32 > {};
 
-struct png_interlace_method
-{
-    typedef int type;
-};
+struct png_interlace_method : property_base< int > {};
 
-struct png_compression_method
-{
-    typedef int type;
-};
+struct png_compression_method : property_base< int > {};
 
-struct png_filter_method
-{
-    typedef int type;
-};
+struct png_filter_method : property_base< int > {};
 
+struct png_bitdepth : property_base< int > {};
 
-struct png_bitdepth
-{
-    typedef int type;
-};
+struct png_num_channels : property_base< png_byte > {};
 
-struct png_num_channels
-{
-    typedef png_byte type;
-};
+struct png_color_type : property_base< int > {};
 
-struct png_color_type
-{
-    typedef int type;
-};
+struct png_significant_bits : property_base< png_color_8p > {};
 
-struct png_significant_bits
-{
-    typedef png_color_8p type;
-};
+struct png_x_resolution : property_base< png_uint_32 > {};
 
-
-struct png_x_resolution
-{
-    typedef png_uint_32 type;
-};
-
-struct png_y_resolution
-{
-    typedef png_uint_32 type;
-};
+struct png_y_resolution : property_base< png_uint_32 > {};
 
 /// @todo srgb intent + gamma ?
-struct png_gamma
-{
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-    typedef double type;
+    struct png_gamma : property_base< double > {};
 #else 
-    typedef png_fixed_point type;
+    struct png_gamma : property_base< png_fixed_point > {};
 #endif
-};
 
 /// @todo Support for text?
-
 
 template<>
 struct image_read_info<png_tag>
@@ -105,17 +66,17 @@ struct image_read_info<png_tag>
     png_image_height::type _height;
 
     png_num_channels::type _num_channels;
-    png_bitdepth::type _bit_depth;
-    png_color_type::type  _color_type;
+    png_bitdepth::type     _bit_depth;
+    png_color_type::type   _color_type;
 
-    png_interlace_method::type _interlace_method;
+    png_interlace_method::type   _interlace_method;
     png_compression_method::type _compression_method;
-    png_filter_method::type _filter_method;
+    png_filter_method::type      _filter_method;
 
 
-    png_gamma::type _gamma;
-    png_x_resolution::type _x_res;
-    png_y_resolution::type _y_res;
+    png_gamma::type            _gamma;
+    png_x_resolution::type     _x_res;
+    png_y_resolution::type     _y_res;
     png_significant_bits::type _sbits;
 };
 
@@ -139,13 +100,13 @@ struct image_read_settings< png_tag > : public image_read_settings_base
 template<>
 struct image_write_info<png_tag>
 {
-    png_interlace_method::type _interlace_method;
+    png_interlace_method::type   _interlace_method;
     png_compression_method::type _compression_method;
-    png_filter_method::type _filter_method;
+    png_filter_method::type      _filter_method;
 
-    png_gamma::type _gamma;
-    png_x_resolution::type _x_res;
-    png_y_resolution::type _y_res;
+    png_gamma::type            _gamma;
+    png_x_resolution::type     _x_res;
+    png_y_resolution::type     _y_res;
     png_significant_bits::type _sbits;
 };
 

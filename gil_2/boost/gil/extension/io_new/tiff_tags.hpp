@@ -14,7 +14,7 @@
 /// \file               
 /// \brief All supported tiff tags by the gil io extension.
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-///         
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -32,181 +32,71 @@ extern "C" {
 
 namespace boost { namespace gil {
 
+template< typename T, int Value >
+struct tiff_property_base : property_base< uint32_t >
+{
+    static const unsigned int tag = Value;
+};
+
 struct tiff_tag : format_tag {};
 
-struct tiff_new_subfile_type
-{
-   typedef boost::uint32_t type;
-   static const unsigned int tag = TIFFTAG_SUBFILETYPE;
-};
+struct tiff_new_subfile_type : tiff_property_base< uint32_t, TIFFTAG_SUBFILETYPE > {};
 
-struct tiff_subfile_type
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_OSUBFILETYPE;
-};
+struct tiff_subfile_type : tiff_property_base< uint16_t, TIFFTAG_OSUBFILETYPE > {};
 
-struct tiff_image_width
-{
-   typedef boost::uint32_t type;
-   static const unsigned int tag = TIFFTAG_IMAGEWIDTH;
-};
+struct tiff_image_width : tiff_property_base< uint32_t, TIFFTAG_IMAGEWIDTH > {};
 
-struct tiff_image_height
-{
-   typedef boost::uint32_t type;
-   static const unsigned int tag = TIFFTAG_IMAGELENGTH;
-};
+struct tiff_image_height : tiff_property_base< uint32_t, TIFFTAG_IMAGELENGTH > {};
 
-struct tiff_bits_per_sample
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_BITSPERSAMPLE;
-};
+struct tiff_bits_per_sample : tiff_property_base< uint16_t, TIFFTAG_BITSPERSAMPLE > {};
 
-struct tiff_compression
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_COMPRESSION;
-};
+struct tiff_compression : tiff_property_base< uint16_t, TIFFTAG_COMPRESSION > {};
 
-struct tiff_photometric_interpretation
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_PHOTOMETRIC;
-};
+struct tiff_photometric_interpretation : tiff_property_base< uint16_t, TIFFTAG_PHOTOMETRIC > {};
 
-struct tiff_thresholding
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_THRESHHOLDING;
-};
+struct tiff_thresholding : tiff_property_base< uint16_t, TIFFTAG_THRESHHOLDING > {};
 
-struct tiff_cell_width
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_CELLWIDTH;
-};
+struct tiff_cell_width : tiff_property_base< uint16_t, TIFFTAG_CELLWIDTH > {};
 
-struct tiff_cell_length
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_CELLLENGTH;
-};
+struct tiff_cell_length : tiff_property_base< uint16_t, TIFFTAG_CELLLENGTH > {};
 
-struct tiff_fill_order
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_FILLORDER;
-};
+struct tiff_fill_order : tiff_property_base< std::string, TIFFTAG_FILLORDER > {};
 
-struct tiff_image_description
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_IMAGEDESCRIPTION;
-};
+struct tiff_image_description : tiff_property_base< std::string, TIFFTAG_IMAGEDESCRIPTION > {};
 
-struct tiff_make
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_MAKE;
-};
+struct tiff_make : tiff_property_base< std::string, TIFFTAG_MAKE > {};
 
-struct tiff_model
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_MODEL;
-};
+struct tiff_model : tiff_property_base< std::string, TIFFTAG_MODEL > {};
 
-struct tiff_orientation
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_ORIENTATION;
-};
+struct tiff_orientation : tiff_property_base< uint16_t, TIFFTAG_ORIENTATION > {};
 
-struct tiff_samples_per_pixel
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_SAMPLESPERPIXEL;
-};
+struct tiff_samples_per_pixel : tiff_property_base< uint16_t, TIFFTAG_SAMPLESPERPIXEL > {};
 
-struct tiff_rows_per_strip
-{
-   typedef boost::uint32_t type;
-   static const unsigned int tag = TIFFTAG_ROWSPERSTRIP;
-};
+struct tiff_rows_per_strip : tiff_property_base< uint32_t, TIFFTAG_ROWSPERSTRIP > {};
 
-struct tiff_min_sample_value
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_MINSAMPLEVALUE;
-};
+struct tiff_min_sample_value : tiff_property_base< uint16_t, TIFFTAG_MINSAMPLEVALUE > {};
 
-struct tiff_max_sample_value
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_MAXSAMPLEVALUE;
-};
+struct tiff_max_sample_value : tiff_property_base< uint16_t, TIFFTAG_MAXSAMPLEVALUE > {};
 
-struct tiff_x_resolution
-{
-   typedef float type;
-   static const unsigned int tag = TIFFTAG_XRESOLUTION;
-};
+struct tiff_x_resolution : tiff_property_base< float, TIFFTAG_XRESOLUTION > {};
 
-struct tiff_y_resolution
-{
-   typedef float type;
-   static const unsigned int tag = TIFFTAG_YRESOLUTION;
-};
+struct tiff_y_resolution : tiff_property_base< float, TIFFTAG_YRESOLUTION > {};
 
-struct tiff_planar_configuration
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_PLANARCONFIG;
-};
+struct tiff_planar_configuration : tiff_property_base< uint16_t, TIFFTAG_PLANARCONFIG > {};
 
-struct tiff_gray_response_unit
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_GRAYRESPONSEUNIT;
-};
+struct tiff_gray_response_unit : tiff_property_base< uint16_t, TIFFTAG_GRAYRESPONSEUNIT > {};
 
-struct tiff_gray_response_curve
-{
-   typedef boost::uint16_t* type;
-   static const unsigned int tag = TIFFTAG_GRAYRESPONSECURVE;
-};
+struct tiff_gray_response_curve : tiff_property_base< uint16_t*, TIFFTAG_GRAYRESPONSECURVE > {};
 
-struct tiff_resolution_unit
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_RESOLUTIONUNIT;
-};
+struct tiff_resolution_unit : tiff_property_base< uint16_t, TIFFTAG_RESOLUTIONUNIT > {};
 
-struct tiff_software
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_SOFTWARE;
-};
+struct tiff_software : tiff_property_base< std::string, TIFFTAG_SOFTWARE > {};
 
-struct tiff_date_time
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_DATETIME;
-};
+struct tiff_date_time : tiff_property_base< std::string, TIFFTAG_DATETIME > {};
 
-struct tiff_artist
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_ARTIST;
-};
+struct tiff_artist : tiff_property_base< std::string, TIFFTAG_ARTIST > {};
 
-struct tiff_host_computer
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_HOSTCOMPUTER;
-};
+struct tiff_host_computer : tiff_property_base< std::string, TIFFTAG_HOSTCOMPUTER > {};
 
 struct tiff_color_map
 {
@@ -217,31 +107,15 @@ struct tiff_color_map
    static const unsigned int tag = TIFFTAG_COLORMAP;
 };
 
-struct tiff_extra_samples
-{
-   typedef boost::uint16_t* type;
-   static const unsigned int tag = TIFFTAG_EXTRASAMPLES;
-};
+struct tiff_extra_samples : tiff_property_base< uint16_t*, TIFFTAG_EXTRASAMPLES > {};
 
-struct tiff_copyright
-{
-   typedef std::string type;
-   static const unsigned int tag = TIFFTAG_COPYRIGHT;
-};
+struct tiff_copyright : tiff_property_base< std::string, TIFFTAG_COPYRIGHT > {};
 
 // non-baseline tags
 
-struct tiff_sample_format
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_SAMPLEFORMAT;
-};
+struct tiff_sample_format : tiff_property_base< uint16_t, TIFFTAG_SAMPLEFORMAT > {};
 
-struct tiff_indexed
-{
-   typedef boost::uint16_t type;
-   static const unsigned int tag = TIFFTAG_INDEXED;
-};
+struct tiff_indexed : tiff_property_base< uint16_t, TIFFTAG_INDEXED > {};
 
 template<>
 struct image_read_info< tiff_tag >

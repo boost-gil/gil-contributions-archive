@@ -1,0 +1,247 @@
+
+tiger-minisblack-strip-01.tif	73x1151 1-bit minisblack strip gray image
+tiger-minisblack-strip-02.tif	73x1151 2-bit minisblack strip gray image
+tiger-minisblack-strip-03.tif	73x1151 3-bit minisblack strip gray image
+tiger-minisblack-strip-04.tif	73x1151 4-bit minisblack strip gray image
+tiger-minisblack-strip-05.tif	73x1151 5-bit minisblack strip gray image
+tiger-minisblack-strip-06.tif	73x1151 6-bit minisblack strip gray image
+tiger-minisblack-strip-07.tif	73x1151 7-bit minisblack strip gray image
+tiger-minisblack-strip-08.tif	73x1151 8-bit minisblack strip gray image
+tiger-minisblack-strip-09.tif	73x1151 9-bit minisblack strip gray image
+tiger-minisblack-strip-10.tif	73x1151 10-bit minisblack strip gray image
+tiger-minisblack-strip-11.tif	73x1151 11-bit minisblack strip gray image
+tiger-minisblack-strip-12.tif	73x1151 12-bit minisblack strip gray image
+tiger-minisblack-strip-13.tif	73x1151 13-bit minisblack strip gray image
+tiger-minisblack-strip-14.tif	73x1151 14-bit minisblack strip gray image
+tiger-minisblack-strip-15.tif	73x1151 15-bit minisblack strip gray image
+tiger-minisblack-strip-16.tif	73x1151 16-bit minisblack strip gray image
+tiger-minisblack-strip-17.tif	73x1151 17-bit minisblack strip gray image
+tiger-minisblack-strip-18.tif	73x1151 18-bit minisblack strip gray image
+tiger-minisblack-strip-19.tif	73x1151 19-bit minisblack strip gray image
+tiger-minisblack-strip-20.tif	73x1151 20-bit minisblack strip gray image
+tiger-minisblack-strip-21.tif	73x1151 21-bit minisblack strip gray image
+tiger-minisblack-strip-22.tif	73x1151 22-bit minisblack strip gray image
+tiger-minisblack-strip-23.tif	73x1151 23-bit minisblack strip gray image
+tiger-minisblack-strip-24.tif	73x1151 24-bit minisblack strip gray image
+tiger-minisblack-strip-25.tif	73x1151 25-bit minisblack strip gray image
+tiger-minisblack-strip-26.tif	73x1151 26-bit minisblack strip gray image
+tiger-minisblack-strip-27.tif	73x1151 27-bit minisblack strip gray image
+tiger-minisblack-strip-28.tif	73x1151 28-bit minisblack strip gray image
+tiger-minisblack-strip-29.tif	73x1151 29-bit minisblack strip gray image
+tiger-minisblack-strip-30.tif	73x1151 30-bit minisblack strip gray image
+tiger-minisblack-strip-31.tif	73x1151 31-bit minisblack strip gray image
+tiger-minisblack-strip-32.tif	73x1151 32-bit minisblack strip gray image
+tiger-minisblack-strip-64.tif	73x1151 64-bit minisblack strip gray image
+tiger-minisblack-tile-01.tif	73x1151 1-bit minisblack tiled gray image
+tiger-minisblack-tile-02.tif	73x1151 2-bit minisblack tiled gray image
+tiger-minisblack-tile-03.tif	73x1151 3-bit minisblack tiled gray image
+tiger-minisblack-tile-04.tif	73x1151 4-bit minisblack tiled gray image
+tiger-minisblack-tile-05.tif	73x1151 5-bit minisblack tiled gray image
+tiger-minisblack-tile-06.tif	73x1151 6-bit minisblack tiled gray image
+tiger-minisblack-tile-07.tif	73x1151 7-bit minisblack tiled gray image
+tiger-minisblack-tile-08.tif	73x1151 8-bit minisblack tiled gray image
+tiger-minisblack-tile-09.tif	73x1151 9-bit minisblack tiled gray image
+tiger-minisblack-tile-10.tif	73x1151 10-bit minisblack tiled gray image
+tiger-minisblack-tile-11.tif	73x1151 11-bit minisblack tiled gray image
+tiger-minisblack-tile-12.tif	73x1151 12-bit minisblack tiled gray image
+tiger-minisblack-tile-13.tif	73x1151 13-bit minisblack tiled gray image
+tiger-minisblack-tile-14.tif	73x1151 14-bit minisblack tiled gray image
+tiger-minisblack-tile-15.tif	73x1151 15-bit minisblack tiled gray image
+tiger-minisblack-tile-16.tif	73x1151 16-bit minisblack tiled gray image
+tiger-minisblack-tile-17.tif	73x1151 17-bit minisblack tiled gray image
+tiger-minisblack-tile-18.tif	73x1151 18-bit minisblack tiled gray image
+tiger-minisblack-tile-19.tif	73x1151 19-bit minisblack tiled gray image
+tiger-minisblack-tile-20.tif	73x1151 20-bit minisblack tiled gray image
+tiger-minisblack-tile-21.tif	73x1151 21-bit minisblack tiled gray image
+tiger-minisblack-tile-22.tif	73x1151 22-bit minisblack tiled gray image
+tiger-minisblack-tile-23.tif	73x1151 23-bit minisblack tiled gray image
+tiger-minisblack-tile-24.tif	73x1151 24-bit minisblack tiled gray image
+tiger-minisblack-tile-25.tif	73x1151 25-bit minisblack tiled gray image
+tiger-minisblack-tile-26.tif	73x1151 26-bit minisblack tiled gray image
+tiger-minisblack-tile-27.tif	73x1151 27-bit minisblack tiled gray image
+tiger-minisblack-tile-28.tif	73x1151 28-bit minisblack tiled gray image
+tiger-minisblack-tile-29.tif	73x1151 29-bit minisblack tiled gray image
+tiger-minisblack-tile-30.tif	73x1151 30-bit minisblack tiled gray image
+tiger-minisblack-tile-31.tif	73x1151 31-bit minisblack tiled gray image
+tiger-minisblack-tile-32.tif	73x1151 32-bit minisblack tiled gray image
+tiger-minisblack-tile-64.tif	73x1151 64-bit minisblack tiled gray image
+tiger-minisblack-float-strip-32.tif	73x1151 32-bit minisblack strip gray float image
+tiger-minisblack-float-strip-64.tif	73x1151 64-bit minisblack strip gray float image
+tiger-minisblack-float-tile-32.tif	73x1151 32-bit minisblack tiled gray float image
+tiger-minisblack-float-tile-64.tif	73x1151 64-bit minisblack tiled gray float image
+tiger-palette-strip-01.tif	73x1151 2-entry colormapped strip image
+tiger-palette-strip-02.tif	73x1151 4-entry colormapped strip image
+tiger-palette-strip-03.tif	73x1151 8-entry colormapped strip image
+tiger-palette-strip-04.tif	73x1151 16-entry colormapped strip image
+tiger-palette-strip-05.tif	73x1151 32-entry colormapped strip image
+tiger-palette-strip-06.tif	73x1151 64-entry colormapped strip image
+tiger-palette-strip-07.tif	73x1151 128-entry colormapped strip image
+tiger-palette-strip-08.tif	73x1151 256-entry colormapped strip image
+tiger-palette-strip-09.tif	73x1151 512-entry colormapped strip image
+tiger-palette-strip-10.tif	73x1151 1024-entry colormapped strip image
+tiger-palette-strip-11.tif	73x1151 2048-entry colormapped strip image
+tiger-palette-strip-12.tif	73x1151 4096-entry colormapped strip image
+tiger-palette-strip-13.tif	73x1151 8192-entry colormapped strip image
+tiger-palette-strip-14.tif	73x1151 16384-entry colormapped strip image
+tiger-palette-strip-15.tif	73x1151 32768-entry colormapped strip image
+tiger-palette-strip-16.tif	73x1151 65536-entry colormapped strip image
+tiger-palette-tile-01.tif	73x1151 2-entry colormapped tiled image
+tiger-palette-tile-02.tif	73x1151 4-entry colormapped tiled image
+tiger-palette-tile-03.tif	73x1151 8-entry colormapped tiled image
+tiger-palette-tile-04.tif	73x1151 16-entry colormapped tiled image
+tiger-palette-tile-05.tif	73x1151 32-entry colormapped tiled image
+tiger-palette-tile-06.tif	73x1151 64-entry colormapped tiled image
+tiger-palette-tile-07.tif	73x1151 128-entry colormapped tiled image
+tiger-palette-tile-08.tif	73x1151 256-entry colormapped tiled image
+tiger-palette-tile-09.tif	73x1151 512-entry colormapped tiled image
+tiger-palette-tile-10.tif	73x1151 1024-entry colormapped tiled image
+tiger-palette-tile-11.tif	73x1151 2048-entry colormapped tiled image
+tiger-palette-tile-12.tif	73x1151 4096-entry colormapped tiled image
+tiger-palette-tile-13.tif	73x1151 8192-entry colormapped tiled image
+tiger-palette-tile-14.tif	73x1151 16384-entry colormapped tiled image
+tiger-palette-tile-15.tif	73x1151 32768-entry colormapped tiled image
+tiger-palette-tile-16.tif	73x1151 65536-entry colormapped tiled image
+tiger-rgb-strip-contig-01.tif	73x1151 1-bit contiguous RGB image
+tiger-rgb-strip-contig-02.tif	73x1151 2-bit contiguous RGB image
+tiger-rgb-strip-contig-03.tif	73x1151 3-bit contiguous RGB image
+tiger-rgb-strip-contig-04.tif	73x1151 4-bit contiguous RGB image
+tiger-rgb-strip-contig-05.tif	73x1151 5-bit contiguous RGB image
+tiger-rgb-strip-contig-06.tif	73x1151 6-bit contiguous RGB image
+tiger-rgb-strip-contig-07.tif	73x1151 7-bit contiguous RGB image
+tiger-rgb-strip-contig-08.tif	73x1151 8-bit contiguous RGB image
+tiger-rgb-strip-contig-09.tif	73x1151 9-bit contiguous RGB image
+tiger-rgb-strip-contig-10.tif	73x1151 10-bit contiguous RGB image
+tiger-rgb-strip-contig-11.tif	73x1151 11-bit contiguous RGB image
+tiger-rgb-strip-contig-12.tif	73x1151 12-bit contiguous RGB image
+tiger-rgb-strip-contig-13.tif	73x1151 13-bit contiguous RGB image
+tiger-rgb-strip-contig-14.tif	73x1151 14-bit contiguous RGB image
+tiger-rgb-strip-contig-15.tif	73x1151 15-bit contiguous RGB image
+tiger-rgb-strip-contig-16.tif	73x1151 16-bit contiguous RGB image
+tiger-rgb-strip-contig-17.tif	73x1151 17-bit contiguous RGB image
+tiger-rgb-strip-contig-18.tif	73x1151 18-bit contiguous RGB image
+tiger-rgb-strip-contig-19.tif	73x1151 19-bit contiguous RGB image
+tiger-rgb-strip-contig-20.tif	73x1151 20-bit contiguous RGB image
+tiger-rgb-strip-contig-21.tif	73x1151 21-bit contiguous RGB image
+tiger-rgb-strip-contig-22.tif	73x1151 22-bit contiguous RGB image
+tiger-rgb-strip-contig-23.tif	73x1151 23-bit contiguous RGB image
+tiger-rgb-strip-contig-24.tif	73x1151 24-bit contiguous RGB image
+tiger-rgb-strip-contig-25.tif	73x1151 25-bit contiguous RGB image
+tiger-rgb-strip-contig-26.tif	73x1151 26-bit contiguous RGB image
+tiger-rgb-strip-contig-27.tif	73x1151 27-bit contiguous RGB image
+tiger-rgb-strip-contig-28.tif	73x1151 28-bit contiguous RGB image
+tiger-rgb-strip-contig-29.tif	73x1151 29-bit contiguous RGB image
+tiger-rgb-strip-contig-30.tif	73x1151 30-bit contiguous RGB image
+tiger-rgb-strip-contig-31.tif	73x1151 31-bit contiguous RGB image
+tiger-rgb-strip-contig-32.tif	73x1151 32-bit contiguous RGB image
+tiger-rgb-strip-contig-64.tif	73x1151 64-bit contiguous RGB image
+tiger-rgb-strip-planar-01.tif	73x1151 1-bit separated RGB image
+tiger-rgb-strip-planar-02.tif	73x1151 2-bit separated RGB image
+tiger-rgb-strip-planar-03.tif	73x1151 3-bit separated RGB image
+tiger-rgb-strip-planar-04.tif	73x1151 4-bit separated RGB image
+tiger-rgb-strip-planar-05.tif	73x1151 5-bit separated RGB image
+tiger-rgb-strip-planar-06.tif	73x1151 6-bit separated RGB image
+tiger-rgb-strip-planar-07.tif	73x1151 7-bit separated RGB image
+tiger-rgb-strip-planar-08.tif	73x1151 8-bit separated RGB image
+tiger-rgb-strip-planar-09.tif	73x1151 9-bit separated RGB image
+tiger-rgb-strip-planar-10.tif	73x1151 10-bit separated RGB image
+tiger-rgb-strip-planar-11.tif	73x1151 11-bit separated RGB image
+tiger-rgb-strip-planar-12.tif	73x1151 12-bit separated RGB image
+tiger-rgb-strip-planar-13.tif	73x1151 13-bit separated RGB image
+tiger-rgb-strip-planar-14.tif	73x1151 14-bit separated RGB image
+tiger-rgb-strip-planar-15.tif	73x1151 15-bit separated RGB image
+tiger-rgb-strip-planar-16.tif	73x1151 16-bit separated RGB image
+tiger-rgb-strip-planar-17.tif	73x1151 17-bit separated RGB image
+tiger-rgb-strip-planar-18.tif	73x1151 18-bit separated RGB image
+tiger-rgb-strip-planar-19.tif	73x1151 19-bit separated RGB image
+tiger-rgb-strip-planar-20.tif	73x1151 20-bit separated RGB image
+tiger-rgb-strip-planar-21.tif	73x1151 21-bit separated RGB image
+tiger-rgb-strip-planar-22.tif	73x1151 22-bit separated RGB image
+tiger-rgb-strip-planar-23.tif	73x1151 23-bit separated RGB image
+tiger-rgb-strip-planar-24.tif	73x1151 24-bit separated RGB image
+tiger-rgb-strip-planar-25.tif	73x1151 25-bit separated RGB image
+tiger-rgb-strip-planar-26.tif	73x1151 26-bit separated RGB image
+tiger-rgb-strip-planar-27.tif	73x1151 27-bit separated RGB image
+tiger-rgb-strip-planar-28.tif	73x1151 28-bit separated RGB image
+tiger-rgb-strip-planar-29.tif	73x1151 29-bit separated RGB image
+tiger-rgb-strip-planar-30.tif	73x1151 30-bit separated RGB image
+tiger-rgb-strip-planar-31.tif	73x1151 31-bit separated RGB image
+tiger-rgb-strip-planar-32.tif	73x1151 32-bit separated RGB image
+tiger-rgb-strip-planar-64.tif	73x1151 64-bit separated RGB image
+tiger-rgb-tile-contig-01.tif	73x1151 1-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-02.tif	73x1151 2-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-03.tif	73x1151 3-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-04.tif	73x1151 4-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-05.tif	73x1151 5-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-06.tif	73x1151 6-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-07.tif	73x1151 7-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-08.tif	73x1151 8-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-09.tif	73x1151 9-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-10.tif	73x1151 10-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-11.tif	73x1151 11-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-12.tif	73x1151 12-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-13.tif	73x1151 13-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-14.tif	73x1151 14-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-15.tif	73x1151 15-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-16.tif	73x1151 16-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-17.tif	73x1151 17-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-18.tif	73x1151 18-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-19.tif	73x1151 19-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-20.tif	73x1151 20-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-21.tif	73x1151 21-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-22.tif	73x1151 22-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-23.tif	73x1151 23-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-24.tif	73x1151 24-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-25.tif	73x1151 25-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-26.tif	73x1151 26-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-27.tif	73x1151 27-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-28.tif	73x1151 28-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-29.tif	73x1151 29-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-30.tif	73x1151 30-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-31.tif	73x1151 31-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-32.tif	73x1151 32-bit tiled contiguous RGB image
+tiger-rgb-tile-contig-64.tif	73x1151 64-bit tiled contiguous RGB image
+tiger-rgb-tile-planar-01.tif	73x1151 1-bit tiled separated RGB image
+tiger-rgb-tile-planar-02.tif	73x1151 2-bit tiled separated RGB image
+tiger-rgb-tile-planar-03.tif	73x1151 3-bit tiled separated RGB image
+tiger-rgb-tile-planar-04.tif	73x1151 4-bit tiled separated RGB image
+tiger-rgb-tile-planar-05.tif	73x1151 5-bit tiled separated RGB image
+tiger-rgb-tile-planar-06.tif	73x1151 6-bit tiled separated RGB image
+tiger-rgb-tile-planar-07.tif	73x1151 7-bit tiled separated RGB image
+tiger-rgb-tile-planar-08.tif	73x1151 8-bit tiled separated RGB image
+tiger-rgb-tile-planar-09.tif	73x1151 9-bit tiled separated RGB image
+tiger-rgb-tile-planar-10.tif	73x1151 10-bit tiled separated RGB image
+tiger-rgb-tile-planar-11.tif	73x1151 11-bit tiled separated RGB image
+tiger-rgb-tile-planar-12.tif	73x1151 12-bit tiled separated RGB image
+tiger-rgb-tile-planar-13.tif	73x1151 13-bit tiled separated RGB image
+tiger-rgb-tile-planar-14.tif	73x1151 14-bit tiled separated RGB image
+tiger-rgb-tile-planar-15.tif	73x1151 15-bit tiled separated RGB image
+tiger-rgb-tile-planar-16.tif	73x1151 16-bit tiled separated RGB image
+tiger-rgb-tile-planar-17.tif	73x1151 17-bit tiled separated RGB image
+tiger-rgb-tile-planar-18.tif	73x1151 18-bit tiled separated RGB image
+tiger-rgb-tile-planar-19.tif	73x1151 19-bit tiled separated RGB image
+tiger-rgb-tile-planar-20.tif	73x1151 20-bit tiled separated RGB image
+tiger-rgb-tile-planar-21.tif	73x1151 21-bit tiled separated RGB image
+tiger-rgb-tile-planar-22.tif	73x1151 22-bit tiled separated RGB image
+tiger-rgb-tile-planar-23.tif	73x1151 23-bit tiled separated RGB image
+tiger-rgb-tile-planar-24.tif	73x1151 24-bit tiled separated RGB image
+tiger-rgb-tile-planar-25.tif	73x1151 25-bit tiled separated RGB image
+tiger-rgb-tile-planar-26.tif	73x1151 26-bit tiled separated RGB image
+tiger-rgb-tile-planar-27.tif	73x1151 27-bit tiled separated RGB image
+tiger-rgb-tile-planar-28.tif	73x1151 28-bit tiled separated RGB image
+tiger-rgb-tile-planar-29.tif	73x1151 29-bit tiled separated RGB image
+tiger-rgb-tile-planar-30.tif	73x1151 30-bit tiled separated RGB image
+tiger-rgb-tile-planar-31.tif	73x1151 31-bit tiled separated RGB image
+tiger-rgb-tile-planar-32.tif	73x1151 32-bit tiled separated RGB image
+tiger-rgb-tile-planar-64.tif	73x1151 64-bit tiled separated RGB image
+tiger-rgb-float-strip-contig-32.tif	73x1151 32-bit contiguous RGB float image
+tiger-rgb-float-strip-contig-64.tif	73x1151 64-bit contiguous RGB float image
+tiger-rgb-float-strip-planar-32.tif	73x1151 32-bit separated RGB float image
+tiger-rgb-float-strip-planar-64.tif	73x1151 64-bit separated RGB float image
+tiger-rgb-float-tile-contig-32.tif	73x1151 32-bit tiled contiguous RGB float image
+tiger-rgb-float-tile-contig-64.tif	73x1151 64-bit tiled contiguous RGB float image
+tiger-rgb-float-tile-planar-32.tif	73x1151 32-bit tiled separated RGB float image
+tiger-rgb-float-tile-planar-64.tif	73x1151 64-bit tiled separated RGB float image
+tiger-separated-strip-contig-08.tif	73x1151 8-bit strip contiguous CMYK image
+tiger-separated-strip-contig-16.tif	73x1151 16-bit strip contiguous CMYK image
+tiger-separated-strip-planar-08.tif	73x1151 8-bit strip separated CMYK image
+tiger-separated-strip-planar-16.tif	73x1151 16-bit strip separated CMYK image

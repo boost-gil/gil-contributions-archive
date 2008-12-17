@@ -88,18 +88,18 @@ private:
 */
 
         int spn = ( view.width() * num_channels< View >::value + 3 ) & ~3;
-        int ofs = header_size + win32_info_size + entries * 4;
+        int ofs = bmp_header_size + bmp_win32_info_size + entries * 4;
         int siz = ofs + spn * view.height();
 
         // write the BMP file header
-        _out.write_int16( bm_signature );
+        _out.write_int16( bmp_signature );
         _out.write_int32( siz );
         _out.write_int16( 0 );
         _out.write_int16( 0 );
         _out.write_int32( ofs );
 
         // writes Windows information header
-        _out.write_int32( win32_info_size );
+        _out.write_int32( bmp_win32_info_size );
         _out.write_int32( view.width()  );
         _out.write_int32( view.height() );
         _out.write_int16( 1 );

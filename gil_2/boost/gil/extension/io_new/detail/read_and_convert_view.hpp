@@ -198,6 +198,7 @@ void read_and_convert_view( const String&                           file_name
                         );
 }
 
+
 template < typename Device
          , typename View
          , typename FormatTag

@@ -29,40 +29,20 @@ namespace boost { namespace gil {
 
 struct jpeg_tag : format_tag {};
 
-struct jpeg_image_width
-{
-   typedef JDIMENSION type;
-};
+struct jpeg_image_width : property_base< JDIMENSION > {};
 
-struct jpeg_image_height
-{
-   typedef JDIMENSION type;
-};
+struct jpeg_image_height : property_base< JDIMENSION > {};
 
-struct jpeg_num_components
-{
-   typedef int type;
-};
+struct jpeg_num_components : property_base< int > {};
 
-struct jpeg_color_space
-{
-   typedef J_COLOR_SPACE type;
-};
+struct jpeg_color_space : property_base< J_COLOR_SPACE > {};
 
-struct jpeg_quality
-{
-   typedef int type;
-};
+struct jpeg_quality : property_base< int > {};
 
-struct jpeg_data_precision
-{
-   typedef int type;
-};
+struct jpeg_data_precision : property_base< int > {};
 
-struct jpeg_dct_method
+struct jpeg_dct_method : property_base< J_DCT_METHOD >
 {
-    typedef J_DCT_METHOD type;
-
     static const type slow        = JDCT_ISLOW;
     static const type fast        = JDCT_IFAST;
     static const type floating_pt = JDCT_FLOAT;

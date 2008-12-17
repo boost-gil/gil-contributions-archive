@@ -152,7 +152,7 @@ public:
         else
         {
             std::vector< unsigned int > channel_sizes( this->_info._samples_per_pixel );
-            for( int i = 0; i < this->_info._samples_per_pixel; ++i )
+            for( uint16_t i = 0; i < this->_info._samples_per_pixel; ++i )
             {
                 channel_sizes[i] = this->_info._bits_per_sample;
             }

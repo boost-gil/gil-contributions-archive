@@ -44,11 +44,10 @@ struct bmp_image_height : property_base< int32_t > {};
 struct bmp_bits_per_pixel : property_base< uint16_t > {};
 
 // The compression method being used.
-
-static const uint32_t ct_rgb = 0;     // RGB without compression
-static const uint32_t ct_rle8 = 1;    // 8 bit index with RLE compression
-static const uint32_t ct_rle4 = 2;    // 4 bit index with RLE compression
-static const uint32_t ct_bitfield = 3;// 16 or 32 bit fields without compression
+static const uint32_t ct_rgb      = 0; // RGB without compression
+static const uint32_t ct_rle8     = 1; // 8 bit index with RLE compression
+static const uint32_t ct_rle4     = 2; // 4 bit index with RLE compression
+static const uint32_t ct_bitfield = 3; // 16 or 32 bit fields without compression
 
 struct bmp_compression : property_base< uint32_t > {};
 
@@ -123,10 +122,10 @@ struct image_write_info< bmp_tag >
 {
 };
 
-static const int header_size     = 14;
-static const int win32_info_size = 40;
-static const int os2_info_size   = 12;
-static const int bm_signature    = 0x4D42;
+static const int bmp_header_size     = 14;
+static const int bmp_win32_info_size = 40;
+static const int bmp_os2_info_size   = 12;
+static const int bmp_signature       = 0x4D42;
 
 } // namespace gil
 } // namespace boost
