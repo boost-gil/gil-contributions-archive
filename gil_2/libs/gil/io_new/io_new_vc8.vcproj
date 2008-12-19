@@ -286,6 +286,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\bit_operations.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\bmp_io_read.hpp"
 					>
 				</File>

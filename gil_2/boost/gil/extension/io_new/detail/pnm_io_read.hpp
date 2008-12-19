@@ -25,6 +25,7 @@
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
 #include "base.hpp"
+#include "bit_operations.hpp"
 #include "reader_base.hpp"
 #include "io_device.hpp"
 #include "typedefs.hpp"
@@ -239,62 +240,7 @@ public:
     }
 
 private:
-/*
-    template< typename View_Src
-            , typename View_Dst
-            >
-    void read_text_data( const View_Dst& view )
-    {
-        typedef typename View_Dst::y_coord_t y_t;
 
-        uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
-
-        std::vector< byte_t > row( pitch );
-        View_Src v = interleaved_view( _info._width
-                                     , 1
-                                     , (typename View_Src::value_type*) &row.front()
-                                     , pitch
-                                     );
-
-        typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
-        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
-
-        char buf[16];
-
-        for( y_t y = 0; y < view.height(); ++y )
-        {
-            for( uint32_t x = 0; x < pitch; ++x )
-            {
-                for( uint32_t k = 0; ; )
-                {
-					int ch = _io_dev.getc_unchecked();
-
-					if( isdigit( ch ))
-					{
-                        buf[ k++ ] = ch;
-					}
-					else if( k )
-					{
-						buf[ k ] = 0;
-						break;
-					}
-					else if( ch == EOF || !isspace( ch ))
-					{
-						return;
-					}
-                }
-
-                row[x] = atoi( buf );
-            }
-
-            this->_cc_policy.read( beg
-                                 , end
-                                 , view.row_begin( y )
-                                 );
-
-        }
-    }
-*/
     template< typename View_Src
             , typename View_Dst
             >
