@@ -32,6 +32,10 @@ struct mirror_bits
    void operator() ( Buffer& ) {}
 };
 
+
+// The functor will generate a lookup table since the
+// mirror operation is quite costly. Some basic benchmarks
+// have proven it.
 template< typename Buffer >
 struct mirror_bits< Buffer
                   , boost::mpl::true_

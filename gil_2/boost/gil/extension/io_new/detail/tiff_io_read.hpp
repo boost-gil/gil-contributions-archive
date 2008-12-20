@@ -31,6 +31,7 @@ extern "C" {
 #include <boost/shared_ptr.hpp>
 
 #include "base.hpp"
+#include "bit_operations.hpp"
 #include "io_device.hpp"
 #include "reader_base.hpp"
 #include "tiff_io_device.hpp"
@@ -299,9 +300,16 @@ private:
 
       skip_over_rows( buffer, plane );
 
-      swap_bits_fn< typename is_bit_aligned< View >::type
-                  , buffer_t
-                  > sb( _io_dev.are_bytes_swapped() );
+
+      //@todo is _io_dev.are_bytes_swapped() == true when reading bit_aligned images?
+      //      If the following fires then we need to pass a boolean to the constructor.
+      io_error_if( is_bit_aligned< View >::value && !_io_dev.are_bytes_swapped()
+                 , "Cannot be read."
+                 );
+
+      mirror_bits< buffer_t
+                 , typename is_bit_aligned< View >::type
+                 > mirror_bits;
 
       typename point_t::value_type num_rows = this->_settings._dim.y - this->_settings._top_left.y;
 
@@ -314,7 +322,7 @@ private:
                              , row
                              , plane   );
 
-         sb( buffer );
+         mirror_bits( buffer );
 
          this->_cc_policy.read( first
                               , last

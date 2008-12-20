@@ -109,20 +109,6 @@ void io_error_if( bool expr, const std::string& descr )
       io_error( descr );
 }
 
-inline
-unsigned char swap_bits( unsigned char c )
-{
-   unsigned char result = 0;
-   for( int i = 0; i < 8; ++i )
-   {
-      result = result << 1;
-      result |= ( c & 1 );
-      c = c >> 1;
-   }
-
-   return result;
-}
-
 template<typename PixelT,typename DummyT = void >
 struct row_buffer_helper
 {
@@ -222,57 +208,6 @@ struct row_buffer_helper_view<View,
     row_buffer_helper_view( int width ) 
         : row_buffer_helper<typename View::reference>(width)
     {}
-};
-
-
-template< typename IsBitAligned
-        , typename Buffer
-        >
-struct swap_bits_fn
-{
-   swap_bits_fn( bool ) {}
-
-   void operator() ( Buffer& ) {}
-};
-
-template<>
-struct swap_bits_fn< boost::mpl::true_
-                   , std::vector< unsigned char > >
-{
-   swap_bits_fn( bool swap )
-   {
-      for( int i = 0; i < 256; ++i )
-      {
-         _lookup[i] = swap_bits( i );
-      }
-
-      _swap_bits = swap;
-   }
-
-   void operator() ( std::vector< unsigned char >& buffer )
-   {
-      typedef swap_bits_fn< boost::mpl::true_, std::vector< unsigned char > > tt;
-
-      if( _swap_bits )
-      {
-         std::transform( buffer.begin()
-                       , buffer.end()
-                       , buffer.begin()
-                       , boost::bind( &tt::_swap, *this, _1 ));
-      }
-   }
- 
- private:
- 
-   unsigned char _swap( unsigned char byte ) const
-   {
-      return _lookup[ byte ];
-   }
- 
- private:
- 
-   boost::array< unsigned char, 256 > _lookup;
-   bool _swap_bits;
 };
 
 } // namespace detail
