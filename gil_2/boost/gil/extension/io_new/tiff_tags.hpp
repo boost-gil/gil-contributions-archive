@@ -33,7 +33,7 @@ extern "C" {
 namespace boost { namespace gil {
 
 template< typename T, int Value >
-struct tiff_property_base : property_base< uint32_t >
+struct tiff_property_base : property_base< T >
 {
     static const unsigned int tag = Value;
 };
