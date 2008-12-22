@@ -29,7 +29,7 @@ namespace png_test {
 // |+--------- parameter of test (in this case gamma-value)
 // +---------- test feature (in this case gamma)
 
-BOOST_AUTO_TEST_CASE( my_png_file_format_test )
+BOOST_AUTO_TEST_CASE( file_format_test )
 {
    string in ( "..\\test_images\\png\\PngSuite\\" );
    string out( "..\\test\\png\\" );

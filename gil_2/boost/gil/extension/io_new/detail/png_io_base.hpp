@@ -42,7 +42,7 @@ protected:
 
     void check() const
     {
-        unsigned char buf[PNG_BYTES_TO_CHECK];
+        byte_t buf[PNG_BYTES_TO_CHECK];
 
         io_error_if(_io_dev.read(buf, PNG_BYTES_TO_CHECK) != PNG_BYTES_TO_CHECK,
                 "png_check_validity: failed to read image");

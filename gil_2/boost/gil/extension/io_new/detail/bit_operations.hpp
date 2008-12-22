@@ -45,7 +45,7 @@ struct mirror_bits< Buffer
    {
         for( int i = 0; i < 256; ++i )
         {
-            unsigned char c = i;
+            byte_t c = i;
             mirror( c );
 
             _lookup[i] = c;
@@ -149,6 +149,52 @@ private:
         c = (( c << 4 ) & 0xF0 ) | (( c >> 4 ) & 0x0F );
     }
 };
+
+template< typename Buffer >
+struct do_nothing
+{
+   do_nothing() {}
+
+   void operator() ( Buffer& ) {}
+};
+
+/// Count consecutive zeros on the right
+template< typename T >
+inline
+unsigned int trailing_zeros( T x )
+throw()
+{
+    unsigned int n = 0;
+
+    x = ~x & (x - 1);
+
+    while( x )
+    {
+        n = n + 1;
+        x = x >> 1;
+    }
+
+    return n;
+}
+
+/// Counts ones in a bit-set
+template< typename T >
+inline
+unsigned int count_ones( T x )
+throw()
+{
+    unsigned int n = 0;
+
+    while( x )
+    {
+	    // clear the least significant bit set
+	    x &= x - 1;
+	    ++n;
+    }
+
+    return n;
+}
+
 
 } // namespace detail
 } // namespace gil

@@ -55,7 +55,7 @@ template< typename Channel
         , typename Layout
         , bool Mutable
         >
-struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< unsigned char
+struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< byte_t
                                                                                                  , Channel
                                                                                                  , Layout
                                                                                                  , Mutable
@@ -200,7 +200,7 @@ private:
                    , const mpl::true_&    // bit_aligned
                    )
     {
-        std::vector< unsigned char > row( row_size_in_bytes );
+        byte_vector_t row( row_size_in_bytes );
 
         typedef typename View::x_iterator x_it_t;
         x_it_t row_it = x_it_t( &(*row.begin()));
@@ -228,7 +228,7 @@ private:
                    , const mpl::false_&    // bit_aligned
                    )
     {
-        std::vector< unsigned char > row( row_size_in_bytes );
+        byte_vector_t row( row_size_in_bytes );
 
         typedef typename my_interleaved_pixel_iterator_type_from_pixel_reference< typename View::reference
                                                                                 >::type x_iterator;

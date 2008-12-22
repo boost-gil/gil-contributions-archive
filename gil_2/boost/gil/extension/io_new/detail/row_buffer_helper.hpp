@@ -12,7 +12,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
-/// \brief 
+/// \brief  Helper for having one read implementation used for
+///         bit_aligned and non_bit_aligned images.
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///         
 /// \date   2007-2008 \n
@@ -57,7 +58,7 @@ struct row_buffer_helper< Pixel
                                             >::type
                         >
 {
-    typedef unsigned char element_t;
+    typedef byte_t element_t;
     typedef std::vector< element_t > buffer_t;
     typedef Pixel pixel_type;
     typedef bit_aligned_pixel_iterator<pixel_type> iterator_t;
@@ -116,7 +117,9 @@ template< typename View
         >
 struct row_buffer_helper_view : row_buffer_helper< typename View::value_type >
 {
-    row_buffer_helper_view( int width, bool in_bytes )
+    row_buffer_helper_view( int  width
+                          , bool in_bytes
+                          )
     :  row_buffer_helper< typename View::value_type >( width
                                                      , in_bytes
                                                      )
@@ -131,7 +134,9 @@ struct row_buffer_helper_view< View
                                                  >::type
                              > : row_buffer_helper< typename View::reference >
 {
-    row_buffer_helper_view( int width, bool in_bytes ) 
+    row_buffer_helper_view( int  width
+                          , bool in_bytes
+                          ) 
     : row_buffer_helper< typename View::reference >( width
                                                    , in_bytes
                                                    )

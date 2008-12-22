@@ -24,70 +24,13 @@
 
 #include "base.hpp"
 #include "bit_operations.hpp"
+#include "row_buffer_helper.hpp"
 #include "reader_base.hpp"
 #include "io_device.hpp"
 #include "typedefs.hpp"
 #include "bmp_supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
-
-/// Compute the consecutive zero bits on the right
-template< typename T >
-inline
-unsigned trailing_zeros( T x )
-throw()
-{
-    unsigned n = 0;
-
-    x = ~x & (x - 1);
-
-    while( x )
-    {
-        n = n + 1;
-        x = x >> 1;
-    }
-
-    return n;
-}
-
-/// Counts a bit-set
-template< typename T >
-inline
-unsigned count_ones( T x )
-throw()
-{
-    unsigned n = 0;
-
-    while( x )
-    {
-	    // clear the least significant bit set
-	    x &= x - 1;
-	    ++n;
-    }
-
-    return n;
-}
-
-inline
-void swap_bits_( unsigned char& c )
-{
-   unsigned char result = 0;
-   for( int i = 0; i < 8; ++i )
-   {
-      result = result << 1;
-      result |= ( c & 1 );
-      c = c >> 1;
-   }
-
-   c = result;
-}
-
-inline
-void swap_half_bytes_( unsigned char& c )
-{
-    unsigned char b = ( c & 0xF ) << 4;
-    c = ( c >> 4 ) | b;
-}
 
 /// Color channel mask
 struct bit_field
@@ -214,305 +157,6 @@ public:
 
         return _info;
     }
-/*
-    template< typename View >
-    void apply( const View& dst_view )
-    {
-        if( !_info._valid )
-        {
-            get_info();
-        }
-
-        // read the color masks
-        color_mask mask;
-        if( _info._compression == ct_bitfield )
-        {
-            mask.red.mask    = _io_dev.read_int32();
-            mask.green.mask  = _io_dev.read_int32();
-            mask.blue.mask   = _io_dev.read_int32();
-
-            mask.red.width   = count_ones( mask.red.mask   );
-            mask.green.width = count_ones( mask.green.mask );
-            mask.blue.width  = count_ones( mask.blue.mask  );
-
-            mask.red.shift   = trailing_zeros( mask.red.mask   );
-            mask.green.shift = trailing_zeros( mask.green.mask );
-            mask.blue.shift  = trailing_zeros( mask.blue.mask  );
-        }
-        else if( _info._compression == ct_rgb )
-        {
-            switch( _info._bits_per_pixel )
-            {
-                case 15:
-                case 16:
-                {
-                    mask.red.mask   = 0x007C00; mask.red.width   = 5; mask.red.shift   = 10;
-                    mask.green.mask = 0x0003E0; mask.green.width = 5; mask.green.shift =  5;
-                    mask.blue.mask  = 0x00001F; mask.blue.width  = 5; mask.blue.shift  =  0;
-                    break;
-                }
-
-                case 24:
-                case 32:
-                {
-                    mask.red.mask   = 0xFF0000; mask.red.width   = 8; mask.red.shift   = 16;
-                    mask.green.mask = 0x00FF00; mask.green.width = 8; mask.green.shift =  8;
-                    mask.blue.mask  = 0x0000FF; mask.blue.width  = 8; mask.blue.shift  =  0;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            io_error( "bmp_reader::apply(): unsupported BMP compression" );
-        }
-
-        // Read the color map.
-        std::vector< rgba8_pixel_t > palette;
-
-        if( _info._bits_per_pixel <= 8 )
-        {
-            int entries = _info._num_colors;
-
-            if( entries == 0 )
-            {
-                entries = 1 << _info._bits_per_pixel;
-            }
-
-            palette.resize( entries );
-
-            for( int i = 0; i < entries; ++i )
-            {
-                get_color( palette[i], blue_t()  ) = _io_dev.read_int8();
-                get_color( palette[i], green_t() ) = _io_dev.read_int8();
-                get_color( palette[i], red_t()   ) = _io_dev.read_int8();
-
-                // there are 4 entries when windows header
-                // but 3 for os2 header
-                if( _info._header_size == bmp_win32_info_size )
-                {
-                    _io_dev.read_int8();
-                }
-
-            } // for
-        } // if
-
-
-        // the row pitch must be multiple 4 bytes
-        int pitch;
-
-        if( _info._bits_per_pixel < 8 )
-        {
-            pitch = (( this->_info._width * this->_info._bits_per_pixel ) + 7 ) >> 3;
-        }
-        else
-        {
-            pitch = _info._width * (( this->_info._bits_per_pixel + 7 ) >> 3);
-        }
-
-        pitch = (pitch + 3) & ~3;
-
-        // read the raster
-        std::vector< byte_t > row( pitch );
-
-        int ybeg = 0;
-        int yend = this->_settings._dim.y;
-        int yinc = 1;
-
-        if( _info._height > 0 )
-        {
-            // the image is upside down
-            ybeg = this->_settings._dim.y - 1;
-            yend = -1;
-            yinc = -1;
-
-            // go to the first scanline to read
-            _io_dev.seek( _info._offset
-                        + (   this->_info._height 
-                            - this->_settings._top_left.y 
-                            - this->_settings._dim.y 
-                          ) * pitch
-                        );
-
-        }
-        else
-        {
-            // go to the first scanline to read
-            _io_dev.seek( _info._offset
-                        + this->_settings._top_left.y * pitch
-                        );
-
-        }
-
-        for( int y = ybeg; y != yend; y += yinc )
-        {
-            // @todo: For now we're reading the whole scanline which is
-            // slightly inefficient. Later versions should try to read
-            // only the bytes which are necessary.
-            _io_dev.read( &row.front(), pitch );
-
-            switch( _info._bits_per_pixel )
-            {
-                case 1:
-                {
-                    // 2-bit indices
-
-                    // we have to swap bits
-                    // 11101100 -> 00110111
-                    for_each( row.begin(), row.end(), swap_bits_ );
-
-                    // row contains the indices
-                    typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-                    typedef image_t::view_t::x_iterator it_t;
-                    
-                    it_t it( &row.front(), 0 );
-                    it += this->_settings._top_left.x;
-                    it_t end = it + this->_settings._dim.x;
-
-                    typename View::x_iterator dst_it = dst_view.row_begin( y );
-
-                    for( ; it != end; ++it, ++dst_it )
-                    {
-                        unsigned char c = get_color( *it, gray_color_t() );
-                        *dst_it = palette[ c ];
-                    }
-
-                    break;
-                }
-
-                case 4:
-                {
-                    // 4-bit indices
-
-                    // we have to swap half bytes
-                    // 11101100 -> 11001110
-                    for_each( row.begin(), row.end(), swap_half_bytes_ );
-
-                    // row contains the indices
-                    typedef bit_aligned_image1_type< 4, gray_layout_t >::type image_t;
-                    typedef image_t::view_t::x_iterator it_t;
-
-                    it_t it( &row.front(), 0 );
-                    it += this->_settings._top_left.x;
-                    it_t end = it + this->_settings._dim.x;
-
-                    typename View::x_iterator dst_it = dst_view.row_begin( y );
-
-                    for( ; it != end; ++it, ++dst_it )
-                    {
-                        unsigned char c = get_color( *it, gray_color_t() );
-                        *dst_it = palette[ c ];
-                    }
-
-                    break;
-                }
-
-                case 8:
-                {
-                    // 8-bit indices
-                    typedef gray8_image_t image_t;
-
-                    gray8_view_t v = interleaved_view( _info._width
-                                                     , 1
-                                                     , (gray8_pixel_t*) &row.front()
-                                                     , _info._width
-                                                     );
-
-                    gray8_view_t::x_iterator it  = v.row_begin( 0 ) + this->_settings._top_left.x;
-                    gray8_view_t::x_iterator end = it + this->_settings._dim.x;
-
-
-                    typename View::x_iterator dst_it = dst_view.row_begin( y );
-
-                    for( ; it != end; ++it, ++dst_it )
-                    {
-                        unsigned char c = get_color( *it, gray_color_t() );
-                        *dst_it = palette[ c ];
-                    }
-
-
-                    break;
-                }
-
-                case 15:
-                case 16:
-                {
-                    typedef rgb8_image_t image_t;
-                    typedef image_t::view_t::x_iterator it_t;
-
-                    image_t img_row( _info._width, 1 );
-                    image_t::view_t v = view( img_row );
-                    it_t it = v.row_begin( 0 );
-
-                    unsigned char* src = &row.front();
-                    for( int i = 0 ; i < _info._width; ++i, src += 2 )
-                    {
-				        int p = ( src[1] << 8 ) | src[0];
-
-				        int r = ((p & mask.red.mask)   >> mask.red.shift)   << (8 - mask.red.width);
-				        int g = ((p & mask.green.mask) >> mask.green.shift) << (8 - mask.green.width);
-				        int b = ((p & mask.blue.mask)  >> mask.blue.shift)  << (8 - mask.blue.width);
-
-                        get_color( it[i], red_t()   ) = r;
-                        get_color( it[i], green_t() ) = g;
-                        get_color( it[i], blue_t()  ) = b;
-                    }
-
-                    it_t beg = v.row_begin( 0 ) + this->_settings._top_left.x;
-                    it_t end = beg + this->_settings._dim.x;
-
-                    this->_cc_policy.read( beg
-                                         , end
-                                         , dst_view.row_begin( y )
-                                         );
-
-                    break;
-                }
-
-                case 24:
-                {
-                    // 8-8-8 BGR
-                    bgr8_view_t v = interleaved_view( _info._width
-                                                    , 1
-                                                    , (bgr8_pixel_t*) &row.front()
-                                                    , _info._width * 3
-                                                    );
-
-                    bgr8_view_t::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
-                    bgr8_view_t::x_iterator end = beg + this->_settings._dim.x;
-
-                    this->_cc_policy.read( beg
-                                         , end
-                                         , dst_view.row_begin( y )
-                                         );
-
-                    break;
-                }
-
-
-                case 32:
-                {
-                    // 8-8-8-8 BGRA
-                    bgra8_view_t v = interleaved_view( _info._width
-                                                     , 1
-                                                     , (bgra8_pixel_t*) &row.front()
-                                                     , _info._width * 4
-                                                     );
-
-                    bgra8_view_t::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
-                    bgra8_view_t::x_iterator end = beg + this->_settings._dim.x;
-
-                    this->_cc_policy.read( beg
-                                         , end
-                                         , dst_view.row_begin( y )
-                                         );
-
-                    break;
-                }
-            }
-        }
-    }
-*/
 
     template< typename View >
     void apply( const View& dst_view )
@@ -536,8 +180,6 @@ public:
 
         pitch = (pitch + 3) & ~3;
 
-        // read the raster
-        std::vector< byte_t > row( pitch );
 
         int ybeg = 0;
         int yend = this->_settings._dim.y;
@@ -569,18 +211,37 @@ public:
 
         switch( _info._bits_per_pixel )
         {
-            case 1: {  read_data_1( dst_view, row, ybeg, yend, yinc, offset ); break; }
-            case 4: {  read_data_4( dst_view, row, ybeg, yend, yinc, offset  ); break; }
-            case 8: {  read_data_8( dst_view, row, ybeg, yend, yinc, offset  ); break; }
+            case 1:
+            {
+                read_palette_image< gray1_image_t::view_t
+                                  , mirror_bits< byte_vector_t, mpl::true_ >
+                                  > ( dst_view, pitch, ybeg, yend, yinc, offset ); 
+                break;
+            }
 
-            case 15: case 16: {  read_data_15( dst_view, row, ybeg, yend, yinc, offset  ); break; }
+            case 4:
+            {
+                read_palette_image< gray4_image_t::view_t
+                                  , swap_half_bytes< byte_vector_t, mpl::true_ >
+                                  > ( dst_view, pitch, ybeg, yend, yinc, offset ); 
+                break;
+            }
 
-            case 24: {  read_data< bgr8_view_t  >( dst_view, row, ybeg, yend, yinc, offset  ); break; }
-            case 32: {  read_data< bgra8_view_t >( dst_view, row, ybeg, yend, yinc, offset  ); break; }
+            case 8:
+            {
+                read_palette_image< gray8_image_t::view_t
+                                  , do_nothing< std::vector< gray8_pixel_t > >
+                                  > ( dst_view, pitch, ybeg, yend, yinc, offset ); 
+                break;
+            }
+
+            case 15: case 16: {  read_data_15( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
+
+            case 24: {  read_data< bgr8_view_t  >( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
+            case 32: {  read_data< bgra8_view_t >( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
 
         }
     }
-
 
 private:
 
@@ -611,42 +272,46 @@ private:
         } // for
     }
 
-    // 1-bit indices
-    template< typename View >
-    void read_data_1( const View&          view
-                    , std::vector< byte >& row
-                    , int                  ybeg
-                    , int                  yend
-                    , int                  yinc
-                    , int                  offset
-                    )
+    template< typename View_Src
+            , typename Byte_Manipulator
+            , typename View_Dst
+            >
+    void read_palette_image( const View_Dst& view
+                           , int             pitch
+                           , int             ybeg
+                           , int             yend
+                           , int             yinc
+                           , int             offset
+                           )
     {
-        // Read the color map.
         std::vector< rgba8_pixel_t > pal;
         read_palette( pal );
 
         // jump to first scanline
         _io_dev.seek( offset );
 
-        typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-        typedef image_t::view_t::x_iterator it_t;
+        typedef row_buffer_helper_view< View_Src > rh_t;
+        typedef typename rh_t::iterator_t          it_t;
+
+        rh_t rh( pitch, true );
 
         // we have to swap bits
-        mirror_bits< std::vector< byte_t >, mpl::true_ > mirror_bits;
+        Byte_Manipulator byte_manipulator;
 
         for( int y = ybeg; y != yend; y += yinc )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
             // only the bytes which are necessary.
-            _io_dev.read( &row.front(), row.size() );
+            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
+                        , pitch
+                        );
 
-            mirror_bits( row );
+            byte_manipulator( rh.buffer() );
 
-            typename View::x_iterator dst_it = view.row_begin( y );
+            typename View_Dst::x_iterator dst_it = view.row_begin( y );
 
-            it_t it( &row.front(), 0 );
-            it += this->_settings._top_left.x;
+            it_t it  = rh.begin() + this->_settings._top_left.x;
             it_t end = it + this->_settings._dim.x;
 
             for( ; it != end; ++it, ++dst_it )
@@ -657,107 +322,17 @@ private:
         }
     }
 
-    // 4-bit indices
     template< typename View >
-    void read_data_4( const View&          view
-                    , std::vector< byte >& row
-                    , int                  ybeg
-                    , int                  yend
-                    , int                  yinc
-                    , int                  offset
-                    )
-    {
-        // Read the color map.
-        std::vector< rgba8_pixel_t > pal;
-        read_palette( pal );
-
-        // jump to first scanline
-        _io_dev.seek( offset );
-
-        typedef bit_aligned_image1_type< 4, gray_layout_t >::type image_t;
-        typedef image_t::view_t::x_iterator it_t;
-
-        // we have to swap half bytes
-        swap_half_bytes< std::vector< byte_t >, mpl::true_ > swap_half_bytes;
-
-        for( int y = ybeg; y != yend; y += yinc )
-        {
-            // @todo: For now we're reading the whole scanline which is
-            // slightly inefficient. Later versions should try to read
-            // only the bytes which are necessary.
-            _io_dev.read( &row.front(), row.size() );
-
-            swap_half_bytes( row );
-
-            typename View::x_iterator dst_it = view.row_begin( y );
-
-            it_t it( &row.front(), 0 );
-            it += this->_settings._top_left.x;
-            it_t end = it + this->_settings._dim.x;
-
-            for( ; it != end; ++it, ++dst_it )
-            {
-                unsigned char c = get_color( *it, gray_color_t() );
-                *dst_it = pal[ c ];
-            }
-        }
-    }
-
-
-    // 8-bit indices
-    template< typename View >
-    void read_data_8( const View&          view
-                    , std::vector< byte >& row
-                    , int                  ybeg
-                    , int                  yend
-                    , int                  yinc
-                    , int                  offset
-                    )
-    {
-        // Read the color map.
-        std::vector< rgba8_pixel_t > pal;
-        read_palette( pal );
-
-        // jump to first scanline
-        _io_dev.seek( offset );
-
-        typedef gray8_image_t image_t;
-
-        gray8_view_t v = interleaved_view( _info._width
-                                         , 1
-                                         , (gray8_pixel_t*) &row.front()
-                                         , _info._width
-                                         );
-
-        for( int y = ybeg; y != yend; y += yinc )
-        {
-            // @todo: For now we're reading the whole scanline which is
-            // slightly inefficient. Later versions should try to read
-            // only the bytes which are necessary.
-            _io_dev.read( &row.front(), row.size() );
-
-            typename View::x_iterator dst_it = view.row_begin( y );
-
-            gray8_view_t::x_iterator it  = v.row_begin( 0 ) + this->_settings._top_left.x;
-            gray8_view_t::x_iterator end = it + this->_settings._dim.x;
-
-            for( ; it != end; ++it, ++dst_it )
-            {
-                unsigned char c = get_color( *it, gray_color_t() );
-                *dst_it = pal[ c ];
-            }
-        }
-    }
-
-    template< typename View >
-    void read_data_15( const View&          view
-                     , std::vector< byte >& row
-                     , int                  ybeg
-                     , int                  yend
-                     , int                  yinc
-                     , int                  offset
+    void read_data_15( const View& view
+                     , int         pitch
+                     , int         ybeg
+                     , int         yend
+                     , int         yinc
+                     , int         offset
                      )
     {
+        byte_vector_t row( pitch );
+
         // read the color masks
         color_mask mask;
         if( _info._compression == ct_bitfield )
@@ -822,7 +397,7 @@ private:
             it_t beg = v.row_begin( 0 ) + this->_settings._top_left.x;
             it_t end = beg + this->_settings._dim.x;
 
-            unsigned char* src = &row.front();
+            byte_t* src = &row.front();
             for( int i = 0 ; i < _info._width; ++i, src += 2 )
             {
                 int p = ( src[1] << 8 ) | src[0];
@@ -847,16 +422,18 @@ private:
     // 8-8-8 BGR
     // 8-8-8-8 BGRA
     template< typename View_Src
-            , typename View
+            , typename View_Dst
             >
-    void read_data( const View&          view
-                  , std::vector< byte >& row
-                  , int                  ybeg
-                  , int                  yend
-                  , int                  yinc
-                  , int                  offset
+    void read_data( const View_Dst& view
+                  , int             pitch
+                  , int             ybeg
+                  , int             yend
+                  , int             yinc
+                  , int             offset
                   )
     {
+        byte_vector_t row( pitch );
+
         // jump to first scanline
         _io_dev.seek( offset );
 

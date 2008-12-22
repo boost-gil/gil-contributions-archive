@@ -112,8 +112,6 @@ public:
     template<typename View>
     void apply( const View& view )
     {
-        typedef bit_aligned_image1_type< 1, gray_layout_t >::type mono_t;
-
 		switch( this->_info._type )
 		{
             // reading mono text is reading grayscale but with only two values
@@ -121,7 +119,7 @@ public:
 			case pnm_type_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
 			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; } 
 			
-			case pnm_type_mono_bin:  { read_bin_data< mono_t::view_t >( view ); break; }
+			case pnm_type_mono_bin:  { read_bin_data< gray1_image_t::view_t >( view ); break; }
 			case pnm_type_gray_bin:  { read_bin_data< gray8_view_t   >( view ); break; } 
 			case pnm_type_color_bin: { read_bin_data< rgb8_view_t    >( view ); break; }
 		}
@@ -204,7 +202,7 @@ private:
         uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
 
         typedef row_buffer_helper_view< View_Src > rh_t;
-        rh_t rh( pitch, false );
+        rh_t rh( pitch, true );
 
         typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
         typename rh_t::iterator_t end = beg + this->_settings._dim.x;

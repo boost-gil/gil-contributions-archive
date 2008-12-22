@@ -100,8 +100,8 @@ public:
         return ( char ) ch;
     }
 
-    std::size_t read( unsigned char* data
-                    , std::size_t    count )
+    std::size_t read( byte_t*     data
+                    , std::size_t count )
     {
         return fread( data, 1, static_cast<int>( count ), file );
     }
@@ -225,8 +225,6 @@ private:
  */
 class istream_device
 {
-   typedef unsigned char byte_t;
-
 public:
    istream_device( std::istream& in )
    : _in( in ) {}
@@ -246,16 +244,16 @@ public:
         return ( char ) ch;
     }
 
-    std::size_t read( unsigned char* data
-                    , std::size_t    count )
+    std::size_t read( byte_t*     data
+                    , std::size_t count )
     {
         std::streamsize cr = 0;
 
         do
         {
             _in.peek();
-            std::streamsize c = _in.readsome( reinterpret_cast<char*>( data )
-                                            , static_cast<std::streamsize>( count ));
+            std::streamsize c = _in.readsome( reinterpret_cast< char* >( data )
+                                            , static_cast< std::streamsize >( count ));
 
             count -= c;
             data += c;
@@ -311,8 +309,8 @@ public:
                  );
     }
 
-    void write( const unsigned char* data
-              , std::size_t          count )
+    void write( const byte_t* data
+              , std::size_t   count )
     {
         throw std::runtime_error( "Bad io error." );
     }
@@ -335,8 +333,8 @@ public:
     {
     }
 
-    size_t read( unsigned char* data
-               , std::size_t    count )
+    size_t read( byte_t*     data
+               , std::size_t count )
     {
         throw std::runtime_error( "Bad io error." );
     }
@@ -352,8 +350,8 @@ public:
                   );
     }
 
-    void write( const unsigned char* data
-              , std::size_t          count )
+    void write( const byte_t* data
+              , std::size_t   count )
     {
         _out.write( reinterpret_cast<char const*>( data )
                  , static_cast<std::streamsize>( count )

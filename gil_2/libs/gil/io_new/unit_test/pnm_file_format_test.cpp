@@ -18,7 +18,8 @@ namespace pnm_test {
 // 
 
 // @todo When reading and converting from a 1-bit binary pnm the image
-// is incorrectly converted. See p4.pnm
+// is incorrectly converted. See p4.pnm, which is read as a 
+// 1-bit image.
 
 BOOST_AUTO_TEST_CASE( file_format_test )
 {

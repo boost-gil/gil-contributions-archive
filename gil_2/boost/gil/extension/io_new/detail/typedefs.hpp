@@ -35,6 +35,11 @@ struct double_one  { static double apply() { return 1.0; } };
 
 typedef scoped_channel_value< double, double_zero, double_one > bits64f;
 
+typedef unsigned char byte_t;
+typedef std::vector< byte_t > byte_vector_t;
+
+typedef boost::gil::point2< std::ptrdiff_t > point_t;
+
 } // namespace gil
 } // namespace boost
 
@@ -48,8 +53,6 @@ template<> struct is_floating_point< boost::gil::bits64f > : mpl::true_ {};
 namespace boost { namespace gil { namespace detail {
 
 ///@todo We should use boost::preprocessor here.
-
-typedef unsigned char byte;
 
 typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
 typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
