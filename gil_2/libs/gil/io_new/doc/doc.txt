@@ -7,7 +7,13 @@ BOOST::GIL::IO
 
 1. Overview
 -----------
+This extension to boost::gil provides an easy to interface for reading and writing
+various image formats. It also includes a framework for adding new formats.
 
+Please see section 3.3 for supported image formats. A basic tutorial is provided 
+in section 2.
+
+For adding new format please refer to section 3.4.
 
 1.1 Supported Platforms
 -----------------------
@@ -20,10 +26,39 @@ The library is designed to support as many formats as required by the user.
 For instance, if the user only needs bmp support none of the above mentioned 
 dependencies are required.
 
-
+There are more details depending on the image format under section 3.3.
 
 2. Tutorial
 -----------
+Thanks for modern C++ programming techniques the interface for this library
+is rather small and easy to use. Please refer to section 3 for more details.
+
+Since this is a boost::gil extension I would expect the user to have some basic
+understanding of the gil ( generic image library ). Please see here for the help.
+
+Probably the most common case to reading a tiff image can be done as follows:
+
+std::string filename( "image.tif" );
+rgb8_image_t img;
+read_image( file, img, tiff_tag() );
+
+The code would be same for all other image formats. The only thing that needs to
+change is the tag type ( tiff_tag ) in the read_image call.
+The read_image() call expects the supplied image type to be compatible with the 
+image stored in the file. If the user doesn't know what he is dealing with it
+can use the read_and_convert_image.
+Another important fact here is that read_image will allocate the appropriate
+memory needed for the read operation. There are read_view or read_and_convert_view
+counterparts, if the memory is already allocated.
+
+Sometimes the user only wants to read a subpart of the image then the above call
+would look as follows:
+
+read_image( filename
+          , img
+          , image_read_settings< bmp_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
+          );
+
 
 
 3. Using IO
