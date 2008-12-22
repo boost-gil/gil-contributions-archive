@@ -25,6 +25,7 @@ extern "C" {
 
 #include "typedefs.hpp"
 #include "base.hpp"
+#include "row_buffer_helper.hpp"
 #include "png_io_base.hpp"
 
 namespace boost { namespace gil { namespace detail {
@@ -155,7 +156,7 @@ private:
                 png_set_packswap(_png_ptr);
         }
 
-        row_buffer_helper_view<View> row_buffer( view.width() );
+        row_buffer_helper_view<View> row_buffer( view.width(), false );
 
         for( int y = 0; y != view.height(); ++ y) 
         {
@@ -192,7 +193,7 @@ private:
                 png_set_packswap(_png_ptr);
         }
 
-        row_buffer_helper_view< View > row_buffer( view.width() );
+        row_buffer_helper_view< View > row_buffer( view.width(), false );
 
         for( int y = 0; y != view.height(); ++ y) 
         {

@@ -28,10 +28,10 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <boost/static_assert.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "base.hpp"
 #include "bit_operations.hpp"
+#include "row_buffer_helper.hpp"
 #include "io_device.hpp"
 #include "reader_base.hpp"
 #include "tiff_io_device.hpp"
@@ -284,24 +284,26 @@ private:
    {
       typedef typename is_bit_aligned< typename View::value_type >::type is_view_bit_aligned_t;
 
-      typedef read_helper_for_compatible_views< is_view_bit_aligned_t
-                                              , View
-                                              > read_helper_t;
+      typedef row_buffer_helper_view< View > row_buffer_helper_t;
 
-      typedef typename read_helper_t::buffer_t buffer_t;
+      typedef typename row_buffer_helper_t::buffer_t   buffer_t;
+      typedef typename row_buffer_helper_t::iterator_t it_t;
 
       std::size_t size_to_allocate = buffer_size< typename View::value_type >( dst_view.width()
                                                                              , is_view_bit_aligned_t() );
-      buffer_t buffer( size_to_allocate );
-      typename read_helper_t::iterator_t begin = read_helper_t::begin( buffer );
+      row_buffer_helper_t row_buffer_helper( size_to_allocate, true );
 
-      typename read_helper_t::iterator_t first = begin + this->_settings._top_left.x;
-      typename read_helper_t::iterator_t last  = begin + this->_settings._dim.x; // one after last element
+      it_t begin = row_buffer_helper.begin();
 
-      skip_over_rows( buffer, plane );
+      it_t first = begin + this->_settings._top_left.x;
+      it_t last  = begin + this->_settings._dim.x; // one after last element
+
+      skip_over_rows( row_buffer_helper.buffer()
+                    , plane
+                    );
 
 
-      //@todo is _io_dev.are_bytes_swapped() == true when reading bit_aligned images?
+      //@todo Is _io_dev.are_bytes_swapped() == true when reading bit_aligned images?
       //      If the following fires then we need to pass a boolean to the constructor.
       io_error_if( is_bit_aligned< View >::value && !_io_dev.are_bytes_swapped()
                  , "Cannot be read."
@@ -318,46 +320,18 @@ private:
          ; ++row
          )
       {
-         _io_dev.read_scaline( buffer
+         _io_dev.read_scaline( row_buffer_helper.buffer()
                              , row
-                             , plane   );
+                             , plane
+                             );
 
-         mirror_bits( buffer );
+         mirror_bits( row_buffer_helper.buffer() );
 
          this->_cc_policy.read( first
                               , last
                               , dst_view.row_begin( row ));
       }
    }
-
-   template< typename is_bit_aligned
-           , typename View
-           >
-   struct read_helper_for_compatible_views
-   {
-      typedef typename View::value_type element_t;
-      typedef std::vector< element_t > buffer_t;
-      typedef typename buffer_t::const_iterator iterator_t;
-
-      static iterator_t begin( const buffer_t& buffer )
-      {
-         return iterator_t( buffer.begin() );
-      }
-   };
-
-   template< typename View >
-   struct read_helper_for_compatible_views< mpl::true_, View >
-   {
-      typedef unsigned char element_t;
-      typedef std::vector< element_t > buffer_t;
-      typedef bit_aligned_pixel_iterator< typename View::reference > iterator_t;
-
-      static iterator_t begin( buffer_t& buffer )
-      {
-         return iterator_t( &buffer.front(), 0 );
-      }
-   };
-
 
    template< typename Pixel >
    std::size_t buffer_size( std::size_t width

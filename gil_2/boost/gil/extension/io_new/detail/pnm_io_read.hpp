@@ -25,125 +25,13 @@
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
 #include "base.hpp"
+#include "row_buffer_helper.hpp"
 #include "bit_operations.hpp"
 #include "reader_base.hpp"
 #include "io_device.hpp"
 #include "typedefs.hpp"
 
 namespace boost { namespace gil { namespace detail {
-
-template< typename View
-        , typename DummyT = void // needed for enable_if
-        >
-struct row_buffer_helper_
-{
-    typedef typename View::value_type element_t;
-    typedef std::vector< element_t > buffer_t;
-    typedef typename buffer_t::iterator iterator_t;
-
-    row_buffer_helper_( int size )
-        : row_buffer( size / num_channels< View >::value ) {}
-
-    iterator_t begin() { return row_buffer.begin(); }
-    iterator_t end()   { return row_buffer.end();   }
-
-    element_t* data()  { return &row_buffer[0]; }
-
-    buffer_t& buffer()
-    {
-        return row_buffer;
-    }
-
-private:
-
-    buffer_t row_buffer;
-};
-
-template< typename View >
-struct row_buffer_helper_< View
-                        , typename enable_if
-                                < typename mpl::and_
-                                    < typename is_bit_aligned< typename View::reference >::type
-                                    , typename is_homogeneous< typename View::reference >::type
-                                    >::type
-                                >::type
-                        >
-{
-    typedef byte_t element_t;
-    typedef std::vector< element_t > buffer_t;
-    typedef bit_aligned_pixel_iterator< typename View::reference > iterator_t;
-
-
-    row_buffer_helper_( int size )
-    : row_buffer( size )
-    {
-        // number of full bytes
-        _c = ( size
-               * num_channels<typename View::reference>::value
-               * channel_type<typename View::reference>::type::num_bits
-             )
-             >> 3;
-
-
-        // number of remaining bits
-        _r = size 
-           * num_channels<typename View::reference>::value
-           * channel_type<typename View::reference>::type::num_bits
-           - ( _c << 3 );
-    }
-
-    iterator_t begin()
-    {
-        return iterator_t( &row_buffer.front(), 0 );
-    }
-
-    iterator_t end()
-    {
-        return ( _r == 0 )
-               ? iterator_t( &row_buffer.back() + 1, 0  )
-               : iterator_t( &row_buffer.back()    , _r );
-    }
-
-    element_t* data()  { return &row_buffer[0]; }
-
-    buffer_t& buffer() { return row_buffer; }
-
-private:
-
-    buffer_t row_buffer;
-
-    // number of full bytes
-    int _c;
-
-    // number of remaining bits
-    int _r;
-
-    // For instance 25 pixels of rgb2 type would be:
-    // overall 25 pixels * 3 channels * 2 bits/channel = 150 bits
-    // c = 18 bytes
-    // r = 6 bits
- };
-
-template<typename View,typename D = void>
-struct row_buffer_helper_view_
-    : row_buffer_helper_<View>
-{
-    row_buffer_helper_view_( int width ) 
-      :  row_buffer_helper_<View>(width)
-    {}
-};
-
-
-template<typename View>
-struct row_buffer_helper_view_<View,
-    typename enable_if<typename is_bit_aligned< View >::type>::type
-    >
-    : row_buffer_helper_<View>
-{
-    row_buffer_helper_view_( int width ) 
-        : row_buffer_helper_<View>( width )
-    {}
-};
 
 template< typename View, typename T >
 struct calc_pitch {};
@@ -315,8 +203,8 @@ private:
 
         uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
 
-        typedef row_buffer_helper_view_< View_Src > rh_t;
-        rh_t rh( pitch );
+        typedef row_buffer_helper_view< View_Src > rh_t;
+        rh_t rh( pitch, false );
 
         typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
         typename rh_t::iterator_t end = beg + this->_settings._dim.x;

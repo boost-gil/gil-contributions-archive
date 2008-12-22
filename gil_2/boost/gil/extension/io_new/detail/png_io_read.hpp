@@ -206,7 +206,9 @@ private:
             throw std::runtime_error( "Image type aren't compatible." );
         }
 */
-        row_buffer_helper<ImagePixel> buffer( static_cast<int>( this->_info._width ));
+        row_buffer_helper<ImagePixel> buffer( static_cast<int>( this->_info._width )
+                                            , false
+                                            );
 
         // skip rows
         for( int y = 0; y < this->_settings._top_left.y; ++y )

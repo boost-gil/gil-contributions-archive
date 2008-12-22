@@ -394,6 +394,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\boost\gil\extension\io_new\detail\row_buffer_helper.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io.hpp"
 					>
 				</File>
