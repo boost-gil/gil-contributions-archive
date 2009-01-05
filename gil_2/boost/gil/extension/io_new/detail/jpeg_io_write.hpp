@@ -20,6 +20,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
+
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 #include <boost/gil/extension/io_new/detail/jpeg_supported_types.hpp>
 

@@ -7,17 +7,18 @@ BOOST::GIL::IO
 
 1. Overview
 -----------
-This extension to boost::gil provides an easy to interface for reading and writing
+This extension to boost::gil provides an easy to use interface for reading and writing
 various image formats. It also includes a framework for adding new formats.
 
 Please see section 3.3 for supported image formats. A basic tutorial is provided 
 in section 2.
 
-For adding new format please refer to section 3.4.
+For adding new image formats please refer to section 3.4.
 
 1.1 Supported Platforms
 -----------------------
-All platforms that have a decent C++ and the following image libs available:
+All platforms supoorted by boost which have a decent C++ compiler. Depending on the  
+image format one or more of the following image libraries might be needed:
     * libtiff
     * libjpeg
     * libpng
@@ -26,17 +27,35 @@ The library is designed to support as many formats as required by the user.
 For instance, if the user only needs bmp support none of the above mentioned 
 dependencies are required.
 
-There are more details depending on the image format under section 3.3.
+There are more details available in this documentation on the image format dependencies. 
+Please see section 3.3.
 
 2. Tutorial
 -----------
-Thanks for modern C++ programming techniques the interface for this library
-is rather small and easy to use. Please refer to section 3 for more details.
+Thanks to modern C++ programming techniques the interface for this library
+is rather small and easy to use. In this tutorial I'll give you a short walkaround 
+on how to use this boost::gil extension. For more details please refer to section 3.
 
-Since this is a boost::gil extension I would expect the user to have some basic
+Since this is an extension to boost::gil I expect the user to have some very basic
 understanding of the gil ( generic image library ). Please see here for the help.
 
-Probably the most common case to reading a tiff image can be done as follows:
+2.1. Header Files
+----------------------
+
+Before we can read or write image one thing. The header files to be included all have 
+the same format. For instance, tiff_all.hpp will allow to read and write. Whereas, 
+tiff_read only allows for reading. If the user only wants to write jpeg's include
+jpeg_write.hpp. All formats provide these three types of header files:
+    * xxx_all.hpp
+    * xxx_read.hpp
+    * xxx_write.hpp
+
+xxx stands for image format.
+
+2.2. Reading An Image
+----------------------
+
+Probably the most common case to read a tiff image can be done as follows:
 
 std::string filename( "image.tif" );
 rgb8_image_t img;
@@ -44,21 +63,65 @@ read_image( file, img, tiff_tag() );
 
 The code would be same for all other image formats. The only thing that needs to
 change is the tag type ( tiff_tag ) in the read_image call.
-The read_image() call expects the supplied image type to be compatible with the 
+The read_image() expects the supplied image type to be compatible with the 
 image stored in the file. If the user doesn't know what he is dealing with it
-can use the read_and_convert_image.
-Another important fact here is that read_image will allocate the appropriate
+can use read_and_convert_image().
+Another important fact is that read_image() will allocate the appropriate
 memory needed for the read operation. There are read_view or read_and_convert_view
 counterparts, if the memory is already allocated.
 
-Sometimes the user only wants to read a subpart of the image then the above call
+Sometimes the user only wants to read a subpart of an image, then the above call
 would look as follows:
 
 read_image( filename
           , img
-          , image_read_settings< bmp_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
+          , image_read_settings< tiff_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
           );
 
+The image_read_settings class will provide the user with image format independet 
+reading setting but can also serves as a pointer for format dependent settings. Please
+see the specific image format sections ( 3.3.x ) for more details.
+
+Sometimes, the user is only interested in reading the header information of an image.
+Here, the read_image_info() comes into play. 
+
+image_read_info< tiff_t > info = read_image_info( filename
+                                                , tiff_t()
+                                                );
+
+The image_read_info class keeps all the relevant information that the image header contains.
+It's highly image format dependent and though, more information can be found in section 3.3.
+
+2.3. Writing An Image
+---------------------
+
+Besides reading the information also writing is the second part of this boost::gil extension.
+Writing is a lot simpler than reading since an existing image view contains all the information.
+For instance writing an image can be done as follows:
+
+std::string filename( "image.tif" );
+rgb8_image_t img( 640, 480 );
+... // fill the image with some information
+write_view( filename
+          , view( img )
+          , tiff_tag()
+          );
+
+The interface is similar to reading an image. To add image format specific parameter the user can use
+image_write_info class. For instance, a user can specify the jpeg quality when writing like this:
+
+
+std::string filename( "image.jpg" );
+rgb8_image_t img( 640, 480 );
+
+// write data into image
+
+write_view( filename
+          , view( img )
+          , image_write_info< jpeg_tag >( 95 )
+          );
+          
+The above example will write an image where the jpeg quality is set to 95 percent.
 
 
 3. Using IO

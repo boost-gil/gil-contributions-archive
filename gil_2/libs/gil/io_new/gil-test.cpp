@@ -1,11 +1,6 @@
 #include "stdafx.h"
 
-#include <boost/filesystem.hpp>
-
-#define ADD_FS_PATH_SUPPORT
-#define ENABLE_GRAY_ALPHA
-
-#include <boost/gil/extension/io_new/pnm_all.hpp>
+#include <boost/gil/extension/io_new/jpeg_write.hpp>
 
 using namespace std;
 using namespace boost::gil;
@@ -13,10 +8,12 @@ namespace fs = boost::filesystem;
 
 int main()
 {
-    const string filename( ".\\test_images\\pnm\\p4.pnm" );
+    std::string filename( "image.jpg" );
+    rgb8_image_t img( 640, 480 );
 
-    {
-        rgb8_image_t img;
-        read_and_convert_image( filename, img, pnm_tag() );
-    }
+    write_view( filename
+              , view( img )
+              , image_write_info< jpeg_tag >( 95 )
+              );
+
 }

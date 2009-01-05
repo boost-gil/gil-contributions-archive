@@ -86,7 +86,11 @@ struct image_read_settings< jpeg_tag > : public image_read_settings_base
 template<>
 struct image_write_info< jpeg_tag >
 {
-   jpeg_quality::type _quality;
+    image_write_info( const jpeg_quality::type& quality = 100 )
+    : _quality( quality )
+    {}
+
+    jpeg_quality::type _quality;
 };
 
 
