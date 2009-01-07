@@ -20,6 +20,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
+
 #include <boost/gil/extension/io_new/bmp_tags.hpp>
 
 namespace boost { namespace gil { namespace detail {

@@ -27,41 +27,46 @@
 
 namespace boost { namespace gil { namespace detail {
 
-template<typename ChannelT,typename ColorSpace>
-struct jpeg_rw_support
+template< typename Channel
+        , typename ColorSpace
+        >
+struct jpeg_rw_support : read_write_support_false
+{};
+
+template<>
+struct jpeg_rw_support< bits8
+                      , rgb_t
+                      > : read_write_support_true
 {
-    BOOST_STATIC_CONSTANT(bool,is_supported=false);
+    BOOST_STATIC_CONSTANT( J_COLOR_SPACE, color_type = JCS_RGB );
 };
 
 template<>
-struct jpeg_rw_support<bits8, rgb_t>
+struct jpeg_rw_support< bits8
+                      , cmyk_t
+                      > : read_write_support_true
 {
-    BOOST_STATIC_CONSTANT(bool,is_supported=true);
-    BOOST_STATIC_CONSTANT(J_COLOR_SPACE,color_type=JCS_RGB);
+    BOOST_STATIC_CONSTANT( J_COLOR_SPACE, color_type = JCS_CMYK );
 };
 
 template<>
-struct jpeg_rw_support<bits8, cmyk_t>
+struct jpeg_rw_support< bits8
+                      , gray_t
+                      > : read_write_support_true
 {
-    BOOST_STATIC_CONSTANT(bool,is_supported=true);
-    BOOST_STATIC_CONSTANT(J_COLOR_SPACE,color_type=JCS_CMYK);
-};
-
-template<>
-struct jpeg_rw_support<bits8, gray_t>
-{
-    BOOST_STATIC_CONSTANT(bool,is_supported=true);
-    BOOST_STATIC_CONSTANT(J_COLOR_SPACE,color_type=JCS_GRAYSCALE);
+    BOOST_STATIC_CONSTANT( J_COLOR_SPACE, color_type = JCS_GRAYSCALE );
 };
 
 } // namespace detail
 
-template<typename PixelType>
-struct is_supported<PixelType,jpeg_tag>
-    : mpl::bool_<detail::jpeg_rw_support<
-                    typename channel_type<PixelType>::type,
-                    typename color_space_type<PixelType>::type
-                    >::is_supported>
+template< typename Pixel >
+struct is_supported< Pixel
+                   , jpeg_tag
+                   > 
+    : mpl::bool_< detail::jpeg_rw_support< typename channel_type< Pixel >::type
+                                         , typename color_space_type< Pixel >::type
+                                         >::is_supported
+                >
 {};
 
 } // namespace gil

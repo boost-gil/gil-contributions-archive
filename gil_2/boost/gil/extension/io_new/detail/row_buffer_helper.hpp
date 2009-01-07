@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief  Helper for having one read implementation used for
-///         bit_aligned and non_bit_aligned images.
+///         bit_aligned and byte images.
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///         
 /// \date   2007-2008 \n

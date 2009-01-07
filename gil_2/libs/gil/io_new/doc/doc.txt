@@ -142,6 +142,16 @@ The above example will write an image where the jpeg quality is set to 95 percen
 3.3.1 BMP
 ---------
 
+For a general overview of the BMP image file format go to the following link.
+
+http://en.wikipedia.org/wiki/BMP_file_format
+
+Please note, the code has not been tested with the X Windows System variations
+of the BMP format which are usually referred to XBM and XPM formats.
+
+Here, only the MS Windows format is relevant.
+
+
 3.3.2 JPEG
 ----------
 

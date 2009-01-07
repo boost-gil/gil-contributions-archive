@@ -106,6 +106,18 @@ void io_error_if( bool expr, const std::string& descr )
       io_error( descr );
 }
 
+
+struct read_write_support_true
+{
+    BOOST_STATIC_CONSTANT( bool, is_supported = true );
+};
+
+struct read_write_support_false
+{
+    BOOST_STATIC_CONSTANT( bool, is_supported = false );
+};
+
+
 } // namespace detail
 } // namespace gil
 } // namespace boost

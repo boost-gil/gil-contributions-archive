@@ -30,14 +30,15 @@ namespace boost{ namespace gil {
 namespace detail {
 
 // TIFF virtually supports everything 
-struct tiff_rw_support {
-    BOOST_STATIC_CONSTANT(bool,is_supported=true);
-};
+struct tiff_rw_support : read_write_support_true
+{};
 
 } // namespace detail
 
-template<typename PixelType>
-struct is_supported<PixelType,tiff_tag>
+template<typename Pixel >
+struct is_supported< Pixel
+                   , tiff_tag
+                   > 
     : mpl::bool_< detail::tiff_rw_support::is_supported >
 {};
 

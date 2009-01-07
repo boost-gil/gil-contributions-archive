@@ -30,15 +30,8 @@ namespace boost { namespace gil { namespace detail {
 template< typename Channel
         , typename ColorSpace
         >
-struct pnm_rw_support
-{
-    BOOST_STATIC_CONSTANT(bool,is_supported=false);
-};
-
-struct pnm_rw_support_true
-{
-    BOOST_STATIC_CONSTANT( bool, is_supported = true );
-};
+struct pnm_rw_support : read_write_support_false
+{};
 
 template< typename BitField, bool Mutable >
 struct pnm_rw_support< packed_dynamic_channel_reference< BitField
@@ -46,18 +39,21 @@ struct pnm_rw_support< packed_dynamic_channel_reference< BitField
                                                        , Mutable
                                                        >
                      , gray_t
-                     > : pnm_rw_support_true {};
+                     > : read_write_support_true
+{};
 
 template<>
 struct pnm_rw_support< bits8
                      , gray_t
-                     > : pnm_rw_support_true {};
+                     > : read_write_support_true
+{};
 
 
 template<>
 struct pnm_rw_support< bits8
                      , rgb_t
-                     > : pnm_rw_support_true {};
+                     > : read_write_support_true
+{};
 
 } // namespace detail
 
@@ -65,10 +61,10 @@ template< typename Pixel >
 struct is_supported< Pixel
                    , pnm_tag
                    >
-: mpl::bool_<detail::pnm_rw_support<
-                    typename channel_type< Pixel >::type,
-                    typename color_space_type< Pixel >::type
-                    >::is_supported>
+    : mpl::bool_< detail::pnm_rw_support< typename channel_type< Pixel >::type
+                                        , typename color_space_type< Pixel >::type
+                                        >::is_supported
+                >
 {};
 
 } // namespace gil
