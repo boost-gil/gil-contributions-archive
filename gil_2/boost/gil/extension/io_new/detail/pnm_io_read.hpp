@@ -197,7 +197,7 @@ private:
     void read_bin_data( const View_Dst& view )
     {
         typedef typename View_Dst::y_coord_t y_t;
-        typedef is_bit_aligned< View_Src::value_type >::type is_bit_aligned_t;
+        typedef is_bit_aligned< typename View_Src::value_type >::type is_bit_aligned_t;
 
         uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
 
