@@ -290,18 +290,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\bmp_io_read.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\bmp_io_write.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\bmp_supported_types.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\conversion_policies.hpp"
 					>
 				</File>
@@ -318,55 +306,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\jpeg_io_is_allowed.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\jpeg_io_read.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\jpeg_io_write.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\jpeg_supported_types.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\path_spec.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\png_io_base.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\png_io_is_allowed.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\png_io_read.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\png_io_write.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\png_supported_types.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\pnm_io_read.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\pnm_io_write.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\pnm_supported_types.hpp"
 					>
 				</File>
 				<File
@@ -398,26 +338,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io_device.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io_is_allowed.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io_read.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\boost\gil\extension\io_new\detail\tiff_io_write.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\boost\gil\extension\io_new\detail\typedefs.hpp"
 					>
 				</File>
@@ -426,30 +346,114 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="formats"
+				>
+				<Filter
+					Name="bmp"
+					>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\bmp_io_read.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\bmp_io_write.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\bmp_supported_types.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="jpeg"
+					>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_io_is_allowed.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_io_read.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_io_write.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_supported_types.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="png"
+					>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_base.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_is_allowed.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_read.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_write.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_supported_types.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="pnm"
+					>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\pnm_io_read.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\pnm_io_write.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\pnm_supported_types.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="tiff"
+					>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_device.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_is_allowed.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_read.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_write.hpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="test"
 			>
-			<File
-				RelativePath=".\compiler weirdness.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
 			<File
 				RelativePath=".\gil-test.cpp"
 				>
