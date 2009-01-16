@@ -44,9 +44,9 @@ void read_and_convert_view( Device&                                 file
                           , const View&                             view
                           , const image_read_settings< FormatTag >& settings
                           , const ColorConverter&                   cc
-                          , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                  , typename detail::is_input_device< Device >::type
-                                                                  >::type
+                          , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                         , detail::is_input_device< Device >
+                                                         >
                                               >::type* ptr = 0
                           )
 {
@@ -77,11 +77,11 @@ void read_and_convert_view( Device&                                 file
                           , const View&                             view
                           , const image_read_settings< FormatTag >& settings
                           , const ColorConverter&                   cc
-                          , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
-                                                                                                              , Device
-                                                                                                              >::type
-                                                                  , typename is_format_tag< FormatTag >::type
-                                                                  >::type
+                          , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
+                                                                                            , Device
+                                                                                            >
+                                                         , is_format_tag< FormatTag >
+                                                         >
                                               >::type* ptr = 0
                           )
 {
@@ -108,9 +108,9 @@ void read_and_convert_view( const String&                           file_name
                           , const View&                             view
                           , const image_read_settings< FormatTag >& settings
                           , const ColorConverter&                   cc
-                          , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                  , typename detail::is_supported_path_spec< String >::type
-                                                                  >::type
+                          , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                         , detail::is_supported_path_spec< String >
+                                                         >
                                             >::type* ptr = 0
                           )
 {
@@ -136,9 +136,9 @@ void read_and_convert_view( const String&         file_name
                           , const View&           view
                           , const ColorConverter& cc
                           , const FormatTag&      tag
-                          , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
+                          , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                         , detail::is_supported_path_spec< String >
+                                                         >
                                             >::type* ptr = 0
                           )
 {
@@ -159,13 +159,13 @@ void read_and_convert_view( Device&               device
                           , const View&           view
                           , const ColorConverter& cc
                           , const FormatTag&      tag
-                          , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                      , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                  , Device
-                                                                                                                                  >::type
-                                                                                      >::type
-                                                                   , typename is_format_tag< FormatTag >::type
-                                                                   >::type
+                          , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
+                                                                   , detail::is_adaptable_input_device< FormatTag
+                                                                                                      , Device
+                                                                                                      >
+                                                                   >
+                                                         , is_format_tag< FormatTag >
+                                                         >
                                                >::type* ptr = 0
                           )
 {
@@ -185,9 +185,9 @@ inline
 void read_and_convert_view( const String&                           file_name
                           , const View&                             view
                           , const image_read_settings< FormatTag >& settings
-                          , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
+                          , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                         , detail::is_supported_path_spec< String >
+                                                         >
                                             >::type* ptr = 0
                           )
 {
@@ -207,13 +207,13 @@ inline
 void read_and_convert_view( Device&                                 device
                           , const View&                             view
                           , const image_read_settings< FormatTag >& settings
-                          , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                     , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                 , Device
-                                                                                                                                 >::type
-                                                                                      >::type
-                                                                   , typename is_format_tag< FormatTag >::type
-                                                                   >::type
+                          , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
+                                                                   , detail::is_adaptable_input_device< FormatTag
+                                                                                                      , Device
+                                                                                                      >
+                                                                    >
+                                                         , is_format_tag< FormatTag >
+                                                         >
                                                >::type* ptr = 0
                           )
 {
@@ -233,9 +233,9 @@ inline
 void read_and_convert_view( const String&    file_name
                           , const View&      view
                           , const FormatTag& tag
-                          , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                  , typename detail::is_supported_path_spec< String >::type
-                                                                  >::type
+                          , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                         , detail::is_supported_path_spec< String >
+                                                         >
                                               >::type* ptr = 0
                           )
 {
@@ -254,13 +254,13 @@ inline
 void read_and_convert_view( Device&          device
                           , const View&      view
                           , const FormatTag& tag
-                          , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                     , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                 , Device
-                                                                                                                                 >::type
-                                                                                      >::type
-                                                                   , typename is_format_tag< FormatTag >::type
-                                                                   >::type
+                          , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
+                                                                   , detail::is_adaptable_input_device< FormatTag
+                                                                                                      , Device
+                                                                                                      >
+                                                                   >
+                                                         , is_format_tag< FormatTag >
+                                                         >
                                                >::type* ptr = 0
                           )
 {

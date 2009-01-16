@@ -43,9 +43,9 @@ void read_and_convert_image( Device&                                 file
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
                            , const ColorConverter&                   cc
-                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                   , typename detail::is_input_device< Device >::type
-                                                                   >::type
+                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                          , detail::is_input_device< Device >
+                                                          >
                                                 >::type* ptr = 0
                            )
 {
@@ -76,12 +76,12 @@ void read_and_convert_image( Device&                                 file
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
                            , const ColorConverter&                   cc
-                           , typename enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
-                                                                   , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                               , Device
-                                                                                                               >::type
-                                                                         >::type
-                                                     >::type* ptr = 0
+                           , typename enable_if< mpl::and_< is_format_tag<FormatTag>
+                                                          , detail::is_adaptable_input_device< FormatTag
+                                                                                             , Device
+                                                                                             >
+                                                          >
+                                               >::type* ptr = 0
                            )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -106,10 +106,10 @@ void read_and_convert_image( const String&                           file_name
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
                            , const ColorConverter&                   cc
-                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
-                                            >::type* ptr = 0
+                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                          , detail::is_supported_path_spec< String >
+                                                          >
+                                               >::type* ptr = 0
                            )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
@@ -134,10 +134,10 @@ void read_and_convert_image( const String& file_name
                            , Image& img
                            , const ColorConverter& cc
                            , const FormatTag& tag
-                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
-                                            >::type* ptr = 0
+                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                          , detail::is_supported_path_spec< String >
+                                                          >
+                                               >::type* ptr = 0
                            )
 {
     read_and_convert_image( file_name
@@ -157,14 +157,14 @@ void read_and_convert_image( Device&               device
                            , Image&                img
                            , const ColorConverter& cc
                            , const FormatTag&      tag
-                           , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                                      , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                                  , Device
-                                                                                                                                                  >::type
-                                                                                                      >::type
-                                                                                   , typename is_format_tag< FormatTag >::type
-                                                                                   >::type
-                                                               >::type* ptr = 0 
+                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
+                                                                    , detail::is_adaptable_input_device< FormatTag
+                                                                                                       , Device
+                                                                                                       >
+                                                                    >
+                                                                    , is_format_tag< FormatTag >
+                                                          >
+                                               >::type* ptr = 0 
                            )
 {
     read_and_convert_image( device
@@ -183,10 +183,10 @@ inline
 void read_and_convert_image( const String&                           file_name
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
-                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                   , typename detail::is_supported_path_spec< String >::type
-                                                                   >::type
-                                            >::type* ptr = 0
+                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                          , detail::is_supported_path_spec< String >
+                                                          >
+                                               >::type* ptr = 0
                            )
 {
    read_and_convert_image( file_name
@@ -204,13 +204,13 @@ inline
 void read_and_convert_image( Device&                                 device
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
-                           , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                      , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                  , Device
-                                                                                                                                  >::type
-                                                                                      >::type
-                                                                   , typename is_format_tag< FormatTag >::type
-                                                                   >::type
+                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
+                                                                    , detail::is_adaptable_input_device< FormatTag
+                                                                                                       , Device
+                                                                                                       >
+                                                                    >
+                                                          , is_format_tag< FormatTag >
+                                                          >
                                                >::type* ptr = 0
                            )
 {
@@ -230,10 +230,10 @@ inline
 void read_and_convert_image( const String&    file_name
                            , Image&           img
                            , const FormatTag& tag
-                           , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                                 , typename detail::is_supported_path_spec< String >::type
-                                                                 >::type
-                                            >::type* ptr = 0
+                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                                          , detail::is_supported_path_spec< String >
+                                                          >
+                                               >::type* ptr = 0
                            )
 {
    read_and_convert_image( file_name
@@ -251,13 +251,13 @@ inline
 void read_and_convert_image( Device&          device
                            , Image&           img
                            , const FormatTag& tag
-                           , typename enable_if< typename mpl::and_< typename mpl::or_< typename detail::is_input_device< Device >::type
-                                                                                      , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                                  , Device
-                                                                                                                                  >::type
-                                                                                      >::type
-                                                                   , typename is_format_tag< FormatTag >::type
-                                                                   >::type
+                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
+                                                                    , detail::is_adaptable_input_device< FormatTag
+                                                                                                       , Device
+                                                                                                       >
+                                                                    >
+                                                          , typename is_format_tag< FormatTag >
+                                                          >
                                                >::type* ptr = 0
                            )
 {

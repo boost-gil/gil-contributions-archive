@@ -39,9 +39,9 @@ inline
 image_read_info< FormatTag >
 read_image_info( Device&         file
                , const FormatTag tag
-               , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                       , typename detail::is_input_device<Device>::type
-                                                       >::type
+               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                              , detail::is_input_device< Device >
+                                              >
                                    >::type* ptr = 0
                )
 {
@@ -60,11 +60,11 @@ inline
 image_read_info<FormatTag>
 read_image_info( Device&          file
                , const FormatTag& tag
-               , typename enable_if< typename mpl::and_< typename is_format_tag<FormatTag>::type
-                                                       , typename detail::is_adaptable_input_device< FormatTag
-                                                                                                   , Device
-                                                                                                   >::type
-                                                                         >::type
+               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                              , detail::is_adaptable_input_device< FormatTag
+                                                                                 , Device
+                                                                                 >
+                                              >
                                    >::type* ptr = 0
                )
 {
@@ -89,9 +89,9 @@ inline
 image_read_info<FormatTag>  
 read_image_info( const String&    file_name
                , const FormatTag& tag
-               , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
-                                                       , typename detail::is_supported_path_spec< String >::type
-                                                       >::type
+               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                              , detail::is_supported_path_spec< String >
+                                              >
                                    >::type* ptr = 0
                )
 {

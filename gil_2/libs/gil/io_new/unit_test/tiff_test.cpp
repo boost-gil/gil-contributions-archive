@@ -124,16 +124,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
     {
         rgb8_image_t img( 200, 133 );
-        // see readme.txt
-        //read_and_convert_view( filename, view( img ), tag_t() );
+        read_and_convert_view( filename, view( img ), tag_t() );
     }
 
     {
         TIFF* file = TIFFOpen( filename.c_str(), "r" );
 
         rgb8_image_t img( 200, 133 );
-        // see readme.txt
-        //read_and_convert_view( file, view( img ), tag_t() );
+        read_and_convert_view( file, view( img ), tag_t() );
     }
 }
 

@@ -40,12 +40,12 @@ inline
 void read_image( Device&                                 file
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
-               , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
-                                                       , typename is_format_tag          < FormatTag >::type
-                                                       , typename is_supported           < typename get_pixel_type< typename Image::view_t >::type
-                                                                                         , FormatTag 
-                                                                                         >::type 
-                                                                       >::type 
+               , typename enable_if< mpl::and_< detail::is_input_device< Device    >
+                                              , is_format_tag          < FormatTag >
+                                              , is_supported           < typename get_pixel_type< typename Image::view_t >::type
+                                                                       , FormatTag 
+                                                                       >
+                                              >
                                    >::type* ptr = 0
                )
 {
@@ -70,14 +70,14 @@ inline
 void read_image( Device&                                 file
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
-               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
-                                                                                                   , Device
-                                                                                                   >::type
-                                                       , typename is_format_tag< FormatTag >::type
-                                                       , typename is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                              , FormatTag
-                                                                              >::type 
-                                                       >::type
+               , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
+                                                                                 , Device
+                                                                                 >
+                                              , is_format_tag< FormatTag >
+                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                            , FormatTag
+                                                            >
+                                              >
                                    >::type* ptr = 0
                       )
 {
@@ -107,13 +107,13 @@ inline
 void read_image( const String&                           file_name
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
-               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
-                                                                     , typename is_format_tag< FormatTag >::type
-                                                                     , typename is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                                            , FormatTag
-                                                                                            >::type
-                                                                     >::type
-                                                 >::type* ptrdiff_t = 0
+               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                              , is_format_tag< FormatTag >
+                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                            , FormatTag
+                                                                            >
+                                              >
+                                   >::type* ptrdiff_t = 0
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -135,12 +135,12 @@ inline
 void read_image( Device&          file
                , Image&           img
                , const FormatTag& tag
-               , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
-                                                       , typename is_format_tag          < FormatTag >::type
-                                                       , typename is_supported           < typename get_pixel_type< typename Image::view_t >::type
-                                                                                         , FormatTag 
-                                                                                         >::type 
-                                                       >::type 
+               , typename enable_if< mpl::and_< detail::is_input_device< Device    >
+                                              , is_format_tag          < FormatTag >
+                                              , is_supported           < typename get_pixel_type< typename Image::view_t >::type
+                                                                       , FormatTag 
+                                                                       >
+                                              >
                                    >::type* ptr = 0 
                )
 {
@@ -159,15 +159,15 @@ inline
 void read_image( Device&          file
                , Image&           img
                , const FormatTag& tag
-               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_input_device< FormatTag
-                                                                                                                         , Device
-                                                                                                                         >::type
-                                                                             , typename is_format_tag<FormatTag>::type
-                                                                             , typename is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                                                    , FormatTag
-                                                                                                    >::type 
-                                                                             >::type
-                                                         >::type* ptr = 0 
+               , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
+                                                                                 , Device
+                                                                                 >
+                                              , is_format_tag< FormatTag >
+                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                            , FormatTag
+                                                            >
+                                              >
+                                   >::type* ptr = 0 
                )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag, Device >::device_type device_type;
@@ -188,13 +188,13 @@ inline
 void read_image( const String&    file_name
                , Image&           img
                , const FormatTag& tag
-               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
-                                                       , typename is_format_tag< FormatTag >::type
-                                                       , typename is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                              , FormatTag
-                                                                              >::type
-                                                       >::type
-                                   >::type* ptrdiff_t = 0
+               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                              , is_format_tag< FormatTag >
+                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                            , FormatTag
+                                                            >
+                                              >
+                                   >::type* ptr = 0
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )

@@ -72,8 +72,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_and_convert_view_test )
 
     {
         rgb8_image_t img( 200, 133 );
-        // see readme.txt
-        //tiff_read_and_convert_view( filename, view( img ) );
+        tiff_read_and_convert_view( filename, view( img ) );
     }
 }
 

@@ -158,20 +158,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
     {
         rgb8_image_t img( 320, 240 );
-
-        ///@todo: weird compiler error
-        // see readme.txt
-        //read_and_convert_view( filename, view( img ), tag_t() );
+        read_and_convert_view( filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( filename.c_str(), ios::in | ios::binary );
 
         rgb8_image_t img( 320, 240 );
-
-        ///@todo: weird compiler error
-        // see readme.txt
-        //read_and_convert_view( in, view( img ), tag_t() );
+        read_and_convert_view( in, view( img ), tag_t() );
     }
 
     {
@@ -179,12 +173,10 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
         
         rgb8_image_t img( 320, 240 );
 
-        /*
-        image_read_info< tag_t > info = read_and_convert_view( file
-                                                             , view( img )
-                                                             , tag_t()
-                                                             );
-        */
+        read_and_convert_view( file
+                             , view( img )
+                             , tag_t()
+                             );
     }
 }
 
