@@ -50,8 +50,8 @@ template< typename String
         >
 inline 
 void bmp_read_view( const String& filename
-                   , const View&   view
-                   )
+                  , const View&   view
+                  )
 {
     read_view( filename
              , view

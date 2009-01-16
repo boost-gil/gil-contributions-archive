@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "tiff_tags.hpp"
-#include "detail/tiff_io.hpp"
-#include "detail/tiff_io_read.hpp"
+#include "formats/tiff/tiff_io.hpp"
+#include "formats/tiff/tiff_io_read.hpp"
 
 #include "detail/read_image_info.hpp"
 #include "detail/read_view.hpp"

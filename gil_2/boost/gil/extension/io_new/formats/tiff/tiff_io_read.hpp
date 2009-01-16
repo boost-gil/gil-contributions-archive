@@ -29,11 +29,12 @@ extern "C" {
 #include <vector>
 #include <boost/static_assert.hpp>
 
-#include "base.hpp"
-#include "bit_operations.hpp"
-#include "row_buffer_helper.hpp"
-#include "io_device.hpp"
-#include "reader_base.hpp"
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/bit_operations.hpp>
+#include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
+#include <boost/gil/extension/io_new/detail/reader_base.hpp>
+
 #include "tiff_io_device.hpp"
 #include "tiff_io_is_allowed.hpp"
 

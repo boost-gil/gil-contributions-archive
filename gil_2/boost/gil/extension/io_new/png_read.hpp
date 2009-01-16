@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "png_tags.hpp"
-#include "detail/png_supported_types.hpp"
-#include "detail/png_io_read.hpp"
+#include "formats/png/png_supported_types.hpp"
+#include "formats/png/png_io_read.hpp"
 
 #include "detail/read_image.hpp"
 #include "detail/read_view.hpp"

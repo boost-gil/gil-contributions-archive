@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "bmp_tags.hpp"
-#include "detail/bmp_supported_types.hpp"
-#include "detail/bmp_io_write.hpp"
+#include "formats/bmp/bmp_supported_types.hpp"
+#include "formats/bmp/bmp_io_write.hpp"
 
 #include "detail/write_view.hpp"
 

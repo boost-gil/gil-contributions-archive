@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "jpeg_tags.hpp"
-#include "detail/jpeg_supported_types.hpp"
-#include "detail/jpeg_io_write.hpp"
+#include "formats/jpeg/jpeg_supported_types.hpp"
+#include "formats/jpeg/jpeg_io_write.hpp"
 
 #include "detail/write_view.hpp"
 

@@ -27,8 +27,8 @@ extern "C" {
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include "base.hpp"
-#include "io_device.hpp"
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
 
 namespace boost { namespace gil { namespace detail {
 

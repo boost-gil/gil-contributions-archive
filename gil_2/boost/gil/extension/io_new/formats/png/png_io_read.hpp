@@ -23,10 +23,11 @@
 
 #include <boost/gil/gil_all.hpp>
 
-#include "base.hpp"
-#include "reader_base.hpp"
-#include "io_device.hpp"
-#include "typedefs.hpp"
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/reader_base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
+#include <boost/gil/extension/io_new/detail/typedefs.hpp>
+
 #include "png_io_base.hpp"
 #include "png_supported_types.hpp"
 #include "png_io_is_allowed.hpp"

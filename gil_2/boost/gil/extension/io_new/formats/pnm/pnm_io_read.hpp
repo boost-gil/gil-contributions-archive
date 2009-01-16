@@ -24,12 +24,12 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
-#include "base.hpp"
-#include "row_buffer_helper.hpp"
-#include "bit_operations.hpp"
-#include "reader_base.hpp"
-#include "io_device.hpp"
-#include "typedefs.hpp"
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
+#include <boost/gil/extension/io_new/detail/bit_operations.hpp>
+#include <boost/gil/extension/io_new/detail/reader_base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
+#include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
 namespace boost { namespace gil { namespace detail {
 

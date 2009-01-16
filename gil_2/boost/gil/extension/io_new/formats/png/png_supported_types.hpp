@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef ENABLE_GRAY_ALPHA
-#include "boost/gil/extension/toolbox/gray_alpha.hpp"
+#include <boost/gil/extension/toolbox/gray_alpha.hpp>
 #endif // ENABLE_GRAY_ALPHA
 
 namespace boost { namespace gil { namespace detail {

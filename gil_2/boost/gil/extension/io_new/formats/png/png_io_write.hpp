@@ -23,9 +23,10 @@ extern "C" {
 #include <png.h>
 }
 
-#include "typedefs.hpp"
-#include "base.hpp"
-#include "row_buffer_helper.hpp"
+#include <boost/gil/extension/io_new/detail/typedefs.hpp>
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
+
 #include "png_io_base.hpp"
 
 namespace boost { namespace gil { namespace detail {

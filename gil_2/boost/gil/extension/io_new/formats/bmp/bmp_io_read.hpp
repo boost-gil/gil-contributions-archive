@@ -22,12 +22,13 @@
 #include <vector>
 #include <boost/gil/extension/io_new/bmp_tags.hpp>
 
-#include "base.hpp"
-#include "bit_operations.hpp"
-#include "row_buffer_helper.hpp"
-#include "reader_base.hpp"
-#include "io_device.hpp"
-#include "typedefs.hpp"
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/bit_operations.hpp>
+#include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
+#include <boost/gil/extension/io_new/detail/reader_base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
+#include <boost/gil/extension/io_new/detail/typedefs.hpp>
+
 #include "bmp_supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {

@@ -21,10 +21,10 @@
 
 #include <stdlib.h>
 
-#include "base.hpp"
-#include "io_device.hpp"
-
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
+
+#include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
 
 namespace boost { namespace gil { namespace detail {
 
