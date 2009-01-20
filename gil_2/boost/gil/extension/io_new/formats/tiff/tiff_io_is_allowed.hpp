@@ -19,6 +19,8 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/mpl/for_each.hpp>
+
 namespace boost { namespace gil { namespace detail {
 
 template< typename Channel >
