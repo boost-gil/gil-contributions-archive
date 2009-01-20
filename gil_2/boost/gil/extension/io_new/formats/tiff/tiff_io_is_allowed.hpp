@@ -101,6 +101,15 @@ struct compare_channel_sizes_fn
     bool _b;
 };
 
+template< typename T >
+struct channel_sizes_type {};
+
+template< typename B, typename C, typename L, bool M >
+struct channel_sizes_type< bit_aligned_pixel_reference< B, C, L, M > > { typedef C type; };
+
+template< typename B, typename C, typename L, bool M >
+struct channel_sizes_type< const bit_aligned_pixel_reference< B, C, L, M > > { typedef C type; };
+
 template< typename View >
 bool compare_channel_sizes( std::vector< unsigned int >& channel_sizes // in bits
                           , mpl::true_                                 // is_bit_aligned
