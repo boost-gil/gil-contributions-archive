@@ -20,7 +20,7 @@
 #include "conversion_policies.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
+/// \file
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 /// 
@@ -98,7 +98,7 @@ void write_view( const String&    file_name
                                                                               , FormatTag
                                                                               >::type
                                                        >::type
-                                   >::type* ptrdiff_t = 0
+                                   >::type* ptr = 0
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -179,7 +179,7 @@ void write_view( const String&                        file_name
                                                                               , FormatTag
                                                                               >::type
                                                        >::type
-                                   >::type* ptrdiff_t = 0
+                                   >::type* ptr = 0
                )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )

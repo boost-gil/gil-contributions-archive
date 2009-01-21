@@ -11,10 +11,10 @@
 #define BOOST_GIL_EXTENSION_IO_BMP_IO_READ_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
-/// \brief 
+/// \file
+/// \brief
 /// \author Christian Henning \n
-///         
+///
 /// \date 2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ public:
     {
         // read file header
 
-        // the magic number used to identify the BMP file: 
+        // the magic number used to identify the BMP file:
         // 0x42 0x4D (ASCII code points for B and M)
         if( _io_dev.read_int16() == 0x424D )
         {
@@ -92,7 +92,7 @@ public:
         }
 
         // the size of the BMP file in bytes
-        uint32_t size = _io_dev.read_int32();
+        _io_dev.read_int32();
 
         // reserved; actual value depends on the application that creates the image
         _io_dev.read_int16();
@@ -197,9 +197,9 @@ public:
             yinc = -1;
 
             offset = _info._offset
-                   + (   this->_info._height 
-                       - this->_settings._top_left.y 
-                       - this->_settings._dim.y 
+                   + (   this->_info._height
+                       - this->_settings._top_left.y
+                       - this->_settings._dim.y
                      ) * pitch;
 
 
@@ -216,7 +216,7 @@ public:
             {
                 read_palette_image< gray1_image_t::view_t
                                   , mirror_bits< byte_vector_t, mpl::true_ >
-                                  > ( dst_view, pitch, ybeg, yend, yinc, offset ); 
+                                  > ( dst_view, pitch, ybeg, yend, yinc, offset );
                 break;
             }
 
@@ -224,7 +224,7 @@ public:
             {
                 read_palette_image< gray4_image_t::view_t
                                   , swap_half_bytes< byte_vector_t, mpl::true_ >
-                                  > ( dst_view, pitch, ybeg, yend, yinc, offset ); 
+                                  > ( dst_view, pitch, ybeg, yend, yinc, offset );
                 break;
             }
 
@@ -232,7 +232,7 @@ public:
             {
                 read_palette_image< gray8_image_t::view_t
                                   , do_nothing< std::vector< gray8_pixel_t > >
-                                  > ( dst_view, pitch, ybeg, yend, yinc, offset ); 
+                                  > ( dst_view, pitch, ybeg, yend, yinc, offset );
                 break;
             }
 

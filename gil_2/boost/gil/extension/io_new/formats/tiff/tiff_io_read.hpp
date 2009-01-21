@@ -11,10 +11,10 @@
 #define BOOST_GIL_EXTENSION_IO_TIFF_IO_READ_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
-/// \brief 
+/// \file
+/// \brief
 /// \author Christian Henning, Lubomir Bourdev \n
-///         
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ struct plane_recursion
                                                 , tiff_tag
                                                 , ConversionPolicy >* p )
    {
-      typedef typename kth_channel_view_type< K, typename View >::type plane_t;
+      typedef typename kth_channel_view_type< K, View >::type plane_t;
       plane_t plane = kth_channel_view<K>( dst_view );
       p->read_data( plane, K );
 
@@ -92,7 +92,7 @@ public:
     {}
 
     reader( Device&                                                         device
-          , typename const typename ConversionPolicy::color_converter_type& cc
+          , const typename ConversionPolicy::color_converter_type& cc
           )
     : reader_base< tiff_tag
                  , ConversionPolicy
@@ -163,12 +163,14 @@ public:
             // the tiff type need to compatible. Which means:
             // color_spaces_are_compatible && channels_are_pairwise_compatible
 
+            typedef typename boost::is_same< ConversionPolicy
+                                           , read_and_no_convert
+                                           >::type is_read_and_convert_t;
+
             if( !is_allowed< View >( this->_info._samples_per_pixel
                                    , channel_sizes
                                    , this->_info._sample_format
-                                   , boost::is_same< ConversionPolicy
-                                                   , read_and_no_convert
-                                                   >::type()
+                                   , is_read_and_convert_t()
                                    ))
             {
                 throw std::runtime_error( "Image type aren't compatible." );
@@ -222,7 +224,10 @@ private:
 
       int ret = _io_dev.get_field_defaulted( red, green, blue );
 
-      typedef typename channel_traits< element_type< typename Indices_View::value_type >::type >::value_type channel_t;
+      typedef typename channel_traits< 
+                    typename element_type< 
+                            typename Indices_View::value_type >::type >::value_type channel_t;
+
       int num_colors = channel_traits< channel_t >::max_value();
 
       rgb16_planar_view_t palette = planar_rgb_view( num_colors

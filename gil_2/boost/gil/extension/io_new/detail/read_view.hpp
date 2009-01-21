@@ -11,10 +11,10 @@
 #define BOOST_GIL_EXTENSION_IO_READ_VIEW_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
+/// \file
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-///         
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ void read_view( const String&                           file_name
                                                                              , FormatTag
                                                                              >::type
                                                       >::type
-                                  >::type* ptrdiff_t = 0
+                                  >::type* ptr = 0
               )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -143,7 +143,7 @@ void read_view( const String&    file_name
                                                                              , FormatTag
                                                                              >::type
                                                       >::type
-                                  >::type* ptrdiff_t = 0
+                                  >::type* ptr = 0
               )
 {
     read_view( file_name

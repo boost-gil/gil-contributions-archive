@@ -11,10 +11,10 @@
 #define BOOST_GIL_EXTENSION_IO_TIFF_IO_IS_ALLOWED_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
-/// \brief 
+/// \file
+/// \brief
 /// \author Christian Henning \n
-///         
+///
 /// \date 2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,8 @@ bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // 
                           ) 
 {
     typedef typename View::value_type pixel_t;
-    typedef typename channel_traits< element_type< pixel_t >::type >::value_type channel_t;
+    typedef typename channel_traits< 
+                typename element_type< pixel_t >::type >::value_type channel_t;
 
     unsigned int s = boost::gil::detail::unsigned_integral_num_bits< channel_t >::value;
 
@@ -121,7 +122,7 @@ bool compare_channel_sizes( std::vector< unsigned int >& channel_sizes // in bit
     // loop through all channels and compare
 
     typedef typename View::reference ref_t;
-    typedef channel_sizes_type< ref_t >::type cs_t;
+    typedef typename channel_sizes_type< ref_t >::type cs_t;
 
     compare_channel_sizes_fn fn( &channel_sizes.front() );
     mpl::for_each< cs_t >( fn );
@@ -138,14 +139,19 @@ bool is_allowed( unsigned int                       src_n // num channels
 {
     typedef typename View::value_type pixel_t;
     typedef typename View::reference  ref_t;
-    typedef typename channel_traits< element_type< pixel_t >::type >::value_type channel_t;
+    typedef typename channel_traits< 
+                typename element_type< pixel_t >::type >::value_type channel_t;
 
-    int dst_n = num_channels< pixel_t >::value;
-    int dst_f = format_value< channel_t >( typename is_bit_aligned< pixel_t >::type() );
+    const typename num_channels< pixel_t >::value_type dst_n = num_channels< pixel_t >::value;
+    const typename num_channels< pixel_t >::value_type dst_f = format_value< channel_t >( typename is_bit_aligned< pixel_t >::type() );
 
-    bool s = compare_channel_sizes< View >( src_s
-                                          , typename is_bit_aligned< ref_t >::type()
-                                          , typename is_homogeneous< ref_t >::type() );
+
+
+    const bool s( compare_channel_sizes< View >( src_s
+                                               , typename is_bit_aligned< ref_t >::type()
+                                               , typename is_homogeneous< ref_t >::type() 
+                                               )
+                );
 
     return (  dst_n == src_n
            && s

@@ -186,7 +186,15 @@
 			>
 		</File>
 		<File
+			RelativePath=".\bmp_read_test.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\bmp_test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\bmp_write_test.cpp"
 			>
 		</File>
 		<File

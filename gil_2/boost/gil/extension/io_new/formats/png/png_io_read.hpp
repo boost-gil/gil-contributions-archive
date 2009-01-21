@@ -11,10 +11,10 @@
 #define BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_READ_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
-/// \brief 
+/// \file
+/// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-///         
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +27,7 @@
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
+#include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
 #include "png_io_base.hpp"
 #include "png_supported_types.hpp"
@@ -110,7 +111,7 @@ public:
 
         png_bitdepth::type bit_depth = this->_info._bit_depth;
         png_color_type::type color_type = this->_info._color_type;
-        
+
         if(color_type == PNG_COLOR_TYPE_PALETTE)
         {
             color_type = PNG_COLOR_TYPE_RGB;
@@ -156,7 +157,7 @@ public:
                 #else
                     io_error("gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application.");
                 #endif // ENABLE_GRAY_ALPHA
-                
+
 
                 break;
             }

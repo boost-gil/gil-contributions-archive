@@ -11,11 +11,11 @@
 #define BOOST_GIL_EXTENSION_IO_DETAIL_READ_HELPER_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
+/// \file
 /// \brief  Helper for having one read implementation used for
 ///         bit_aligned and byte images.
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-///         
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////

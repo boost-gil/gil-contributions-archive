@@ -11,10 +11,10 @@
 #define BOOST_GIL_EXTENSION_IO_READ_AND_CONVERT_IMAGE_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
+/// \file
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-///         
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +256,7 @@ void read_and_convert_image( Device&          device
                                                                                                        , Device
                                                                                                        >
                                                                     >
-                                                          , typename is_format_tag< FormatTag >
+                                                          , is_format_tag< FormatTag >
                                                           >
                                                >::type* ptr = 0
                            )

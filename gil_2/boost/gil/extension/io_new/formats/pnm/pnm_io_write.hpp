@@ -11,15 +11,17 @@
 #define BOOST_GIL_EXTENSION_IO_PNM_IO_WRITE_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
-/// \brief 
+/// \file
+/// \brief
 /// \author Christian Henning \n
-///         
+///
 /// \date 2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
+
+#include <boost/lexical_cast.hpp>
 
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
@@ -31,7 +33,7 @@ namespace boost { namespace gil { namespace detail {
 template< typename Device >
 class writer< Device
             , pnm_tag
-            > 
+            >
 {
     typedef image_write_info< pnm_tag > info_t;
 
@@ -72,21 +74,17 @@ public:
         // write header
 
         // Add a white space at each string so read_int() can decide when a numbers ends.
-        char buffer[10];
 
         std::string str( "P" );
-        _itoa( type, buffer, 10 );
-        str += buffer + std::string( " " );
+        str += boost::lexical_cast< std::string >( type ) + std::string( " " );
         _out.print_line( str );
 
         str.clear();
-        _itoa( width, buffer, 10 );
-        str += buffer + std::string( " " );
+        str += boost::lexical_cast< std::string >( width ) + std::string( " " );
         _out.print_line( str );
 
         str.clear();
-        _itoa( height, buffer, 10 );
-        str += buffer + std::string( " " );
+        str += boost::lexical_cast< std::string >( height ) + std::string( " " );
         _out.print_line( str );
 
         _out.print_line( "255 ");
@@ -103,7 +101,7 @@ public:
                                    );
 
 
-		for( int y = 0; y < height; ++y )
+        for( int y = 0; y < height; ++y )
 		{
             copy_pixels( subimage_view( view, 0, y, view.width(), 1 )
                        , row

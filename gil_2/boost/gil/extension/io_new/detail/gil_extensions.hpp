@@ -15,7 +15,7 @@
 /// \brief Definitions of is_bit_aligned, is_homogeneous, and is_similar metafunctions and
 ///        some other goodies.
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-///         
+///
 /// \date   2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////

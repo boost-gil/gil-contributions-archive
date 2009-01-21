@@ -11,10 +11,10 @@
 #define BOOST_GIL_EXTENSION_IO_READ_IMAGE_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
+/// \file
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-///         
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -26,6 +26,7 @@
 #include "base.hpp"
 #include "io_device.hpp"
 #include "path_spec.hpp"
+#include "conversion_policies.hpp"
 
 namespace boost{ namespace gil {
 
@@ -110,14 +111,16 @@ void read_image( const String&                           file_name
                , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
                                               , is_format_tag< FormatTag >
                                               , is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                            , FormatTag
-                                                                            >
+                                                                                     , FormatTag
+                                                                                     >
                                               >
-                                   >::type* ptrdiff_t = 0
+                                   >::type* ptr = 0
                )
 {
+    typedef typename detail::file_stream_device<FormatTag>::read_tag read_tag;
+
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
-                                                , detail::file_stream_device<FormatTag>::read_tag()
+                                                , read_tag()
                                                 );
 
     read_image( device
