@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( pnm_read_and_convert_image_test )
 BOOST_AUTO_TEST_CASE( pnm_read_view_test )
 {
     {
-        rgb8_image_t img( 200, 200 );
+        gray8_image_t img( 200, 200 );
         pnm_read_view( filename, view( img ) );
     }
 }

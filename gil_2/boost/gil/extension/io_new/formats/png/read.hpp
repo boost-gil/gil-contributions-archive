@@ -29,9 +29,8 @@
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
-#include "png_io_base.hpp"
-#include "png_supported_types.hpp"
-#include "png_io_is_allowed.hpp"
+#include "base.hpp"
+#include "is_allowed.hpp"
 
 namespace boost { namespace gil { namespace detail {
 

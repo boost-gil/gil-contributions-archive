@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "pnm_tags.hpp"
-#include "formats/pnm/pnm_supported_types.hpp"
-#include "formats/pnm/pnm_io_read.hpp"
+#include "formats/pnm/supported_types.hpp"
+#include "formats/pnm/read.hpp"
 
 #include "detail/read_image.hpp"
 #include "detail/read_view.hpp"

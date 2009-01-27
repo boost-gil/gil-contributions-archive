@@ -27,7 +27,8 @@ extern "C" {
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
-#include "png_io_base.hpp"
+#include "base.hpp"
+#include "supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -66,9 +67,9 @@ public:
     void apply( const View&                      view
               , const image_write_info<png_tag>& info )
     {
-        typedef png_rw_support< typename channel_type<View>::type
-                              , typename color_space_type<View>::type
-                              > png_rw_info;
+        typedef png_write_support< typename channel_type<View>::type
+                                 , typename color_space_type<View>::type
+                                 > png_rw_info;
 
         png_set_IHDR( _png_ptr
                     , _info_ptr
@@ -116,11 +117,11 @@ public:
     template< typename View >
     void apply( const View& view )
     {
-        typedef png_rw_support< typename kth_semantic_element_type< typename View::value_type
-                                                                  , 0
-                                                                  >::type
-                              , typename color_space_type<View>::type
-                              > png_rw_info;
+        typedef png_write_support< typename kth_semantic_element_type< typename View::value_type
+                                                                     , 0
+                                                                     >::type
+                                 , typename color_space_type<View>::type
+                                 > png_rw_info;
 
         png_set_IHDR( _png_ptr
                     , _info_ptr
@@ -144,12 +145,11 @@ private:
                    ,  boost::mpl::false_ // is bit aligned
                    )
     {
-        typedef png_rw_support<
-                        typename channel_type<View>::type,
-                        typename color_space_type<View>::type
-                        > png_rw_info;
+        typedef png_write_support< typename channel_type<View>::type
+                                 , typename color_space_type<View>::type
+                                 > png_rw_info;
 
-        if (little_endian() )
+        if( little_endian() )
         {   
             if( png_rw_info::bit_depth == 16 )
                 png_set_swap(_png_ptr);
@@ -181,10 +181,11 @@ private:
                    , boost::mpl::true_ // is bit aligned
                    ) 
     {
-        typedef png_rw_support< typename kth_semantic_element_type< typename View::value_type
-                                                                 , 0>::type,
-                        typename color_space_type<View>::type
-                        > png_rw_info;
+        typedef png_write_support< typename kth_semantic_element_type< typename View::value_type
+                                                                     , 0
+                                                                     >::type
+                                 , typename color_space_type<View>::type
+                                 > png_rw_info;
 
         if (little_endian() )
         {   

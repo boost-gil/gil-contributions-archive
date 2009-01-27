@@ -35,8 +35,8 @@ extern "C" {
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
 
-#include "tiff_io_device.hpp"
-#include "tiff_io_is_allowed.hpp"
+#include "device.hpp"
+#include "is_allowed.hpp"
 
 
 namespace boost { namespace gil { namespace detail {

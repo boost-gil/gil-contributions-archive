@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( bmp_write_view_test )
     {
         string filename( "..\\test\\bmp\\test4.bmp" );
 
-        gray8_image_t img( 127, 64 );
+        rgb8_image_t img( 127, 64 );
         bmp_write_view( filename, view( img ) );
     }
 }

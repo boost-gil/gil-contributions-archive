@@ -98,10 +98,16 @@ struct is_homogeneous<packed_pixel< B, C, L > >
                            , mpl::size< C >::type::value
                            > {};
 
-template <typename B, typename C, typename L>  
-struct is_homogeneous<const packed_pixel<B,C,L> > 
-	: is_homogeneous_impl_p<C,typename mpl::at_c<C,0>::type,1,mpl::size<C>::type::value>
-{};
+template< typename B
+        , typename C
+        , typename L
+        >  
+struct is_homogeneous< const packed_pixel< B, C, L > > 
+	: is_homogeneous_impl_p< C
+	                       , typename mpl::at_c<C,0>::type
+	                       , 1
+	                       , mpl::size< C >::type::value
+	                       > {};
 
 // for bit_aligned_pixel_reference
 template <typename B, typename C, typename L, bool M>  
@@ -143,7 +149,10 @@ struct get_num_bits< const packed_channel_reference< B, I, S, M > >
 template <typename B, typename C, typename L, bool M>  
 struct gen_chan_ref
 {
-	typedef packed_dynamic_channel_reference<B,mpl::at_c<C,0>::type::value,M> type;
+	typedef packed_dynamic_channel_reference< B
+	                                        , mpl::at_c< C, 0 >::type::value
+	                                        , M
+	                                        > type;
 };
 
 

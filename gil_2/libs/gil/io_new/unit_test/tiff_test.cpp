@@ -9,7 +9,6 @@
 
 #include "stdafx.h"
 
-#include <boost/gil/extension/io_new/pnm_read.hpp>
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 #include <boost/type_traits/is_same.hpp>
 

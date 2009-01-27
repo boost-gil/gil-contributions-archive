@@ -162,13 +162,6 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
-        string filename( "..\\test\\bmp\\test1.bmp" );
-
-        gray8_image_t img( 127, 64 );
-        write_view( filename, view( img ), tag_t() );
-    }
-
-    {
         string filename( "..\\test\\bmp\\test2.bmp" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );

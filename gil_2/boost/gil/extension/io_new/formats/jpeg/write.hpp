@@ -26,7 +26,7 @@
 
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
-#include "jpeg_supported_types.hpp"
+#include "supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -72,8 +72,9 @@ public:
         _cinfo.image_width  = JDIMENSION(view.width());
         _cinfo.image_height = JDIMENSION(view.height());
         _cinfo.input_components = num_channels<View>::value;
-        _cinfo.in_color_space = detail::jpeg_rw_support<typename channel_type<View>::type,
-            typename color_space_type<View>::type>::color_type;
+        _cinfo.in_color_space = detail::jpeg_write_support< typename channel_type< View >::type
+                                                          , typename color_space_type<View>::type
+                                                          >::color_type;
         jpeg_set_defaults(&_cinfo);
         jpeg_set_quality(&_cinfo, 100, TRUE);
 
@@ -87,9 +88,9 @@ public:
         _cinfo.image_width  = JDIMENSION(view.width());
         _cinfo.image_height = JDIMENSION(view.height());
         _cinfo.input_components = num_channels<View>::value;
-        _cinfo.in_color_space = detail::jpeg_rw_support< typename channel_type<View>::type
-                                                       , typename color_space_type<View>::type
-                                                       >::color_type;
+        _cinfo.in_color_space = detail::jpeg_write_support< typename channel_type<View>::type
+                                                          , typename color_space_type<View>::type
+                                                          >::color_type;
 
         jpeg_set_defaults( &_cinfo);
         jpeg_set_quality ( &_cinfo

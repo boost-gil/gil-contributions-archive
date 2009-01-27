@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         BOOST_CHECK_EQUAL( img.height(), 200 );
     }
 }
-
+/*
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
     {
@@ -186,5 +186,5 @@ BOOST_AUTO_TEST_CASE( write_view_test )
         write_view( file, view( img ), tag_t() );
     }
 }
-
+*/
 } // namespace pnm_test

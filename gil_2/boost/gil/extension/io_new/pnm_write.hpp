@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "pnm_tags.hpp"
-#include "formats/pnm/pnm_supported_types.hpp"
-#include "formats/pnm/pnm_io_write.hpp"
+#include "formats/pnm/supported_types.hpp"
+#include "formats/pnm/write.hpp"
 
 #include "detail/write_view.hpp"
 

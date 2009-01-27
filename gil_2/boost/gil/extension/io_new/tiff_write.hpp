@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include "tiff_tags.hpp"
-#include "formats/tiff/tiff_io.hpp"
-#include "formats/tiff/tiff_io_write.hpp"
+#include "formats/tiff/supported_types.hpp"
+#include "formats/tiff/write.hpp"
 
 #include "detail/write_view.hpp"
 

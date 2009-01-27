@@ -41,9 +41,9 @@ void write_view( Device&          device
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
                                                                         , typename is_format_tag< FormatTag >::type
-                                                                        , typename is_supported< typename View::value_type
-                                                                                               , FormatTag
-                                                                                               >::type
+                                                                        , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                                     , FormatTag
+                                                                                                     >::type
                                                                         >::type
                                                     >::type* ptr = 0
                )
@@ -64,11 +64,12 @@ void write_view( Device&          device
                , const View&      view
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
-                                                                                                                           , Device
-                                                                                                                           >::type
+                                                                                                    , Device
+                                                                                                    >::type
                                                                               , typename is_format_tag< FormatTag >::type
-                                                                              , typename is_supported< typename View::value_type
-                                                                                                     , FormatTag>::type
+                                                                              , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                                           , FormatTag
+                                                                                                           >::type
                                                                               >::type
                                                           >::type* ptr = 0
         )
@@ -94,9 +95,9 @@ void write_view( const String&    file_name
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                        , typename is_format_tag< FormatTag >::type
-                                                       , typename is_supported< typename View::value_type
-                                                                              , FormatTag
-                                                                              >::type
+                                                       , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                    , FormatTag
+                                                                                    >::type
                                                        >::type
                                    >::type* ptr = 0
                )
@@ -122,9 +123,9 @@ void write_view( Device&                            device
                , const image_write_info<FormatTag>& info
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
                                                                         , typename is_format_tag< FormatTag >::type
-                                                                        , typename is_supported< typename View::value_type
-                                                                                               , FormatTag
-                                                                                               >::type
+                                                                        , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                                     , FormatTag
+                                                                                                     >::type
                                                                         >::type
                                                     >::type* ptr = 0 
                )
@@ -149,8 +150,9 @@ void write_view( Device&                              device
                                                                                                                            , Device
                                                                                                                            >::type
                                                                               , typename is_format_tag< FormatTag >::type
-                                                                              , typename is_supported< typename View::value_type
-                                                                                                     , FormatTag>::type
+                                                                              , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                                           , FormatTag
+                                                                                                           >::type
                                                                               >::type
                                                           >::type* ptr = 0 
                )
@@ -175,9 +177,9 @@ void write_view( const String&                        file_name
                , const image_write_info< FormatTag >& info
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                        , typename is_format_tag< FormatTag >::type
-                                                       , typename is_supported< typename View::value_type
-                                                                              , FormatTag
-                                                                              >::type
+                                                       , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                    , FormatTag
+                                                                                    >::type
                                                        >::type
                                    >::type* ptr = 0
                )

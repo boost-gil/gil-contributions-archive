@@ -45,13 +45,6 @@ struct property_base
     typedef Property type;
 };
 
-/**
- * Boolean meta function, mpl::true_ if the pixel type \a PixelType is supported 
- * by the image format identified with \a FormatTag.
- * \todo the name is_supported is to generic, pick something more IO realted.
- */
-template<typename PixelType, typename FormatTag> struct is_supported;
-
 template<typename FormatTag> struct is_format_tag : is_base_and_derived< format_tag
                                                                        , FormatTag
                                                                        > {};
@@ -84,6 +77,17 @@ template<typename FormatTag> struct image_read_settings;
 template<typename FormatTag> struct image_write_info;
 
 
+/**
+ * Boolean meta function, mpl::true_ if the pixel type \a PixelType is supported 
+ * by the image format identified with \a FormatTag.
+ * \todo the name is_supported is to generic, pick something more IO realted.
+ */
+// Depending on image type the parameter Pixel can be a reference type 
+// for bit_aligned images or a pixel for byte images.
+template< typename Pixel, typename FormatTag > struct is_read_supported {};
+template< typename Pixel, typename FormatTag > struct is_write_supported {};
+
+
 namespace detail {
 
 template< typename Property > 
@@ -106,17 +110,10 @@ void io_error_if( bool expr, const std::string& descr )
       io_error( descr );
 }
 
-
-struct read_write_support_true
-{
-    BOOST_STATIC_CONSTANT( bool, is_supported = true );
-};
-
-struct read_write_support_false
-{
-    BOOST_STATIC_CONSTANT( bool, is_supported = false );
-};
-
+struct read_support_true  { BOOST_STATIC_CONSTANT( bool, is_supported = true );  };
+struct read_support_false { BOOST_STATIC_CONSTANT( bool, is_supported = false ); };
+struct write_support_true { BOOST_STATIC_CONSTANT( bool, is_supported = true );  };
+struct write_support_false{ BOOST_STATIC_CONSTANT( bool, is_supported = false ); };
 
 } // namespace detail
 } // namespace gil

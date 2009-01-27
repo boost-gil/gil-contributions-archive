@@ -353,15 +353,15 @@
 					Name="bmp"
 					>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\bmp_io_read.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\read.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\bmp_io_write.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\supported_types.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\bmp_supported_types.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\bmp\write.hpp"
 						>
 					</File>
 				</Filter>
@@ -369,19 +369,19 @@
 					Name="jpeg"
 					>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_io_is_allowed.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\is_allowed.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_io_read.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\read.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_io_write.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\supported_types.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\jpeg_supported_types.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\jpeg\write.hpp"
 						>
 					</File>
 				</Filter>
@@ -389,23 +389,23 @@
 					Name="png"
 					>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_base.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\base.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_is_allowed.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\is_allowed.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_read.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\read.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_io_write.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\supported_types.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\png_supported_types.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\png\write.hpp"
 						>
 					</File>
 				</Filter>
@@ -413,15 +413,15 @@
 					Name="pnm"
 					>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\pnm_io_read.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\read.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\pnm_io_write.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\supported_types.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\pnm_supported_types.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\pnm\write.hpp"
 						>
 					</File>
 				</Filter>
@@ -429,23 +429,23 @@
 					Name="tiff"
 					>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\device.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_device.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\is_allowed.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_is_allowed.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\read.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_read.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\supported_types.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\tiff_io_write.hpp"
+						RelativePath="..\..\..\boost\gil\extension\io_new\formats\tiff\write.hpp"
 						>
 					</File>
 				</Filter>

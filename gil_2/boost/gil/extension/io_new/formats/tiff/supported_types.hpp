@@ -29,17 +29,31 @@ namespace boost{ namespace gil {
 
 namespace detail {
 
+// Read support
+
 // TIFF virtually supports everything 
-struct tiff_rw_support : read_write_support_true
+struct tiff_read_support : read_support_true
+{};
+
+
+// Write support
+
+struct tiff_write_support : write_support_true
 {};
 
 } // namespace detail
 
-template<typename Pixel >
-struct is_supported< Pixel
-                   , tiff_tag
-                   > 
-    : mpl::bool_< detail::tiff_rw_support::is_supported >
+template< typename Pixel >
+struct is_read_supported< Pixel
+                        , tiff_tag
+                        > 
+    : mpl::bool_< detail::tiff_read_support::is_supported > {};
+
+template< typename Pixel >
+struct is_write_supported< Pixel
+                         , tiff_tag
+                         > 
+    : mpl::bool_< detail::tiff_write_support::is_supported >
 {};
 
 } // namespace gil

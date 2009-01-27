@@ -27,9 +27,7 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
-#include "jpeg_supported_types.hpp"
-#include "jpeg_io_is_allowed.hpp"
-#include "jpeg_supported_types.hpp"
+#include "is_allowed.hpp"
 
 namespace boost { namespace gil { namespace detail {
 

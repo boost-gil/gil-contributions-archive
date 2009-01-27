@@ -43,7 +43,7 @@ void read_image( Device&                                 file
                , const image_read_settings< FormatTag >& settings
                , typename enable_if< mpl::and_< detail::is_input_device< Device    >
                                               , is_format_tag          < FormatTag >
-                                              , is_supported           < typename get_pixel_type< typename Image::view_t >::type
+                                              , is_read_supported      < typename get_pixel_type< typename Image::view_t >::type
                                                                        , FormatTag 
                                                                        >
                                               >
@@ -75,9 +75,9 @@ void read_image( Device&                                 file
                                                                                  , Device
                                                                                  >
                                               , is_format_tag< FormatTag >
-                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                            , FormatTag
-                                                            >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
                                               >
                                    >::type* ptr = 0
                       )
@@ -110,9 +110,9 @@ void read_image( const String&                           file_name
                , const image_read_settings< FormatTag >& settings
                , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
                                               , is_format_tag< FormatTag >
-                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                                     , FormatTag
-                                                                                     >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
                                               >
                                    >::type* ptr = 0
                )
@@ -140,7 +140,7 @@ void read_image( Device&          file
                , const FormatTag& tag
                , typename enable_if< mpl::and_< detail::is_input_device< Device    >
                                               , is_format_tag          < FormatTag >
-                                              , is_supported           < typename get_pixel_type< typename Image::view_t >::type
+                                              , is_read_supported      < typename get_pixel_type< typename Image::view_t >::type
                                                                        , FormatTag 
                                                                        >
                                               >
@@ -166,9 +166,9 @@ void read_image( Device&          file
                                                                                  , Device
                                                                                  >
                                               , is_format_tag< FormatTag >
-                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                            , FormatTag
-                                                            >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
                                               >
                                    >::type* ptr = 0 
                )
@@ -193,9 +193,9 @@ void read_image( const String&    file_name
                , const FormatTag& tag
                , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
                                               , is_format_tag< FormatTag >
-                                              , is_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                            , FormatTag
-                                                            >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
                                               >
                                    >::type* ptr = 0
                )
