@@ -40,6 +40,8 @@ struct indexed_image_deref_fn
     {
         return value_type();
     }
+
+
 };
 
 template< typename IndicesLoc
@@ -69,8 +71,8 @@ public:
     , _num_colors( 0 )
     {}
 
-    indexed_image_view( const point_t&              dimensions
-                      , std::size_t                 num_colors
+    indexed_image_view( const point_t&           dimensions
+                      , std::size_t              num_colors
                       , const indices_locator_t& indices
                       , const palette_locator_t& palette
                       )
@@ -88,11 +90,11 @@ public:
     , _palette( iv._palette )
     {}
 
-    const point_t&    dimensions() { return _dimensions; }
-    const std::size_t num_colors() { return _num_colors; }
+    const point_t&    dimensions() const { return _dimensions; }
+    const std::size_t num_colors() const { return _num_colors; }
 
-    const indices_locator_t& indices() { return _indices; }
-    const palette_locator_t& palette() { return _palette; }
+    const indices_locator_t& indices() const { return _indices; }
+    const palette_locator_t& palette() const { return _palette; }
 
 private:
 
