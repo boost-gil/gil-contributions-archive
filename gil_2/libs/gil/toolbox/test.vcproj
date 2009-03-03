@@ -234,6 +234,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\boost\gil\extension\toolbox\indexed_image.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\boost\gil\extension\toolbox\lab.hpp"
 				>
 			</File>

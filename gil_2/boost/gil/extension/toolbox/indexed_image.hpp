@@ -29,6 +29,8 @@ struct indexed_image_deref_fn
     typedef IndicesLoc indices_locator_t;
     typedef PaletteLoc palette_locator_t;
 
+    typedef typename channel_type< typename indices_locator_t::value_type >::type index_t;
+
     typedef indexed_image_deref_fn          const_t;
     typedef typename PaletteLoc::value_type value_type;
     typedef value_type                      reference;
@@ -36,12 +38,28 @@ struct indexed_image_deref_fn
     typedef point_t                         argument_type;
     typedef reference                       result_type;
 
+    indexed_image_deref_fn() {}
+
+    indexed_image_deref_fn( const indices_locator_t& indices_loc
+                          , const palette_locator_t& palette_loc
+                          )
+    : _indices_loc( indices_loc )
+    , _palette_loc( palette_loc )
+    {}
+
     result_type operator()( const point_t& p ) const
     {
+        indices_locator_t l = _indices_loc.xy_at( p );
+        indices_locator_t::value_type gray = *l;
+        //index_t index = [0];
+
+        //return _palette_loc[ index ];
         return value_type();
     }
+private:
 
-
+    indices_locator_t _indices_loc;
+    palette_locator_t _palette_loc;
 };
 
 template< typename IndicesLoc
@@ -57,7 +75,7 @@ struct indexed_image_locator_type
 };
 
 template< typename Locator > // indexed_image_locator_type< ... >::type
-class indexed_image_view
+class indexed_image_view : public image_view< Locator >
 {
 public:
 
@@ -67,44 +85,31 @@ public:
     typedef indexed_image_view< Locator > const_t;
 
     indexed_image_view()
-    : _dimensions( 0, 0 )
+    : image_view()
     , _num_colors( 0 )
     {}
 
-    indexed_image_view( const point_t&           dimensions
-                      , std::size_t              num_colors
-                      , const indices_locator_t& indices
-                      , const palette_locator_t& palette
+    indexed_image_view( const point_t& dimensions
+                      , std::size_t    num_colors
+                      , const Locator& locator
                       )
-    : _dimensions( dimensions )
+    : image_view( dimensions, locator )
     , _num_colors( num_colors )
-    , _indices( indices )
-    , _palette( palette )
     {}
 
     template< typename IndexedView >
     indexed_image_view( const IndexedView& iv )
-    : _dimensions( iv._dimensions )
+    : image_view( iv )
     , _num_colors( iv._num_colors )
-    , _indices( iv._indices )
-    , _palette( iv._palette )
     {}
 
-    const point_t&    dimensions() const { return _dimensions; }
     const std::size_t num_colors() const { return _num_colors; }
-
-    const indices_locator_t& indices() const { return _indices; }
-    const palette_locator_t& palette() const { return _palette; }
 
 private:
 
     template< typename Locator2 > friend class indexed_image_view;
 
-    point_t     _dimensions;
     std::size_t _num_colors;
-
-    indices_locator_t _indices;
-    palette_locator_t _palette;
 };
 
 
@@ -148,10 +153,26 @@ public:
         std::size_t indices_row_size = get_row_size_in_memunits< indices_view_t >( dimensions.x );
         std::size_t palette_row_size = get_row_size_in_memunits< palette_view_t >( num_colors   );
 
+        indices_loc_t indices_loc( view( _indices ).xy_at( 0, 0 ), indices_row_size );
+
+        typedef indexed_image_deref_fn< indices_locator_t
+                                      , palette_locator_t
+                                      > defer_fn_t;
+
+        defer_fn_t deref_fn( indices_loc
+                           , palette_loc_t( view( _palette ).xy_at( 0, 0 )
+                                          , palette_row_size
+                                          )
+                           );
+
+        locator_t locator( point_t( 0, 0 )
+                         , point_t( 1, 1 )
+                         , deref_fn
+                         );
+
         _view = view_t( dimensions
                       , num_colors
-                      , indices_loc_t( view( _indices ).xy_at( 0, 0 ), indices_row_size )
-                      , palette_loc_t( view( _palette ).xy_at( 0, 0 ), palette_row_size )
+                      , locator
                       );
     }
 
@@ -163,8 +184,8 @@ public:
     template <typename Pixel2, typename Index2>
     indexed_image( const indexed_image< Pixel2, Index2 >& img )
     {
-        copy_pixels( img.get_indices_const_view(), get_indices_view() );
-        copy_pixels( img.get_palette_view(), get_palette_view() );
+        _indices = img._indices;
+        _palette = img._palette;
     }
 
     indexed_image& operator= ( const indexed_image& img )

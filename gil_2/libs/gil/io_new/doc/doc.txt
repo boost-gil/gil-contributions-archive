@@ -146,24 +146,100 @@ For a general overview of the BMP image file format go to the following link.
 
 http://en.wikipedia.org/wiki/BMP_file_format
 
-Please note, the code has not been tested with the X Windows System variations
+Please note, the code has not been tested on X Windows System variations
 of the BMP format which are usually referred to XBM and XPM formats.
 
 Here, only the MS Windows and OS/2 format is relevant.
 
+Currently the code is able to read and write the following image types:
+
+Read: gray1_image_t, gray4_image_t, gray8_image_t, rgb8_image_t and, rgba8_image_t
+Write: rgb8_image_t and, rgba8_image_t
+
+The lack of having an indexed image type in gil restricts the current interface to only
+write out non-indexed images. This is subject to change soon.
 
 
 3.3.2 JPEG
 ----------
+For a general overview of the JPEG image file format go to the following link.
+
+http://en.wikipedia.org/wiki/JPEG
+
+This jpeg extension is based on the libjpeg library which can be found here:
+
+http://www.ijg.org/
+
+The user has to make sure this library is properly installed. I strongly recommend the user
+to build the library yourself. It could potentially save you a lot of trouble.
+
+Currently the code is able to read and write the following image types:
+
+Read: gray8_image_t, rgb8_image_t, cmyk8_image_t
+Write: gray8_image_t, rgb8_image_t, cmyk8_image_t
+
+Reading YCbCr or YCCK images is possible but might result in inaccuracies since both color spaces
+aren't available yet for gil. For now these color space are read as rgb images.
+This is subject to change soon.
 
 3.3.3 PNG
 ---------
+For a general overview of the PNG image file format go to the following link.
+
+http://en.wikipedia.org/wiki/Portable_Network_Graphics
+
+This png extension is based on the libpng, which can be found here:
+
+http://libpng.org/pub/png/libpng.html
+
+The user has to make sure this library is properly installed. I strongly recommend the user
+to build the library yourself. It could potentially save you a lot of trouble.
+
+Currently the code is able to read and write the following image types:
+
+Read: gray1, gray2, gray4, gray8, gray16, gray_alpha_8, gray_alpha_16, rgb8, rgb16, rgba8, rgba16
+Write: gray1, gray2, gray4, gray8, gray16, gray_alpha_8, gray_alpha_16, rgb8, rgb16, rgba8, rgba16
+
+For reading gray_alpa images the user has to enable the ENABLE_GRAY_ALPHA compiler switch. This color
+space is defined in the toolbox by using gray_alpha.hpp.
 
 3.3.4 PNM
 ---------
+For a general overview of the PNM image file format go to the following link.
 
-3.3.5 TIF
+http://en.wikipedia.org/wiki/Portable_anymap
+
+No external library is needed for the pnm format. Both ascii and binary formats are supported.
+
+Currently the code is able to read and write the following image types:
+
+Read: gray1, gray8, rgb8
+Write: gray1, gray8, rgb8
+
+When reading a mono text image the data is read as a gray8 image.
+
+3.3.5 TIFF
 ----------
+For a general overview of the PNM image file format go to the following link.
+
+http://en.wikipedia.org/wiki/Tagged_Image_File_Format
+
+This tiff extension is based on the libtiff, which can be found here:
+
+http://www.remotesensing.org/libtiff/
+
+The user has to make sure this library is properly installed. I strongly recommend the user
+to build the library yourself. It could potentially save you a lot of trouble.
+
+TIFF images can virtually encode all kinds of channel sizes representing various color spaces. Even
+planar images are possible. For instance, rbg323 or gray7. The channels also can have specific formats, like
+integer values or floating point values. For a complete set of options please consult the following websites:
+
+http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
+http://www.awaresystems.be/imaging/tiff/tifftags/extension.html
+
+The author of this extension is not claiming all tiff format are readable or writeable. This extension is
+likely to be a moving target adding new features.
 
 
 3.4 Extending GIL::IO with new Formats
