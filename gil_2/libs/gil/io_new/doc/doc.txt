@@ -131,6 +131,27 @@ The above example will write an image where the jpeg quality is set to 95 percen
 3.1 Read Interface
 ------------------
 
+As the Tutorial demonstrated there a few ways to read images. Here is an enumeration of 
+all read functions with a short description:
+
+* read_image - read into a gil image with no conversion. Memory is allocated.
+* read_view  - read into a gil view with no conversion.
+
+* read_and_convert_image - read and convert into a gil image. Memory is allocated.
+* read_and_convert_view  - read and convert into a gil view.
+
+* read_image_info - read the image header.
+
+Conversion in this context is necessary if the source ( file ) is using a incompatible color space
+as the destination ( gil image type ). If that's the case the user has to use the xxx_and_convert_xxx
+variants.
+
+All functions take the path + filename as the first parameter. This can be anything from a c string, std::string,
+std::wstring and a boost::filesystem path. When using the path object the user needs to define 
+the ADD_FS_PATH_SUPPORT compiler symbol to include the boost::filesystem dependency.
+
+
+
 
 3.2 Write Interface
 -------------------
@@ -239,7 +260,7 @@ http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
 http://www.awaresystems.be/imaging/tiff/tifftags/extension.html
 
 The author of this extension is not claiming all tiff format are readable or writeable. This extension is
-likely to be a moving target adding new features.
+likely to be a moving target adding new features with each new milestone.
 
 
 3.4 Extending GIL::IO with new Formats
