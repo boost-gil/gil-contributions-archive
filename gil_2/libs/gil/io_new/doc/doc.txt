@@ -146,10 +146,28 @@ Conversion in this context is necessary if the source ( file ) is using a incomp
 as the destination ( gil image type ). If that's the case the user has to use the xxx_and_convert_xxx
 variants.
 
-All functions take the path + filename as the first parameter. This can be anything from a c string, std::string,
-std::wstring and a boost::filesystem path. When using the path object the user needs to define 
+All functions take the filename as the first parameter. This can be anything from a c string, std::string,
+std::wstring, and a boost::filesystem path. When using the path object the user needs to define 
 the ADD_FS_PATH_SUPPORT compiler symbol to include the boost::filesystem dependency.
+The second parameter is either an image or view type depending on the read_xxx function.
+The third and last parameter is either an instance of the image_read_settings<FormatTag> or just the 
+FormatTag. The settings can be various depending on the format which is being read. But the all
+share settings for reading a partial image area. The first point describes the top left image
+coordinate whereas the second are the dimensions in x and y directions. Here an example of
+setting up partial read.
 
+read_image( filename
+          , img
+          , image_read_settings< tiff_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
+          );
+
+
+Each format supports reading just the header information, using read_image_info(). Please
+refer to the format specific sections under 3.3. A basic example follows:
+
+image_read_info< tiff_t > info = read_image_info( filename
+                                                , tiff_t()
+                                                );
 
 
 
