@@ -131,7 +131,7 @@ The above example will write an image where the jpeg quality is set to 95 percen
 3.1 Read Interface
 ------------------
 
-As the Tutorial demonstrated there a few ways to read images. Here is an enumeration of 
+As the Tutorial demonstrated there are a few ways to read images. Here is an enumeration of 
 all read functions with a short description:
 
 * read_image - read into a gil image with no conversion. Memory is allocated.
@@ -142,13 +142,15 @@ all read functions with a short description:
 
 * read_image_info - read the image header.
 
-Conversion in this context is necessary if the source ( file ) is using a incompatible color space
-as the destination ( gil image type ). If that's the case the user has to use the xxx_and_convert_xxx
+Conversion in this context is necessary if the source ( file ) has an incompatible color space
+with the destination ( gil image type ). If that's the case the user has to use the xxx_and_convert_xxx
 variants.
 
-All functions take the filename as the first parameter. This can be anything from a c string, std::string,
-std::wstring, and a boost::filesystem path. When using the path object the user needs to define 
-the ADD_FS_PATH_SUPPORT compiler symbol to include the boost::filesystem dependency.
+All functions take the filename or a device as the first parameter. The filename can be anything from 
+a c string, std::string, std::wstring, and a boost::filesystem path. When using the path object the 
+user needs to define the ADD_FS_PATH_SUPPORT compiler symbol to include the boost::filesystem 
+dependency. Devices could be a FILE*, std::ifstream, and a TIFF* for TIFF images.
+
 The second parameter is either an image or view type depending on the read_xxx function.
 The third and last parameter is either an instance of the image_read_settings<FormatTag> or just the 
 FormatTag. The settings can be various depending on the format which is being read. But the all
@@ -173,6 +175,15 @@ image_read_info< tiff_t > info = read_image_info( filename
 
 3.2 Write Interface
 -------------------
+
+There is only one function for writing out images, write_view. Similar to reading the first parameter is either
+a filename or a device. The filename can be anything from a c string, std::string, std::wstring, and a 
+boost::filesystem path. When using the path object the user needs to define the ADD_FS_PATH_SUPPORT compiler symbol 
+to include the boost::filesystem dependency. Devices could be a FILE*, std::ifstream, and a TIFF* for TIFF images.
+
+The second parameter is an view object to image being written. The third and last parameter is either a tag or 
+an image_write_info< FormatTag > object containing more settings. One example for instance is the jpeg quality. 
+Refer to the format specific sections under 3.3. to have a list of all the possible settings.
 
 
 3.3. Supported Image Formats
@@ -284,6 +295,105 @@ likely to be a moving target adding new features with each new milestone.
 3.4 Extending GIL::IO with new Formats
 --------------------------------------
 
+Extending the gil::io with new formats is meant to be simple and straightforward. Before adding I would
+recommend to have a look at existing implementations and then trying to follow a couple of guidelines:
+
+* Create the following files for your new xxx format
+    * xxx_read.hpp // Only includes read code
+    * xxx_write.hpp // Only includes write code
+    * xxx_all.hpp // includes xxx_read.hpp and xxx_write.hpp
+* Add the code to the boost::gil::detail namespace
+* Create a tag type for the new format. Like this
+    struct xxx_tag : format_tag {};
+
+* Create the image_read_info for the new format. It contains all the information that are
+  necessary to read an image. It should be filled and returned by the get_info() member of
+  the reader class. See below.
+
+    template<> struct image_read_info< xxx_tag > {};
+
+* Create the image_write_info for the new format. It contains all the information that are
+  necessary to write an image.
+  
+    template<> struct image_write_info< jpeg_tag > {};
+
+
+* Use the following reader skeleton as a start:
+
+template< typename Device
+        , typename ConversionPolicy
+        >
+class reader< Device
+            , xxx_tag
+            , ConversionPolicy
+            > 
+    : public reader_base< xxx_tag
+                        , ConversionPolicy
+                        >
+{
+private:
+
+    typedef typename ConversionPolicy::color_converter_type cc_t;
+
+public:
+
+    reader( Device& device )
+    : _io_dev( device )
+    {}
+
+    reader( Device&     device
+          , const cc_t& cc
+          )
+    : _io_dev( device )
+    , reader_base< xxx_tag
+                 , ConversionPolicy
+                 >( cc )
+    {}
+
+    image_read_info< xxx_tag > get_info()
+    {
+        // your implementation here
+    }
+
+    template< typename View >
+    void apply( const View& dst_view )
+    {
+        // your implementation here
+    }
+};
+
+* The writer skeleton:
+
+template< typename Device >
+class writer< Device
+            , xxx_tag
+            > 
+{
+public:
+
+    writer( Device & file )
+        : out(file)
+    {}
+
+    template<typename View>
+    void apply( const View& view )
+    {
+        // your implementation here
+    }
+
+    template<typename View>
+    void apply( const View&                        view
+              , const image_write_info< xxx_tag >& info )
+    {
+        // your implementation here
+    }
+};
 
 4. Reference
 ------------
+
+TIFF websites: 
+[1] http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
+[2] http://www.awaresystems.be/imaging/tiff/tifftags/extension.html
+[2] http://www.remotesensing.org/libtiff/
+[3] http://www.libtiff.org/man/
