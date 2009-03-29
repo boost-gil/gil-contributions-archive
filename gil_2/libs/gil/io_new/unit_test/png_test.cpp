@@ -108,6 +108,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     }
 
     {
+        rgba8_image_t img;
+        read_and_convert_image( filename, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 320 );
+        BOOST_CHECK_EQUAL( img.height(), 240 );
+    }
+
+    {
         ifstream in( filename.c_str(), ios::in | ios::binary );
 
         rgb8_image_t img;

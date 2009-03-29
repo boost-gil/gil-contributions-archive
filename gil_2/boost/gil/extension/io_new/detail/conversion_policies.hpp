@@ -88,7 +88,6 @@ public:
                       , out
                       , deref_t( _cc )
                       );
-
     }
 };
 

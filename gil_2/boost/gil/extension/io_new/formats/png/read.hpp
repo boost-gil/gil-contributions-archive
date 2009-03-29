@@ -207,9 +207,20 @@ private:
             throw std::runtime_error( "Image type aren't compatible." );
         }
 */
-        row_buffer_helper<ImagePixel> buffer( static_cast<int>( this->_info._width )
-                                            , false
-                                            );
+        typedef row_buffer_helper_view< ImagePixel > row_buffer_helper_t;
+
+        typedef typename row_buffer_helper_t::buffer_t   buffer_t;
+        typedef typename row_buffer_helper_t::iterator_t it_t;
+
+        row_buffer_helper_t buffer( static_cast<int>( this->_info._width )
+                                  , false
+                                  );
+
+        it_t begin = buffer.begin();
+
+        it_t first = begin + this->_settings._top_left.x;
+        it_t last  = begin + this->_settings._dim.x; // one after last element
+
 
         // skip rows
         for( int y = 0; y < this->_settings._top_left.y; ++y )
@@ -220,17 +231,16 @@ private:
                         );
         }
 
-        for(int y = 0; y < view.height(); ++y )
+        for( int y = 0; y < view.height(); ++y )
         {
             png_read_row( _png_ptr
                         , reinterpret_cast< png_bytep >( buffer.data() )
                         , 0
                         );
 
-            this->_cc_policy.read( buffer.begin() + this->_settings._top_left.x
-                                 , buffer.begin() + this->_settings._top_left.x + this->_settings._dim.x
-                                 , view.row_begin( y )
-                                 );
+             this->_cc_policy.read( first
+                                  , last
+                                  , view.row_begin( y ));
         }
     }
 
