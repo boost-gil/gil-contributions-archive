@@ -180,9 +180,9 @@ public:
         pitch = (pitch + 3) & ~3;
 
 
-        int ybeg = 0;
-        int yend = this->_settings._dim.y;
-        int yinc = 1;
+        std::ptrdiff_t ybeg = 0;
+        std::ptrdiff_t yend = this->_settings._dim.y;
+        std::ptrdiff_t yinc = 1;
 
         // offset to first scanline
         int offset = 0;
@@ -277,9 +277,9 @@ private:
             >
     void read_palette_image( const View_Dst& view
                            , int             pitch
-                           , int             ybeg
-                           , int             yend
-                           , int             yinc
+                           , std::ptrdiff_t  ybeg
+                           , std::ptrdiff_t  yend
+                           , std::ptrdiff_t  yinc
                            , int             offset
                            )
     {
@@ -297,7 +297,7 @@ private:
         // we have to swap bits
         Byte_Manipulator byte_manipulator;
 
-        for( int y = ybeg; y != yend; y += yinc )
+        for( std::size_t y = ybeg; y != yend; y += yinc )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
@@ -322,12 +322,12 @@ private:
     }
 
     template< typename View >
-    void read_data_15( const View& view
-                     , int         pitch
-                     , int         ybeg
-                     , int         yend
-                     , int         yinc
-                     , int         offset
+    void read_data_15( const View&    view
+                     , int            pitch
+                     , std::ptrdiff_t ybeg
+                     , std::ptrdiff_t yend
+                     , std::ptrdiff_t yinc
+                     , int            offset
                      )
     {
         byte_vector_t row( pitch );
@@ -382,7 +382,7 @@ private:
         typedef rgb8_image_t image_t;
         typedef image_t::view_t::x_iterator it_t;
 
-        for( int y = ybeg; y != yend; y += yinc )
+        for( std::size_t y = ybeg; y != yend; y += yinc )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
@@ -397,7 +397,7 @@ private:
             it_t end = beg + this->_settings._dim.x;
 
             byte_t* src = &row.front();
-            for( int i = 0 ; i < _info._width; ++i, src += 2 )
+            for( int32_t i = 0 ; i < _info._width; ++i, src += 2 )
             {
                 int p = ( src[1] << 8 ) | src[0];
 
@@ -425,9 +425,9 @@ private:
             >
     void read_data( const View_Dst& view
                   , int             pitch
-                  , int             ybeg
-                  , int             yend
-                  , int             yinc
+                  , std::ptrdiff_t  ybeg
+                  , std::ptrdiff_t  yend
+                  , std::ptrdiff_t  yinc
                   , int             offset
                   )
     {
@@ -445,7 +445,7 @@ private:
         typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
         typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
-        for( int y = ybeg; y != yend; y += yinc )
+        for( std::size_t y = ybeg; y != yend; y += yinc )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read

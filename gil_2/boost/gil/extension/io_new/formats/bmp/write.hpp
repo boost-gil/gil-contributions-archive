@@ -93,21 +93,21 @@ private:
         }
 */
 
-        int spn = ( view.width() * num_channels< View >::value + 3 ) & ~3;
-        int ofs = bmp_header_size + bmp_win32_info_size + entries * 4;
-        int siz = ofs + spn * view.height();
+        std::size_t spn = ( view.width() * num_channels< View >::value + 3 ) & ~3;
+        std::size_t ofs = bmp_header_size + bmp_win32_info_size + entries * 4;
+        std::size_t siz = ofs + spn * view.height();
 
         // write the BMP file header
         _out.write_int16( bmp_signature );
-        _out.write_int32( siz );
+        _out.write_int32( (uint32_t) siz );
         _out.write_int16( 0 );
         _out.write_int16( 0 );
-        _out.write_int32( ofs );
+        _out.write_int32( (uint32_t) ofs );
 
         // writes Windows information header
         _out.write_int32( bmp_win32_info_size );
-        _out.write_int32( view.width()  );
-        _out.write_int32( view.height() );
+        _out.write_int32( (uint32_t) view.width()  );
+        _out.write_int32( (uint32_t) view.height() );
         _out.write_int16( 1 );
         _out.write_int16( bpp );
         _out.write_int32( ct_rgb );
@@ -140,9 +140,14 @@ private:
                                        , spn
                                        );
 
-        for( int y = view.height() - 1; y > -1; --y  )
+        for( std::size_t y = view.height() - 1; y > -1; --y  )
         {
-            copy_pixels( subimage_view( view, 0, y, view.width(), 1 )
+            copy_pixels( subimage_view( view
+                                      , 0
+                                      , (int) y
+                                      , (int) view.width()
+                                      , 1
+                                      )
                        , row
                        );
 

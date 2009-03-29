@@ -1,7 +1,4 @@
-// pnm_test.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
+#include <fstream>
 
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/pnm_all.hpp>

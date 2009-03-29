@@ -1,7 +1,7 @@
-#include "stdafx.h"
-
 #define ADD_FS_PATH_SUPPORT
 #define ENABLE_GRAY_ALPHA
+
+#include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/extension/io_new/png_all.hpp>
 

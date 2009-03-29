@@ -34,7 +34,8 @@ struct row_buffer_helper
     typedef std::vector< element_t > buffer_t;
     typedef typename buffer_t::iterator iterator_t;
 
-    row_buffer_helper( int width, bool in_bytes )
+    row_buffer_helper( std::size_t width
+                     , bool        in_bytes )
     : _row_buffer( width )
     {}
 
@@ -63,8 +64,8 @@ struct row_buffer_helper< Pixel
     typedef Pixel pixel_type;
     typedef bit_aligned_pixel_iterator<pixel_type> iterator_t;
 
-    row_buffer_helper( int  width
-                     , bool in_bytes
+    row_buffer_helper( std::size_t width
+                     , bool        in_bytes
                      )
     : _c( ( width 
           * num_channels< pixel_type >::type::value
@@ -73,10 +74,10 @@ struct row_buffer_helper< Pixel
           >> 3 
         )
 
-    ,_r( width
-       * num_channels<pixel_type>::type::value
-       * channel_type<pixel_type>::type::num_bits 
-       - ( _c << 3 )
+    , _r( width
+        * num_channels<pixel_type>::type::value
+        * channel_type<pixel_type>::type::num_bits 
+        - ( _c << 3 )
        )
     {
         if( in_bytes )
@@ -106,8 +107,8 @@ private:
     // c = 18 bytes
     // r = 6 bits
 
-    int _c; // number of full bytes
-    int _r; // number of remaining bits
+    std::size_t _c; // number of full bytes
+    std::size_t _r; // number of remaining bits
 
     buffer_t _row_buffer;
 };
@@ -117,8 +118,8 @@ template< typename View
         >
 struct row_buffer_helper_view : row_buffer_helper< typename View::value_type >
 {
-    row_buffer_helper_view( int  width
-                          , bool in_bytes
+    row_buffer_helper_view( std::size_t width
+                          , bool        in_bytes
                           )
     :  row_buffer_helper< typename View::value_type >( width
                                                      , in_bytes
@@ -134,8 +135,8 @@ struct row_buffer_helper_view< View
                                                  >::type
                              > : row_buffer_helper< typename View::reference >
 {
-    row_buffer_helper_view( int  width
-                          , bool in_bytes
+    row_buffer_helper_view( std::size_t width
+                          , bool        in_bytes
                           ) 
     : row_buffer_helper< typename View::reference >( width
                                                    , in_bytes

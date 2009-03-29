@@ -5,8 +5,6 @@
  *
  **************************************************/
 
-#include "stdafx.h"
-
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 
 #include <boost/test/unit_test.hpp>

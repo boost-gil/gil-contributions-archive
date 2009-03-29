@@ -1,7 +1,6 @@
-#include "stdafx.h"
-
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 
+#include <boost/filesystem/convenience.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace std;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/extension/io_new/pnm_all.hpp>
 

@@ -1,7 +1,3 @@
-// tiff_test.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
 
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 #include <boost/gil/extension/io_new/png_all.hpp>
