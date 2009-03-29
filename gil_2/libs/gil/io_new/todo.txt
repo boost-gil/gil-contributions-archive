@@ -2,8 +2,6 @@ todo list
 
 * add doxygen comments to library interface
 
-* ask people to compile on linux
-
 * add dynamic io
 * fix read_and_convert_view( ... ) compilation issue
 * add planar bit_aligned image support - not so easy
@@ -11,3 +9,4 @@ todo list
 * incorporate Phil Endecott suggestions ( email 04/27/2008 )
 * also add John Femiani suggestions ( same time )
 * ran dos2unix on all files, since they have an unpleasant mix of CR/LF and LF
+* support tiled tiff

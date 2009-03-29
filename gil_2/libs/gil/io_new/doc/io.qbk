@@ -1,24 +1,46 @@
-BOOST::GIL::IO
+[library Boost.GIL.io
+    [authors [Henning, Christian] ]
+    [copyright 2009 Christian Henning]
+    [purpose
+        An generic, user-friendly interface for reading different image formats.
+    ]
+    [id gil.io]
+    [dirname gil/extension/io]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        <ulink url="http://www.boost.org/LICENSE_1_0.txt">
+            http://www.boost.org/LICENSE_1_0.txt
+        </ulink>)
+    ]
+]
 
-1. Overview
-2. Tutorial
-3. Using IO
-4. Reference
+[/ Links ]
+[def _BMP_Wiki_            [@http://en.wikipedia.org/wiki/BMP_file_format]]
+[def _JPEG_Wiki_           [@http://en.wikipedia.org/wiki/JPEG]]
+[def _JPEG_lib_            [@http://www.ijg.org/]]
+[def _PNG_Wiki_            [@http://en.wikipedia.org/wiki/Portable_Network_Graphics]]
+[def _PNG_Lib_             [@http://libpng.org/pub/png/libpng.html]]
+[def _PNM_Wiki_            [@http://en.wikipedia.org/wiki/Portable_anymap]]
+[def _TIFF_Wiki_           [@http://en.wikipedia.org/wiki/Tagged_Image_File_Format]]
+[def _TIFF_Lib_            [@http://www.remotesensing.org/libtiff/]]
+[def _TIFF_Base_Tags_      [@http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html]]
+[def _TIFF_Extension_Tags_ [@http://www.awaresystems.be/imaging/tiff/tifftags/extension.html]]
 
-1. Overview
------------
+[/ QuickBook Document version 1.0 ]
+
+[section Overview]
 This extension to boost::gil provides an easy to use interface for reading and writing
 various image formats. It also includes a framework for adding new formats.
 
 Please see section 3.3 for supported image formats. A basic tutorial is provided 
-in section 2.
+in section [link _Tutorial_ Tutorial].
 
-For adding new image formats please refer to section 3.4.
-
-1.1 Supported Platforms
------------------------
+For adding new image formats please refer to section [link _extenting_io_ Extending GIL::IO with new Formats].
+[h2 Supported Platforms]
 All platforms supoorted by boost which have a decent C++ compiler. Depending on the  
 image format one or more of the following image libraries might be needed:
+
     * libtiff
     * libjpeg
     * libpng
@@ -28,10 +50,10 @@ For instance, if the user only needs bmp support none of the above mentioned
 dependencies are required.
 
 There are more details available in this documentation on the image format dependencies. 
-Please see section 3.3.
+Please see section [link _Supported_Formats_ Supported Image Formats].
+[endsect]
 
-2. Tutorial
------------
+[section Tutorial]
 Thanks to modern C++ programming techniques the interface for this library
 is rather small and easy to use. In this tutorial I'll give you a short walkaround 
 on how to use this boost::gil extension. For more details please refer to section 3.
@@ -39,9 +61,7 @@ on how to use this boost::gil extension. For more details please refer to sectio
 Since this is an extension to boost::gil I expect the user to have some very basic
 understanding of the gil ( generic image library ). Please see here for the help.
 
-2.1. Header Files
-----------------------
-
+[h2 Header Files]
 Before we can read or write image one thing. The header files to be included all have 
 the same format. For instance, tiff_all.hpp will allow to read and write. Whereas, 
 tiff_read only allows for reading. If the user only wants to write jpeg's include
@@ -52,14 +72,14 @@ jpeg_write.hpp. All formats provide these three types of header files:
 
 xxx stands for image format.
 
-2.2. Reading An Image
-----------------------
-
+[h2 Reading An Image]
 Probably the most common case to read a tiff image can be done as follows:
 
-std::string filename( "image.tif" );
-rgb8_image_t img;
-read_image( file, img, tiff_tag() );
+    ``
+    std::string filename( "image.tif" );
+    rgb8_image_t img;
+    read_image( file, img, tiff_tag() );
+    ``
 
 The code would be same for all other image formats. The only thing that needs to
 change is the tag type ( tiff_tag ) in the read_image call.
@@ -73,74 +93,65 @@ counterparts, if the memory is already allocated.
 Sometimes the user only wants to read a subpart of an image, then the above call
 would look as follows:
 
-read_image( filename
-          , img
-          , image_read_settings< tiff_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
-          );
+    ``
+    read_image( filename
+              , img
+              , image_read_settings< tiff_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
+              );
+    ``
 
 The image_read_settings class will provide the user with image format independet 
 reading setting but can also serves as a pointer for format dependent settings. Please
-see the specific image format sections ( 3.3.x ) for more details.
+see the specific image format sections [link _Supported_Formats_] for more details.
 
-Sometimes, the user is only interested in reading the header information of an image.
-Here, the read_image_info() comes into play. 
-
-image_read_info< tiff_t > info = read_image_info( filename
-                                                , tiff_t()
-                                                );
-
-The image_read_info class keeps all the relevant information that the image header contains.
-It's highly image format dependent and though, more information can be found in section 3.3.
-
-2.3. Writing An Image
----------------------
-
+[h2 Writing An Image]
 Besides reading the information also writing is the second part of this boost::gil extension.
 Writing is a lot simpler than reading since an existing image view contains all the information.
 For instance writing an image can be done as follows:
 
-std::string filename( "image.tif" );
-rgb8_image_t img( 640, 480 );
-... // fill the image with some information
-write_view( filename
-          , view( img )
-          , tiff_tag()
-          );
+    ``
+    std::string filename( "image.tif" );
+    rgb8_image_t img( 640, 480 );
+    
+    // write data into image
+
+    write_view( filename
+              , view( img )
+              , tiff_tag()
+              );
+
+    ``
 
 The interface is similar to reading an image. To add image format specific parameter the user can use
 image_write_info class. For instance, a user can specify the jpeg quality when writing like this:
 
+    ``
+    std::string filename( "image.jpg" );
+    rgb8_image_t img( 640, 480 );
 
-std::string filename( "image.jpg" );
-rgb8_image_t img( 640, 480 );
+    // write data into image
 
-// write data into image
+    write_view( filename
+              , view( img )
+              , image_write_info< jpeg_tag >( 95 )
+              );
 
-write_view( filename
-          , view( img )
-          , image_write_info< jpeg_tag >( 95 )
-          );
-          
+    ``
+
 The above example will write an image where the jpeg quality is set to 95 percent.
+[endsect]
 
-
-3. Using IO
------------
-
-
-3.1 Read Interface
-------------------
-
+[section Using IO]
+[h2 Read Interface]
 As the Tutorial demonstrated there are a few ways to read images. Here is an enumeration of 
 all read functions with a short description:
+    * read_image - read into a gil image with no conversion. Memory is allocated.
+    * read_view  - read into a gil view with no conversion.
 
-* read_image - read into a gil image with no conversion. Memory is allocated.
-* read_view  - read into a gil view with no conversion.
+    * read_and_convert_image - read and convert into a gil image. Memory is allocated.
+    * read_and_convert_view  - read and convert into a gil view.
 
-* read_and_convert_image - read and convert into a gil image. Memory is allocated.
-* read_and_convert_view  - read and convert into a gil view.
-
-* read_image_info - read the image header.
+    * read_image_info - read the image header.
 
 Conversion in this context is necessary if the source ( file ) has an incompatible color space
 with the destination ( gil image type ). If that's the case the user has to use the xxx_and_convert_xxx
@@ -158,24 +169,25 @@ share settings for reading a partial image area. The first point describes the t
 coordinate whereas the second are the dimensions in x and y directions. Here an example of
 setting up partial read.
 
-read_image( filename
-          , img
-          , image_read_settings< tiff_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
-          );
+    ``
+    read_image( filename
+              , img
+              , image_read_settings< tiff_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
+              );
 
+    ``
 
 Each format supports reading just the header information, using read_image_info(). Please
 refer to the format specific sections under 3.3. A basic example follows:
 
-image_read_info< tiff_t > info = read_image_info( filename
-                                                , tiff_t()
-                                                );
+    ``
+    image_read_info< tiff_t > info = read_image_info( filename
+                                                    , tiff_t()
+                                                    );
 
+    ``
 
-
-3.2 Write Interface
--------------------
-
+[h2 Write Interface]
 There is only one function for writing out images, write_view. Similar to reading the first parameter is either
 a filename or a device. The filename can be anything from a c string, std::string, std::wstring, and a 
 boost::filesystem path. When using the path object the user needs to define the ADD_FS_PATH_SUPPORT compiler symbol 
@@ -185,16 +197,9 @@ The second parameter is an view object to image being written. The third and las
 an image_write_info< FormatTag > object containing more settings. One example for instance is the jpeg quality. 
 Refer to the format specific sections under 3.3. to have a list of all the possible settings.
 
-
-3.3. Supported Image Formats
-----------------------------
-
-3.3.1 BMP
----------
-
-For a general overview of the BMP image file format go to the following link.
-
-http://en.wikipedia.org/wiki/BMP_file_format
+[h2 Supported Image Formats]
+[h3 BMP]
+For a general overview of the BMP image file format go to the following _BMP_Wiki_.
 
 Please note, the code has not been tested on X Windows System variations
 of the BMP format which are usually referred to XBM and XPM formats.
@@ -209,16 +214,10 @@ Write: rgb8_image_t and, rgba8_image_t
 The lack of having an indexed image type in gil restricts the current interface to only
 write out non-indexed images. This is subject to change soon.
 
+[h3 JPEG]
+For a general overview of the JPEG image file format go to the following _JPEG_Wiki_.
 
-3.3.2 JPEG
-----------
-For a general overview of the JPEG image file format go to the following link.
-
-http://en.wikipedia.org/wiki/JPEG
-
-This jpeg extension is based on the libjpeg library which can be found here:
-
-http://www.ijg.org/
+This jpeg extension is based on the libjpeg library which can be found here, _JPEG_Lib_.
 
 The user has to make sure this library is properly installed. I strongly recommend the user
 to build the library yourself. It could potentially save you a lot of trouble.
@@ -232,15 +231,10 @@ Reading YCbCr or YCCK images is possible but might result in inaccuracies since 
 aren't available yet for gil. For now these color space are read as rgb images.
 This is subject to change soon.
 
-3.3.3 PNG
----------
-For a general overview of the PNG image file format go to the following link.
+[h3 PNG]
+For a general overview of the PNG image file format go to the following _PNG_Wiki_.
 
-http://en.wikipedia.org/wiki/Portable_Network_Graphics
-
-This png extension is based on the libpng, which can be found here:
-
-http://libpng.org/pub/png/libpng.html
+This png extension is based on the libpng, which can be found here, _PNG_Lib.
 
 The user has to make sure this library is properly installed. I strongly recommend the user
 to build the library yourself. It could potentially save you a lot of trouble.
@@ -253,11 +247,8 @@ Write: gray1, gray2, gray4, gray8, gray16, gray_alpha_8, gray_alpha_16, rgb8, rg
 For reading gray_alpa images the user has to enable the ENABLE_GRAY_ALPHA compiler switch. This color
 space is defined in the toolbox by using gray_alpha.hpp.
 
-3.3.4 PNM
----------
-For a general overview of the PNM image file format go to the following link.
-
-http://en.wikipedia.org/wiki/Portable_anymap
+[h3 PNM]
+For a general overview of the PNM image file format go to the following _PNM_Wiki_.
 
 No external library is needed for the pnm format. Both ascii and binary formats are supported.
 
@@ -268,15 +259,10 @@ Write: gray1, gray8, rgb8
 
 When reading a mono text image the data is read as a gray8 image.
 
-3.3.5 TIFF
-----------
-For a general overview of the PNM image file format go to the following link.
+[h3 TIFF]
+For a general overview of the PNM image file format go to the following _TIFF_Wiki_.
 
-http://en.wikipedia.org/wiki/Tagged_Image_File_Format
-
-This tiff extension is based on the libtiff, which can be found here:
-
-http://www.remotesensing.org/libtiff/
+This tiff extension is based on the libtiff, which can be found, _TIFF_Lib_.
 
 The user has to make sure this library is properly installed. I strongly recommend the user
 to build the library yourself. It could potentially save you a lot of trouble.
@@ -285,115 +271,109 @@ TIFF images can virtually encode all kinds of channel sizes representing various
 planar images are possible. For instance, rbg323 or gray7. The channels also can have specific formats, like
 integer values or floating point values. For a complete set of options please consult the following websites:
 
-http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
-http://www.awaresystems.be/imaging/tiff/tifftags/extension.html
+    * _TIFF_Base_Tags_
+    * _TIFF_Extension_Tags_
 
 The author of this extension is not claiming all tiff format are readable or writeable. This extension is
 likely to be a moving target adding new features with each new milestone.
 
-
-3.4 Extending GIL::IO with new Formats
---------------------------------------
-
+[h2 Extending GIL::IO with new Formats]
 Extending the gil::io with new formats is meant to be simple and straightforward. Before adding I would
 recommend to have a look at existing implementations and then trying to follow a couple of guidelines:
 
-* Create the following files for your new xxx format
-    * xxx_read.hpp // Only includes read code
-    * xxx_write.hpp // Only includes write code
-    * xxx_all.hpp // includes xxx_read.hpp and xxx_write.hpp
-* Add the code to the boost::gil::detail namespace
-* Create a tag type for the new format. Like this
-    struct xxx_tag : format_tag {};
+    * Create the following files for your new xxx format
+        * [c++] `xxx_read.hpp // Only includes read code`
+        * `xxx_write.hpp // Only includes write code`
+        * `xxx_all.hpp // includes xxx_read.hpp and xxx_write.hpp`
+    * Add the code to the [c++] `boost::gil::detail` namespace
+    * Create a tag type for the new format. Like this
+        ``
+        struct xxx_tag : format_tag {};
+        ``
+    * Create the image_read_info for the new format. It contains all the information that are
+      necessary to read an image. It should be filled and returned by the get_info() member of
+      the reader class. See below.
+      ``
+      template<> struct image_read_info< xxx_tag > {};
+      ``
 
-* Create the image_read_info for the new format. It contains all the information that are
-  necessary to read an image. It should be filled and returned by the get_info() member of
-  the reader class. See below.
+    * Create the image_write_info for the new format. It contains all the information that are
+      necessary to write an image.
+      ``
+      template<> struct image_write_info< xxx_tag > {};
+      ``
 
-    template<> struct image_read_info< xxx_tag > {};
-
-* Create the image_write_info for the new format. It contains all the information that are
-  necessary to write an image.
-  
-    template<> struct image_write_info< jpeg_tag > {};
-
-
-* Use the following reader skeleton as a start:
-
-template< typename Device
-        , typename ConversionPolicy
-        >
-class reader< Device
-            , xxx_tag
-            , ConversionPolicy
-            > 
-    : public reader_base< xxx_tag
-                        , ConversionPolicy
-                        >
-{
-private:
-
-    typedef typename ConversionPolicy::color_converter_type cc_t;
-
-public:
-
-    reader( Device& device )
-    : _io_dev( device )
-    {}
-
-    reader( Device&     device
-          , const cc_t& cc
-          )
-    : _io_dev( device )
-    , reader_base< xxx_tag
-                 , ConversionPolicy
-                 >( cc )
-    {}
-
-    image_read_info< xxx_tag > get_info()
+    * Use the following reader skeleton as a start:
+    ``
+    template< typename Device
+            , typename ConversionPolicy
+            >
+    class reader< Device
+                , xxx_tag
+                , ConversionPolicy
+                > 
+                : public reader_base< xxx_tag
+                                    , ConversionPolicy
+                                    >
     {
-        // your implementation here
-    }
+    private:
 
-    template< typename View >
-    void apply( const View& dst_view )
+        typedef typename ConversionPolicy::color_converter_type cc_t;
+
+    public:
+
+        reader( Device& device )
+        : _io_dev( device )
+        {}
+
+        reader( Device&     device
+              , const cc_t& cc
+              )
+        : _io_dev( device )
+        , reader_base< xxx_tag
+                     , ConversionPolicy
+                     >( cc )
+        {}
+
+        image_read_info< xxx_tag > get_info()
+        {
+            // your implementation here
+        }
+
+        template< typename View >
+        void apply( const View& dst_view )
+        {
+            // your implementation here
+        }
+    };
+    ``
+
+    * The writer skeleton:
+    ``
+    template< typename Device >
+    class writer< Device
+                , xxx_tag
+                > 
     {
-        // your implementation here
-    }
-};
+    public:
 
-* The writer skeleton:
-
-template< typename Device >
-class writer< Device
-            , xxx_tag
-            > 
-{
-public:
-
-    writer( Device & file )
+        writer( Device & file )
         : out(file)
-    {}
+        {}
 
-    template<typename View>
-    void apply( const View& view )
-    {
-        // your implementation here
-    }
+        template<typename View>
+        void apply( const View& view )
+        {
+            // your implementation here
+        }
 
-    template<typename View>
-    void apply( const View&                        view
-              , const image_write_info< xxx_tag >& info )
-    {
-        // your implementation here
-    }
-};
+        template<typename View>
+        void apply( const View&                        view
+                  , const image_write_info< xxx_tag >& info )
+        {
+            // your implementation here
+        }
+    };
+    ``
+[endsect]
 
-4. Reference
-------------
-
-TIFF websites: 
-[1] http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
-[2] http://www.awaresystems.be/imaging/tiff/tifftags/extension.html
-[2] http://www.remotesensing.org/libtiff/
-[3] http://www.libtiff.org/man/
