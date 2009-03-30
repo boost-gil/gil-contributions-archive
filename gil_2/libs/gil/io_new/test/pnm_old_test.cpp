@@ -3,12 +3,14 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/pnm_io_old.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
 namespace pnm_test {
 
-const string filename( "..\\test_images\\pnm\\rgb.pnm" );
+const string filename( pnm_in + "rgb.pnm" );
 
 BOOST_AUTO_TEST_CASE( pnm_read_dimensions_test )
 {
@@ -61,7 +63,7 @@ BOOST_AUTO_TEST_CASE( pnm_read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( pnm_write_view_test )
 {
     {
-        string filename( "..\\test\\pnm\\test4.pnm" );
+        string filename( pnm_out + "test4.pnm" );
 
         gray8_image_t img( 200, 200);
         pnm_write_view( filename, view( img ) );

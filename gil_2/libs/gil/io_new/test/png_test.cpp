@@ -7,6 +7,8 @@
 
 #include <boost/type_traits/is_same.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -14,10 +16,10 @@ typedef png_tag tag_t;
 
 namespace png_test {
 
+extern std::string filename;
+
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         image_read_info< png_tag > info = read_image_info( filename
                                                          , tag_t() );
@@ -48,8 +50,6 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 
 BOOST_AUTO_TEST_CASE( read_image_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgba8_image_t img;
         read_image( filename, img, tag_t() );
@@ -79,8 +79,6 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     }
 
     {
-        std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
         typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
         image_t img;
 
@@ -94,8 +92,6 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgb8_image_t img;
         read_and_convert_image( filename, img, tag_t() );
@@ -135,8 +131,6 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgba8_image_t img( 320, 240 );
         read_view( filename, view( img ), tag_t() );
@@ -159,8 +153,6 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 
 BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
-    std::string filename( "..\\test_images\\png\\wikipedia\\test.png" );
-
     {
         rgb8_image_t img( 320, 240 );
         read_and_convert_view( filename, view( img ), tag_t() );
@@ -188,14 +180,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
-        string filename( "..\\test\\png\\test1.png" );
+        string filename( png_out + "test1.png" );
 
         gray8_image_t img( 320, 240 );
         write_view( filename, view( img ), tag_t() );
     }
 
     {
-        string filename( "..\\test\\png\\test2.png" );
+        string filename( png_out + "test2.png" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
@@ -204,7 +196,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
-        string filename( "..\\test\\png\\test3.png" );
+        string filename( png_out + "test3.png" );
 
         FILE* file = fopen( filename.c_str(), "wb" );
         

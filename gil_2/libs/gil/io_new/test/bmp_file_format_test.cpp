@@ -3,6 +3,8 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 namespace fs = boost::filesystem;
@@ -32,10 +34,7 @@ struct my_color_converter
 
 BOOST_AUTO_TEST_CASE( my_file_format_test )
 {
-   string in ( "..\\test_images\\bmp\\" );
-   string out( "..\\test\\bmp\\" );
-
-   fs::path in_path = fs::system_complete( fs::path( in, fs::native ) );
+   fs::path in_path = fs::system_complete( fs::path( bmp_in, fs::native ) );
 
    if ( fs::is_directory( in_path ) )
    {
@@ -49,7 +48,7 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
             && ( fs::extension( dir_itr->path() ) == ".bmp" ))
          {
             rgb8_image_t img;
-            string filename = in + dir_itr->path().leaf();
+            string filename = bmp_in + dir_itr->path().leaf();
 
             try
             {
@@ -64,7 +63,7 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
                     read_and_convert_image( filename, img, tag_t() );
                 }
 
-                write_view( out + fs::basename( dir_itr->path() ) + ".bmp"
+                write_view( bmp_out + fs::basename( dir_itr->path() ) + ".bmp"
                           , view( img )
                           , tag_t()
                           );
@@ -77,7 +76,7 @@ BOOST_AUTO_TEST_CASE( my_file_format_test )
 
 BOOST_AUTO_TEST_CASE( partial_image_test )
 {
-    const std::string filename( "..\\test_images\\bmp\\rgb.bmp" );
+    const std::string filename( bmp_in + "rgb.bmp" );
 
     {
         rgba8_image_t img;
@@ -87,7 +86,7 @@ BOOST_AUTO_TEST_CASE( partial_image_test )
                   );
 
 
-        write_view( "..\\test\\bmp\\rgb_partial.bmp"
+        write_view( bmp_out + "rgb_partial.bmp"
                   , view( img )
                   , tag_t()
                   );

@@ -5,6 +5,8 @@
 
 #include <boost/type_traits/is_same.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -12,7 +14,7 @@ typedef bmp_tag tag_t;
 
 namespace bmp_test {
 
-const std::string filename( "..\\test_images\\bmp\\rgb.bmp" );
+const std::string filename( bmp_in + "rgb.bmp" );
 
 BOOST_AUTO_TEST_CASE( read_test )
 {

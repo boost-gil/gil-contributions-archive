@@ -150,8 +150,8 @@ private:
         typedef typename channel_traits< typename element_type< pixel_t >::type >::value_type channel_t;
 
         // write dimensions
-        tiff_image_width::type width   = src_view.width();
-        tiff_image_height::type height = src_view.height();
+        tiff_image_width::type  width  = (tiff_image_width::type)  src_view.width();
+        tiff_image_height::type height = (tiff_image_height::type) src_view.height();
 
         _io_dev.template set_property<tiff_image_width >( width  );
         _io_dev.template set_property<tiff_image_height>( height );
@@ -215,7 +215,7 @@ private:
                      );
 
             _io_dev.write_scaline( row
-                                 , y
+                                 , (uint32) y
                                  , 0
                                  );
 
@@ -245,7 +245,7 @@ private:
                      );
 
             _io_dev.write_scaline( row
-                                 , y
+                                 , (uint32) y
                                  , 0
                                  );
 

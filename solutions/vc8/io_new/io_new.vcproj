@@ -60,9 +60,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="jpeg.lib libpng_chh.lib zlib.lib libtiff.lib"
+				AdditionalDependencies="libjpeg.lib libpng_chh.lib zlib.lib libtiff.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\chh\image libs\debug;"
+				AdditionalLibraryDirectories="C:\chh\image libs\release;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -117,9 +117,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -135,7 +135,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libjpeg.lib libpng_chh.lib zlib.lib libtiff.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\chh\image libs\release;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -483,6 +485,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\paths.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_file_format_test.cpp"
 				>
 			</File>
@@ -519,6 +525,14 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool

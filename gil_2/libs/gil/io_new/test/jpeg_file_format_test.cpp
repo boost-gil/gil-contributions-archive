@@ -3,6 +3,8 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -12,7 +14,7 @@ namespace jpeg_test {
 
 BOOST_AUTO_TEST_CASE( jpeg_file_format_test )
 {
-    std::string filename( "..\\test_images\\jpg\\found online\\test.jpg" );
+    std::string filename( jpeg_in + "found online\\test.jpg" );
 
     {
         typedef rgb8_image_t image_t;
@@ -23,7 +25,7 @@ BOOST_AUTO_TEST_CASE( jpeg_file_format_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\jpg\\test4.jpg"
+        write_view( jpeg_out + "test4.jpg"
                   , view( img )
                   , tag_t()
                   );
@@ -32,7 +34,7 @@ BOOST_AUTO_TEST_CASE( jpeg_file_format_test )
 
 BOOST_AUTO_TEST_CASE( jpeg_dct_method_test )
 {
-    std::string filename( "..\\test_images\\jpg\\found online\\test.jpg" );
+    std::string filename( jpeg_in + "found online\\test.jpg" );
 
     {
         typedef rgb8_image_t image_t;
@@ -46,7 +48,7 @@ BOOST_AUTO_TEST_CASE( jpeg_dct_method_test )
                   , settings
                   );
 
-        write_view( "..\\test\\jpg\\test5.jpg"
+        write_view( jpeg_out + "test5.jpg"
                   , view( img )
                   , tag_t()
                   );

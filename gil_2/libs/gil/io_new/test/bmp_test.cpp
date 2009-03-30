@@ -7,6 +7,8 @@
 
 #include <boost/type_traits/is_same.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -14,7 +16,7 @@ typedef bmp_tag tag_t;
 
 namespace bmp_test {
 
-const std::string filename( "..\\test_images\\bmp\\rgb.bmp" );
+const std::string filename( bmp_in + "rgb.bmp" );
 
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
@@ -159,7 +161,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
-        string filename( "..\\test\\bmp\\test2.bmp" );
+        string filename( bmp_out + "test2.bmp" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
@@ -168,7 +170,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
-        string filename( "..\\test\\bmp\\test3.bmp" );
+        string filename( bmp_out + "test3.bmp" );
 
         FILE* file = fopen( filename.c_str(), "wb" );
         

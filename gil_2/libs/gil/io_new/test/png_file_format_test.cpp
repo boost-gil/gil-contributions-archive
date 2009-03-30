@@ -7,6 +7,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 namespace fs = boost::filesystem;
@@ -31,8 +33,7 @@ namespace png_test {
 
 BOOST_AUTO_TEST_CASE( file_format_test )
 {
-   string in ( "..\\test_images\\png\\PngSuite\\" );
-   string out( "..\\test\\png\\" );
+   string in ( png_in + "PngSuite\\" );
 
    fs::path in_path = fs::system_complete( fs::path( in, fs::native ) );
 
@@ -51,7 +52,7 @@ BOOST_AUTO_TEST_CASE( file_format_test )
             string filename = in + dir_itr->path().leaf();
             read_and_convert_image( filename, img, tag_t() );
 
-            write_view( out + fs::basename( dir_itr->path() ) + ".png"
+            write_view( png_out + fs::basename( dir_itr->path() ) + ".png"
                       , view( img )
                       , png_tag()
                       );

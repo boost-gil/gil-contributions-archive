@@ -12,6 +12,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -19,10 +21,10 @@ typedef tiff_tag tag_t;
 
 namespace tiff_test {
 
+extern std::string filename;
+
 BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
-    string filename( "..\\test_images\\tiff\\test.tif" );
-
     {
         image_read_info< tag_t > info = read_image_info( filename
                                                        , tag_t() );
@@ -54,8 +56,6 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
 
 BOOST_AUTO_TEST_CASE( read_image_test )
 {
-    string filename( "..\\test_images\\tiff\\test.tif" );
-
     {
         rgb8_image_t img;
         read_image( filename, img, tag_t() );
@@ -77,8 +77,6 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
-    string filename( "..\\test_images\\tiff\\test.tif" );
-
     {
         rgb8_image_t img;
         read_and_convert_image( filename, img, tag_t() );
@@ -100,8 +98,6 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
-    string filename( "..\\test_images\\tiff\\test.tif" );
-
     {
         rgb8_image_t img( 200, 133 );
         read_view( filename, view( img ), tag_t() );
@@ -117,8 +113,6 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 
 BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
-    string filename( "..\\test_images\\tiff\\test.tif" );
-
     {
         rgb8_image_t img( 200, 133 );
         read_and_convert_view( filename, view( img ), tag_t() );
@@ -135,7 +129,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
-        string filename( "..\\test\\tiff\\test1.tif" );
+        string filename( tiff_out + "test1.tif" );
 
         gray8_image_t img( 320, 240 );
         write_view( filename, view( img ), tiff_tag() );
@@ -147,7 +141,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
-        string filename( "..\\test\\tiff\\test2.tif" );
+        string filename( tiff_out + "test2.tif" );
 
         TIFF* file = TIFFOpen( filename.c_str(), "w" );
         

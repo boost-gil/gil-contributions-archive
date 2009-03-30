@@ -5,6 +5,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -15,12 +17,12 @@ BOOST_AUTO_TEST_CASE( write_test )
     // test writing all supported image types
     {
         rgb8_image_t img( 10, 10 );
-        write_view( "..\\test\\bmp\\write_test_rgb.bmp", view( img ), bmp_tag() );
+        write_view( bmp_out + "write_test_rgb.bmp", view( img ), bmp_tag() );
     }
 
     {
         rgba8_image_t img( 10, 10 );
-        write_view( "..\\test\\bmp\\write_test_rgba.bmp", view( img ), bmp_tag() );
+        write_view( bmp_out + "write_test_rgba.bmp", view( img ), bmp_tag() );
     }
 }
 

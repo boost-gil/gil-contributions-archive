@@ -3,12 +3,14 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/bmp_io_old.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
 namespace bmp_test {
 
-const std::string filename( "..\\test_images\\bmp\\rgb.bmp" );
+const std::string filename( bmp_in + "rgb.bmp" );
 
 BOOST_AUTO_TEST_CASE( bmp_read_dimensions_test )
 {
@@ -61,7 +63,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( bmp_write_view_test )
 {
     {
-        string filename( "..\\test\\bmp\\test4.bmp" );
+        string filename( bmp_out + "test4.bmp" );
 
         rgb8_image_t img( 127, 64 );
         bmp_write_view( filename, view( img ) );

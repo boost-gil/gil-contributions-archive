@@ -9,6 +9,8 @@
 #define ADD_FS_PATH_SUPPORT
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 using namespace boost::filesystem;
@@ -17,9 +19,10 @@ typedef jpeg_tag tag_t;
 
 namespace jpeg_test {
 
+extern std::string filename;
+
 BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
-    std::string filename( "..\\test_images\\jpg\\found online\\test.jpg" );
 
     {
         image_read_info< jpeg_tag > info = read_image_info( filename
@@ -63,8 +66,6 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
 
 BOOST_AUTO_TEST_CASE( read_image_test )
 {
-    std::string filename( "..\\test_images\\jpg\\found online\\test.jpg" );
-
     {
         rgb8_image_t img;
         read_image( filename, img, tag_t() );
@@ -111,8 +112,6 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
-    std::string filename( "..\\test_images\\jpg\\found online\\test.jpg" );
-
     {
         rgb8_image_t img;
         read_and_convert_image( filename, img, tag_t() );
@@ -128,8 +127,6 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
-    std::string filename( "..\\test_images\\jpg\\found online\\test.jpg" );
-
     {
         rgb8_image_t img( 136, 98 );
         read_view( filename, view( img ), tag_t() );
@@ -151,8 +148,6 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 }
 BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
-    std::string filename( "..\\test_images\\jpg\\found online\\test.jpg" );
-
     {
         rgb8_image_t img( 136, 98 );
         read_and_convert_view( filename, view( img ), tag_t() );
@@ -179,14 +174,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
-        string filename( "..\\test\\jpg\\test1.jpg" );
+        string filename( jpeg_out + "test1.jpg" );
 
         gray8_image_t img( 320, 240 );
         write_view( filename, view( img ), tag_t() );
     }
 
     {
-        string filename( "..\\test\\jpg\\test2.jpg" );
+        string filename( jpeg_out + "test2.jpg" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
@@ -195,7 +190,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
-        string filename( "..\\test\\jpg\\test3.jpg" );
+        string filename( jpeg_out + "test3.jpg" );
 
         FILE* file = fopen( filename.c_str(), "wb" );
         

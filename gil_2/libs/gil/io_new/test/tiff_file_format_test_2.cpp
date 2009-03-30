@@ -9,6 +9,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -19,7 +21,7 @@ namespace tiff_test {
 // 64K-colormap.tiff
 BOOST_AUTO_TEST_CASE( colormap_test )
 {
-    std::string filename( "..\\test_images\\tiff\\GraphicsMagick\\64K-colormap.tiff" );
+    std::string filename( tiff_in + "GraphicsMagick\\64K-colormap.tiff" );
 
     {
         image_read_info< tag_t > info = read_image_info( filename, tag_t() );
@@ -32,7 +34,7 @@ BOOST_AUTO_TEST_CASE( colormap_test )
                   , tag_t()
                   );
 
-        write_view( "..\\test\\tiff\\test40.tif"
+        write_view( tiff_out + "test40.tif"
                   , view( img )
                   , tiff_tag()
                   );

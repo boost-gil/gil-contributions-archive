@@ -7,6 +7,8 @@
 
 #include <boost/type_traits/is_same.hpp>
 
+#include "paths.hpp"
+
 using namespace std;
 using namespace boost::gil;
 
@@ -14,7 +16,7 @@ typedef pnm_tag tag_t;
 
 namespace pnm_test {
 
-const string filename( "..\\test_images\\pnm\\rgb.pnm" );
+const string filename( pnm_in + "rgb.pnm" );
 
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
@@ -76,7 +78,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         BOOST_CHECK_EQUAL( img.height(), 200 );
     }
 }
-/*
+
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
     {
@@ -159,14 +161,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
-        string filename( "..\\test\\pnm\\test1.pnm" );
+        string filename( pnm_out + "test1.pnm" );
 
         gray8_image_t img( 200, 200 );
         write_view( filename, view( img ), tag_t() );
     }
 
     {
-        string filename( "..\\test\\pnm\\test2.pnm" );
+        string filename( pnm_out + "test2.pnm" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
@@ -175,7 +177,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
-        string filename( "..\\test\\pnm\\test3.pnm" );
+        string filename( pnm_out + "test3.pnm" );
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
@@ -183,5 +185,5 @@ BOOST_AUTO_TEST_CASE( write_view_test )
         write_view( file, view( img ), tag_t() );
     }
 }
-*/
+
 } // namespace pnm_test

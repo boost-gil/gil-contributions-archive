@@ -61,15 +61,14 @@ public:
     void apply( const View&   view
               , const info_t& info )
     {
-        int width  = view.width();
-        int height = view.height();
+        std::size_t width  = view.width();
+        std::size_t height = view.height();
 
-        int num    = num_channels< View >::value;
-        int chn    = std::min( 3, num );
-        int bpp    = chn * 8;
-        int pitch  = chn * width;
-        int type   = ( num_channels<View>::value == 1 ) ? pnm_type_gray_bin : pnm_type_color_bin;
-
+        std::size_t num    = num_channels< View >::value;
+        std::size_t chn    = std::min( (std::size_t) 3, num );
+        std::size_t bpp    = chn * 8;
+        std::size_t pitch  = chn * width;
+        unsigned int type  = ( num_channels<View>::value == 1 ) ? pnm_type_gray_bin : pnm_type_color_bin;
 
         // write header
 
@@ -101,9 +100,9 @@ public:
                                    );
 
 
-        for( int y = 0; y < height; ++y )
+        for( std::size_t y = 0; y < height; ++y )
 		{
-            copy_pixels( subimage_view( view, 0, y, view.width(), 1 )
+            copy_pixels( subimage_view( view, 0, (int) y, (int) view.width(), 1 )
                        , row
                        );
 
