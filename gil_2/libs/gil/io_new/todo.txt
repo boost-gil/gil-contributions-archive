@@ -10,3 +10,7 @@ todo list
 * also add John Femiani suggestions ( same time )
 * ran dos2unix on all files, since they have an unpleasant mix of CR/LF and LF
 * support tiled tiff
+
+* png extension crashes when image is empty
+* cannot write in-memory buffer with tiff extension - no ostream_device
+  or istream_device specialization for tiff_tag. Is that possible, at all?
