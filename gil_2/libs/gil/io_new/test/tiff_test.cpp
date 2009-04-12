@@ -148,6 +148,14 @@ BOOST_AUTO_TEST_CASE( write_view_test )
         rgb8_image_t img( 320, 240 );
         write_view( file, view( img ), tag_t() );
     }
+
+    {
+        string filename( tiff_out + "test3.tif" );
+
+        image_write_info< tiff_tag > info;
+        rgb8_image_t img( 320, 240 );
+        write_view( filename, view( img ), info );
+    }
 }
 
 } // namespace tiff_test

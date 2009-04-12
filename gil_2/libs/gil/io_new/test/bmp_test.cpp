@@ -160,22 +160,31 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
+    rgb8_image_t img( 127, 64 );
+
     {
-        string filename( bmp_out + "test2.bmp" );
+        string filename( bmp_out + "test1.bmp" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
-        rgb8_image_t img( 127, 64 );
         write_view( out, view( img ), tag_t() );
+    }
+
+    {
+        string filename( bmp_out + "test2.bmp" );
+
+        FILE* file = fopen( filename.c_str(), "wb" );
+        
+        write_view( file, view( img ), tag_t() );
     }
 
     {
         string filename( bmp_out + "test3.bmp" );
 
+        image_write_info< bmp_tag > info;
+
         FILE* file = fopen( filename.c_str(), "wb" );
-        
-        rgb8_image_t img( 127, 64 );
-        write_view( file, view( img ), tag_t() );
+        write_view( file, view( img ), info );
     }
 }
 

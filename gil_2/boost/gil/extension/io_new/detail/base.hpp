@@ -49,8 +49,6 @@ template<typename FormatTag> struct is_format_tag : is_base_and_derived< format_
                                                                        , FormatTag
                                                                        > {};
 
-template<typename FormatTag> struct image_read_info;
-
 struct image_read_settings_base
 {
 protected:
@@ -73,8 +71,9 @@ public:
     point_t _dim;
 };
 
+template<typename FormatTag> struct image_read_info;
 template<typename FormatTag> struct image_read_settings;
-template<typename FormatTag> struct image_write_info;
+template<typename FormatTag, typename Log = detail::no_log > struct image_write_info;
 
 
 /**
@@ -114,6 +113,8 @@ struct read_support_true  { BOOST_STATIC_CONSTANT( bool, is_supported = true ); 
 struct read_support_false { BOOST_STATIC_CONSTANT( bool, is_supported = false ); };
 struct write_support_true { BOOST_STATIC_CONSTANT( bool, is_supported = true );  };
 struct write_support_false{ BOOST_STATIC_CONSTANT( bool, is_supported = false ); };
+
+class no_log {};
 
 } // namespace detail
 } // namespace gil

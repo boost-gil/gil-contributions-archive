@@ -100,6 +100,17 @@ struct image_read_settings< png_tag > : public image_read_settings_base
 template<>
 struct image_write_info<png_tag>
 {
+    image_write_info()
+    : _interlace_method( PNG_INTERLACE_NONE )
+    , _compression_method( PNG_COMPRESSION_TYPE_DEFAULT )
+    , _filter_method( PNG_FILTER_TYPE_DEFAULT )
+
+    , _gamma( 0 )
+    , _x_res( 0 )
+    , _y_res( 0 )
+    , _sbits( NULL )
+    {}
+
     png_interlace_method::type   _interlace_method;
     png_compression_method::type _compression_method;
     png_filter_method::type      _filter_method;

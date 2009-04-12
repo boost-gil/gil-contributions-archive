@@ -29,6 +29,7 @@ extern "C" {
 }
 
 #include "detail/base.hpp"
+#include "formats/tiff/log.hpp"
 
 namespace boost { namespace gil {
 
@@ -151,13 +152,22 @@ struct image_read_settings< tiff_tag > : public image_read_settings_base
 
 };
 
-template<>
-struct image_write_info< tiff_tag >
+template< typename Log >
+struct image_write_info< tiff_tag, Log >
 {
-   tiff_photometric_interpretation::type _photometric_interpretation;
-   tiff_compression::type                _compression;
-   tiff_orientation::type                _orientation;
-   tiff_planar_configuration::type       _planar_configuration;
+    image_write_info()
+    : _photometric_interpretation( PHOTOMETRIC_MINISBLACK )
+    , _compression               ( COMPRESSION_NONE       )
+    , _orientation               ( ORIENTATION_TOPLEFT    )
+    , _planar_configuration      ( PLANARCONFIG_CONTIG    )
+    {}
+
+    tiff_photometric_interpretation::type _photometric_interpretation;
+    tiff_compression::type                _compression;
+    tiff_orientation::type                _orientation;
+    tiff_planar_configuration::type       _planar_configuration;
+
+    Log                                   _log;
 };
 
 } // namespace gil

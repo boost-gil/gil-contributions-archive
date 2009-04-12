@@ -96,22 +96,25 @@ public:
 
         png_set_pHYs( _png_ptr
                     , _info_ptr
-                    , &info._x_res
-                    , &info._y_res
+                    , info._x_res
+                    , info._y_res
                     , PNG_RESOLUTION_METER
                     );
 
-        png_set_sBIT( _png_ptr
-                    , _info_ptr
-                    , const_cast< png_color_8* >( &info._sbits )
-                    );
+        if( info._sbits )
+        {
+            png_set_sBIT( _png_ptr
+                        , _info_ptr
+                        , info._sbits
+                        );
+        }
 
         png_write_info( _png_ptr
                       ,_info_ptr
                       );
 
         write_view( view
-                  , is_bit_aligned< View >::type );
+                  , is_bit_aligned< View >::type() );
     }
 
     template< typename View >

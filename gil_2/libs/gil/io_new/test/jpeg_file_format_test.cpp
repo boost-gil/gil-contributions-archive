@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE( jpeg_file_format_test )
                   , tag_t()
                   );
 
-        write_view( jpeg_out + "test4.jpg"
+        write_view( jpeg_out + "test5.jpg"
                   , view( img )
                   , tag_t()
                   );
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( jpeg_dct_method_test )
                   , settings
                   );
 
-        write_view( jpeg_out + "test5.jpg"
+        write_view( jpeg_out + "test6.jpg"
                   , view( img )
                   , tag_t()
                   );

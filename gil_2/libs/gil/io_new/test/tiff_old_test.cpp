@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( tiff_write_view_test )
 {
     {
-        string filename( tiff_out + "test3.tif" );
+        string filename( tiff_out + "test4.tif" );
 
         gray8_image_t img( 320, 240 );
         tiff_write_view( filename, view( img ) );

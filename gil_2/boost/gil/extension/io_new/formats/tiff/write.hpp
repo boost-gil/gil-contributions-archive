@@ -25,6 +25,7 @@ extern "C" {
 }
 
 #include <algorithm>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <boost/static_assert.hpp>
@@ -93,15 +94,15 @@ template<> struct photometric_interpretation< rgb_t  > : public boost::mpl::int_
 template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
 template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
 
-
-template < typename Device >
+template < typename Device, typename Log >
 class writer< Device
             , tiff_tag
+            , Log
             > 
 {
 public:
 
-    typedef image_write_info<tiff_tag> info_t;
+    typedef image_write_info<tiff_tag, Log> info_t;
 
     writer( Device& dev )
     : _io_dev( dev ) {}
@@ -119,11 +120,6 @@ public:
         // will assume PHOTOMETRIC_MINISBLACK for gray_t images and PHOTOMETRIC_RGB
         // for rgb_t images.
         info._photometric_interpretation = photometric_interpretation< color_space_t >::value;
-
-        info._compression = COMPRESSION_LZW;
-        info._orientation = ORIENTATION_TOPLEFT;
-
-        info._planar_configuration = PLANARCONFIG_CONTIG;
 
         write_view( view
                   , info );
@@ -252,8 +248,6 @@ private:
             // @todo: do optional bit swapping here if you need to...
         }
     }
-
-private:
 
     Device& _io_dev;
 };

@@ -203,6 +203,15 @@ BOOST_AUTO_TEST_CASE( write_view_test )
         rgb8_image_t img( 320, 240 );
         write_view( file, view( img ), tag_t() );
     }
+
+    {
+        string filename( png_out + "test4.png" );
+        FILE* file = fopen( filename.c_str(), "wb" );
+
+        image_write_info< png_tag > info;
+        rgb8_image_t img( 320, 240 );
+        write_view( file, view( img ), info );
+    }
 }
 
 } // namespace png_test

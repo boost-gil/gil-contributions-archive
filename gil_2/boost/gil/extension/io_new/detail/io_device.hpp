@@ -325,6 +325,7 @@ private:
 /**
  * Output stream device
  */
+template< typename FormatTag >
 class ostream_device
 {
 public:
@@ -460,8 +461,9 @@ struct is_adaptable_input_device< FormatTag
  * Should be replaced by an external facility in the future.
  */
 template<typename IODevice> struct is_output_device : mpl::false_{};
-template<typename FormatTag> struct is_output_device<file_stream_device< FormatTag > > : mpl::true_{};
-template<> struct is_output_device<ostream_device> : mpl::true_{};
+
+template< typename FormatTag > struct is_output_device< file_stream_device< FormatTag > > : mpl::true_{};
+template< typename FormatTag > struct is_output_device< ostream_device    < FormatTag > > : mpl::true_{};
 
 template<typename FormatTag, typename IODevice,typename D=void> struct is_adaptable_output_device : mpl::false_{};
 template<typename FormatTag, typename T> struct is_adaptable_output_device<FormatTag, T,
@@ -469,7 +471,7 @@ template<typename FormatTag, typename T> struct is_adaptable_output_device<Forma
     >
   : mpl::true_
 {
-    typedef ostream_device device_type;
+    typedef ostream_device< FormatTag > device_type;
 };
 
 template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,void>
@@ -479,7 +481,7 @@ template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,v
 };
 
 template<typename Device, typename FormatTag, typename ConversionPolicy> class reader;
-template<typename Device, typename FormatTag> class writer;
+template<typename Device, typename FormatTag, typename Log = no_log> class writer;
 
 } // namespace detail
 } // namespace gil

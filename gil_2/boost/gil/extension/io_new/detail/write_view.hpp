@@ -76,7 +76,7 @@ void write_view( Device&          device
 {
     typedef typename detail::is_adaptable_output_device< FormatTag
                                                        , Device
-                                                       >::device_type dev_t;                                               
+                                                       >::device_type dev_t;
     dev_t dev( device );
 
     write_view( dev
@@ -116,11 +116,12 @@ void write_view( const String&    file_name
 template< typename Device
         , typename View
         , typename FormatTag
+        , typename Log
         > 
 inline
 void write_view( Device&                            device
                , const View&                        view
-               , const image_write_info<FormatTag>& info
+               , const image_write_info<FormatTag, Log>& info
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
                                                                         , typename is_format_tag< FormatTag >::type
                                                                         , typename is_write_supported< typename get_pixel_type< View >::type
@@ -132,6 +133,7 @@ void write_view( Device&                            device
 {
     detail::writer< Device
                   , FormatTag
+                  , Log
                   > writer( device );
 
     writer.apply( view
@@ -141,11 +143,12 @@ void write_view( Device&                            device
 template< typename Device
         , typename View
         , typename FormatTag
+        , typename Log
         > 
 inline
 void write_view( Device&                              device
                , const View&                          view
-               , const image_write_info< FormatTag >& info
+               , const image_write_info< FormatTag, Log >& info
                , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
                                                                                                                            , Device
                                                                                                                            >::type
@@ -170,11 +173,12 @@ void write_view( Device&                              device
 template< typename String
         , typename View
         , typename FormatTag
+        , typename Log
         > 
 inline
 void write_view( const String&                        file_name
                , const View&                          view
-               , const image_write_info< FormatTag >& info
+               , const image_write_info< FormatTag, Log >& info
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        , typename is_write_supported< typename get_pixel_type< View >::type

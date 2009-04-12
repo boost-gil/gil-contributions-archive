@@ -59,6 +59,9 @@ public:
     void apply( const View&                        view
               , const image_write_info< bmp_tag >& info )
     {
+        // Add code here, once image_write_info< bmp_tag > isn't empty anymore.
+
+        write( view );
     }
 
 private:

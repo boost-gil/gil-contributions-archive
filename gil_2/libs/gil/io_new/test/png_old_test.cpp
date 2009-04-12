@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( png_read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( png_write_view_test )
 {
     {
-        string filename( png_out + "test1.png" );
+        string filename( png_out + "test5.png" );
 
         gray8_image_t img( 320, 240 );
         png_write_view( filename, view( img ) );
