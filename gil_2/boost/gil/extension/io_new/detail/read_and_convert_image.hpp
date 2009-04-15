@@ -113,7 +113,7 @@ void read_and_convert_image( const String&                           file_name
                            )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
-                                                  , detail::file_stream_device< FormatTag >::read_tag()
+                                                  , typename detail::file_stream_device< FormatTag >::read_tag()
                                                   );
 
     read_and_convert_image( device
