@@ -24,13 +24,13 @@
 namespace boost { namespace gil { namespace detail {
 
 template< typename Channel >
-int format_value( boost::mpl::true_ ) // is_bit_aligned
+int format_value( mpl::true_ ) // is_bit_aligned
 {
     return SAMPLEFORMAT_UINT;
 }
 
 template< typename Channel >
-int format_value( boost::mpl::false_ ) // is_bit_aligned
+int format_value( mpl::false_ ) // is_bit_aligned
 {
     if( is_unsigned< Channel >::value )
     {
@@ -62,7 +62,7 @@ bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // 
     typedef typename channel_traits< 
                 typename element_type< pixel_t >::type >::value_type channel_t;
 
-    unsigned int s = boost::gil::detail::unsigned_integral_num_bits< channel_t >::value;
+    unsigned int s = detail::unsigned_integral_num_bits< channel_t >::value;
 
     return ( s == channel_sizes[0] );
 }
@@ -79,7 +79,7 @@ bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // 
     typedef channel_traits< element_type< ref_t >::type >::value_type channel_t;
     channel_t c;
 
-    unsigned int s = boost::gil::detail::unsigned_integral_num_bits< channel_t >::value;
+    unsigned int s = detail::unsigned_integral_num_bits< channel_t >::value;
 
     return ( s == channel_sizes[0] );
 }
@@ -134,7 +134,7 @@ template< typename View >
 bool is_allowed( unsigned int                       src_n // num channels
                , const std::vector< unsigned int >& src_s // array of channel sizes
                , unsigned int                       src_f // channel format
-               , boost::mpl::true_                        // is read_and_no_convert
+               , mpl::true_                               // is read_and_no_convert
                )
 {
     typedef typename View::value_type pixel_t;
@@ -163,7 +163,7 @@ template< typename View >
 bool is_allowed( unsigned int                       src_n // num channels
                , const std::vector< unsigned int >& src_s // array of channel sizes
                , unsigned int                       src_f // channel format
-               , boost::mpl::false_                       // is read_and_convert
+               , mpl::false_                              // is read_and_convert
                )
 {
     return true;

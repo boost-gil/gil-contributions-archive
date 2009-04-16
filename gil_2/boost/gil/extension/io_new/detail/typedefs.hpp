@@ -40,15 +40,15 @@ typedef scoped_channel_value< double, double_zero, double_one > bits64f;
 typedef unsigned char byte_t;
 typedef std::vector< byte_t > byte_vector_t;
 
-typedef boost::gil::point2< std::ptrdiff_t > point_t;
+typedef point2< std::ptrdiff_t > point_t;
 
 } // namespace gil
 } // namespace boost
 
 namespace boost { 
 
-template<> struct is_floating_point< boost::gil::bits32f > : mpl::true_ {};
-template<> struct is_floating_point< boost::gil::bits64f > : mpl::true_ {};
+template<> struct is_floating_point< gil::bits32f > : mpl::true_ {};
+template<> struct is_floating_point< gil::bits64f > : mpl::true_ {};
 
 } // namespace boost
 

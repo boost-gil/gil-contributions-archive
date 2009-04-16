@@ -163,20 +163,16 @@ struct gen_chan_ref
 
 // bit_aligned_pixel_reference
 template <typename B, typename C, typename L, bool M>  
-struct channel_type<bit_aligned_pixel_reference<B,C,L,M> > 
-	: boost::lazy_enable_if< 
-		is_homogeneous<bit_aligned_pixel_reference<B,C,L,M> >,
-		gen_chan_ref<B,C,L,M>
-		>
-{};
+struct channel_type< bit_aligned_pixel_reference<B,C,L,M> > 
+	: lazy_enable_if< is_homogeneous< bit_aligned_pixel_reference< B, C, L, M > >
+                    , gen_chan_ref< B, C, L, M >
+		            > {};
 
 template <typename B, typename C, typename L, bool M>  
 struct channel_type<const bit_aligned_pixel_reference<B,C,L,M> > 
-	: boost::lazy_enable_if< 
-		is_homogeneous<bit_aligned_pixel_reference<B,C,L,M> >,
-		gen_chan_ref<B,C,L,M>
-		>
-{};
+	: lazy_enable_if< is_homogeneous< bit_aligned_pixel_reference< B, C, L, M > >
+	                , gen_chan_ref< B, C, L, M >
+		            > {};
 
 template <typename B, typename C, typename L>  
 struct gen_chan_ref_p
@@ -196,22 +192,22 @@ struct channel_type< packed_pixel< BitField
                                  , ChannelRefVec
                                  , Layout
                                  >
-                   > : boost::lazy_enable_if< is_homogeneous< packed_pixel< BitField
-                                                                          , ChannelRefVec
-                                                                          , Layout
-                                                                          >
-                                                             >
-                                            , gen_chan_ref_p< BitField
-                                                            , ChannelRefVec
-                                                            , Layout
-                                                            >
-		                                    > {};
+                   > : lazy_enable_if< is_homogeneous< packed_pixel< BitField
+                                                                   , ChannelRefVec
+                                                                   , Layout
+                                                                   >
+                                                     >
+                                     , gen_chan_ref_p< BitField
+                                                     , ChannelRefVec
+                                                     , Layout
+                                                     >
+		                             > {};
 
 template <typename B, typename C, typename L>  
 struct channel_type< const packed_pixel< B, C, L > > 
-	: boost::lazy_enable_if< is_homogeneous<packed_pixel< B, C, L> >
-	                       , gen_chan_ref_p<B,C,L>
-		                   >
+	: lazy_enable_if< is_homogeneous<packed_pixel< B, C, L > >
+	                , gen_chan_ref_p< B, C, L >
+		            >
 {};
 
 /// get_pixel_type metafunction

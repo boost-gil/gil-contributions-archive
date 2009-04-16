@@ -44,7 +44,7 @@ template <typename PixelReference>
 struct my_interleaved_pixel_iterator_type_from_pixel_reference
 {
 private:
-	typedef typename boost::remove_reference< PixelReference >::type::value_type pixel_t;
+	typedef typename remove_reference< PixelReference >::type::value_type pixel_t;
 public:
 	typedef typename iterator_type_from_pixel< pixel_t
 	                                         , false
@@ -89,10 +89,10 @@ template<> struct sample_format<bits16s> : public mpl::int_<SAMPLEFORMAT_INT> {}
 template<> struct sample_format<bits32s> : public mpl::int_<SAMPLEFORMAT_INT> {};
 
 template <typename Channel> struct photometric_interpretation {};
-template<> struct photometric_interpretation< gray_t > : public boost::mpl::int_< PHOTOMETRIC_MINISBLACK > {};
-template<> struct photometric_interpretation< rgb_t  > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
-template<> struct photometric_interpretation< rgba_t > : public boost::mpl::int_< PHOTOMETRIC_RGB        > {};
-template<> struct photometric_interpretation< cmyk_t > : public boost::mpl::int_< PHOTOMETRIC_SEPARATED  > {};
+template<> struct photometric_interpretation< gray_t > : public mpl::int_< PHOTOMETRIC_MINISBLACK > {};
+template<> struct photometric_interpretation< rgb_t  > : public mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< rgba_t > : public mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< cmyk_t > : public mpl::int_< PHOTOMETRIC_SEPARATED  > {};
 
 template < typename Device, typename Log >
 class writer< Device

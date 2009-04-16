@@ -199,9 +199,9 @@ private:
     {
 /*
         /// @todo
-        if( !is_allowed< View >( boost::is_same< ConversionPolicy
-                                               , read_and_no_convert
-                                               >::type()
+        if( !is_allowed< View >( is_same< ConversionPolicy
+                                        , read_and_no_convert
+                                        >::type()
                                ))
         {
             throw std::runtime_error( "Image type aren't compatible." );

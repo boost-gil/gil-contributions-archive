@@ -116,7 +116,7 @@ public:
     }
 
     /// Reads byte
-    boost::uint8_t read_int8() throw()
+    uint8_t read_int8() throw()
     {
         byte_t m[1];
 
@@ -125,7 +125,7 @@ public:
     }
 
     /// Reads 16 bit little endian integer
-    boost::uint16_t read_int16() throw()
+    uint16_t read_int16() throw()
     {
         byte_t m[2];
 
@@ -134,7 +134,7 @@ public:
     }
 
     /// Reads 32 bit little endian integer
-    boost::uint32_t read_int32() throw()
+    uint32_t read_int32() throw()
     {
         byte_t m[4];
 
@@ -159,14 +159,14 @@ public:
     }
 
     /// Writes byte
-    void write_int8( boost::uint8_t x ) throw()
+    void write_int8( uint8_t x ) throw()
     {
 	    byte_t m[1] = { x };
 	    write(m);
     }
 
     /// Writes 16 bit little endian integer
-    void write_int16( boost::uint16_t x ) throw()
+    void write_int16( uint16_t x ) throw()
     {
 	    byte_t m[2];
 
@@ -177,7 +177,7 @@ public:
     }
 
     /// Writes 32 bit little endian integer
-    void write_int32( boost::uint32_t x ) throw()
+    void write_int32( uint32_t x ) throw()
     {
 	    byte_t m[4];
 
@@ -275,7 +275,7 @@ public:
     }
 
     /// Reads byte
-    boost::uint8_t read_int8() throw()
+    uint8_t read_int8() throw()
     {
         byte_t m[1];
 
@@ -284,7 +284,7 @@ public:
     }
 
     /// Reads 16 bit little endian integer
-    boost::uint16_t read_int16() throw()
+    uint16_t read_int16() throw()
     {
         byte_t m[2];
 
@@ -293,7 +293,7 @@ public:
     }
 
     /// Reads 32 bit little endian integer
-    boost::uint32_t read_int32() throw()
+    uint32_t read_int32() throw()
     {
         byte_t m[4];
 
@@ -370,14 +370,14 @@ public:
     }
 
     /// Writes byte
-    void write_int8( boost::uint8_t x ) throw()
+    void write_int8( uint8_t x ) throw()
     {
 	    byte_t m[1] = { x };
 	    write(m);
     }
 
     /// Writes 16 bit little endian integer
-    void write_int16( boost::uint16_t x ) throw()
+    void write_int16( uint16_t x ) throw()
     {
 	    byte_t m[2];
 
@@ -388,7 +388,7 @@ public:
     }
 
     /// Writes 32 bit little endian integer
-    void write_int32( boost::uint32_t x ) throw()
+    void write_int32( uint32_t x ) throw()
     {
 	    byte_t m[4];
 

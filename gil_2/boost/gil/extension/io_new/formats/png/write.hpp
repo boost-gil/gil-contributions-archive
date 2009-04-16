@@ -114,7 +114,7 @@ public:
                       );
 
         write_view( view
-                  , is_bit_aligned< View >::type() );
+                  , typename is_bit_aligned< View >::type() );
     }
 
     template< typename View >
@@ -123,7 +123,7 @@ public:
         typedef png_write_support< typename kth_semantic_element_type< typename View::value_type
                                                                      , 0
                                                                      >::type
-                                 , typename color_space_type<View>::type
+                                 , typename color_space_type< View >::type
                                  > png_rw_info;
 
         png_set_IHDR( _png_ptr
@@ -145,7 +145,7 @@ public:
 private:
     template<typename View>
     void write_view( const View& view
-                   ,  boost::mpl::false_ // is bit aligned
+                   ,  mpl::false_       // is bit aligned
                    )
     {
         typedef png_write_support< typename channel_type<View>::type
@@ -181,7 +181,7 @@ private:
 
     template<typename View>
     void write_view( const View& view
-                   , boost::mpl::true_ // is bit aligned
+                   , mpl::true_         // is bit aligned
                    ) 
     {
         typedef png_write_support< typename kth_semantic_element_type< typename View::value_type

@@ -101,9 +101,9 @@ struct tiff_host_computer : tiff_property_base< std::string, TIFFTAG_HOSTCOMPUTE
 
 struct tiff_color_map
 {
-   typedef boost::uint16_t* red_t;
-   typedef boost::uint16_t* green_t;
-   typedef boost::uint16_t* blue_t;
+   typedef uint16_t* red_t;
+   typedef uint16_t* green_t;
+   typedef uint16_t* blue_t;
 
    static const unsigned int tag = TIFFTAG_COLORMAP;
 };

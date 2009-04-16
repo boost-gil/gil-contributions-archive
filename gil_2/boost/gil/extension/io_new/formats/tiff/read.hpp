@@ -163,9 +163,9 @@ public:
             // the tiff type need to compatible. Which means:
             // color_spaces_are_compatible && channels_are_pairwise_compatible
 
-            typedef typename boost::is_same< ConversionPolicy
-                                           , read_and_no_convert
-                                           >::type is_read_and_convert_t;
+            typedef typename is_same< ConversionPolicy
+                                    , read_and_no_convert
+                                    >::type is_read_and_convert_t;
 
             if( !is_allowed< View >( this->_info._samples_per_pixel
                                    , channel_sizes
@@ -207,7 +207,7 @@ private:
 
       read_palette_image( dst_view
                         , view( indices )
-                        , boost::is_same< View, rgb16_view_t >::type() );
+                        , is_same< View, rgb16_view_t >::type() );
    }
 
    template< typename View
@@ -215,7 +215,7 @@ private:
            >
    void read_palette_image( const View&         dst_view
                           , const Indices_View& indices_view
-                          , boost::mpl::true_   // is View rgb16_view_t
+                          , mpl::true_   // is View rgb16_view_t
                           )
    {
       tiff_color_map::red_t   red   = NULL;
@@ -261,7 +261,7 @@ private:
    inline
    void read_palette_image( const View&         dst_view
                           , const Indices_View& indices_view
-                          , boost::mpl::false_  // is View rgb16_view_t
+                          , mpl::false_  // is View rgb16_view_t
                           )
    {
       io_error( "User supplied image type must be rgb16_image_t." );

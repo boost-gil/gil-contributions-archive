@@ -75,15 +75,15 @@ public:
         // Add a white space at each string so read_int() can decide when a numbers ends.
 
         std::string str( "P" );
-        str += boost::lexical_cast< std::string >( type ) + std::string( " " );
+        str += lexical_cast< std::string >( type ) + std::string( " " );
         _out.print_line( str );
 
         str.clear();
-        str += boost::lexical_cast< std::string >( width ) + std::string( " " );
+        str += lexical_cast< std::string >( width ) + std::string( " " );
         _out.print_line( str );
 
         str.clear();
-        str += boost::lexical_cast< std::string >( height ) + std::string( " " );
+        str += lexical_cast< std::string >( height ) + std::string( " " );
         _out.print_line( str );
 
         _out.print_line( "255 ");

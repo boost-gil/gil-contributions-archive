@@ -38,7 +38,7 @@ struct mirror_bits
 // have proven it.
 template< typename Buffer >
 struct mirror_bits< Buffer
-                  , boost::mpl::true_
+                  , mpl::true_
                   >
 {
    mirror_bits()
@@ -56,12 +56,12 @@ struct mirror_bits< Buffer
    {
         for_each( buf.begin()
                 , buf.end()
-                , boost::bind( &mirror_bits< Buffer
-                                           , boost::mpl::true_
-                                           >::lookup
-                             , *this
-                             , _1
-                             )
+                , bind( &mirror_bits< Buffer
+                                    , mpl::true_
+                                    >::lookup
+                       , *this
+                       , _1
+                       )
                 );
    }
 
@@ -87,7 +87,7 @@ private:
  
 private:
  
-    boost::array< byte_t, 256 > _lookup;
+    array< byte_t, 256 > _lookup;
 };
 
 
