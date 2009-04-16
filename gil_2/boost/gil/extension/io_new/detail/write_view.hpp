@@ -40,12 +40,12 @@ void write_view( Device&          device
                , const View&      view
                , const FormatTag& tag
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
-                                                                        , typename is_format_tag< FormatTag >::type
-                                                                        , typename is_write_supported< typename get_pixel_type< View >::type
-                                                                                                     , FormatTag
-                                                                                                     >::type
-                                                                        >::type
-                                                    >::type* ptr = 0
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                    , FormatTag
+                                                                                    >::type
+                                                       >::type
+                                   >::type* ptr = 0
                )
 {
     detail::writer< Device

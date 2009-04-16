@@ -10,6 +10,9 @@
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <fstream>
+#include <sstream>
+
 #include <boost/test/unit_test.hpp>
 
 #include "paths.hpp"
@@ -34,13 +37,12 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
-        // An ifstream cannot be used to construct a device_type.
-        // There is no way to get a TIFF* from a ifstream.
+        ifstream in( filename.c_str(), ios::binary );
+        image_read_info< tag_t > info = read_image_info( in
+                                                       , tag_t() );
 
-        //ifstream in( filename.c_str(), ios::in | ios::binary );
-        //image_read_info< tag_t > info = read_image_info( in
-        //                                               , tag_t() );
-
+        BOOST_CHECK_EQUAL( info._width , 200 );
+        BOOST_CHECK_EQUAL( info._height, 133 );
     }
 
     {
@@ -59,6 +61,17 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     {
         rgb8_image_t img;
         read_image( filename, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
+    }
+
+    {
+
+        ifstream in( filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+        read_image( in, img, tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 200 );
         BOOST_CHECK_EQUAL( img.height(), 133 );
@@ -86,6 +99,16 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     }
 
     {
+        ifstream in( filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+        read_and_convert_image( in, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
+    }
+
+    {
         TIFF* file = TIFFOpen( filename.c_str(), "r" );
 
         rgb8_image_t img;
@@ -104,6 +127,16 @@ BOOST_AUTO_TEST_CASE( read_view_test )
     }
 
     {
+        ifstream in( filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+        read_view( in, view( img ), tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
+    }
+
+    {
         TIFF* file = TIFFOpen( filename.c_str(), "r" );
 
         rgb8_image_t img( 200, 133 );
@@ -119,6 +152,16 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
     }
 
     {
+        ifstream in( filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+        read_and_convert_view( in, view( img ), tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 200 );
+        BOOST_CHECK_EQUAL( img.height(), 133 );
+    }
+
+    {
         TIFF* file = TIFFOpen( filename.c_str(), "r" );
 
         rgb8_image_t img( 200, 133 );
@@ -128,34 +171,64 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
+    rgb8_image_t img( 320, 240 );
+
     {
-        string filename( tiff_out + "test1.tif" );
+        string filename( tiff_out + "write_test_string.tif" );
 
         gray8_image_t img( 320, 240 );
         write_view( filename, view( img ), tiff_tag() );
     }
 
     {
-        // An ofstream cannot be used to construct a device_type.
-        // There is no way to get a TIFF* from a ofstream.
+        string filename( tiff_out + "write_test_ofstream.tif" );
+
+        ofstream out( filename.c_str(), ios_base::binary );
+        write_view( out, view( img ), tag_t() );
     }
 
     {
-        string filename( tiff_out + "test2.tif" );
+        string filename( tiff_out + "write_test_tiff.tif" );
 
         TIFF* file = TIFFOpen( filename.c_str(), "w" );
         
-        rgb8_image_t img( 320, 240 );
         write_view( file, view( img ), tag_t() );
     }
 
     {
-        string filename( tiff_out + "test3.tif" );
+        string filename( tiff_out + "write_test_info.tif" );
 
         image_write_info< tiff_tag > info;
-        rgb8_image_t img( 320, 240 );
         write_view( filename, view( img ), info );
     }
+}
+
+BOOST_AUTO_TEST_CASE( stream_test )
+{
+    // 1. Read an image.
+    ifstream in( filename.c_str(), ios::binary );
+
+    rgb8_image_t img;
+    read_image( in, img, tag_t() );
+
+    // 2. Write image to in-memory buffer.
+    stringstream out_buffer( ios_base::out | ios_base::binary );
+
+    rgb8_image_t src;
+    write_view( out_buffer, view( src ), tag_t() );
+
+    // 3. Copy in-memory buffer to another.
+    stringstream in_buffer( ios_base::in | ios_base::binary );
+    in_buffer << out_buffer.rdbuf();
+
+    // 4. Read in-memory buffer to gil image
+    rgb8_image_t dst;
+    read_image( in_buffer, dst, tag_t() );
+
+    // 5. Write out image.
+    string filename( tiff_out + "stream_test.tif" );
+    ofstream out( filename.c_str(), ios_base::binary );
+    write_view( out, view( dst ), tag_t() );
 }
 
 } // namespace tiff_test

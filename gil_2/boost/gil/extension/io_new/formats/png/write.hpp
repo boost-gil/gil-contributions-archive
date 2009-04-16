@@ -73,8 +73,8 @@ public:
 
         png_set_IHDR( _png_ptr
                     , _info_ptr
-                    , view.width()
-                    , view.height()
+                    , static_cast< png_uint_32 >( view.width()  )
+                    , static_cast< png_uint_32 >( view.height() )
                     , png_rw_info::bit_depth
                     , png_rw_info::color_type
                     , info._interlace_method

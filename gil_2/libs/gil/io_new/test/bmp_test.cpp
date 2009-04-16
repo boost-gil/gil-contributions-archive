@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
     }
 
     {
-        ifstream in( filename.c_str(), ios::in | ios::binary );
+        ifstream in( filename.c_str(), ios::binary );
 
         image_read_info< tag_t > info = read_image_info( in
                                                        , tag_t() );
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     }
 
     {
-        ifstream in( filename.c_str(), ios::in | ios::binary );
+        ifstream in( filename.c_str(), ios::binary );
 
         rgba8_image_t img;
         read_image( in, img, tag_t() );
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     }
 
     {
-        ifstream in( filename.c_str(), ios::in | ios::binary );
+        ifstream in( filename.c_str(), ios::binary );
 
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE( read_view_test )
     }
 
     {
-        ifstream in( filename.c_str(), ios::in | ios::binary );
+        ifstream in( filename.c_str(), ios::binary );
 
         rgba8_image_t img( 127, 64 );
         read_view( in, view( img ), tag_t() );
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
     }
 
     {
-        ifstream in( filename.c_str(), ios::in | ios::binary );
+        ifstream in( filename.c_str(), ios::binary );
 
         rgb8_image_t img( 127, 64 );
         read_and_convert_view( in, view( img ), tag_t() );
@@ -163,15 +163,15 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     rgb8_image_t img( 127, 64 );
 
     {
-        string filename( bmp_out + "test1.bmp" );
+        string filename( bmp_out + "write_test_ofstream.bmp" );
 
-        ofstream out( filename.c_str(), ios::out | ios::binary );
+        ofstream out( filename.c_str(), ios::binary );
 
         write_view( out, view( img ), tag_t() );
     }
 
     {
-        string filename( bmp_out + "test2.bmp" );
+        string filename( bmp_out + "write_test_file.bmp" );
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
@@ -179,13 +179,41 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
-        string filename( bmp_out + "test3.bmp" );
+        string filename( bmp_out + "write_test_info.bmp" );
 
         image_write_info< bmp_tag > info;
 
         FILE* file = fopen( filename.c_str(), "wb" );
         write_view( file, view( img ), info );
     }
+}
+
+BOOST_AUTO_TEST_CASE( stream_test )
+{
+    // 1. Read an image.
+    ifstream in( filename.c_str(), ios::binary );
+
+    rgb8_image_t img;
+    read_image( in, img, tag_t() );
+
+    // 2. Write image to in-memory buffer.
+    stringstream out_buffer( ios_base::out | ios_base::binary );
+
+    rgb8_image_t src;
+    write_view( out_buffer, view( src ), tag_t() );
+
+    // 3. Copy in-memory buffer to another.
+    stringstream in_buffer( ios_base::in | ios_base::binary );
+    in_buffer << out_buffer.rdbuf();
+
+    // 4. Read in-memory buffer to gil image
+    rgb8_image_t dst;
+    read_image( in_buffer, dst, tag_t() );
+
+    // 5. Write out image.
+    string filename( bmp_out + "stream_test.bmp" );
+    ofstream out( filename.c_str(), ios_base::binary );
+    write_view( out, view( dst ), tag_t() );
 }
 
 } // namespace bmp_test

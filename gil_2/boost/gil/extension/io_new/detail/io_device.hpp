@@ -223,6 +223,7 @@ private:
 /**
  * Input stream device
  */
+template< typename FormatTag >
 class istream_device
 {
 public:
@@ -424,9 +425,12 @@ private:
  */
 template< typename IODevice  > struct is_input_device : mpl::false_{};
 template< typename FormatTag > struct is_input_device< file_stream_device< FormatTag > > : mpl::true_{};
-template<> struct is_input_device< istream_device > : mpl::true_{};
+template< typename FormatTag > struct is_input_device<     istream_device< FormatTag > > : mpl::true_{};
 
-template< typename FormatTag, typename T, typename D = void >
+template< typename FormatTag
+        , typename T
+        , typename D = void
+        >
 struct is_adaptable_input_device : mpl::false_{};
 
 template< typename FormatTag
@@ -438,10 +442,9 @@ struct is_adaptable_input_device< FormatTag
                                                                          , T
                                                                          >
                                                     >::type
-                                >
-    : mpl::true_
+                                > : mpl::true_
 {
-    typedef istream_device device_type;
+    typedef istream_device< FormatTag > device_type;
 };
 
 template< typename FormatTag >
@@ -465,11 +468,21 @@ template<typename IODevice> struct is_output_device : mpl::false_{};
 template< typename FormatTag > struct is_output_device< file_stream_device< FormatTag > > : mpl::true_{};
 template< typename FormatTag > struct is_output_device< ostream_device    < FormatTag > > : mpl::true_{};
 
-template<typename FormatTag, typename IODevice,typename D=void> struct is_adaptable_output_device : mpl::false_{};
-template<typename FormatTag, typename T> struct is_adaptable_output_device<FormatTag, T,
-    typename enable_if<is_base_and_derived<std::ostream,T> >::type
-    >
-  : mpl::true_
+template< typename FormatTag
+        , typename IODevice
+        , typename D = void
+        >
+struct is_adaptable_output_device : mpl::false_ {};
+
+template< typename FormatTag
+        , typename T
+        > struct is_adaptable_output_device< FormatTag
+                                           , T
+                                           , typename enable_if< is_base_and_derived< std::ostream
+                                                                                    , T
+                                                                                    >
+                                                               >::type
+        > : mpl::true_
 {
     typedef ostream_device< FormatTag > device_type;
 };
@@ -480,8 +493,8 @@ template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,v
     typedef file_stream_device< FormatTag > device_type;
 };
 
-template<typename Device, typename FormatTag, typename ConversionPolicy> class reader;
-template<typename Device, typename FormatTag, typename Log = no_log> class writer;
+template< typename Device, typename FormatTag, typename ConversionPolicy > class reader;
+template< typename Device, typename FormatTag, typename Log = no_log > class writer;
 
 } // namespace detail
 } // namespace gil

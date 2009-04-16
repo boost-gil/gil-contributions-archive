@@ -435,6 +435,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\tiff\log.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\tiff\read.hpp"
 						>
 					</File>

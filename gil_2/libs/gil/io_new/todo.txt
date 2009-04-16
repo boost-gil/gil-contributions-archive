@@ -12,7 +12,3 @@ todo list
 * support tiled tiff
 
 * png extension crashes when image is empty
-* cannot write in-memory buffer with tiff extension - no ostream_device
-  or istream_device specialization for tiff_tag. See here
-  http://www.ibm.com/developerworks/linux/library/l-libtiff2/
-  in the Advanced topics section.
