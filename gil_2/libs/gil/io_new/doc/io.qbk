@@ -139,6 +139,40 @@ image_write_info class. For instance, a user can specify the jpeg quality when w
     ``
 
 The above example will write an image where the jpeg quality is set to 95 percent.
+
+[h2 Reading And Writing In-Memory Buffers]
+Reading and writing in-mempory buffers are supported as well. See as follows:
+
+    ``
+    // 1. Read an image.
+    ifstream in( "test.tif", ios::binary );
+
+    rgb8_image_t img;
+    read_image( in, img, tiff_tag() );
+
+    // 2. Write image to in-memory buffer.
+    stringstream out_buffer( ios_base::out | ios_base::binary );
+
+    rgb8_image_t src;
+    write_view( out_buffer, view( src ), tiff_tag() );
+
+    // 3. Copy in-memory buffer to another.
+    stringstream in_buffer( ios_base::in | ios_base::binary );
+    in_buffer << out_buffer.rdbuf();
+
+    // 4. Read in-memory buffer to gil image
+    rgb8_image_t dst;
+    read_image( in_buffer, dst, tag_t() );
+
+    // 5. Write out image.
+    string filename( "out.tif" );
+    ofstream out( filename.c_str(), ios_base::binary );
+    write_view( out, view( dst ), tiff_tag() );
+    ``
+
+In case the user is using his own stream classes he has to make sure it has the common interface read,
+write, seek, close, etc. Interface.
+
 [endsect]
 
 [section Using IO]
