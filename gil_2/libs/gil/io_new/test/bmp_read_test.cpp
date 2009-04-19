@@ -14,10 +14,4 @@ typedef bmp_tag tag_t;
 
 namespace bmp_test {
 
-const std::string filename( bmp_in + "rgb.bmp" );
-
-BOOST_AUTO_TEST_CASE( read_test )
-{
-}
-
 } // namespace bmp_test

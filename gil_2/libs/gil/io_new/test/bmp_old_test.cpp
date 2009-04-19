@@ -10,12 +10,10 @@ using namespace boost::gil;
 
 namespace bmp_test {
 
-const std::string filename( bmp_in + "rgb.bmp" );
-
 BOOST_AUTO_TEST_CASE( bmp_read_dimensions_test )
 {
     {
-        point2< ptrdiff_t > dim = bmp_read_dimensions( filename );
+        point2< ptrdiff_t > dim = bmp_read_dimensions( bmp_filename );
 
         BOOST_CHECK_EQUAL( dim.x, 127 );
         BOOST_CHECK_EQUAL( dim.y, 64 );
@@ -26,7 +24,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_image_test )
 {
     {
         rgba8_image_t img;
-        bmp_read_image( filename, img );
+        bmp_read_image( bmp_filename, img );
 
         BOOST_CHECK_EQUAL( img.width() , 127 );
         BOOST_CHECK_EQUAL( img.height(), 64 );
@@ -37,7 +35,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
-        bmp_read_and_convert_image( filename, img );
+        bmp_read_and_convert_image( bmp_filename, img );
 
         BOOST_CHECK_EQUAL( img.width() , 127 );
         BOOST_CHECK_EQUAL( img.height(), 64 );
@@ -48,7 +46,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_view_test )
 {
     {
         rgba8_image_t img( 127, 64 );
-        bmp_read_view( filename, view( img ) );
+        bmp_read_view( bmp_filename, view( img ) );
     }
 }
 
@@ -56,7 +54,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 127, 64 );
-        bmp_read_and_convert_view( filename, view( img ) );
+        bmp_read_and_convert_view( bmp_filename, view( img ) );
     }
 }
 

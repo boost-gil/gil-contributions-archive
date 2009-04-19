@@ -19,13 +19,11 @@ typedef jpeg_tag tag_t;
 
 namespace jpeg_test {
 
-extern std::string filename;
-
 BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
 
     {
-        image_read_info< jpeg_tag > info = read_image_info( filename
+        image_read_info< jpeg_tag > info = read_image_info( jpeg_filename
                                                           , tag_t() );
 
         BOOST_CHECK_EQUAL( info._width , 136 );
@@ -33,7 +31,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( jpeg_filename.c_str(), ios::binary );
 
         image_read_info< jpeg_tag > info = read_image_info( in
                                                           , tag_t() );
@@ -43,7 +41,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
-        FILE* file = fopen( filename.c_str(), "rb" );
+        FILE* file = fopen( jpeg_filename.c_str(), "rb" );
         
         image_read_info< tag_t > info = boost::gil::read_image_info( file
                                                                    , tag_t() );
@@ -53,7 +51,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
-        path my_path( filename );
+        path my_path( jpeg_filename );
         image_read_info< tag_t > info = boost::gil::read_image_info( my_path
                                                                    , tag_t() );
 
@@ -68,14 +66,14 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 {
     {
         rgb8_image_t img;
-        read_image( filename, img, tag_t() );
+        read_image( jpeg_filename, img, tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 136 );
         BOOST_CHECK_EQUAL( img.height(), 98 );
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( jpeg_filename.c_str(), ios::binary );
 
         rgb8_image_t img;
         read_image( in, img, tag_t() );
@@ -85,7 +83,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     }
 
     {
-        FILE* file = fopen( filename.c_str(), "rb" );
+        FILE* file = fopen( jpeg_filename.c_str(), "rb" );
         
         rgb8_image_t img;
         read_image( file, img, tag_t() );
@@ -102,7 +100,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
                                                 , jpeg_dct_method::slow
                                                 );
 
-        read_image( filename, img, settings );
+        read_image( jpeg_filename, img, settings );
 
         BOOST_CHECK_EQUAL( img.width() , 10 );
         BOOST_CHECK_EQUAL( img.height(), 10 );
@@ -114,11 +112,11 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
-        read_and_convert_image( filename, img, tag_t() );
+        read_and_convert_image( jpeg_filename, img, tag_t() );
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( jpeg_filename.c_str(), ios::binary );
 
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
@@ -129,18 +127,18 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
         rgb8_image_t img( 136, 98 );
-        read_view( filename, view( img ), tag_t() );
+        read_view( jpeg_filename, view( img ), tag_t() );
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( jpeg_filename.c_str(), ios::binary );
 
         rgb8_image_t img( 136, 98 );
         read_view( in, view( img ), tag_t() );
     }
 
     {
-        FILE* file = fopen( filename.c_str(), "rb" );
+        FILE* file = fopen( jpeg_filename.c_str(), "rb" );
         
         rgb8_image_t img( 136, 98 );
         read_view( file, view( img ), tag_t() );
@@ -150,18 +148,18 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 136, 98 );
-        read_and_convert_view( filename, view( img ), tag_t() );
+        read_and_convert_view( jpeg_filename, view( img ), tag_t() );
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( jpeg_filename.c_str(), ios::binary );
 
         rgb8_image_t img( 136, 98 );
         read_and_convert_view( in, view( img ), tag_t() );
     }
 
     {
-        FILE* file = fopen( filename.c_str(), "rb" );
+        FILE* file = fopen( jpeg_filename.c_str(), "rb" );
 
         rgb8_image_t img( 136, 98 );
         read_and_convert_view( file
@@ -212,7 +210,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 BOOST_AUTO_TEST_CASE( stream_test )
 {
     // 1. Read an image.
-    ifstream in( filename.c_str(), ios::binary );
+    ifstream in( jpeg_filename.c_str(), ios::binary );
 
     rgb8_image_t img;
     read_image( in, img, tag_t() );

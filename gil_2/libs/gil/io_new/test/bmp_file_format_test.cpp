@@ -32,7 +32,7 @@ struct my_color_converter
     }
 };
 
-BOOST_AUTO_TEST_CASE( my_file_format_test )
+BOOST_AUTO_TEST_CASE( bmp_file_format_test )
 {
    fs::path in_path = fs::system_complete( fs::path( bmp_in, fs::native ) );
 

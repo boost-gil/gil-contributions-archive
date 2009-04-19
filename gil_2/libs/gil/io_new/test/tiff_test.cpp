@@ -24,12 +24,10 @@ typedef tiff_tag tag_t;
 
 namespace tiff_test {
 
-extern std::string filename;
-
 BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
     {
-        image_read_info< tag_t > info = read_image_info( filename
+        image_read_info< tag_t > info = read_image_info( tiff_filename
                                                        , tag_t() );
 
         BOOST_CHECK_EQUAL( info._width , 200 );
@@ -37,7 +35,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( tiff_filename.c_str(), ios::binary );
         image_read_info< tag_t > info = read_image_info( in
                                                        , tag_t() );
 
@@ -46,7 +44,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 
     {
-        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+        TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
         image_read_info< tag_t > info = read_image_info( file
                                                        , tag_t() );
@@ -60,7 +58,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 {
     {
         rgb8_image_t img;
-        read_image( filename, img, tag_t() );
+        read_image( tiff_filename, img, tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 200 );
         BOOST_CHECK_EQUAL( img.height(), 133 );
@@ -68,7 +66,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
     {
 
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( tiff_filename.c_str(), ios::binary );
 
         rgb8_image_t img;
         read_image( in, img, tag_t() );
@@ -78,7 +76,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     }
 
     {
-        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+        TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
         rgb8_image_t img;
         read_image( file, img, tag_t() );
@@ -92,14 +90,14 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
-        read_and_convert_image( filename, img, tag_t() );
+        read_and_convert_image( tiff_filename, img, tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 200 );
         BOOST_CHECK_EQUAL( img.height(), 133 );
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( tiff_filename.c_str(), ios::binary );
 
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
@@ -109,7 +107,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     }
 
     {
-        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+        TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
         rgb8_image_t img;
         read_and_convert_image( file, img, tag_t() );
@@ -123,11 +121,11 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
         rgb8_image_t img( 200, 133 );
-        read_view( filename, view( img ), tag_t() );
+        read_view( tiff_filename, view( img ), tag_t() );
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( tiff_filename.c_str(), ios::binary );
 
         rgb8_image_t img;
         read_view( in, view( img ), tag_t() );
@@ -137,7 +135,7 @@ BOOST_AUTO_TEST_CASE( read_view_test )
     }
 
     {
-        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+        TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
         rgb8_image_t img( 200, 133 );
         read_view( file, view( img ), tag_t() );
@@ -148,11 +146,11 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 200, 133 );
-        read_and_convert_view( filename, view( img ), tag_t() );
+        read_and_convert_view( tiff_filename, view( img ), tag_t() );
     }
 
     {
-        ifstream in( filename.c_str(), ios::binary );
+        ifstream in( tiff_filename.c_str(), ios::binary );
 
         rgb8_image_t img;
         read_and_convert_view( in, view( img ), tag_t() );
@@ -162,7 +160,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
     }
 
     {
-        TIFF* file = TIFFOpen( filename.c_str(), "r" );
+        TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
         rgb8_image_t img( 200, 133 );
         read_and_convert_view( file, view( img ), tag_t() );
@@ -206,7 +204,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 BOOST_AUTO_TEST_CASE( stream_test )
 {
     // 1. Read an image.
-    ifstream in( filename.c_str(), ios::binary );
+    ifstream in( tiff_filename.c_str(), ios::binary );
 
     rgb8_image_t img;
     read_image( in, img, tag_t() );
