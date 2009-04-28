@@ -23,7 +23,7 @@
 /// \file
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
-/// 
+///
 /// \date   2007-2008 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ void write_view( const String&    file_name
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
-                                                , detail::file_stream_device<FormatTag>::write_tag()
+                                                , typename detail::file_stream_device<FormatTag>::write_tag()
                                                 );
 
     write_view( device
@@ -117,7 +117,7 @@ template< typename Device
         , typename View
         , typename FormatTag
         , typename Log
-        > 
+        >
 inline
 void write_view( Device&                            device
                , const View&                        view
@@ -128,7 +128,7 @@ void write_view( Device&                            device
                                                                                                      , FormatTag
                                                                                                      >::type
                                                                         >::type
-                                                    >::type* ptr = 0 
+                                                    >::type* ptr = 0
                )
 {
     detail::writer< Device
@@ -144,7 +144,7 @@ template< typename Device
         , typename View
         , typename FormatTag
         , typename Log
-        > 
+        >
 inline
 void write_view( Device&                              device
                , const View&                          view
@@ -157,7 +157,7 @@ void write_view( Device&                              device
                                                                                                            , FormatTag
                                                                                                            >::type
                                                                               >::type
-                                                          >::type* ptr = 0 
+                                                          >::type* ptr = 0
                )
 {
     typename detail::is_adaptable_output_device< FormatTag
@@ -174,7 +174,7 @@ template< typename String
         , typename View
         , typename FormatTag
         , typename Log
-        > 
+        >
 inline
 void write_view( const String&                        file_name
                , const View&                          view
@@ -189,7 +189,7 @@ void write_view( const String&                        file_name
                )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
-                                                  , detail::file_stream_device< FormatTag >::write_tag()
+                                                  , typename detail::file_stream_device< FormatTag >::write_tag()
                                                   );
 
     write_view( device

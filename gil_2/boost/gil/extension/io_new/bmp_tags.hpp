@@ -122,10 +122,10 @@ struct image_write_info< bmp_tag >
 {
 };
 
-static const int bmp_header_size     = 14;
-static const int bmp_win32_info_size = 40;
-static const int bmp_os2_info_size   = 12;
-static const int bmp_signature       = 0x4D42;
+static const uint32_t bmp_header_size     = 14;
+static const uint32_t bmp_win32_info_size = 40;
+static const uint32_t bmp_os2_info_size   = 12;
+static const uint32_t bmp_signature       = 0x4D42;
 
 } // namespace gil
 } // namespace boost

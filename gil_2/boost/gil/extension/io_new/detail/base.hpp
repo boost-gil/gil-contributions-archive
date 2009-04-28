@@ -71,11 +71,6 @@ public:
     point_t _dim;
 };
 
-template<typename FormatTag> struct image_read_info;
-template<typename FormatTag> struct image_read_settings;
-template<typename FormatTag, typename Log = detail::no_log > struct image_write_info;
-
-
 /**
  * Boolean meta function, mpl::true_ if the pixel type \a PixelType is supported 
  * by the image format identified with \a FormatTag.
@@ -117,6 +112,11 @@ struct write_support_false{ BOOST_STATIC_CONSTANT( bool, is_supported = false );
 class no_log {};
 
 } // namespace detail
+
+template<typename FormatTag> struct image_read_info;
+template<typename FormatTag> struct image_read_settings;
+template<typename FormatTag, typename Log = typename detail::no_log > struct image_write_info;
+
 } // namespace gil
 } // namespace boost
 

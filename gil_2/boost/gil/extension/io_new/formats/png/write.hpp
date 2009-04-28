@@ -79,10 +79,10 @@ public:
                     , png_rw_info::color_type
                     , info._interlace_method
                     , info._compression_method
-                    , info._filter_method 
+                    , info._filter_method
                     );
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED 
+#ifdef PNG_FLOATING_POINT_SUPPORTED
         png_set_gAMA( _png_ptr
                     , _info_ptr
                     , info._gamma
@@ -139,7 +139,7 @@ public:
 
         png_write_info(_png_ptr,_info_ptr);
         write_view( view
-                  , is_bit_aligned< View >::type() );
+                  , typename is_bit_aligned< View >::type() );
     }
 
 private:
@@ -153,7 +153,7 @@ private:
                                  > png_rw_info;
 
         if( little_endian() )
-        {   
+        {
             if( png_rw_info::bit_depth == 16 )
                 png_set_swap(_png_ptr);
             if( png_rw_info::bit_depth < 8 )
@@ -162,7 +162,7 @@ private:
 
         row_buffer_helper_view<View> row_buffer( view.width(), false );
 
-        for( int y = 0; y != view.height(); ++ y) 
+        for( int y = 0; y != view.height(); ++ y)
         {
             std::copy( view.row_begin( y )
                      , view.row_end  ( y )
@@ -173,7 +173,7 @@ private:
                          , reinterpret_cast< png_bytep >( row_buffer.data() )
                          );
         }
-        
+
         png_write_end( _png_ptr
                      , _info_ptr
                      );
@@ -182,7 +182,7 @@ private:
     template<typename View>
     void write_view( const View& view
                    , mpl::true_         // is bit aligned
-                   ) 
+                   )
     {
         typedef png_write_support< typename kth_semantic_element_type< typename View::value_type
                                                                      , 0
@@ -191,7 +191,7 @@ private:
                                  > png_rw_info;
 
         if (little_endian() )
-        {   
+        {
             if( png_rw_info::bit_depth == 16 )
                 png_set_swap(_png_ptr);
             if( png_rw_info::bit_depth < 8 )
@@ -200,7 +200,7 @@ private:
 
         row_buffer_helper_view< View > row_buffer( view.width(), false );
 
-        for( int y = 0; y != view.height(); ++ y) 
+        for( int y = 0; y != view.height(); ++ y)
         {
             std::copy( view.row_begin( y )
                      , view.row_end  ( y )
@@ -211,14 +211,14 @@ private:
                          , reinterpret_cast< png_bytep >( row_buffer.data() )
                          );
         }
-        
+
         png_write_end(_png_ptr,_info_ptr);
     }
 
     void init_io( png_structp png_ptr )
     {
-        png_set_write_fn(png_ptr, 
-                static_cast<void*>(&this->_io_dev), 
+        png_set_write_fn(png_ptr,
+                static_cast<void*>(&this->_io_dev),
                 static_cast<png_rw_ptr>(&png_io_base<Device>::write_data),
                 static_cast<png_flush_ptr>(&png_io_base<Device>::flush)
                 );

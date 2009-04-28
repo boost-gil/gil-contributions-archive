@@ -36,7 +36,7 @@ template <> struct get_bgr_cs< 4 > { typedef bgra8_view_t type; };
 template< typename Device >
 class writer< Device
             , bmp_tag
-            > 
+            >
 {
 public:
 
@@ -69,7 +69,7 @@ private:
     template< typename View >
     void write( const View& view )
     {
-        typedef typename channel_type< 
+        typedef typename channel_type<
                     typename get_pixel_type< View >::type >::type channel_t;
 
         typedef typename color_space_type< View >::type color_space_t;
@@ -88,7 +88,7 @@ private:
         int entries = 0;
 
 /*
-        /// @todo: Not supported for now. bit_aligned_images refer to indexed images 
+        /// @todo: Not supported for now. bit_aligned_images refer to indexed images
         ///        in this context.
         if( bpp <= 8 )
         {
@@ -121,7 +121,7 @@ private:
         _out.write_int32( 0 );
 
         write_image< View
-                   , get_bgr_cs< num_channels< View >::value >::type
+                   , typename get_bgr_cs< num_channels< View >::value >::type
                    >( view, spn );
     }
 

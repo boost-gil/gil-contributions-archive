@@ -36,15 +36,15 @@ namespace boost{ namespace gil {
 template < typename Device
          , typename Image
          , typename FormatTag
-         > 
-inline 
+         >
+inline
 void read_image( Device&                                 file
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
                , typename enable_if< mpl::and_< detail::is_input_device< Device    >
                                               , is_format_tag          < FormatTag >
                                               , is_read_supported      < typename get_pixel_type< typename Image::view_t >::type
-                                                                       , FormatTag 
+                                                                       , FormatTag
                                                                        >
                                               >
                                    >::type* ptr = 0
@@ -66,8 +66,8 @@ void read_image( Device&                                 file
 template < typename Device
          , typename Image
          , typename FormatTag
-         > 
-inline 
+         >
+inline
 void read_image( Device&                                 file
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
@@ -103,8 +103,8 @@ void read_image( Device&                                 file
 template < typename String
          , typename Image
          , typename FormatTag
-         > 
-inline 
+         >
+inline
 void read_image( const String&                           file_name
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
@@ -133,7 +133,7 @@ void read_image( const String&                           file_name
 template < typename Device
          , typename Image
          , typename FormatTag
-         > 
+         >
 inline
 void read_image( Device&          file
                , Image&           img
@@ -141,10 +141,10 @@ void read_image( Device&          file
                , typename enable_if< mpl::and_< detail::is_input_device< Device    >
                                               , is_format_tag          < FormatTag >
                                               , is_read_supported      < typename get_pixel_type< typename Image::view_t >::type
-                                                                       , FormatTag 
+                                                                       , FormatTag
                                                                        >
                                               >
-                                   >::type* ptr = 0 
+                                   >::type* ptr = 0
                )
 {
     read_image( file
@@ -157,7 +157,7 @@ void read_image( Device&          file
 template < typename Device
          , typename Image
          , typename FormatTag
-         > 
+         >
 inline
 void read_image( Device&          file
                , Image&           img
@@ -170,7 +170,7 @@ void read_image( Device&          file
                                                                  , FormatTag
                                                                  >
                                               >
-                                   >::type* ptr = 0 
+                                   >::type* ptr = 0
                )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag, Device >::device_type device_type;
@@ -186,7 +186,7 @@ void read_image( Device&          file
 template < typename String
          , typename Image
          , typename FormatTag
-         > 
+         >
 inline
 void read_image( const String&    file_name
                , Image&           img
@@ -201,7 +201,7 @@ void read_image( const String&    file_name
                )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
-                                                  , detail::file_stream_device< FormatTag >::read_tag()
+                                                  , typename detail::file_stream_device< FormatTag >::read_tag()
                                                   );
 
     read_image( device

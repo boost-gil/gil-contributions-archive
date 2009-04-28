@@ -3,14 +3,15 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <boost/filesystem/convenience.hpp>
 
-#include <boost/type_traits/is_same.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include "paths.hpp"
 
 using namespace std;
 using namespace boost::gil;
+namespace fs = boost::filesystem;
 
 typedef bmp_tag tag_t;
 
@@ -44,6 +45,15 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 
         BOOST_CHECK_EQUAL( info._width , 127 );
         BOOST_CHECK_EQUAL( info._height, 64 );
+    }
+
+    {
+        fs::path my_path( bmp_filename );
+        image_read_info< tag_t > info = read_image_info( my_path
+                                                       , tag_t() );
+
+        BOOST_CHECK_EQUAL( info._width , 127 );
+        BOOST_CHECK_EQUAL( info._height, 64  );
     }
 }
 

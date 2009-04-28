@@ -57,6 +57,4 @@ private:
 } // namespace gil
 } // namespace boost
 
-
-
 #endif // BOOST_GIL_EXTENSION_IO_TIFF_IO_LOG_HPP_INCLUDED

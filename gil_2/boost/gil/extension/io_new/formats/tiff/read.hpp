@@ -30,6 +30,7 @@ extern "C" {
 #include <boost/static_assert.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 #include <boost/gil/extension/io_new/detail/bit_operations.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
@@ -159,7 +160,7 @@ public:
                 channel_sizes[i] = this->_info._bits_per_sample;
             }
 
-            // In case we only read the image the user's type and 
+            // In case we only read the image the user's type and
             // the tiff type need to compatible. Which means:
             // color_spaces_are_compatible && channels_are_pairwise_compatible
 
@@ -207,7 +208,7 @@ private:
 
       read_palette_image( dst_view
                         , view( indices )
-                        , is_same< View, rgb16_view_t >::type() );
+                        , typename is_same< View, rgb16_view_t >::type() );
    }
 
    template< typename View
@@ -224,8 +225,8 @@ private:
 
       int ret = _io_dev.get_field_defaulted( red, green, blue );
 
-      typedef typename channel_traits< 
-                    typename element_type< 
+      typedef typename channel_traits<
+                    typename element_type<
                             typename Indices_View::value_type >::type >::value_type channel_t;
 
       int num_colors = channel_traits< channel_t >::max_value();

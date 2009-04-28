@@ -68,7 +68,7 @@ struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligne
 	                                                                    , Channel
 	                                                                    , Layout
 	                                                                    , Mutable
-	                                                                    > 
+	                                                                    >
 	                                 ,false
 	                                 ,false
 	                                 ,true
@@ -98,7 +98,7 @@ template < typename Device, typename Log >
 class writer< Device
             , tiff_tag
             , Log
-            > 
+            >
 {
 public:
 
@@ -187,7 +187,7 @@ private:
         write_data( src_view
               , info
               , (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8
-              , is_bit_aligned< pixel_t >::type()
+              , typename is_bit_aligned< pixel_t >::type()
               );
     }
 

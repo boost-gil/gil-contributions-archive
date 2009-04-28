@@ -56,10 +56,10 @@ template< typename View >
 bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // in bits
                           , mpl::false_                                      // is_bit_aligned
                           , mpl::true_                                       // is_homogeneous
-                          ) 
+                          )
 {
     typedef typename View::value_type pixel_t;
-    typedef typename channel_traits< 
+    typedef typename channel_traits<
                 typename element_type< pixel_t >::type >::value_type channel_t;
 
     unsigned int s = detail::unsigned_integral_num_bits< channel_t >::value;
@@ -72,11 +72,11 @@ template< typename View >
 bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // in bits
                           , mpl::true_                                       // is_bit_aligned
                           , mpl::true_                                       // is_homogeneous
-                          ) 
+                          )
 {
     typedef typename View::reference ref_t;
 
-    typedef channel_traits< element_type< ref_t >::type >::value_type channel_t;
+    typedef typename channel_traits< typename element_type< ref_t >::type >::value_type channel_t;
     channel_t c;
 
     unsigned int s = detail::unsigned_integral_num_bits< channel_t >::value;
@@ -139,7 +139,7 @@ bool is_allowed( unsigned int                       src_n // num channels
 {
     typedef typename View::value_type pixel_t;
     typedef typename View::reference  ref_t;
-    typedef typename channel_traits< 
+    typedef typename channel_traits<
                 typename element_type< pixel_t >::type >::value_type channel_t;
 
     const typename num_channels< pixel_t >::value_type dst_n = num_channels< pixel_t >::value;
@@ -149,7 +149,7 @@ bool is_allowed( unsigned int                       src_n // num channels
 
     const bool s( compare_channel_sizes< View >( src_s
                                                , typename is_bit_aligned< ref_t >::type()
-                                               , typename is_homogeneous< ref_t >::type() 
+                                               , typename is_homogeneous< ref_t >::type()
                                                )
                 );
 

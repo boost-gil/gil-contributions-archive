@@ -36,17 +36,17 @@ template < typename Device
          , typename View
          , typename FormatTag
          >
-inline 
+inline
 void read_view( Device&                                 file
               , const View&                             view
               , const image_read_settings< FormatTag >& settings
               , typename enable_if< typename mpl::and_< typename detail::is_input_device< Device    >::type
                                                       , typename is_format_tag          < FormatTag >::type
                                                       , typename is_read_supported      < typename get_pixel_type< View >::type
-                                                                                        , FormatTag 
+                                                                                        , FormatTag
                                                                                         >::type
-                                                       >::type 
-                                  >::type* ptr = 0 
+                                                       >::type
+                                  >::type* ptr = 0
               )
 {
     detail::reader< Device
@@ -65,8 +65,8 @@ void read_view( Device&                                 file
 template < typename Device
          , typename View
          , typename FormatTag
-         > 
-inline 
+         >
+inline
 void read_view( Device&                                 file
               , const View&                             view
               , const image_read_settings< FormatTag >& settings
@@ -76,9 +76,9 @@ void read_view( Device&                                 file
                                                       , typename is_format_tag<FormatTag>::type
                                                       , typename is_read_supported< typename get_pixel_type< View >::type
                                                                                   , FormatTag
-                                                                                  >::type 
+                                                                                  >::type
                                                       >::type
-                                  >::type* ptr = 0 
+                                  >::type* ptr = 0
               )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -103,8 +103,8 @@ void read_view( Device&                                 file
 template < typename String
          , typename View
          , typename FormatTag
-         > 
-inline 
+         >
+inline
 void read_view( const String&                           file_name
               , const View&                             view
               , const image_read_settings< FormatTag >& settings
@@ -118,7 +118,7 @@ void read_view( const String&                           file_name
               )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
-                                                , detail::file_stream_device< FormatTag >::read_tag()
+                                                , typename detail::file_stream_device< FormatTag >::read_tag()
                                                 );
 
     read_view( device
@@ -132,8 +132,8 @@ void read_view( const String&                           file_name
 template < typename String
          , typename View
          , typename FormatTag
-         > 
-inline 
+         >
+inline
 void read_view( const String&    file_name
               , const View&      view
               , const FormatTag& tag
@@ -155,8 +155,8 @@ void read_view( const String&    file_name
 template< typename Device
         , typename View
         , typename FormatTag
-        > 
-inline 
+        >
+inline
 void read_view( Device&          device
               , const View&      view
               , const FormatTag& tag
