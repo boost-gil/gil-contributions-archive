@@ -49,13 +49,15 @@ struct indexed_image_deref_fn
 
     result_type operator()( const point_t& p ) const
     {
-        indices_locator_t l = _indices_loc.xy_at( p );
-        indices_locator_t::value_type gray = *l;
-        //index_t index = [0];
-
-        //return _palette_loc[ index ];
-        return value_type();
+        return _palette_loc[ _indices_loc.xy_at( p )[0] ];
     }
+
+    void set_indices( const indices_locator_t& indices_loc ) { _indices_loc = indices_loc; }
+    void set_palette( const palette_locator_t& palette_loc ) { _palette_loc = palette_loc; }
+
+    const indices_locator_t& indices() const { return _indices_loc; }
+    const palette_locator_t& palette() const { return _palette_loc; }
+
 private:
 
     indices_locator_t _indices_loc;
@@ -79,10 +81,14 @@ class indexed_image_view : public image_view< Locator >
 {
 public:
 
-    typedef typename Locator::deref_fn_t::indices_locator_t indices_locator_t;
-    typedef typename Locator::deref_fn_t::palette_locator_t palette_locator_t;
+    typedef typename Locator::deref_fn_t deref_fn_t;
+    typedef typename deref_fn_t::indices_locator_t indices_locator_t;
+    typedef typename deref_fn_t::palette_locator_t palette_locator_t;
 
     typedef indexed_image_view< Locator > const_t;
+
+    typedef image_view< indices_locator_t > indices_view_t;
+    typedef image_view< palette_locator_t > palette_view_t;
 
     indexed_image_view()
     : image_view()
@@ -104,6 +110,19 @@ public:
     {}
 
     const std::size_t num_colors() const { return _num_colors; }
+
+    
+    const indices_locator_t& indices() const { return get_deref_fn().indices(); }
+    const palette_locator_t& palette() const { return get_deref_fn().palette(); }
+
+    const indices_view_t get_indices_view() const { return indices_view_t( dimensions(), indices() ); }
+    const palette_view_t get_palette_view() const { return palette_view_t( point_t( num_colors(), 1 )
+                                                                         , palette()
+                                                                         ); }
+
+private:
+
+    const deref_fn_t& get_deref_fn() const { return pixels().deref_fn(); }
 
 private:
 
@@ -150,19 +169,12 @@ public:
         typedef typename indices_view_t::locator indices_loc_t;
         typedef typename palette_view_t::locator palette_loc_t;
 
-        std::size_t indices_row_size = get_row_size_in_memunits< indices_view_t >( dimensions.x );
-        std::size_t palette_row_size = get_row_size_in_memunits< palette_view_t >( num_colors   );
-
-        indices_loc_t indices_loc( view( _indices ).xy_at( 0, 0 ), indices_row_size );
-
         typedef indexed_image_deref_fn< indices_locator_t
                                       , palette_locator_t
                                       > defer_fn_t;
 
-        defer_fn_t deref_fn( indices_loc
-                           , palette_loc_t( view( _palette ).xy_at( 0, 0 )
-                                          , palette_row_size
-                                          )
+        defer_fn_t deref_fn( view( _indices ).xy_at( 0, 0 )
+                           , view( _palette ).xy_at( 0, 0 )
                            );
 
         locator_t locator( point_t( 0, 0 )
@@ -196,20 +208,11 @@ public:
         return *this;
     }
 
-    indices_const_view_t get_indices_const_view() const { return const_view( _indices ); }
-    palette_const_view_t get_palette_const_view() const { return const_view( _palette ); }
+    indices_const_view_t get_indices_const_view() const { return static_cast< indices_const_view_t >( _view.get_indices_view()); }
+    palette_const_view_t get_palette_const_view() const { return static_cast< palette_const_view_t >( _view.get_palette_view()); }
 
-    indices_view_t get_indices_view() { return view( _indices ); }
-    palette_view_t get_palette_view() { return view( _palette ); }
-
-private:
-
-    // Doesn't work if there is an alignment at the end of a row.
-    template< typename View >
-    std::size_t get_row_size_in_memunits( std::size_t width ) const
-    {   
-		return width * memunit_step( typename View::x_iterator() );
-    }
+    indices_view_t get_indices_view() { return _view.get_indices_view(); }
+    palette_view_t get_palette_view() { return _view.get_palette_view(); }
 
 public:
 
@@ -237,6 +240,20 @@ inline
 const typename indexed_image< Index, Pixel >::const_view_t const_view( indexed_image< Index, Pixel >& img )
 {
     return static_cast< const typename indexed_image< Index, Pixel >::const_view_t>( img._view );
+}
+
+// Whole image has one color and all indices are set to 0.
+template< typename Locator
+        , typename Value
+        >
+void fill_pixels( const indexed_image_view< Locator >& view
+                , const Value&                         value
+                )
+{
+    typedef indexed_image_view< Locator > view_t;
+
+    fill_pixels( view.get_indices_view(), view_t::indices_view_t::value_type( 0 ));
+    *view.get_palette_view().begin() = value;
 }
 
 } // gil
