@@ -1,3 +1,5 @@
+#define ADD_FS_PATH_SUPPORT
+
 #include <fstream>
 
 #include <boost/gil/gil_all.hpp>
@@ -205,13 +207,11 @@ BOOST_AUTO_TEST_CASE( stream_test )
     read_image( in, img, tag_t() );
 
     // 2. Write image to in-memory buffer.
-    stringstream out_buffer( ios_base::out | ios_base::binary );
-
-    rgb8_image_t src;
-    write_view( out_buffer, view( src ), tag_t() );
+    stringstream out_buffer( ios_base::in | ios_base::out | ios_base::binary );
+    write_view( out_buffer, view( img ), tag_t() );
 
     // 3. Copy in-memory buffer to another.
-    stringstream in_buffer( ios_base::in | ios_base::binary );
+    stringstream in_buffer( ios_base::in | ios_base::out | ios_base::binary );
     in_buffer << out_buffer.rdbuf();
 
     // 4. Read in-memory buffer to gil image
@@ -222,6 +222,8 @@ BOOST_AUTO_TEST_CASE( stream_test )
     string filename( bmp_out + "stream_test.bmp" );
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
+
+    return ;
 }
 
 } // namespace bmp_test

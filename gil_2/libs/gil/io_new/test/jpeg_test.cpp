@@ -216,13 +216,11 @@ BOOST_AUTO_TEST_CASE( stream_test )
     read_image( in, img, tag_t() );
 
     // 2. Write image to in-memory buffer.
-    stringstream out_buffer( ios_base::out | ios_base::binary );
-
-    rgb8_image_t src;
-    write_view( out_buffer, view( src ), tag_t() );
+    stringstream out_buffer( ios_base::in | ios_base::out | ios_base::binary );
+    write_view( out_buffer, view( img ), tag_t() );
 
     // 3. Copy in-memory buffer to another.
-    stringstream in_buffer( ios_base::in | ios_base::binary );
+    stringstream in_buffer( ios_base::in | ios_base::out | ios_base::binary );
     in_buffer << out_buffer.rdbuf();
 
     // 4. Read in-memory buffer to gil image
