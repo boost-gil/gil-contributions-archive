@@ -11,7 +11,3 @@ using namespace std;
 using namespace boost::gil;
 
 typedef bmp_tag tag_t;
-
-namespace bmp_test {
-
-} // namespace bmp_test

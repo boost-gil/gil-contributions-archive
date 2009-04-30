@@ -21,9 +21,7 @@ using namespace boost::gil;
 
 typedef tiff_tag tag_t;
 
-namespace tiff_test {
-
-BOOST_AUTO_TEST_CASE( read_image_info_test )
+BOOST_AUTO_TEST_CASE( tiff_read_image_info_test )
 {
     {
         image_read_info< tag_t > info = read_image_info( tiff_filename
@@ -53,7 +51,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( read_image_test )
+BOOST_AUTO_TEST_CASE( tiff_read_image_test )
 {
     {
         rgb8_image_t img;
@@ -85,7 +83,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
+BOOST_AUTO_TEST_CASE( tiff_read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
@@ -116,7 +114,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( read_view_test )
+BOOST_AUTO_TEST_CASE( tiff_read_view_test )
 {
     {
         rgb8_image_t img( 200, 133 );
@@ -141,7 +139,7 @@ BOOST_AUTO_TEST_CASE( read_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
+BOOST_AUTO_TEST_CASE( tiff_read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 200, 133 );
@@ -166,7 +164,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( write_view_test )
+BOOST_AUTO_TEST_CASE( tiff_write_view_test )
 {
     rgb8_image_t img( 320, 240 );
 
@@ -200,7 +198,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( stream_test )
+BOOST_AUTO_TEST_CASE( tiff_stream_test )
 {
     // 1. Read an image.
     ifstream in( tiff_filename.c_str(), ios::binary );
@@ -225,5 +223,3 @@ BOOST_AUTO_TEST_CASE( stream_test )
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
 }
-
-} // namespace tiff_test

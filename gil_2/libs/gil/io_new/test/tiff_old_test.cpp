@@ -16,10 +16,7 @@
 using namespace std;
 using namespace boost::gil;
 
-namespace tiff_test {
-
-
-BOOST_AUTO_TEST_CASE( tiff_read_dimensions_test )
+BOOST_AUTO_TEST_CASE( tiff_old_read_dimensions_test )
 {
     {
         point2< ptrdiff_t > dim = tiff_read_dimensions( tiff_filename );
@@ -29,7 +26,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_dimensions_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( tiff_read_image_test )
+BOOST_AUTO_TEST_CASE( tiff_old_read_image_test )
 {
     {
         rgb8_image_t img;
@@ -40,7 +37,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( tiff_read_and_convert_image_test )
+BOOST_AUTO_TEST_CASE( tiff_old_read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
@@ -51,7 +48,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_and_convert_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( tiff_read_view_test )
+BOOST_AUTO_TEST_CASE( tiff_old_read_view_test )
 {
     {
         rgb8_image_t img( 200, 133 );
@@ -59,7 +56,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( tiff_read_and_convert_view_test )
+BOOST_AUTO_TEST_CASE( tiff_old_read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 200, 133 );
@@ -67,7 +64,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_and_convert_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( tiff_write_view_test )
+BOOST_AUTO_TEST_CASE( tiff_old_write_view_test )
 {
     {
         string filename( tiff_out + "tiff_test_old.tif" );
@@ -76,5 +73,3 @@ BOOST_AUTO_TEST_CASE( tiff_write_view_test )
         tiff_write_view( filename, view( img ) );
     }
 }
-
-} // namespace tiff_test

@@ -8,9 +8,7 @@
 using namespace std;
 using namespace boost::gil;
 
-namespace bmp_test {
-
-BOOST_AUTO_TEST_CASE( bmp_read_dimensions_test )
+BOOST_AUTO_TEST_CASE( bmp_old_read_dimensions_test )
 {
     {
         point2< ptrdiff_t > dim = bmp_read_dimensions( bmp_filename );
@@ -20,7 +18,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_dimensions_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_image_test )
+BOOST_AUTO_TEST_CASE( bmp_old_read_image_test )
 {
     {
         rgba8_image_t img;
@@ -31,7 +29,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_and_convert_image_test )
+BOOST_AUTO_TEST_CASE( bmp_old_read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
@@ -42,7 +40,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_and_convert_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_view_test )
+BOOST_AUTO_TEST_CASE( bmp_old_read_view_test )
 {
     {
         rgba8_image_t img( 127, 64 );
@@ -50,7 +48,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_and_convert_view_test )
+BOOST_AUTO_TEST_CASE( bmp_old_read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 127, 64 );
@@ -58,7 +56,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_and_convert_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_write_view_test )
+BOOST_AUTO_TEST_CASE( bmp_old_write_view_test )
 {
     {
         string filename( bmp_out + "test4.bmp" );
@@ -67,5 +65,3 @@ BOOST_AUTO_TEST_CASE( bmp_write_view_test )
         bmp_write_view( filename, view( img ) );
     }
 }
-
-} // namespace bmp_test

@@ -11,8 +11,6 @@ namespace fs = boost::filesystem;
 
 typedef bmp_tag tag_t;
 
-namespace bmp_test {
-
 // Test will loop through the "in" folder to read and convert
 // the png's to rgb8_image_t's. Which then will be written in
 // the "out" folder.
@@ -74,7 +72,7 @@ BOOST_AUTO_TEST_CASE( bmp_file_format_test )
    }
 }
 
-BOOST_AUTO_TEST_CASE( partial_image_test )
+BOOST_AUTO_TEST_CASE( bmp_partial_image_test )
 {
     const std::string filename( bmp_in + "rgb.bmp" );
 
@@ -93,5 +91,3 @@ BOOST_AUTO_TEST_CASE( partial_image_test )
     }
 
 }
-
-} // namespace bmp_test

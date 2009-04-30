@@ -17,9 +17,7 @@ using namespace boost::filesystem;
 
 typedef jpeg_tag tag_t;
 
-namespace jpeg_test {
-
-BOOST_AUTO_TEST_CASE( read_image_info_test )
+BOOST_AUTO_TEST_CASE( jpeg_read_image_info_test )
 {
 
     {
@@ -62,7 +60,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
 
 }
 
-BOOST_AUTO_TEST_CASE( read_image_test )
+BOOST_AUTO_TEST_CASE( jpeg_read_image_test )
 {
     {
         rgb8_image_t img;
@@ -108,7 +106,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
 }
 
-BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
+BOOST_AUTO_TEST_CASE( jpeg_read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
@@ -123,7 +121,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( read_view_test )
+BOOST_AUTO_TEST_CASE( jpeg_read_view_test )
 {
     {
         rgb8_image_t img( 136, 98 );
@@ -144,7 +142,7 @@ BOOST_AUTO_TEST_CASE( read_view_test )
         read_view( file, view( img ), tag_t() );
     }
 }
-BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
+BOOST_AUTO_TEST_CASE( jpeg_read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 136, 98 );
@@ -169,7 +167,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( write_view_test )
+BOOST_AUTO_TEST_CASE( jpeg_write_view_test )
 {
     {
         string filename( jpeg_out + "write_test_string.jpg" );
@@ -207,7 +205,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
 }
 
-BOOST_AUTO_TEST_CASE( stream_test )
+BOOST_AUTO_TEST_CASE( jpeg_stream_test )
 {
     // 1. Read an image.
     ifstream in( jpeg_filename.c_str(), ios::binary );
@@ -232,5 +230,3 @@ BOOST_AUTO_TEST_CASE( stream_test )
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
 }
-
-} // namespace jpeg_test
