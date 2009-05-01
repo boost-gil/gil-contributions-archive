@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_view_test )
     {
         ifstream in( tiff_filename.c_str(), ios::binary );
 
-        rgb8_image_t img;
+        rgb8_image_t img( 200, 133 );
         read_view( in, view( img ), tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 200 );
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE( tiff_read_and_convert_view_test )
     {
         ifstream in( tiff_filename.c_str(), ios::binary );
 
-        rgb8_image_t img;
+        rgb8_image_t img( 200, 133 );
         read_and_convert_view( in, view( img ), tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 200 );
