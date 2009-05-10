@@ -25,6 +25,7 @@
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
+#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
@@ -278,6 +279,93 @@ private:
     png_infop _info_ptr;
 };
 
+
+struct png_type_format_checker
+{
+    png_type_format_checker( png_bitdepth::type   bit_depth
+                           , png_color_type::type color_type
+                           )
+    : _bit_depth ( bit_depth  )
+    , _color_type( color_type )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef is_read_supported< typename get_pixel_type< Image::view_t >::type
+                                 , png_tag
+                                 > is_supported_t;
+
+        return is_supported_t::_bit_depth  == _bit_depth
+            && is_supported_t::_color_type == _color_type;
+    }
+
+private:
+
+    png_bitdepth::type   _bit_depth;
+    png_color_type::type _color_type;
+};
+
+struct png_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , png_tag
+                                           >
+    {};
+};
+
+template< typename Device
+        >
+class dynamic_image_reader< Device
+                          , png_tag
+                          > 
+    : public reader< Device
+                   , png_tag
+                   , detail::read_and_no_convert
+                   >
+{
+    typedef reader< Device
+                  , png_tag
+                  , detail::read_and_no_convert
+                  > parent_t;
+
+public:
+
+    dynamic_image_reader( Device& device )
+    : reader( device )
+    {}    
+
+    template< typename Images >
+    void apply( any_image< Images >& images )
+    {
+        png_type_format_checker format_checker( _info._bit_depth
+                                              , _info._color_type
+                                              );
+
+        if( !construct_matched( images
+                              , format_checker
+                              ))
+        {
+            io_error( "No matching image type between those of the given any_image and that of the file" );
+        }
+        else
+        {
+            init_image( images
+                      , _settings
+                      , _info
+                      );
+
+            dynamic_io_fnobj< png_read_is_supported
+                            , parent_t
+                            > op( this );
+
+            apply_operation( view( images )
+                           , op
+                           );
+        }
+    }
+};
 
 } // namespace detail
 } // namespace gil

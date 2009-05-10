@@ -115,6 +115,37 @@ private:
 
     }
 
+    template< typename Images
+            , typename FormatChecker
+            , typename Parent
+            >
+    void dyn_apply( any_image< Images >& images
+                  , const FormatChecker& fc
+                  )
+    {
+        if( !construct_matched( images
+                              , format_checker
+                              ))
+        {
+            io_error( "No matching image type between those of the given any_image and that of the file" );
+        }
+        else
+        {
+            init_image( images
+                      , _settings
+                      , _info
+                      );
+
+            dynamic_io_fnobj< bmp_read_is_supported
+                            , Parent
+                            > op( this );
+
+            apply_operation( view( images )
+                           , op
+                           );
+        }
+    }
+
 protected:
 
     image_read_settings< FormatTag > _settings;

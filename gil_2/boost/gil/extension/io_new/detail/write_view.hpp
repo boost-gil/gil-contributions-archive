@@ -11,6 +11,7 @@
 #define BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP_INCLUDED
 
 #include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/type_traits/is_base_and_derived.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -146,12 +147,12 @@ template< typename Device
         , typename Log
         >
 inline
-void write_view( Device&                              device
-               , const View&                          view
+void write_view( Device&                                   device
+               , const View&                               view
                , const image_write_info< FormatTag, Log >& info
                , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
-                                                                                                                           , Device
-                                                                                                                           >::type
+                                                                                                    , Device
+                                                                                                    >::type
                                                                               , typename is_format_tag< FormatTag >::type
                                                                               , typename is_write_supported< typename get_pixel_type< View >::type
                                                                                                            , FormatTag
@@ -194,6 +195,167 @@ void write_view( const String&                        file_name
 
     write_view( device
               , view
+              , info
+              );
+}
+
+
+////////////////////////////////////// dynamic_image
+
+// without image_write_info
+template< typename Device
+        , typename Views
+        , typename FormatTag
+        >
+inline
+void write_view( Device&                        device
+               , const any_image_view< Views >& view
+               , const FormatTag&               tag
+               , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       >::type
+                                   >::type* ptr = 0
+               )
+{
+    detail::dynamic_image_writer< Device
+                                , FormatTag
+                                > dyn_writer( device );
+
+    dyn_writer.apply( view );
+}
+
+template< typename Device
+        , typename Views
+        , typename FormatTag
+        >
+inline
+void write_view( Device&                        device
+               , const any_image_view< Views >& views
+               , const FormatTag&               tag
+               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
+                                                                                                    , Device
+                                                                                                    >::type
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       >::type
+                                   >::type* ptr = 0
+        )
+{
+    typedef typename detail::is_adaptable_output_device< FormatTag
+                                                       , Device
+                                                       >::device_type dev_t;
+    dev_t dev( device );
+
+    write_view( dev
+              , views
+              , tag
+              );
+}
+
+template< typename String
+        , typename Views
+        , typename FormatTag
+        >
+inline
+void write_view( const String&                  file_name
+               , const any_image_view< Views >& views
+               , const FormatTag&               tag
+               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       >::type
+                                   >::type* ptr = 0
+               )
+{
+    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
+                                                , typename detail::file_stream_device<FormatTag>::write_tag()
+                                                );
+
+    write_view( device
+               , views
+               , tag
+               );
+}
+
+// with image_write_info
+/// \ingroup IO
+template< typename Device
+        , typename Views
+        , typename FormatTag
+        , typename Log
+        >
+inline
+void write_view( Device&                           device
+               , const any_image_view< Views >&    views
+               , const image_write_info< FormatTag 
+                                       , Log
+                                       >&           info
+               , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       >::type
+                                   >::type* ptr = 0
+               )
+{
+    detail::writer< Device
+                  , FormatTag
+                  , Log
+                  > writer( device );
+
+    writer.apply( views
+                , info
+                );
+}
+
+template< typename Device
+        , typename Views
+        , typename FormatTag
+        , typename Log
+        >
+inline
+void write_view( Device&                           device
+               , const any_image_view< Views >&    views
+               , const image_write_info< FormatTag 
+                                       , Log
+                                       >&          info
+               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
+                                                                                                    , Device
+                                                                                                    >::type
+                                                                              , typename is_format_tag< FormatTag >::type
+                                                                              >::type
+                                                          >::type* ptr = 0
+               )
+{
+    typename detail::is_adaptable_output_device< FormatTag
+                                               , Device
+                                               >::device_type dev( device );
+
+    write_view( dev
+              , views
+              , info
+              );
+}
+
+template< typename String
+        , typename Views
+        , typename FormatTag
+        , typename Log
+        >
+inline
+void write_view( const String&                      file_name
+               , const any_image_view< Views >&     view
+               , const image_write_info< FormatTag
+                                       , Log
+                                       >&           info
+               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       >::type
+                                   >::type* ptr = 0
+               )
+{
+    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
+                                                  , typename detail::file_stream_device< FormatTag >::write_tag()
+                                                  );
+
+    write_view( device
+              , views
               , info
               );
 }

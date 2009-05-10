@@ -75,8 +75,8 @@ public:
                     , _info_ptr
                     , static_cast< png_uint_32 >( view.width()  )
                     , static_cast< png_uint_32 >( view.height() )
-                    , png_rw_info::bit_depth
-                    , png_rw_info::color_type
+                    , png_rw_info::_bit_depth
+                    , png_rw_info::_color_type
                     , info._interlace_method
                     , info._compression_method
                     , info._filter_method
@@ -130,8 +130,8 @@ public:
                     , _info_ptr
                     , static_cast<int>( view.width()  )
                     , static_cast<int>( view.height() )
-                    , png_rw_info::bit_depth
-                    , png_rw_info::color_type
+                    , png_rw_info::_bit_depth
+                    , png_rw_info::_color_type
                     , PNG_INTERLACE_NONE
                     , PNG_COMPRESSION_TYPE_DEFAULT
                     , PNG_FILTER_TYPE_DEFAULT
@@ -148,15 +148,17 @@ private:
                    ,  mpl::false_       // is bit aligned
                    )
     {
-        typedef png_write_support< typename channel_type<View>::type
-                                 , typename color_space_type<View>::type
+        typedef typename get_pixel_type< View >::type pixel_t;
+
+        typedef png_write_support< typename channel_type    < pixel_t >::type
+                                 , typename color_space_type< pixel_t >::type
                                  > png_rw_info;
 
         if( little_endian() )
         {
-            if( png_rw_info::bit_depth == 16 )
+            if( png_rw_info::_bit_depth == 16 )
                 png_set_swap(_png_ptr);
-            if( png_rw_info::bit_depth < 8 )
+            if( png_rw_info::_bit_depth < 8 )
                 png_set_packswap(_png_ptr);
         }
 
@@ -192,9 +194,9 @@ private:
 
         if (little_endian() )
         {
-            if( png_rw_info::bit_depth == 16 )
+            if( png_rw_info::_bit_depth == 16 )
                 png_set_swap(_png_ptr);
-            if( png_rw_info::bit_depth < 8 )
+            if( png_rw_info::_bit_depth < 8 )
                 png_set_packswap(_png_ptr);
         }
 
@@ -217,17 +219,55 @@ private:
 
     void init_io( png_structp png_ptr )
     {
-        png_set_write_fn(png_ptr,
-                static_cast<void*>(&this->_io_dev),
-                static_cast<png_rw_ptr>(&png_io_base<Device>::write_data),
-                static_cast<png_flush_ptr>(&png_io_base<Device>::flush)
-                );
+        png_set_write_fn( png_ptr
+                        , static_cast< void* >        ( &this->_io_dev                   )
+                        , static_cast< png_rw_ptr >   ( &png_io_base<Device>::write_data )
+                        , static_cast< png_flush_ptr >( &png_io_base<Device>::flush      )
+                        );
     }
 
     png_structp _png_ptr;
     png_infop _info_ptr;
 };
 
+struct png_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , png_tag
+                                   >
+    {};
+};
+
+template< typename Device >
+class dynamic_image_writer< Device
+                          , png_tag
+                          >
+    : public writer< Device
+                   , png_tag
+                   >
+{
+    typedef writer< Device
+                  , png_tag
+                  > parent_t;
+
+public:
+
+    dynamic_image_writer( Device& file )
+    : writer( file )
+    {}
+
+    template< typename Views >
+    void apply( const any_image_view< Views >& views )
+    {
+        dynamic_io_fnobj< png_write_is_supported
+                        , parent_t
+                        > op( this );
+
+        apply_operation( views, op );
+    }
+};
 
 } // namespace detail
 } // namespace gil

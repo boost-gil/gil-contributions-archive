@@ -28,21 +28,22 @@ namespace boost { namespace gil { namespace detail {
 static const size_t PNG_BYTES_TO_CHECK = 4;
 
 // Read support
+template< png_bitdepth::type   BitDepth
+        , png_color_type::type ColorType
+        >
+struct png_rw_support_base
+{
+    static const png_bitdepth::type   _bit_depth  = BitDepth;
+    static const png_color_type::type _color_type = ColorType;
+};
 
 template< typename Channel
         , typename ColorSpace
         >
 struct png_read_support : read_support_false
-{};
-
-template< int BitDepth
-        , int ColorType
-        >
-struct png_rw_support_base
-{
-    BOOST_STATIC_CONSTANT( int, bit_depth  = BitDepth  );
-    BOOST_STATIC_CONSTANT( int, color_type = ColorType );
-};
+                        , png_rw_support_base< 1
+                                             , PNG_COLOR_TYPE_GRAY
+                                             > {};
 
 template< typename BitField
         , bool     Mutable
@@ -157,7 +158,9 @@ template< typename Channel
         , typename ColorSpace
         >
 struct png_write_support : write_support_false
-{};
+                         , png_rw_support_base< 1
+                                              , PNG_COLOR_TYPE_GRAY
+                                              > {};
 
 template< typename BitField
         , bool     Mutable
@@ -288,7 +291,14 @@ struct is_read_supported< Pixel
                                           , typename color_space_type< Pixel >::type
                                           >::is_supported
                 >
-{};
+{
+    typedef detail::png_read_support< typename channel_type< Pixel >::type
+                                    , typename color_space_type< Pixel >::type
+                                    > parent_t;
+
+    static const png_bitdepth::type   _bit_depth  = parent_t::_bit_depth;
+    static const png_color_type::type _color_type = parent_t::_color_type;
+};
 
 template< typename Pixel >
 struct is_write_supported< Pixel
@@ -298,7 +308,14 @@ struct is_write_supported< Pixel
                                            , typename color_space_type< Pixel >::type
                                            >::is_supported
                 > 
-{};
+{
+    typedef detail::png_write_support< typename channel_type< Pixel >::type
+                                     , typename color_space_type< Pixel >::type
+                                     > parent_t;
+
+    static const png_bitdepth::type   _bit_depth  = parent_t::_bit_depth;
+    static const png_color_type::type _color_type = parent_t::_color_type;
+};
 
 } // namespace gil
 } // namespace boost

@@ -23,6 +23,7 @@
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
@@ -293,6 +294,87 @@ private:
                        );
         }
 
+    }
+};
+
+struct jpeg_type_format_checker
+{
+    jpeg_type_format_checker( jpeg_color_space::type color_space )
+    : _color_space( color_space )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        return is_read_supported< typename get_pixel_type< Image::view_t >::type
+                                , jpeg_tag
+                                >::_color_space == _color_space;
+    }
+
+private:
+
+    jpeg_color_space::type _color_space;
+};
+
+struct jpeg_read_is_supported
+{
+    template< typename View > 
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , jpeg_tag
+                                           >
+    {};
+};
+
+template< typename Device
+        >
+class dynamic_image_reader< Device
+                          , jpeg_tag
+                          > 
+    : public reader< Device
+                   , jpeg_tag
+                   , detail::read_and_no_convert
+                   >
+{
+    typedef reader< Device
+                  , jpeg_tag
+                  , detail::read_and_no_convert
+                  > parent_t;
+
+public:
+
+    dynamic_image_reader( Device& device )
+    : reader( device )
+    {}    
+
+    template< typename Images >
+    void apply( any_image< Images >& images )
+    {
+        jpeg_type_format_checker format_checker( _info._color_space != JCS_YCbCr 
+                                               ? _info._color_space
+                                               : JCS_RGB
+                                               );
+
+        if( !construct_matched( images
+                              , format_checker
+                              ))
+        {
+            io_error( "No matching image type between those of the given any_image and that of the file" );
+        }
+        else
+        {
+            init_image( images
+                      , _settings
+                      , _info
+                      );
+
+            dynamic_io_fnobj< jpeg_read_is_supported
+                            , parent_t
+                            > op( this );
+
+            apply_operation( view( images )
+                           , op
+                           );
+        }
     }
 };
 

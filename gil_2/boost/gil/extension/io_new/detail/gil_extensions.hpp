@@ -21,8 +21,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/gil/gil_all.hpp>
-
 #include <boost/mpl/if.hpp>
+
+#include "dynamic_io_new.hpp"
 
 namespace boost { namespace gil {
 
@@ -210,6 +211,18 @@ struct channel_type< const packed_pixel< B, C, L > >
 		            >
 {};
 
+template<>
+struct channel_type< any_image_pixel_t >
+{
+    typedef any_image_channel_t type;
+};
+
+template<>
+struct color_space_type< any_image_pixel_t >
+{
+    typedef any_image_color_space_t type;
+};
+
 /// get_pixel_type metafunction
 /// \brief Depending on Image this function generates either 
 ///        the pixel type or the reference type in case
@@ -220,6 +233,11 @@ struct get_pixel_type : mpl::if_< typename is_bit_aligned< typename View::value_
                                 , typename View::value_type
                                 > {};
 
+template< typename ImageViewTypes >
+struct get_pixel_type< any_image_view< ImageViewTypes > >
+{
+    typedef any_image_pixel_t type;
+};
 
 namespace detail {
 

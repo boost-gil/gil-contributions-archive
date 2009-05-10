@@ -496,6 +496,8 @@ template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,v
 template< typename Device, typename FormatTag, typename ConversionPolicy > class reader;
 template< typename Device, typename FormatTag, typename Log = no_log > class writer;
 
+template< typename Device, typename FormatTag > class dynamic_image_reader;
+template< typename Device, typename FormatTag, typename Log = no_log > class dynamic_image_writer;
 } // namespace detail
 } // namespace gil
 } // namespace boost

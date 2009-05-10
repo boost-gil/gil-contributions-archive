@@ -6,7 +6,8 @@
 #include "paths.hpp"
 
 using namespace std;
-using namespace boost::gil;
+using namespace boost;
+using namespace gil;
 
 BOOST_AUTO_TEST_CASE( png_old_read_dimensions_test )
 {
@@ -64,4 +65,24 @@ BOOST_AUTO_TEST_CASE( png_old_write_view_test )
         gray8_image_t img( 320, 240 );
         png_write_view( filename, view( img ) );
     }
+}
+
+BOOST_AUTO_TEST_CASE( png_old_dynamic_image_test )
+{
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , rgba8_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    png_read_image( png_filename.c_str()
+                  , runtime_image
+                  );
+
+    png_write_view( png_out + "old_dynamic_image_test.png"
+                  , view( runtime_image )
+                  );
 }

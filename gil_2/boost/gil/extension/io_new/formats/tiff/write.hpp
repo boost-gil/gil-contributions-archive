@@ -185,10 +185,10 @@ private:
         _io_dev.template set_property<tiff_rows_per_strip>( _io_dev.get_default_strip_size() );
 
         write_data( src_view
-              , info
-              , (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8
-              , typename is_bit_aligned< pixel_t >::type()
-              );
+                  , info
+                  , (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8
+                  , typename is_bit_aligned< pixel_t >::type()
+                  );
     }
 
     template< typename View >

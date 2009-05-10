@@ -89,5 +89,4 @@ BOOST_AUTO_TEST_CASE( bmp_partial_image_test )
                   , tag_t()
                   );
     }
-
 }

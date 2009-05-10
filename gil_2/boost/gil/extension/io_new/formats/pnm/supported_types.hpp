@@ -29,10 +29,22 @@ namespace boost { namespace gil { namespace detail {
 
 // Read Support
 
+template< pnm_image_type::type ASCII_Type
+        , pnm_image_type::type Binary_Type
+        >
+struct png_rw_support_base
+{
+    static const pnm_image_type::type _asc_type = ASCII_Type;
+    static const pnm_image_type::type _bin_type = Binary_Type;
+};
+
 template< typename Channel
         , typename ColorSpace
         >
-struct pnm_read_support : read_support_false {};
+struct pnm_read_support : read_support_false
+                        , png_rw_support_base< 0
+                                             , 0
+                                             > {};
 
 template< typename BitField, bool Mutable >
 struct pnm_read_support< packed_dynamic_channel_reference< BitField
@@ -40,18 +52,27 @@ struct pnm_read_support< packed_dynamic_channel_reference< BitField
                                                          , Mutable
                                                          >
                        , gray_t
-                       > : read_support_true {};
+                       > : read_support_true
+                         , png_rw_support_base< pnm_type_mono_asc
+                                              , pnm_type_mono_bin
+                                              > {};
 
 template<>
 struct pnm_read_support< bits8
                        , gray_t
-                       > : read_support_true {};
+                       > : read_support_true
+                         , png_rw_support_base< pnm_type_gray_asc
+                                              , pnm_type_gray_bin
+                                              > {};
 
 
 template<>
 struct pnm_read_support< bits8
                        , rgb_t
-                       > : read_support_true {};
+                       > : read_support_true
+                         , png_rw_support_base< pnm_type_color_asc
+                                              , pnm_type_color_bin
+                                              > {};
 
 // Write support
 
@@ -67,18 +88,28 @@ struct pnm_write_support< packed_dynamic_channel_reference< BitField
                                                           , Mutable
                                                           >
                         , gray_t
-                        > : write_support_true {};
+                        > : write_support_true
+                          , png_rw_support_base< pnm_type_mono_asc
+                                               , pnm_type_mono_bin
+                                               > {};
+
 
 template<>
 struct pnm_write_support< bits8
                         , gray_t
-                        > : write_support_true {};
+                        > : write_support_true
+                          , png_rw_support_base< pnm_type_gray_asc
+                                               , pnm_type_gray_bin
+                                               > {};
 
 
 template<>
 struct pnm_write_support< bits8
                         , rgb_t
-                        > : write_support_true {};
+                        > : write_support_true
+                          , png_rw_support_base< pnm_type_color_asc
+                                               , pnm_type_color_bin
+                                               > {};
 
 } // namespace detail
 
@@ -89,7 +120,15 @@ struct is_read_supported< Pixel
     : mpl::bool_< detail::pnm_read_support< typename channel_type< Pixel >::type
                                           , typename color_space_type< Pixel >::type
                                           >::is_supported
-                > {};
+                >
+{
+    typedef detail::pnm_read_support< typename channel_type< Pixel >::type
+                                    , typename color_space_type< Pixel >::type
+                                    > parent_t;
+
+    static const pnm_image_type::type _asc_type = parent_t::_asc_type;
+    static const pnm_image_type::type _bin_type = parent_t::_bin_type;
+};
 
 template< typename Pixel >
 struct is_write_supported< Pixel

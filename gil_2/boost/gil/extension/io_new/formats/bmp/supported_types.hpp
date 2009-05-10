@@ -34,7 +34,10 @@ namespace boost { namespace gil { namespace detail {
 template< typename Channel
         , typename ColorSpace
         >
-struct bmp_read_support : read_support_false {};
+struct bmp_read_support : read_support_false
+{
+    static const bmp_bits_per_pixel::type bpp = 0;
+};
 
 template< typename BitField
         , bool     Mutable
@@ -44,7 +47,10 @@ struct bmp_read_support< packed_dynamic_channel_reference< BitField
                                                          , Mutable
                                                          >
                        , gray_t
-                       > : read_support_true {};
+                       > : read_support_true
+{
+    static const bmp_bits_per_pixel::type bpp = 1;
+};
 
 template< typename BitField
         , bool     Mutable
@@ -54,23 +60,38 @@ struct bmp_read_support< packed_dynamic_channel_reference< BitField
                                                          , Mutable
                                                          >
                        , gray_t
-                       > : read_support_true {};
+                       > : read_support_true
+{
+    static const bmp_bits_per_pixel::type bpp = 4;
+};
+
 
 template<>
 struct bmp_read_support< bits8
                        , gray_t
-                       > : read_support_true {};
+                       > : read_support_true
+{
+    static const bmp_bits_per_pixel::type bpp = 8;
+};
+                      
 
 
 template<>
 struct bmp_read_support< bits8
                        , rgb_t
-                       > : read_support_true {};
+                       > : read_support_true
+{
+    static const bmp_bits_per_pixel::type bpp = 24;
+};
+
 
 template<>
 struct bmp_read_support< bits8
                        , rgba_t
-                       > : read_support_true {};
+                       > : read_support_true
+{
+    static const bmp_bits_per_pixel::type bpp = 32;
+};
 
 
 // Write support
@@ -101,7 +122,14 @@ struct is_read_supported< Pixel
     : mpl::bool_< detail::bmp_read_support< typename channel_type< Pixel >::type
                                           , typename color_space_type< Pixel >::type
                                           >::is_supported 
-                > {};
+                >
+{
+    typedef detail::bmp_read_support< typename channel_type< Pixel >::type
+                                    , typename color_space_type< Pixel >::type
+                                    > parent_t;
+
+    static const typename bmp_bits_per_pixel::type bpp = parent_t::bpp;
+};
 
 template< typename Pixel >
 struct is_write_supported< Pixel

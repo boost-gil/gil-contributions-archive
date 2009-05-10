@@ -12,8 +12,9 @@
 #include "paths.hpp"
 
 using namespace std;
-using namespace boost::gil;
-using namespace boost::filesystem;
+using namespace boost;
+using namespace gil;
+using namespace filesystem;
 
 typedef jpeg_tag tag_t;
 
@@ -229,4 +230,26 @@ BOOST_AUTO_TEST_CASE( jpeg_stream_test )
     string filename( jpeg_out + "stream_test.jpg" );
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
+}
+
+BOOST_AUTO_TEST_CASE( jpeg_dynamic_image_test )
+{
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , rgba8_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    read_image( jpeg_filename.c_str()
+              , runtime_image
+              , jpeg_tag()
+              );
+
+    write_view( jpeg_out + "old_dynamic_image_test.jpg"
+              , view( runtime_image )
+              , jpeg_tag()
+              );
 }

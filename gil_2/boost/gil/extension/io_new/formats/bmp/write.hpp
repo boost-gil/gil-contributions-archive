@@ -40,7 +40,7 @@ class writer< Device
 {
 public:
 
-    writer( Device & file )
+    writer( Device& file )
     : _out( file )
     {
     }
@@ -133,7 +133,7 @@ private:
                     , const std::size_t spn
                     )
     {
-        std::vector< byte_t > buffer( spn );
+        byte_vector_t buffer( spn );
         std::fill( buffer.begin(), buffer.end(), 0 );
 
 
@@ -162,6 +162,46 @@ private:
 private:
 
     Device& _out;
+};
+
+
+struct bmp_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , bmp_tag
+                                   >
+    {};
+};
+
+template< typename Device >
+class dynamic_image_writer< Device
+                          , bmp_tag
+                          >
+    : public writer< Device
+                   , bmp_tag
+                   >
+{
+    typedef writer< Device
+                  , bmp_tag
+                  > parent_t;
+
+public:
+
+    dynamic_image_writer( Device& file )
+    : writer( file )
+    {}
+
+    template< typename Views >
+    void apply( const any_image_view< Views >& views )
+    {
+        dynamic_io_fnobj< bmp_write_is_supported
+                        , parent_t
+                        > op( this );
+
+        apply_operation( views, op );
+    }
 };
 
 } // detail

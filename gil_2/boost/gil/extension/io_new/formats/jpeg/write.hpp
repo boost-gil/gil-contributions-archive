@@ -74,7 +74,8 @@ public:
         _cinfo.input_components = num_channels<View>::value;
         _cinfo.in_color_space = detail::jpeg_write_support< typename channel_type< View >::type
                                                           , typename color_space_type<View>::type
-                                                          >::color_type;
+                                                          >::_color_space;
+
         jpeg_set_defaults(&_cinfo);
         jpeg_set_quality(&_cinfo, 100, TRUE);
 
@@ -90,7 +91,7 @@ public:
         _cinfo.input_components = num_channels<View>::value;
         _cinfo.in_color_space = detail::jpeg_write_support< typename channel_type<View>::type
                                                           , typename color_space_type<View>::type
-                                                          >::color_type;
+                                                          >::_color_space;
 
         jpeg_set_defaults( &_cinfo);
         jpeg_set_quality ( &_cinfo
@@ -169,6 +170,45 @@ private:
 
     static const unsigned int buffer_size = 1024;
     JOCTET buffer[buffer_size];
+};
+
+struct jpeg_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , jpeg_tag
+                                   >
+    {};
+};
+
+template< typename Device >
+class dynamic_image_writer< Device
+                          , jpeg_tag
+                          >
+    : public writer< Device
+                   , jpeg_tag
+                   >
+{
+    typedef writer< Device
+                  , jpeg_tag
+                  > parent_t;
+
+public:
+
+    dynamic_image_writer( Device& file )
+    : writer( file )
+    {}
+
+    template< typename Views >
+    void apply( const any_image_view< Views >& views )
+    {
+        dynamic_io_fnobj< jpeg_write_is_supported
+                        , parent_t
+                        > op( this );
+
+        apply_operation( views, op );
+    }
 };
 
 } // detail

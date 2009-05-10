@@ -10,7 +10,8 @@
 #include "paths.hpp"
 
 using namespace std;
-using namespace boost::gil;
+using namespace boost;
+using namespace gil;
 
 typedef pnm_tag tag_t;
 
@@ -19,8 +20,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_info_using_string )
     {
         image_read_info< pnm_tag > info = read_image_info( pnm_filename
                                                          , tag_t() );
-        BOOST_CHECK_EQUAL( info._width , 200 );
-        BOOST_CHECK_EQUAL( info._height, 200 );
+        BOOST_CHECK_EQUAL( info._width , 256 );
+        BOOST_CHECK_EQUAL( info._height, 256 );
     }
 
     {
@@ -29,8 +30,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_info_using_string )
         image_read_info< tag_t > info = read_image_info( in
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 200 );
-        BOOST_CHECK_EQUAL( info._height, 200 );
+        BOOST_CHECK_EQUAL( info._width , 256 );
+        BOOST_CHECK_EQUAL( info._height, 256 );
     }
 
     {
@@ -39,8 +40,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_info_using_string )
         image_read_info< tag_t > info = read_image_info( file
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 200 );
-        BOOST_CHECK_EQUAL( info._height, 200 );
+        BOOST_CHECK_EQUAL( info._width , 256 );
+        BOOST_CHECK_EQUAL( info._height, 256 );
     }
 }
 
@@ -50,8 +51,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_test )
         rgb8_image_t img;
         read_image( pnm_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 200 );
+        BOOST_CHECK_EQUAL( img.width() , 256 );
+        BOOST_CHECK_EQUAL( img.height(), 256 );
     }
 
     {
@@ -60,8 +61,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_test )
         rgb8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 200 );
+        BOOST_CHECK_EQUAL( img.width() , 256 );
+        BOOST_CHECK_EQUAL( img.height(), 256 );
     }
 
     {
@@ -70,8 +71,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_test )
         rgb8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 200 );
+        BOOST_CHECK_EQUAL( img.width() , 256 );
+        BOOST_CHECK_EQUAL( img.height(), 256 );
     }
 }
 
@@ -81,8 +82,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( pnm_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 200 );
+        BOOST_CHECK_EQUAL( img.width() , 256 );
+        BOOST_CHECK_EQUAL( img.height(), 256 );
     }
 
     {
@@ -91,8 +92,8 @@ BOOST_AUTO_TEST_CASE( pnm_read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 200 );
+        BOOST_CHECK_EQUAL( img.width() , 256 );
+        BOOST_CHECK_EQUAL( img.height(), 256 );
     }
 
     {
@@ -101,29 +102,29 @@ BOOST_AUTO_TEST_CASE( pnm_read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 200 );
+        BOOST_CHECK_EQUAL( img.width() , 256 );
+        BOOST_CHECK_EQUAL( img.height(), 256 );
     }
 }
 
 BOOST_AUTO_TEST_CASE( pnm_read_view_test )
 {
     {
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
         read_view( pnm_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( pnm_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
         read_view( in, view( img ), tag_t() );
     }
 
     {
         FILE* file = fopen( pnm_filename.c_str(), "rb" );
         
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
         read_view( file, view( img ), tag_t() );
     }
 }
@@ -131,21 +132,21 @@ BOOST_AUTO_TEST_CASE( pnm_read_view_test )
 BOOST_AUTO_TEST_CASE( pnm_read_and_convert_view_test )
 {
     {
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
         read_and_convert_view( pnm_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( pnm_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
         read_and_convert_view( in, view( img ), tag_t() );
     }
 
     {
         FILE* file = fopen( pnm_filename.c_str(), "rb" );
         
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
 
         read_and_convert_view( file
                              , view( img )
@@ -159,7 +160,7 @@ BOOST_AUTO_TEST_CASE( pnm_write_view_test )
     {
         string filename( pnm_out + "write_test_string.pnm" );
 
-        gray8_image_t img( 200, 200 );
+        gray8_image_t img( 256, 256 );
         write_view( filename, view( img ), tag_t() );
     }
 
@@ -168,7 +169,7 @@ BOOST_AUTO_TEST_CASE( pnm_write_view_test )
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
         write_view( out, view( img ), tag_t() );
     }
 
@@ -177,7 +178,7 @@ BOOST_AUTO_TEST_CASE( pnm_write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
-        rgb8_image_t img( 200, 200 );
+        rgb8_image_t img( 256, 256 );
         write_view( file, view( img ), tag_t() );
     }
 
@@ -215,4 +216,26 @@ BOOST_AUTO_TEST_CASE( pnm_stream_test )
     string filename( pnm_out + "stream_test.pnm" );
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
+}
+
+BOOST_AUTO_TEST_CASE( pnm_dynamic_image_test )
+{
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , gil::detail::gray1_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    read_image( pnm_filename.c_str()
+              , runtime_image
+              , tag_t()
+              );
+
+    write_view( pnm_out + "dynamic_image_test.pnm"
+              , view( runtime_image )
+              , tag_t()
+              );
 }

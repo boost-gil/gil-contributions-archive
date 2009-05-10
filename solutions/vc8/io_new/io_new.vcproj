@@ -60,9 +60,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng_chh.lib zlib.lib libtiff.lib"
+				AdditionalDependencies="libjpegd.lib libpng13d.lib zlib1d.lib libtiffd.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\chh\image libs\release;"
+				AdditionalLibraryDirectories="C:\chh\software\lib\debug"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -122,7 +122,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -137,7 +137,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libjpeg.lib libpng_chh.lib zlib.lib libtiff.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\chh\image libs\release;"
+				AdditionalLibraryDirectories="C:\chh\image libs\lib\release;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -289,6 +289,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\conversion_policies.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_io_new.hpp"
 					>
 				</File>
 				<File
@@ -523,26 +527,6 @@
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_file_format_test.cpp"
 				>
-			</File>
-			<File
-				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_file_format_test_2.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_old_test.cpp"

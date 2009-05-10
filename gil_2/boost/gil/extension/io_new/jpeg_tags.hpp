@@ -49,7 +49,7 @@ struct jpeg_dct_method : property_base< J_DCT_METHOD >
 };
 
 template<>
-struct image_read_info<jpeg_tag> 
+struct image_read_info< jpeg_tag >
 {
    jpeg_image_width::type  _width;
    jpeg_image_height::type _height;

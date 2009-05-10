@@ -10,7 +10,8 @@
 #include "paths.hpp"
 
 using namespace std;
-using namespace boost::gil;
+using namespace boost;
+using namespace gil;
 
 typedef png_tag tag_t;
 
@@ -234,4 +235,26 @@ BOOST_AUTO_TEST_CASE( png_stream_test )
     string filename( png_out + "stream_test.png" );
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
+}
+
+BOOST_AUTO_TEST_CASE( png_dynamic_image_test )
+{
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , rgba8_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    read_image( png_filename.c_str()
+              , runtime_image
+              , tag_t()
+              );
+
+    write_view( png_out + "dynamic_image_test.png"
+              , view( runtime_image )
+              , tag_t()
+              );
 }

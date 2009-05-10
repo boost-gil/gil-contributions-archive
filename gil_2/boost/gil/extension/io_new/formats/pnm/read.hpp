@@ -25,6 +25,7 @@
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
+#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 #include <boost/gil/extension/io_new/detail/bit_operations.hpp>
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
@@ -136,15 +137,12 @@ private:
 
         uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
 
-        std::vector< byte_t > row( pitch );
+        byte_vector_t row( pitch );
         View_Src v = interleaved_view( this->_info._width
                                      , 1
                                      , (typename View_Src::value_type*) &row.front()
                                      , pitch
                                      );
-
-        typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
-        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
         char buf[16];
 
@@ -171,25 +169,96 @@ private:
 					}
                 }
 
-                // when reading mono images we need to reverse the values.
+                int value = atoi( buf );
+
+                
                 if( this->_info._max_value == 1 )
                 {
-                    // 0 is white
-                    row[x] = ( atoi( buf ) != 0 ) ? 0 : 255;
+                    typedef channel_type< typename get_pixel_type< View_Dst >::type >::type channel_t;
+
+                    // for pnm format 0 is white
+                    row[x] = ( value != 0 ) 
+                             ? 0 
+                             : channel_traits< channel_t >::max_value();
                 }
                 else
                 {
-                    row[x] = atoi( buf );
+                    row[x] = value;
                 }
             }
 
-            this->_cc_policy.read( beg
-                                 , end
-                                 , view.row_begin( y )
-                                 );
-
+            // We are reading a gray1_image like a gray8_image but the two pixel_t
+            // aren't compatible. Though, read_and_no_convert::read(...) wont work.
+            copy_data< View_Dst, View_Src >( view
+                                           , v
+                                           , y
+                                           , is_same< View_Dst, gray1_image_t::view_t >::type()
+                                           );
         }
     }
+
+    template< typename View_Dst
+            , typename View_Src
+            >
+    void copy_data( const View_Dst&              dst
+                  , const View_Src&              src
+                  , typename View_Dst::y_coord_t y
+                  , mpl::true_ // is gray1_view
+                  )
+    {
+        if(  this->_info._max_value == 1 )
+        {
+            typename View_Dst::x_iterator it = dst.row_begin( y );
+
+            for( typename View_Dst::x_coord_t x = 0
+               ; x < dst.width()
+               ; ++x
+               )
+            {
+                it[x] = src[x];
+            }
+
+/*
+            copy_and_convert_pixels( src
+                                   , subimage_view( dst
+                                                  , 0
+                                                  , (int) y
+                                                  , (int) dst.width()
+                                                  , 1
+                                                  )
+                                    );
+*/
+
+
+        }
+        else
+        {
+            copy_data( dst
+                     , src
+                     , y
+                     , mpl::false_()
+                     );
+        }
+    }
+
+    template< typename View_Dst
+            , typename View_Src
+            >
+    void copy_data( const View_Dst&              view
+                  , const View_Src&              dst
+                  , typename View_Dst::y_coord_t y
+                  , mpl::false_ // is gray1_view
+                  )
+    {
+        typename View_Src::x_iterator beg = dst.row_begin( 0 ) + this->_settings._top_left.x;
+        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
+
+        this->_cc_policy.read( beg
+                             , end
+                             , view.row_begin( y )
+                             );
+    }
+
 
     template< typename View_Src
             , typename View_Dst
@@ -294,6 +363,88 @@ private:
 
     Device& _io_dev;
 };
+
+struct pnm_type_format_checker
+{
+    pnm_type_format_checker( pnm_image_type::type type )
+    : _type( type )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef is_read_supported< typename get_pixel_type< Image::view_t >::type
+                                 , pnm_tag
+                                 > is_supported_t;
+
+        return is_supported_t::_asc_type == _type
+            || is_supported_t::_bin_type == _type;
+    }
+
+private:
+
+    pnm_image_type::type _type;
+};
+
+struct pnm_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , pnm_tag
+                                           >
+    {};
+};
+
+template< typename Device
+        >
+class dynamic_image_reader< Device
+                          , pnm_tag
+                          > 
+    : public reader< Device
+                   , pnm_tag
+                   , detail::read_and_no_convert
+                   >
+{
+    typedef reader< Device
+                  , pnm_tag
+                  , detail::read_and_no_convert
+                  > parent_t;
+
+public:
+
+    dynamic_image_reader( Device& device )
+    : reader( device )
+    {}    
+
+    template< typename Images >
+    void apply( any_image< Images >& images )
+    {
+        pnm_type_format_checker format_checker( _info._type );
+
+        if( !construct_matched( images
+                              , format_checker
+                              ))
+        {
+            io_error( "No matching image type between those of the given any_image and that of the file" );
+        }
+        else
+        {
+            init_image( images
+                      , _settings
+                      , _info
+                      );
+
+            dynamic_io_fnobj< pnm_read_is_supported
+                            , parent_t
+                            > op( this );
+
+            apply_operation( view( images )
+                           , op
+                           );
+        }
+    }
+};
+
 
 } // detail
 } // gil

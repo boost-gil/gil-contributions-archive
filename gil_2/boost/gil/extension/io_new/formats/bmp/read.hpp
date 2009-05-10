@@ -24,6 +24,7 @@
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/bit_operations.hpp>
+#include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
@@ -459,10 +460,106 @@ private:
         }
     }
 
-private:
+protected:
 
     Device& _io_dev;
     image_read_info< bmp_tag > _info;
+};
+
+/////////////////////////////////// dynamic image
+
+class bmp_type_format_checker
+{
+public:
+
+    bmp_type_format_checker( const bmp_bits_per_pixel::type& bpp )
+    : _bpp( bpp )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        if( _bpp < 32 )
+        {
+            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+        else
+        {
+            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+    }
+
+private:
+
+    const bmp_bits_per_pixel::type& _bpp;
+};
+
+struct bmp_read_is_supported
+{
+    template< typename View > 
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , bmp_tag
+                                           >
+    {};
+};
+
+template< typename Device
+        >
+class dynamic_image_reader< Device
+                          , bmp_tag
+                          > 
+    : public reader< Device
+                   , bmp_tag
+                   , detail::read_and_no_convert
+                   >
+{
+    typedef reader< Device
+                  , bmp_tag
+                  , detail::read_and_no_convert
+                  > parent_t;
+
+public:
+
+    dynamic_image_reader( Device& device )
+    : reader( device )
+    {}    
+
+    template< typename Images >
+    void apply( any_image< Images >& images )
+    {
+        if( !_info._valid )
+        {
+            get_info();
+        }
+
+        bmp_type_format_checker format_checker( _info._bits_per_pixel );
+
+        if( !construct_matched( images
+                              , format_checker
+                              ))
+        {
+            io_error( "No matching image type between those of the given any_image and that of the file" );
+        }
+        else
+        {
+            init_image( images
+                      , _settings
+                      , _info
+                      );
+
+            dynamic_io_fnobj< bmp_read_is_supported
+                            , parent_t
+                            > op( this );
+
+            apply_operation( view( images )
+                           , op
+                           );
+        }
+    }
 };
 
 } // detail

@@ -29,7 +29,7 @@ struct indexed_image_deref_fn
     typedef IndicesLoc indices_locator_t;
     typedef PaletteLoc palette_locator_t;
 
-    typedef typename channel_type< typename indices_locator_t::value_type >::type index_t;
+    typedef typename channel_type< typename indices_locator_t::reference >::type index_t;
 
     typedef indexed_image_deref_fn          const_t;
     typedef typename PaletteLoc::value_type value_type;
