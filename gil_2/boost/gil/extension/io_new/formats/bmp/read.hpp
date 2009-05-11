@@ -214,32 +214,118 @@ public:
             case 1:
             {
                 read_palette_image< gray1_image_t::view_t
-                                  , mirror_bits< byte_vector_t, mpl::true_ >
-                                  > ( dst_view, pitch, ybeg, yend, yinc, offset );
+                                  , mirror_bits< byte_vector_t
+                                               , mpl::true_
+                                               >
+                                  > ( dst_view
+                                    , pitch
+                                    , ybeg
+                                    , yend
+                                    , yinc
+                                    , offset
+                                    );
                 break;
             }
 
             case 4:
             {
-                read_palette_image< gray4_image_t::view_t
-                                  , swap_half_bytes< byte_vector_t, mpl::true_ >
-                                  > ( dst_view, pitch, ybeg, yend, yinc, offset );
+/*
+				switch ( _info._compression )				 
+				{
+				    case ct_rle4:
+				    {
+					    read_palette_image_rle( dst_view
+					                          , pitch
+					                          , ybeg
+					                          , yend
+					                          , yinc
+					                          , offset
+					                          );
+
+					    break;
+                    }
+
+				    case ct_rgb:
+				    {
+					    read_palette_image< gray4_image_t::view_t
+									      , swap_half_bytes< byte_vector_t
+									                       , mpl::true_
+									                       >
+									      > ( dst_view
+									        , pitch
+									        , ybeg
+									        , yend
+									        , yinc
+									        , offset
+									        );
+					    break;
+                    {
+
+				    default:
+				    {
+					    io_error( "Unsupported compression mode in BMP file." );
+                        break;
+                    }
+                }
+*/
                 break;
             }
 
             case 8:
             {
-                read_palette_image< gray8_image_t::view_t
-                                  , do_nothing< std::vector< gray8_pixel_t > >
-                                  > ( dst_view, pitch, ybeg, yend, yinc, offset );
+				switch ( _info._compression )
+				{
+				    case ct_rle8:
+				    {
+					    read_palette_image_rle( dst_view
+					                          , pitch
+					                          , ybeg
+					                          , yend
+					                          , yinc
+					                          , offset
+					                          );
+					    break;
+                    }
+
+				    case ct_rgb:
+				    {
+					    read_palette_image< gray8_image_t::view_t
+									      , do_nothing< std::vector< gray8_pixel_t > >
+									      > ( dst_view
+									        , pitch
+									        , ybeg
+									        , yend
+									        , yinc
+									        , offset
+									        );
+					    break;
+                    }
+
+				    default:
+				    {
+					    io_error( "Unsupported compression mode in BMP file." );
+                        break;
+				    }
+                }
+
                 break;
             }
 
-            case 15: case 16: {  read_data_15( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
+            case 15: case 16:
+            {
+                read_data_15( dst_view
+                            , pitch
+                            , ybeg
+                            , yend
+                            , yinc
+                            , offset
+                            ); 
+
+                break;
+            }
 
             case 24: {  read_data< bgr8_view_t  >( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
             case 32: {  read_data< bgra8_view_t >( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
-
         }
     }
 
@@ -459,6 +545,201 @@ private:
                                  );
         }
     }
+
+
+	template< typename Buffer
+            , typename View
+	        >
+	void copy_row_if_needed( const Buffer&  buf
+	                       , const View&    view
+						   , std::ptrdiff_t y
+						   )
+	{
+		if(  y >= this->_settings._top_left.y
+		  && y <  this->_settings._dim.y
+		  )
+		{
+            typename Buffer::const_iterator beg = buf.begin() + this->_settings._top_left.x;
+            typename Buffer::const_iterator end = beg + this->_settings._dim.x;
+
+			std::copy( beg
+			         , end
+			         , view.row_begin( y )
+			         );
+		}
+	}
+
+    template< typename View_Dst >
+    void read_palette_image_rle( const View_Dst& view
+                               , int             pitch
+                               , std::ptrdiff_t  ybeg
+                               , std::ptrdiff_t  yend
+                               , std::ptrdiff_t  yinc
+                               , int             offset
+                               )
+    {
+        assert(  _info._compression == ct_rle4
+              || _info._compression == ct_rle8
+              );
+
+        std::vector< rgba8_pixel_t > pal;
+        read_palette( pal );
+
+        // jump to start of rle4 data
+        _io_dev.seek( offset );
+
+        // we need to know the stream position for padding purposes
+        std::size_t stream_pos = offset;
+
+        typedef std::vector< rgba8_pixel_t > Buf_type;
+        Buf_type buf( this->_settings._dim.x );
+        Buf_type::iterator dst_it  = buf.begin();
+        Buf_type::iterator dst_end = buf.end();
+
+        std::ptrdiff_t y = ybeg;
+        bool finished = false;
+
+        while ( !finished )
+        {
+            std::ptrdiff_t count  = _io_dev.read_int8();
+            std::ptrdiff_t second = _io_dev.read_int8();
+            stream_pos += 2;
+
+            if ( count )
+            {
+                // encoded mode
+
+                // clamp to boundary
+                if( count > dst_end - dst_it )
+                {
+                    count = dst_end - dst_it;
+                }
+
+                if( _info._compression == ct_rle4 )
+                {
+                    std::ptrdiff_t cs[2] = { second >> 4, second & 0x0f };
+
+                    for( int i = 0; i < count; ++i )
+                    {
+                        *dst_it++ = pal[ cs[i & 1] ];
+                    }
+                }
+                else
+                {
+                    for( int i = 0; i < count; ++i )
+                    {
+                        *dst_it++ = pal[ second ];
+                    }
+                }
+            }
+            else
+            {
+                switch( second )
+                {
+                    case 0:  // end of row
+                    {
+                        copy_row_if_needed( buf, view, y );
+
+                        y += yinc;
+                        if( y == yend )
+                        {
+                            finished = true;
+                        }
+                        else
+                        {
+                            dst_it = buf.begin();
+                            dst_end = buf.end();
+                        }
+
+                        break;
+                    }
+
+                    case 1:  // end of bitmap
+                    {
+                        copy_row_if_needed( buf, view, y );
+                        finished = true;
+
+                        break;
+                    }
+
+                    case 2:  // offset coordinates
+                    {
+                        std::ptrdiff_t dx = _io_dev.read_int8();
+                        std::ptrdiff_t dy = _io_dev.read_int8() * yinc;
+                        stream_pos += 2;
+
+                        if( dy )
+                        {
+                            copy_row_if_needed( buf, view, y );
+                        }
+
+                        std::ptrdiff_t x = dst_it - buf.begin();
+                        x += dx;
+
+                        if( x > _info._width )
+                        {
+                            io_error( "Mangled BMP file." );
+                        }
+
+                        y += dy;
+                        if( yinc > 0 ? y > yend : y < yend )
+                        {
+                            io_error( "Mangled BMP file." );
+                        }
+
+                        dst_it = buf.begin() + x;
+                        dst_end = buf.end();
+                        
+                        break;
+                    }
+
+                    default:  // absolute mode
+                    {
+                        count = second;
+
+                        // clamp to boundary
+                        if( count > dst_end - dst_it )
+                        {
+                            count = dst_end - dst_it;
+                        }
+
+                        if ( _info._compression == ct_rle4 )
+                        {
+                            for( int i = 0; i < count; ++i )
+                            {
+                                uint8_t packed_indices = _io_dev.read_int8();
+                                ++stream_pos;
+
+                                *dst_it++ = pal[ packed_indices >> 4 ];
+                                if( ++i == second )
+                                    break;
+
+                                *dst_it++ = pal[ packed_indices & 0x0f ];
+                            }
+                        }
+                        else
+                        {
+                            for( int i = 0; i < count; ++i )
+                            {
+                                uint8_t c = _io_dev.read_int8();
+                                ++stream_pos;
+                                *dst_it++ = pal[ c ];
+                             }
+                        }
+
+                        // pad to word boundary
+                        if( ( stream_pos - offset ) & 1 )
+                        {
+                            _io_dev.seek( 1, SEEK_CUR );
+                            ++stream_pos;
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+	}
 
 protected:
 
