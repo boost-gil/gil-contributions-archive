@@ -15,7 +15,9 @@ using namespace gil;
 
 typedef pnm_tag tag_t;
 
-BOOST_AUTO_TEST_CASE( pnm_read_image_info_using_string )
+BOOST_AUTO_TEST_SUITE( pnm_test )
+
+BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
     {
         image_read_info< pnm_tag > info = read_image_info( pnm_filename
@@ -45,7 +47,7 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_info_using_string )
     }
 }
 
-BOOST_AUTO_TEST_CASE( pnm_read_image_test )
+BOOST_AUTO_TEST_CASE( read_image_test )
 {
     {
         rgb8_image_t img;
@@ -76,7 +78,7 @@ BOOST_AUTO_TEST_CASE( pnm_read_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( pnm_read_and_convert_image_test )
+BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
@@ -107,7 +109,7 @@ BOOST_AUTO_TEST_CASE( pnm_read_and_convert_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( pnm_read_view_test )
+BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
         rgb8_image_t img( 256, 256 );
@@ -129,7 +131,7 @@ BOOST_AUTO_TEST_CASE( pnm_read_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( pnm_read_and_convert_view_test )
+BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 256, 256 );
@@ -155,7 +157,7 @@ BOOST_AUTO_TEST_CASE( pnm_read_and_convert_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( pnm_write_view_test )
+BOOST_AUTO_TEST_CASE( write_view_test )
 {
     {
         string filename( pnm_out + "write_test_string.pnm" );
@@ -192,7 +194,7 @@ BOOST_AUTO_TEST_CASE( pnm_write_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( pnm_stream_test )
+BOOST_AUTO_TEST_CASE( stream_test )
 {
     // 1. Read an image.
     ifstream in( pnm_filename.c_str(), ios::binary );
@@ -218,7 +220,7 @@ BOOST_AUTO_TEST_CASE( pnm_stream_test )
     write_view( out, view( dst ), tag_t() );
 }
 
-BOOST_AUTO_TEST_CASE( pnm_dynamic_image_test )
+BOOST_AUTO_TEST_CASE( dynamic_image_test )
 {
     typedef mpl::vector< gray8_image_t
                        , gray16_image_t
@@ -239,3 +241,5 @@ BOOST_AUTO_TEST_CASE( pnm_dynamic_image_test )
               , tag_t()
               );
 }
+
+BOOST_AUTO_TEST_SUITE_END()

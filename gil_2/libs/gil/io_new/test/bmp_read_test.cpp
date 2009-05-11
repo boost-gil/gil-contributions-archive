@@ -11,3 +11,7 @@ using namespace std;
 using namespace boost::gil;
 
 typedef bmp_tag tag_t;
+
+BOOST_AUTO_TEST_SUITE( bmp_test )
+
+BOOST_AUTO_TEST_SUITE_END()

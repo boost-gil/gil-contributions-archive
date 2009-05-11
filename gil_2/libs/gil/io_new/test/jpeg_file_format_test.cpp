@@ -10,7 +10,9 @@ using namespace boost::gil;
 
 typedef jpeg_tag tag_t;
 
-BOOST_AUTO_TEST_CASE( jpeg_file_format_test )
+BOOST_AUTO_TEST_SUITE( jpeg_test )
+
+BOOST_AUTO_TEST_CASE( file_format_test )
 {
     std::string filename( jpeg_in + "found online\\test.jpg" );
 
@@ -30,7 +32,7 @@ BOOST_AUTO_TEST_CASE( jpeg_file_format_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( jpeg_dct_method_test )
+BOOST_AUTO_TEST_CASE( dct_method_test )
 {
     std::string filename( jpeg_in + "found online\\test.jpg" );
 
@@ -52,3 +54,5 @@ BOOST_AUTO_TEST_CASE( jpeg_dct_method_test )
                   );
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

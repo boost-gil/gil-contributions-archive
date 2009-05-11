@@ -12,6 +12,8 @@ namespace fs = boost::filesystem;
 
 typedef pnm_tag tag_t;
 
+BOOST_AUTO_TEST_SUITE( pnm_test )
+
 // Test will loop through the "in" folder to read and convert
 // the pnm's to rgb8_image_t's. Which then will be written in
 // the "out" folder.
@@ -21,7 +23,7 @@ typedef pnm_tag tag_t;
 // is incorrectly converted. See p4.pnm, which is read as a 
 // 1-bit image.
 
-BOOST_AUTO_TEST_CASE( pnm_file_format_test )
+BOOST_AUTO_TEST_CASE( file_format_test )
 {
    fs::path in_path = fs::system_complete( fs::path( pnm_in, fs::native ) );
 
@@ -49,3 +51,5 @@ BOOST_AUTO_TEST_CASE( pnm_file_format_test )
       }
    }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -131,22 +131,22 @@ private:
     template< typename View_Src
             , typename View_Dst
             >
-    void read_text_data( const View_Dst& view )
+    void read_text_data( const View_Dst& dst )
     {
         typedef typename View_Dst::y_coord_t y_t;
 
         uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
 
         byte_vector_t row( pitch );
-        View_Src v = interleaved_view( this->_info._width
-                                     , 1
-                                     , (typename View_Src::value_type*) &row.front()
-                                     , pitch
-                                     );
+        View_Src src = interleaved_view( this->_info._width
+                                       , 1
+                                       , (typename View_Src::value_type*) &row.front()
+                                       , pitch
+                                       );
 
         char buf[16];
 
-        for( y_t y = 0; y < view.height(); ++y )
+        for( y_t y = 0; y < dst.height(); ++y )
         {
             for( uint32_t x = 0; x < pitch; ++x )
             {
@@ -189,10 +189,12 @@ private:
 
             // We are reading a gray1_image like a gray8_image but the two pixel_t
             // aren't compatible. Though, read_and_no_convert::read(...) wont work.
-            copy_data< View_Dst, View_Src >( view
-                                           , v
+            copy_data< View_Dst, View_Src >( dst
+                                           , src
                                            , y
-                                           , is_same< View_Dst, gray1_image_t::view_t >::type()
+                                           , is_same< View_Dst
+                                                    , gray1_image_t::view_t
+                                                    >::type()
                                            );
         }
     }
@@ -217,19 +219,6 @@ private:
             {
                 it[x] = src[x];
             }
-
-/*
-            copy_and_convert_pixels( src
-                                   , subimage_view( dst
-                                                  , 0
-                                                  , (int) y
-                                                  , (int) dst.width()
-                                                  , 1
-                                                  )
-                                    );
-*/
-
-
         }
         else
         {

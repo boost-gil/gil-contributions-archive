@@ -30,7 +30,9 @@ struct my_color_converter
     }
 };
 
-BOOST_AUTO_TEST_CASE( bmp_file_format_test )
+BOOST_AUTO_TEST_SUITE( bmp_test )
+
+BOOST_AUTO_TEST_CASE( file_format_test )
 {
    fs::path in_path = fs::system_complete( fs::path( bmp_in, fs::native ) );
 
@@ -72,7 +74,7 @@ BOOST_AUTO_TEST_CASE( bmp_file_format_test )
    }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_partial_image_test )
+BOOST_AUTO_TEST_CASE( partial_image_test )
 {
     const std::string filename( bmp_in + "rgb.bmp" );
 
@@ -90,3 +92,5 @@ BOOST_AUTO_TEST_CASE( bmp_partial_image_test )
                   );
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

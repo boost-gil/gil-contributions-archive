@@ -15,6 +15,8 @@ namespace fs = boost::filesystem;
 
 typedef png_tag tag_t;
 
+BOOST_AUTO_TEST_SUITE( png_test )
+
 // Test will loop through the "in" folder to read and convert
 // the png's to rgb8_image_t's. Which then will be written in
 // the "out" folder.
@@ -29,7 +31,7 @@ typedef png_tag tag_t;
 // |+--------- parameter of test (in this case gamma-value)
 // +---------- test feature (in this case gamma)
 
-BOOST_AUTO_TEST_CASE( png_file_format_test )
+BOOST_AUTO_TEST_CASE( file_format_test )
 {
    string in ( png_in + "PngSuite\\" );
 
@@ -58,3 +60,5 @@ BOOST_AUTO_TEST_CASE( png_file_format_test )
       }
    }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

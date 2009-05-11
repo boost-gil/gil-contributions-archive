@@ -18,7 +18,9 @@ namespace fs = boost::filesystem;
 
 typedef bmp_tag tag_t;
 
-BOOST_AUTO_TEST_CASE( bmp_read_image_info_using_string )
+BOOST_AUTO_TEST_SUITE( bmp_test )
+
+BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
 
     {
@@ -58,7 +60,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_image_info_using_string )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_image_test )
+BOOST_AUTO_TEST_CASE( read_image_test )
 {
     {
         rgba8_image_t img;
@@ -89,7 +91,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_and_convert_image_test )
+BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
@@ -120,7 +122,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_and_convert_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_view_test )
+BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
         rgba8_image_t img( 127, 64 );
@@ -142,7 +144,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_read_and_convert_view_test )
+BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 127, 64 );
@@ -167,7 +169,7 @@ BOOST_AUTO_TEST_CASE( bmp_read_and_convert_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_write_view_test )
+BOOST_AUTO_TEST_CASE( write_view_test )
 {
     rgb8_image_t img( 127, 64 );
 
@@ -197,7 +199,7 @@ BOOST_AUTO_TEST_CASE( bmp_write_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( bmp_stream_test )
+BOOST_AUTO_TEST_CASE( stream_test )
 {
     // 1. Read an image.
     ifstream in( bmp_filename.c_str(), ios::binary );
@@ -223,7 +225,7 @@ BOOST_AUTO_TEST_CASE( bmp_stream_test )
     write_view( out, view( dst ), tag_t() );
 }
 
-BOOST_AUTO_TEST_CASE( bmp_dynamic_image_test )
+BOOST_AUTO_TEST_CASE( dynamic_image_test )
 {
     typedef mpl::vector< gray8_image_t
                        , gray16_image_t
@@ -244,3 +246,5 @@ BOOST_AUTO_TEST_CASE( bmp_dynamic_image_test )
               , bmp_tag()
               );
 }
+
+BOOST_AUTO_TEST_SUITE_END()

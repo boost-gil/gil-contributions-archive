@@ -9,7 +9,9 @@ using namespace std;
 using namespace boost;
 using namespace gil;
 
-BOOST_AUTO_TEST_CASE( jpeg_old_read_dimensions_test )
+BOOST_AUTO_TEST_SUITE( jpeg_test )
+
+BOOST_AUTO_TEST_CASE( old_read_dimensions_test )
 {
     {
         point2< ptrdiff_t > dim = jpeg_read_dimensions( jpeg_filename );
@@ -19,7 +21,7 @@ BOOST_AUTO_TEST_CASE( jpeg_old_read_dimensions_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( jpeg_old_read_image_test )
+BOOST_AUTO_TEST_CASE( old_read_image_test )
 {
     {
         rgb8_image_t img;
@@ -30,7 +32,7 @@ BOOST_AUTO_TEST_CASE( jpeg_old_read_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( jpeg_old_read_and_convert_image_test )
+BOOST_AUTO_TEST_CASE( old_read_and_convert_image_test )
 {
     {
         rgb8_image_t img;
@@ -41,7 +43,7 @@ BOOST_AUTO_TEST_CASE( jpeg_old_read_and_convert_image_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( jpeg_old_read_view_test )
+BOOST_AUTO_TEST_CASE( old_read_view_test )
 {
     {
         rgb8_image_t img( 136, 98 );
@@ -49,7 +51,7 @@ BOOST_AUTO_TEST_CASE( jpeg_old_read_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( jpeg_old_read_and_convert_view_test )
+BOOST_AUTO_TEST_CASE( old_read_and_convert_view_test )
 {
     {
         rgb8_image_t img( 136, 98 );
@@ -57,7 +59,7 @@ BOOST_AUTO_TEST_CASE( jpeg_old_read_and_convert_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( jpeg_old_write_view_test )
+BOOST_AUTO_TEST_CASE( old_write_view_test )
 {
     {
         string filename( jpeg_out + "test1.jpg" );
@@ -67,7 +69,7 @@ BOOST_AUTO_TEST_CASE( jpeg_old_write_view_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( jpeg_old_dynamic_image_test )
+BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
 {
     typedef mpl::vector< gray8_image_t
                        , gray16_image_t
@@ -86,3 +88,5 @@ BOOST_AUTO_TEST_CASE( jpeg_old_dynamic_image_test )
                   , view( runtime_image )
                   );
 }
+
+BOOST_AUTO_TEST_SUITE_END()

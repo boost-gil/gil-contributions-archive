@@ -10,7 +10,9 @@
 using namespace std;
 using namespace boost::gil;
 
-BOOST_AUTO_TEST_CASE( bmp_write_test )
+BOOST_AUTO_TEST_SUITE( bmp_test )
+
+BOOST_AUTO_TEST_CASE( write_test )
 {
     // test writing all supported image types
     {
@@ -23,3 +25,5 @@ BOOST_AUTO_TEST_CASE( bmp_write_test )
         write_view( bmp_out + "write_test_rgba.bmp", view( img ), bmp_tag() );
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()
