@@ -2,7 +2,6 @@ todo list
 
 * add doxygen comments to library interface
 
-* add dynamic io
 * add planar bit_aligned image support - not so easy
 * when reading an indexed tiff image, it's better to use a virtual view.
 * incorporate Phil Endecott suggestions ( email 04/27/2008 )

@@ -221,6 +221,26 @@ refer to the format specific sections under 3.3. A basic example follows:
 
     ``
 
+GIL also comes with a dynamic image extension. In the context of GIL.IO a user can define a any_image based
+on several image types. The IO extension would then pick the matching image type to the current image file.
+The following example shows this feature:
+
+    ``
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , rgba_image_t
+                       > my_img_types;
+
+    any_image< my_img_types > runtime_image;
+
+    read_image( filename
+              , runtime_image
+              , tiff_tag()
+              );
+
+    ``
+
 [h2 Write Interface]
 There is only one function for writing out images, write_view. Similar to reading the first parameter is either
 a filename or a device. The filename can be anything from a c string, std::string, std::wstring, and a 
@@ -230,6 +250,26 @@ to include the boost::filesystem dependency. Devices could be a FILE*, std::ifst
 The second parameter is an view object to image being written. The third and last parameter is either a tag or 
 an image_write_info< FormatTag > object containing more settings. One example for instance is the jpeg quality. 
 Refer to the format specific sections under 3.3. to have a list of all the possible settings.
+
+Writing an any_image<...> is supported. See the following example:
+
+    ``
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , rgba_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    // fill any_image 
+
+    write_view( filename
+              , view( runtime_image )
+              , tiff_tag()
+              );
+    ``
 
 [h2 Supported Image Formats]
 [h3 BMP]
