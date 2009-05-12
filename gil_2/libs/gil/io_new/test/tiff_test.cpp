@@ -17,7 +17,8 @@
 #include "paths.hpp"
 
 using namespace std;
-using namespace boost::gil;
+using namespace boost;
+using namespace gil;
 
 typedef tiff_tag tag_t;
 
@@ -224,6 +225,28 @@ BOOST_AUTO_TEST_CASE( stream_test )
     string filename( tiff_out + "stream_test.tif" );
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
+}
+
+BOOST_AUTO_TEST_CASE( dynamic_image_test )
+{
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , gil::detail::gray1_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    read_image( tiff_filename.c_str()
+              , runtime_image
+              , tag_t()
+              );
+
+    write_view( tiff_out + "dynamic_image_test.tif"
+              , view( runtime_image )
+              , tag_t()
+              );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

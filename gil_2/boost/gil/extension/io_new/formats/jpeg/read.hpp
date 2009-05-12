@@ -28,8 +28,6 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
-#include "is_allowed.hpp"
-
 namespace boost { namespace gil { namespace detail {
 
 template<typename Device>

@@ -139,8 +139,6 @@ public:
 
             _info._compression = ct_rgb;
 
-            _info._image_size = _io_dev.read_int32();
-
             // not used
             _info._image_size            = 0;
             _info._horizontal_resolution = 0;

@@ -15,7 +15,8 @@
 #include "paths.hpp"
 
 using namespace std;
-using namespace boost::gil;
+using namespace boost;
+using namespace gil;
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
 
@@ -75,6 +76,26 @@ BOOST_AUTO_TEST_CASE( old_write_view_test )
         gray8_image_t img( 320, 240 );
         tiff_write_view( filename, view( img ) );
     }
+}
+
+BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
+{
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , gil::detail::gray1_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    tiff_read_image( tiff_filename.c_str()
+                   , runtime_image
+                   );
+
+    tiff_write_view( tiff_out + "old_dynamic_image_test.tif"
+                   , view( runtime_image )
+                   );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

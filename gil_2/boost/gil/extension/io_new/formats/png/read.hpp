@@ -31,7 +31,6 @@
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
 #include "base.hpp"
-#include "is_allowed.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -198,16 +197,6 @@ private:
             >
     void read_rows( const View& view )
     {
-/*
-        /// @todo
-        if( !is_allowed< View >( is_same< ConversionPolicy
-                                        , read_and_no_convert
-                                        >::type()
-                               ))
-        {
-            throw std::runtime_error( "Image type aren't compatible." );
-        }
-*/
         typedef row_buffer_helper_view< ImagePixel > row_buffer_helper_t;
 
         typedef typename row_buffer_helper_t::buffer_t   buffer_t;

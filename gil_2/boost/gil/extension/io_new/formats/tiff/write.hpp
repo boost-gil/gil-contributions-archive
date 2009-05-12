@@ -252,6 +252,45 @@ private:
     Device& _io_dev;
 };
 
+struct tiff_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , tiff_tag
+                                   >
+    {};
+};
+
+template< typename Device >
+class dynamic_image_writer< Device
+                          , tiff_tag
+                          >
+    : public writer< Device
+                   , tiff_tag
+                   >
+{
+    typedef writer< Device
+                  , tiff_tag
+                  > parent_t;
+
+public:
+
+    dynamic_image_writer( Device& file )
+    : writer( file )
+    {}
+
+    template< typename Views >
+    void apply( const any_image_view< Views >& views )
+    {
+        dynamic_io_fnobj< tiff_write_is_supported
+                        , parent_t
+                        > op( this );
+
+        apply_operation( views, op );
+    }
+};
+
 } // namespace detail
 } // namespace gil
 } // namespace boost

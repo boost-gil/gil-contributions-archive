@@ -23,6 +23,8 @@
 
 namespace boost { namespace gil { namespace detail {
 
+typedef std::vector< tiff_bits_per_sample::type > channel_sizes_t;
+
 template< typename Channel >
 int format_value( mpl::true_ ) // is_bit_aligned
 {
@@ -53,9 +55,9 @@ int format_value( mpl::false_ ) // is_bit_aligned
 // The following two functions look the same but are different since one is using
 // a pixel_t as template parameter whereas the other is using reference_t.
 template< typename View >
-bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // in bits
-                          , mpl::false_                                      // is_bit_aligned
-                          , mpl::true_                                       // is_homogeneous
+bool compare_channel_sizes( const channel_sizes_t& channel_sizes // in bits
+                          , mpl::false_                          // is_bit_aligned
+                          , mpl::true_                           // is_homogeneous
                           )
 {
     typedef typename View::value_type pixel_t;
@@ -69,9 +71,9 @@ bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // 
 
 
 template< typename View >
-bool compare_channel_sizes( const std::vector< unsigned int >& channel_sizes // in bits
-                          , mpl::true_                                       // is_bit_aligned
-                          , mpl::true_                                       // is_homogeneous
+bool compare_channel_sizes( const channel_sizes_t& channel_sizes // in bits
+                          , mpl::true_                           // is_bit_aligned
+                          , mpl::true_                           // is_homogeneous
                           )
 {
     typedef typename View::reference ref_t;
@@ -114,9 +116,9 @@ template< typename B, typename C, typename L, bool M >
 struct channel_sizes_type< const bit_aligned_pixel_reference< B, C, L, M > > { typedef C type; };
 
 template< typename View >
-bool compare_channel_sizes( std::vector< unsigned int >& channel_sizes // in bits
-                          , mpl::true_                                 // is_bit_aligned
-                          , mpl::false_                                // is_homogeneous
+bool compare_channel_sizes( channel_sizes_t& channel_sizes // in bits
+                          , mpl::true_                     // is_bit_aligned
+                          , mpl::false_                    // is_homogeneous
                           )
 {
     // loop through all channels and compare
@@ -131,39 +133,45 @@ bool compare_channel_sizes( std::vector< unsigned int >& channel_sizes // in bit
 }
 
 template< typename View >
-bool is_allowed( unsigned int                       src_n // num channels
-               , const std::vector< unsigned int >& src_s // array of channel sizes
-               , unsigned int                       src_f // channel format
-               , mpl::true_                               // is read_and_no_convert
+bool is_allowed( tiff_samples_per_pixel::type src_samples_per_pixel
+               , tiff_bits_per_sample::type   src_bits_per_sample
+               , tiff_sample_format::type     src_sample_format 
+               , mpl::true_ // is read_and_no_convert
                )
 {
-    typedef typename View::value_type pixel_t;
-    typedef typename View::reference  ref_t;
+    channel_sizes_t channel_sizes( src_samples_per_pixel );
+
+    std::fill( channel_sizes.begin()
+             , channel_sizes.end()
+             , src_bits_per_sample
+             );
+
+    typedef typename get_pixel_type< View >::type pixel_t;
     typedef typename channel_traits<
                 typename element_type< pixel_t >::type >::value_type channel_t;
 
-    const typename num_channels< pixel_t >::value_type dst_n = num_channels< pixel_t >::value;
-    const typename num_channels< pixel_t >::value_type dst_f = format_value< channel_t >( typename is_bit_aligned< pixel_t >::type() );
+    typedef typename num_channels< pixel_t >::value_type num_channel_t;
 
+    const num_channel_t dst_samples_per_pixel = num_channels< pixel_t >::value;
+    const num_channel_t dst_sample_format     = format_value< channel_t >( typename is_bit_aligned< pixel_t >::type() );
 
-
-    const bool s( compare_channel_sizes< View >( src_s
-                                               , typename is_bit_aligned< ref_t >::type()
-                                               , typename is_homogeneous< ref_t >::type()
+    const bool s( compare_channel_sizes< View >( channel_sizes
+                                               , typename is_bit_aligned< pixel_t >::type()
+                                               , typename is_homogeneous< pixel_t >::type()
                                                )
                 );
 
-    return (  dst_n == src_n
+    return (  dst_samples_per_pixel == src_samples_per_pixel
            && s
-           && dst_f == src_f
+           && dst_sample_format == src_sample_format
            );
 }
 
 template< typename View >
-bool is_allowed( unsigned int                       src_n // num channels
-               , const std::vector< unsigned int >& src_s // array of channel sizes
-               , unsigned int                       src_f // channel format
-               , mpl::false_                              // is read_and_convert
+bool is_allowed( tiff_samples_per_pixel::type src_samples_per_pixel
+               , tiff_bits_per_sample::type   src_bits_per_sample
+               , tiff_sample_format::type     src_sample_format 
+               , mpl::false_ // is read_and_no_convert
                )
 {
     return true;

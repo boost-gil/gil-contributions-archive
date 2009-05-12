@@ -154,12 +154,6 @@ public:
         }
         else
         {
-            std::vector< unsigned int > channel_sizes( this->_info._samples_per_pixel );
-            for( uint16_t i = 0; i < this->_info._samples_per_pixel; ++i )
-            {
-                channel_sizes[i] = this->_info._bits_per_sample;
-            }
-
             // In case we only read the image the user's type and
             // the tiff type need to compatible. Which means:
             // color_spaces_are_compatible && channels_are_pairwise_compatible
@@ -169,7 +163,7 @@ public:
                                     >::type is_read_and_convert_t;
 
             if( !is_allowed< View >( this->_info._samples_per_pixel
-                                   , channel_sizes
+                                   , this->_info._bits_per_sample
                                    , this->_info._sample_format
                                    , is_read_and_convert_t()
                                    ))
@@ -367,6 +361,98 @@ private:
 
    template < int K > friend struct plane_recursion;
 };
+
+struct tiff_type_format_checker
+{
+    tiff_type_format_checker( tiff_samples_per_pixel::type samples_per_pixel
+                            , tiff_bits_per_sample::type   bits_per_sample
+                            , tiff_sample_format::type     sample_format
+                            )
+    : _samples_per_pixel( samples_per_pixel )
+    , _bits_per_sample  ( bits_per_sample   )
+    , _sample_format    ( sample_format     )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef typename Image::view_t view_t;
+
+        return is_allowed< view_t >( _samples_per_pixel
+                                   , _bits_per_sample
+                                   , _sample_format
+                                   , mpl::true_()
+                                   );
+    }
+
+private:
+    tiff_samples_per_pixel::type _samples_per_pixel;
+    tiff_bits_per_sample::type   _bits_per_sample;
+    tiff_sample_format::type     _sample_format;
+};
+
+struct tiff_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , tiff_tag
+                                           >
+    {};
+};
+
+template< typename Device
+        >
+class dynamic_image_reader< Device
+                          , tiff_tag
+                          > 
+    : public reader< Device
+                   , tiff_tag
+                   , detail::read_and_no_convert
+                   >
+{
+    typedef reader< Device
+                  , tiff_tag
+                  , detail::read_and_no_convert
+                  > parent_t;
+
+public:
+
+    dynamic_image_reader( Device& device )
+    : reader( device )
+    {}    
+
+    template< typename Images >
+    void apply( any_image< Images >& images )
+    {
+        tiff_type_format_checker format_checker( this->_info._samples_per_pixel
+                                               , this->_info._bits_per_sample
+                                               , this->_info._sample_format
+                                               );
+
+        if( !construct_matched( images
+                              , format_checker
+                              ))
+        {
+            io_error( "No matching image type between those of the given any_image and that of the file" );
+        }
+        else
+        {
+            init_image( images
+                      , _settings
+                      , _info
+                      );
+
+            dynamic_io_fnobj< tiff_read_is_supported
+                            , parent_t
+                            > op( this );
+
+            apply_operation( view( images )
+                           , op
+                           );
+        }
+    }
+};
+
 
 } // namespace detail
 } // namespace gil

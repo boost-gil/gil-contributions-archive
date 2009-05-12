@@ -135,9 +135,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng_chh.lib zlib.lib libtiff.lib"
+				AdditionalDependencies="libjpeg.lib libpng13.lib zlib1.lib libtiff.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\chh\image libs\lib\release;"
+				AdditionalLibraryDirectories="C:\chh\software\lib\release"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -371,10 +371,6 @@
 					Name="jpeg"
 					>
 					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\jpeg\is_allowed.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\jpeg\read.hpp"
 						>
 					</File>
@@ -392,10 +388,6 @@
 					>
 					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\png\base.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\png\is_allowed.hpp"
 						>
 					</File>
 					<File
