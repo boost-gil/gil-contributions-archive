@@ -20,6 +20,12 @@ namespace boost { namespace gil {
 
 typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
+template< typename Locator >
+struct get_pixel_type_locator : mpl::if_< typename is_bit_aligned< typename Locator::value_type >::type
+                                , typename Locator::reference
+                                , typename Locator::value_type
+                                > {};
+
 // used for virtual locator
 template< typename IndicesLoc
         , typename PaletteLoc
@@ -29,7 +35,7 @@ struct indexed_image_deref_fn
     typedef IndicesLoc indices_locator_t;
     typedef PaletteLoc palette_locator_t;
 
-    typedef typename channel_type< typename indices_locator_t::reference >::type index_t;
+    typedef typename channel_type< typename get_pixel_type_locator< indices_locator_t >::type >::type index_t;
 
     typedef indexed_image_deref_fn          const_t;
     typedef typename PaletteLoc::value_type value_type;
@@ -37,6 +43,8 @@ struct indexed_image_deref_fn
     typedef value_type                      const_reference;
     typedef point_t                         argument_type;
     typedef reference                       result_type;
+
+    static const bool is_mutable = false;
 
     indexed_image_deref_fn() {}
 
@@ -49,7 +57,7 @@ struct indexed_image_deref_fn
 
     result_type operator()( const point_t& p ) const
     {
-        return _palette_loc[ _indices_loc.xy_at( p )[0] ];
+        return _palette_loc[ at_c< 0 >( *_indices_loc.xy_at( p ) ) ];
     }
 
     void set_indices( const indices_locator_t& indices_loc ) { _indices_loc = indices_loc; }

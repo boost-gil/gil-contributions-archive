@@ -227,7 +227,6 @@ public:
 
             case 4:
             {
-/*
 				switch ( _info._compression )				 
 				{
 				    case ct_rle4:
@@ -265,7 +264,6 @@ public:
                         break;
                     }
                 }
-*/
                 break;
             }
 
