@@ -21,6 +21,8 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include <boost/gil/extension/io_new/detail/base.hpp>
+
 namespace boost { namespace gil { namespace detail {
 
 typedef std::vector< tiff_bits_per_sample::type > channel_sizes_t;
@@ -47,7 +49,7 @@ int format_value( mpl::false_ ) // is_bit_aligned
         return SAMPLEFORMAT_IEEEFP;
     }
 
-    throw std::runtime_error( "Unkown channel format." );
+    io_error( "Unkown channel format." );
 
     return 0;
 }
@@ -139,12 +141,9 @@ bool is_allowed( tiff_samples_per_pixel::type src_samples_per_pixel
                , mpl::true_ // is read_and_no_convert
                )
 {
-    channel_sizes_t channel_sizes( src_samples_per_pixel );
-
-    std::fill( channel_sizes.begin()
-             , channel_sizes.end()
-             , src_bits_per_sample
-             );
+    channel_sizes_t channel_sizes( src_samples_per_pixel
+                                 , src_bits_per_sample
+                                 );
 
     typedef typename get_pixel_type< View >::type pixel_t;
     typedef typename channel_traits<
@@ -155,14 +154,11 @@ bool is_allowed( tiff_samples_per_pixel::type src_samples_per_pixel
     const num_channel_t dst_samples_per_pixel = num_channels< pixel_t >::value;
     const num_channel_t dst_sample_format     = format_value< channel_t >( typename is_bit_aligned< pixel_t >::type() );
 
-    const bool s( compare_channel_sizes< View >( channel_sizes
-                                               , typename is_bit_aligned< pixel_t >::type()
-                                               , typename is_homogeneous< pixel_t >::type()
-                                               )
-                );
-
     return (  dst_samples_per_pixel == src_samples_per_pixel
-           && s
+           && compare_channel_sizes< View >( channel_sizes
+                                           , typename is_bit_aligned< pixel_t >::type()
+                                           , typename is_homogeneous< pixel_t >::type()
+                                           )
            && dst_sample_format == src_sample_format
            );
 }

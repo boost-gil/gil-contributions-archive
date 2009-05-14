@@ -168,7 +168,7 @@ public:
                                    , is_read_and_convert_t()
                                    ))
             {
-                throw std::runtime_error( "Image type aren't compatible." );
+                io_error( "Image type aren't compatible." );
             }
 
             if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )

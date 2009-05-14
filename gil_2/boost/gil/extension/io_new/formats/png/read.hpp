@@ -31,6 +31,7 @@
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
 #include "base.hpp"
+#include "is_allowed.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
@@ -78,19 +79,32 @@ public:
 
     image_read_info<png_tag> get_info() const
     {
-        image_read_info<png_tag> ret = {0};
-        png_get_IHDR(_png_ptr, _info_ptr, 
-                &ret._width, &ret._height,
-                &ret._bit_depth,&ret._color_type,
-                &ret._interlace_method, &ret._compression_method,
-                &ret._filter_method );
+        image_read_info< png_tag > ret = { 0 };
+
+        png_get_IHDR( _png_ptr
+                    , _info_ptr
+                    , &ret._width
+                    , &ret._height
+                    , &ret._bit_depth
+                    , &ret._color_type
+                    , &ret._interlace_method
+                    , &ret._compression_method
+                    , &ret._filter_method
+                    );
+
+        ret._num_channels = png_get_channels( _png_ptr
+                                            , _info_ptr
+                                            );
 
         int res_unit = PNG_RESOLUTION_METER;
         png_get_pHYs(_png_ptr, _info_ptr, &ret._x_res, &ret._y_res, &res_unit);
         png_get_sBIT(_png_ptr, _info_ptr, &ret._sbits );
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED 
-        png_get_gAMA(_png_ptr, _info_ptr, &ret._gamma );
+        if( !png_get_gAMA(_png_ptr, _info_ptr, &ret._gamma ))
+        {
+            ret._gamma = 1.0;
+        }
 #else
         png_get_gAMA_fixed(_png_ptr, _info_ptr, &ret._gamma );
 #endif
@@ -118,27 +132,49 @@ public:
             png_set_palette_to_rgb(_png_ptr);
         }
 
-        if(png_get_valid(_png_ptr, _info_ptr,PNG_INFO_tRNS)) 
+        if( png_get_valid( _png_ptr
+                         , _info_ptr
+                         , PNG_INFO_tRNS
+                         )
+          ) 
         {
             if( color_type == PNG_COLOR_TYPE_RGB )
+            {
                 color_type = PNG_COLOR_TYPE_RGBA;
+                this->_info._num_channels = 4;
+            }
             else if( color_type== PNG_COLOR_TYPE_GRAY )
+            {
                 color_type = PNG_COLOR_TYPE_GA;
+                this->_info._num_channels = 2;
+            }
 
-            png_set_tRNS_to_alpha(_png_ptr);
+            png_set_tRNS_to_alpha( _png_ptr );
         }
+
+#ifdef PNG_FLOATING_POINT_SUPPORTED 
+        png_set_gamma( _png_ptr
+                     , this->_settings._gamma
+                     , this->_info._gamma
+                     );
+#endif
 
         switch( color_type )
         {
             case PNG_COLOR_TYPE_GRAY:
             {
+                if( bit_depth < 8 )
+                {
+                    png_set_gray_1_2_4_to_8( _png_ptr );
+                }
+
                 switch( bit_depth )
                 {
-                    case 1: read_rows< gray1_image_t::view_t::reference >( view ); break;
-                    case 2: read_rows< gray2_image_t::view_t::reference >( view ); break;
-                    case 4: read_rows< gray4_image_t::view_t::reference >( view ); break;
-                    case 8: read_rows< gray8_pixel_t > ( view ); break;
-                    case 16:read_rows< gray16_pixel_t >( view ); break;
+                    case 1:  
+                    case 2:  
+                    case 4:  
+                    case 8:  read_rows< gray8_pixel_t > ( view ); break;
+                    case 16: read_rows< gray16_pixel_t >( view ); break;
                     default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
                 }
 
@@ -202,35 +238,82 @@ private:
         typedef typename row_buffer_helper_t::buffer_t   buffer_t;
         typedef typename row_buffer_helper_t::iterator_t it_t;
 
-        row_buffer_helper_t buffer( static_cast<int>( this->_info._width )
+        typedef typename is_same< ConversionPolicy
+                                , read_and_no_convert
+                                >::type is_read_and_convert_t;
+
+        bool paletted = this->_info._color_type == PNG_COLOR_TYPE_PALETTE;
+
+        if( !is_allowed< View >( this->_info._num_channels
+                               , this->_info._bit_depth
+                               , paletted
+                               , is_read_and_convert_t()
+                               )
+          )
+        {
+           io_error( "Image types aren't compatible." );
+        }
+
+        bool interlaced = this->_info._interlace_method != PNG_INTERLACE_NONE;
+
+        std::ptrdiff_t width = this->_info._width;
+        std::ptrdiff_t height = this->_info._height;
+
+        row_buffer_helper_t buffer( static_cast<int>( interlaced ? width * height : width )
                                   , false
                                   );
 
-        it_t begin = buffer.begin();
-
-        it_t first = begin + this->_settings._top_left.x;
-        it_t last  = begin + this->_settings._dim.x; // one after last element
-
-
-        // skip rows
-        for( int y = 0; y < this->_settings._top_left.y; ++y )
+        if( interlaced )
         {
-            png_read_row( _png_ptr
-                        , reinterpret_cast< png_bytep >( buffer.data() )
-                        , 0
-                        );
+            std::vector< png_bytep > row_ptrs( height );
+            for( int y = 0; y < height; ++y )
+            {
+                row_ptrs[y] = reinterpret_cast< png_bytep >( buffer.data() + y * width );
+            }
+
+            png_read_image( _png_ptr
+                          , &row_ptrs.front()
+                          );
+
+            for( int y = 0; y < view.height(); ++y )
+            {
+                it_t begin = buffer.begin() + y * width;
+
+                it_t first = begin + this->_settings._top_left.x;
+                it_t last  = begin + this->_settings._dim.x; // one after last element
+
+                this->_cc_policy.read( first
+                                     , last
+                                     , view.row_begin( y ));
+            }
         }
-
-        for( int y = 0; y < view.height(); ++y )
+        else
         {
-            png_read_row( _png_ptr
-                        , reinterpret_cast< png_bytep >( buffer.data() )
-                        , 0
-                        );
+            it_t begin = buffer.begin();
 
-             this->_cc_policy.read( first
-                                  , last
-                                  , view.row_begin( y ));
+            it_t first = begin + this->_settings._top_left.x;
+            it_t last  = begin + this->_settings._dim.x; // one after last element
+
+            // skip rows
+            for( int y = 0; y < this->_settings._top_left.y; ++y )
+            {
+                png_read_row( _png_ptr
+                            , reinterpret_cast< png_bytep >( buffer.data() )
+                            , 0
+                            );
+            }
+
+            for( int y = 0; y < view.height(); ++y )
+            {
+                png_read_row( _png_ptr
+                            , reinterpret_cast< png_bytep >( buffer.data() )
+                            , 0
+                            );
+
+                 this->_cc_policy.read( first
+                                      , last
+                                      , view.row_begin( y ));
+            }
         }
     }
 

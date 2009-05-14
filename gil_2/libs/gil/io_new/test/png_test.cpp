@@ -76,17 +76,6 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         BOOST_CHECK_EQUAL( img.width() , 320 );
         BOOST_CHECK_EQUAL( img.height(), 240 );
     }
-
-    {
-        typedef bit_aligned_image1_type< 1, gray_layout_t >::type image_t;
-        image_t img;
-
-        read_image( png_filename, img, tag_t() );
-
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
-    }
-
 }
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
@@ -218,7 +207,7 @@ BOOST_AUTO_TEST_CASE( stream_test )
     // 1. Read an image.
     ifstream in( png_filename.c_str(), ios::binary );
 
-    rgb8_image_t img;
+    rgba8_image_t img;
     read_image( in, img, tag_t() );
 
     // 2. Write image to in-memory buffer.
@@ -230,7 +219,7 @@ BOOST_AUTO_TEST_CASE( stream_test )
     in_buffer << out_buffer.rdbuf();
 
     // 4. Read in-memory buffer to gil image
-    rgb8_image_t dst;
+    rgba8_image_t dst;
     read_image( in_buffer, dst, tag_t() );
 
     // 5. Write out image.

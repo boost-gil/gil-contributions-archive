@@ -391,6 +391,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\png\is_allowed.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\png\read.hpp"
 						>
 					</File>

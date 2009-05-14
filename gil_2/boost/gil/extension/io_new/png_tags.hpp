@@ -57,10 +57,8 @@ struct png_y_resolution : property_base< png_uint_32 > {};
     struct png_gamma : property_base< png_fixed_point > {};
 #endif
 
-/// @todo Support for text?
-
 template<>
-struct image_read_info<png_tag>
+struct image_read_info< png_tag >
 {
     png_image_width::type  _width;
     png_image_height::type _height;
@@ -85,25 +83,37 @@ struct image_read_settings< png_tag > : public image_read_settings_base
 {
     image_read_settings< png_tag >()
     : image_read_settings_base()
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+    , _gamma( 1.0 )
+#endif
     {}
 
     image_read_settings( const point_t& top_left
                        , const point_t& dim
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+                       , double         gamma = 1.0
+#endif
                        )
     : image_read_settings_base( top_left
                               , dim
                               )
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+    , _gamma( gamma )
+#endif
     {}
 
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+    png_gamma::type _gamma;
+#endif
 };
 
 template<>
 struct image_write_info<png_tag>
 {
     image_write_info()
-    : _interlace_method( PNG_INTERLACE_NONE )
+    : _interlace_method  ( PNG_INTERLACE_NONE           )
     , _compression_method( PNG_COMPRESSION_TYPE_DEFAULT )
-    , _filter_method( PNG_FILTER_TYPE_DEFAULT )
+    , _filter_method     ( PNG_FILTER_TYPE_DEFAULT      )
 
     , _gamma( 0 )
     , _x_res( 0 )

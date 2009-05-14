@@ -241,7 +241,7 @@ private:
                                         >::type()
                                ))
         {
-            throw std::runtime_error( "Image type aren't compatible." );
+            io_error( "Image type aren't compatible." );
         }
 */
 

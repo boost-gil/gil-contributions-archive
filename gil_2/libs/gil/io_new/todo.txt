@@ -10,3 +10,9 @@ todo list
 * support tiled tiff
 
 * png extension crashes when image is empty
+
+
+* dynamic image needs to call is_allowed
+* try to test all interface functions seperately
+* make sure all fields are set in the read info structure
+* add one test file that includes all headers

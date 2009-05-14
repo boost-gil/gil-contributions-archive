@@ -313,7 +313,7 @@ public:
     void write( const byte_t* data
               , std::size_t   count )
     {
-        throw std::runtime_error( "Bad io error." );
+        io_error( "Bad io error." );
     }
 
     void flush() {}
@@ -338,7 +338,7 @@ public:
     size_t read( byte_t*     data
                , std::size_t count )
     {
-        throw std::runtime_error( "Bad io error." );
+        io_error( "Bad io error." );
     }
 
     void seek( long count, int whence )

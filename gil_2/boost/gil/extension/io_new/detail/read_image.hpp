@@ -95,7 +95,7 @@ void read_image( Device&                                 file
 
     reader.init_image( img
                      , settings
-                     , reader.get_info
+                     , reader.get_info()
                      );
 
     reader.apply( view( img ));
