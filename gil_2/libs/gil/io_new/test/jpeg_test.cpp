@@ -6,7 +6,7 @@
 
 #include <boost/gil/gil_all.hpp>
 
-#define ADD_FS_PATH_SUPPORT
+#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
 #include "paths.hpp"

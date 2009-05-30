@@ -32,6 +32,8 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
+#include "is_allowed.hpp"
+
 namespace boost { namespace gil { namespace detail {
 
 template< typename View, typename T >
@@ -113,6 +115,18 @@ public:
     template<typename View>
     void apply( const View& view )
     {
+
+        typedef typename is_same< ConversionPolicy
+                                , read_and_no_convert
+                                >::type is_read_and_convert_t;
+
+        io_error_if( !is_allowed< View >( this->_info
+                                        , is_read_and_convert_t()
+                                        )
+                   , "Image types aren't compatible."
+                   );
+
+
         switch( this->_info._type )
 		{
             // reading mono text is reading grayscale but with only two values

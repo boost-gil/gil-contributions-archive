@@ -135,14 +135,12 @@ bool compare_channel_sizes( channel_sizes_t& channel_sizes // in bits
 }
 
 template< typename View >
-bool is_allowed( tiff_samples_per_pixel::type src_samples_per_pixel
-               , tiff_bits_per_sample::type   src_bits_per_sample
-               , tiff_sample_format::type     src_sample_format 
+bool is_allowed( const image_read_info< tiff_tag >& info
                , mpl::true_ // is read_and_no_convert
                )
 {
-    channel_sizes_t channel_sizes( src_samples_per_pixel
-                                 , src_bits_per_sample
+    channel_sizes_t channel_sizes( info._samples_per_pixel
+                                 , info._bits_per_sample
                                  );
 
     typedef typename get_pixel_type< View >::type pixel_t;
@@ -154,19 +152,17 @@ bool is_allowed( tiff_samples_per_pixel::type src_samples_per_pixel
     const num_channel_t dst_samples_per_pixel = num_channels< pixel_t >::value;
     const num_channel_t dst_sample_format     = format_value< channel_t >( typename is_bit_aligned< pixel_t >::type() );
 
-    return (  dst_samples_per_pixel == src_samples_per_pixel
+    return (  dst_samples_per_pixel == info._samples_per_pixel
            && compare_channel_sizes< View >( channel_sizes
                                            , typename is_bit_aligned< pixel_t >::type()
                                            , typename is_homogeneous< pixel_t >::type()
                                            )
-           && dst_sample_format == src_sample_format
+           && dst_sample_format == info._sample_format
            );
 }
 
 template< typename View >
-bool is_allowed( tiff_samples_per_pixel::type src_samples_per_pixel
-               , tiff_bits_per_sample::type   src_bits_per_sample
-               , tiff_sample_format::type     src_sample_format 
+bool is_allowed( const image_read_info< tiff_tag >& info
                , mpl::false_ // is read_and_no_convert
                )
 {

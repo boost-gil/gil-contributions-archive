@@ -1,4 +1,4 @@
-#define ADD_FS_PATH_SUPPORT
+#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 
 #include <fstream>
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 BOOST_AUTO_TEST_CASE( read_image_test )
 {
     {
-        rgba8_image_t img;
+        rgb8_image_t img;
         read_image( bmp_filename, img, tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 127 );
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     {
         ifstream in( bmp_filename.c_str(), ios::binary );
 
-        rgba8_image_t img;
+        rgb8_image_t img;
         read_image( in, img, tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 127 );
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( read_image_test )
     {
         FILE* file = fopen( bmp_filename.c_str(), "rb" );
         
-        rgba8_image_t img;
+        rgb8_image_t img;
         read_image( file, img, tag_t() );
 
         BOOST_CHECK_EQUAL( img.width() , 127 );
@@ -125,21 +125,21 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
-        rgba8_image_t img( 127, 64 );
+        rgb8_image_t img( 127, 64 );
         read_view( bmp_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( bmp_filename.c_str(), ios::binary );
 
-        rgba8_image_t img( 127, 64 );
+        rgb8_image_t img( 127, 64 );
         read_view( in, view( img ), tag_t() );
     }
 
     {
         FILE* file = fopen( bmp_filename.c_str(), "rb" );
         
-        rgba8_image_t img( 127, 64 );
+        rgb8_image_t img( 127, 64 );
         read_view( file, view( img ), tag_t() );
     }
 }

@@ -19,9 +19,9 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 #include <boost/gil/extension/toolbox/gray_alpha.hpp>
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 namespace boost { namespace gil { namespace detail {
 
@@ -92,7 +92,7 @@ struct png_read_support< bits8
                                               , PNG_COLOR_TYPE_GRAY
                                               > {};
 
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 template<>
 struct png_read_support< bits8
                        , gray_alpha_t
@@ -100,7 +100,7 @@ struct png_read_support< bits8
                          , png_rw_support_base< 8
                                               , PNG_COLOR_TYPE_GA
                                               > {};
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 template<>
 struct png_read_support< bits8
@@ -142,7 +142,7 @@ struct png_read_support< bits16
                                               , PNG_COLOR_TYPE_RGBA
                                               > {};
 
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 template<>
 struct png_read_support< bits16
                        , gray_alpha_t
@@ -150,7 +150,7 @@ struct png_read_support< bits16
                          , png_rw_support_base< 16
                                               , PNG_COLOR_TYPE_GA
                                               > {};
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 // Write support
 
@@ -213,7 +213,7 @@ struct png_write_support< bits8
                                                >
 {};
 
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 template<>
 struct png_write_support< bits8
                         , gray_alpha_t
@@ -222,7 +222,7 @@ struct png_write_support< bits8
                                                , PNG_COLOR_TYPE_GA
                                                >
 {};
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 template<>
 struct png_write_support< bits8
@@ -269,7 +269,7 @@ struct png_write_support< bits16
                                                >
 {};
 
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 template<>
 struct png_write_support< bits16
                         , gray_alpha_t
@@ -278,7 +278,7 @@ struct png_write_support< bits16
                                                , PNG_COLOR_TYPE_GA
                                                >
 {};
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 
 } // namespace detail

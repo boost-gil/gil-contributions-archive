@@ -21,9 +21,9 @@
 
 #include <malloc.h>
 
-#ifdef ADD_FS_PATH_SUPPORT
+#ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #include <boost/filesystem/path.hpp>
-#endif // ADD_FS_PATH_SUPPORT
+#endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 namespace boost{ namespace gil{ namespace detail{
 
 template<typename P> struct is_supported_path_spec       : mpl::false_ {};
@@ -35,11 +35,11 @@ template<> struct is_supported_path_spec< char* >        : mpl::true_ {};
 template<int i> struct is_supported_path_spec<const char [i]> : mpl::true_ {};
 template<int i> struct is_supported_path_spec<char [i]> : mpl::true_ {};
 
-#ifdef ADD_FS_PATH_SUPPORT
+#ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 template<typename String, typename Traits>
 struct is_supported_path_spec<filesystem::basic_path<String,Traits> > : mpl::true_
 {};
-#endif // ADD_FS_PATH_SUPPORT
+#endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 
 inline std::string convert_to_string( std::string const& obj)
 {
@@ -65,13 +65,13 @@ inline std::string convert_to_string( char* str )
     return std::string( str );
 }
 
-#ifdef ADD_FS_PATH_SUPPORT
+#ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 template<typename String, typename T>
 inline std::string convert_to_string( filesystem::basic_path<String,T> const& path )
 {
     return convert_to_string( path.string() );
 }
-#endif // ADD_FS_PATH_SUPPORT
+#endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 
 }}}
 

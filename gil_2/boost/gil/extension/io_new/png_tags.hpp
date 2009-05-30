@@ -51,11 +51,11 @@ struct png_x_resolution : property_base< png_uint_32 > {};
 struct png_y_resolution : property_base< png_uint_32 > {};
 
 /// @todo srgb intent + gamma ?
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
     struct png_gamma : property_base< double > {};
 #else 
     struct png_gamma : property_base< png_fixed_point > {};
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
 template<>
 struct image_read_info< png_tag >
@@ -83,28 +83,28 @@ struct image_read_settings< png_tag > : public image_read_settings_base
 {
     image_read_settings< png_tag >()
     : image_read_settings_base()
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
     , _gamma( 1.0 )
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
     {}
 
     image_read_settings( const point_t& top_left
                        , const point_t& dim
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
                        , double         gamma = 1.0
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
                        )
     : image_read_settings_base( top_left
                               , dim
                               )
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
     , _gamma( gamma )
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
     {}
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
     png_gamma::type _gamma;
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 };
 
 template<>

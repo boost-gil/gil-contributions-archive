@@ -1,5 +1,5 @@
-#define ADD_FS_PATH_SUPPORT
-#define ENABLE_GRAY_ALPHA
+#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+#define BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 #include <boost/filesystem/convenience.hpp>
 

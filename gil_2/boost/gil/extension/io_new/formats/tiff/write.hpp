@@ -149,8 +149,8 @@ private:
         tiff_image_width::type  width  = (tiff_image_width::type)  src_view.width();
         tiff_image_height::type height = (tiff_image_height::type) src_view.height();
 
-        _io_dev.template set_property<tiff_image_width >( width  );
-        _io_dev.template set_property<tiff_image_height>( height );
+        _io_dev.template set_property< tiff_image_width  >( width  );
+        _io_dev.template set_property< tiff_image_height >( height );
 
         // write planar configuration
         if( is_bit_aligned<View>::value == false )

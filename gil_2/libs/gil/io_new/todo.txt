@@ -6,7 +6,6 @@ todo list
 * when reading an indexed tiff image, it's better to use a virtual view.
 * incorporate Phil Endecott suggestions ( email 04/27/2008 )
 * also add John Femiani suggestions ( same date )
-* ran dos2unix on all files, since they have an unpleasant mix of CR/LF and LF
 * support tiled tiff
 
 * png extension crashes when image is empty
@@ -16,3 +15,15 @@ todo list
 * try to test all interface functions seperately
 * make sure all fields are set in the read info structure
 * add one test file that includes all headers
+
+* there is a bug in when reading bmp that have negative height
+	- see check_coordinates()
+	- email by Joerg Gonska 05/08/2009
+
+* new tests
+	* make sure all members in all image_read_info<> are set when reading header information
+	* read and write tests using read_image and write_view
+ 
+
+* implement is_allowed for all types
+	* how do we do that with dynamic images???

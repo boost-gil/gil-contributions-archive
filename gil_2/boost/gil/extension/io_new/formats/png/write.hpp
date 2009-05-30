@@ -92,7 +92,7 @@ public:
                           , _info_ptr
                           , info._gamma
                           );
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
         png_set_pHYs( _png_ptr
                     , _info_ptr

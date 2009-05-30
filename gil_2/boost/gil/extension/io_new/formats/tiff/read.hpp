@@ -162,14 +162,11 @@ public:
                                     , read_and_no_convert
                                     >::type is_read_and_convert_t;
 
-            if( !is_allowed< View >( this->_info._samples_per_pixel
-                                   , this->_info._bits_per_sample
-                                   , this->_info._sample_format
-                                   , is_read_and_convert_t()
-                                   ))
-            {
-                io_error( "Image type aren't compatible." );
-            }
+            io_error_if( !is_allowed< View >( this->_info
+                                            , is_read_and_convert_t()
+                                            )
+                       , "Image types aren't compatible."
+                       );
 
             if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
             {
@@ -364,13 +361,8 @@ private:
 
 struct tiff_type_format_checker
 {
-    tiff_type_format_checker( tiff_samples_per_pixel::type samples_per_pixel
-                            , tiff_bits_per_sample::type   bits_per_sample
-                            , tiff_sample_format::type     sample_format
-                            )
-    : _samples_per_pixel( samples_per_pixel )
-    , _bits_per_sample  ( bits_per_sample   )
-    , _sample_format    ( sample_format     )
+    tiff_type_format_checker( const image_read_info< tiff_tag >& info )
+    : _info( info )
     {}
 
     template< typename Image >
@@ -378,17 +370,14 @@ struct tiff_type_format_checker
     {
         typedef typename Image::view_t view_t;
 
-        return is_allowed< view_t >( _samples_per_pixel
-                                   , _bits_per_sample
-                                   , _sample_format
+        return is_allowed< view_t >( _info
                                    , mpl::true_()
                                    );
     }
 
 private:
-    tiff_samples_per_pixel::type _samples_per_pixel;
-    tiff_bits_per_sample::type   _bits_per_sample;
-    tiff_sample_format::type     _sample_format;
+
+    const image_read_info< tiff_tag >& _info;
 };
 
 struct tiff_read_is_supported
@@ -424,10 +413,7 @@ public:
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        tiff_type_format_checker format_checker( this->_info._samples_per_pixel
-                                               , this->_info._bits_per_sample
-                                               , this->_info._sample_format
-                                               );
+        tiff_type_format_checker format_checker( this->_info );
 
         if( !construct_matched( images
                               , format_checker

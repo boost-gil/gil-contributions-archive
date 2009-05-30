@@ -69,10 +69,12 @@ public:
     template<typename View>
     void apply( const View& view )
     {
+        typedef typename channel_type< View >::type channel_t;
+
         _cinfo.image_width  = JDIMENSION(view.width());
         _cinfo.image_height = JDIMENSION(view.height());
         _cinfo.input_components = num_channels<View>::value;
-        _cinfo.in_color_space = detail::jpeg_write_support< typename channel_type< View >::type
+        _cinfo.in_color_space = detail::jpeg_write_support< channel_t
                                                           , typename color_space_type<View>::type
                                                           >::_color_space;
 
@@ -86,10 +88,12 @@ public:
     void apply( const View&                       view
               , const image_write_info<jpeg_tag>& info )
     {
+        typedef typename channel_type< View >::type channel_t;
+
         _cinfo.image_width  = JDIMENSION(view.width());
         _cinfo.image_height = JDIMENSION(view.height());
         _cinfo.input_components = num_channels<View>::value;
-        _cinfo.in_color_space = detail::jpeg_write_support< typename channel_type<View>::type
+        _cinfo.in_color_space = detail::jpeg_write_support< channel_t
                                                           , typename color_space_type<View>::type
                                                           >::_color_space;
 

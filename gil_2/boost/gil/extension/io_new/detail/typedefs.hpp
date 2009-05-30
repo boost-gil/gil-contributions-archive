@@ -26,9 +26,9 @@
 #include <boost/gil/image.hpp>
 #include <boost/gil/utilities.hpp>
 
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 #include <boost/gil/extension/toolbox/gray_alpha.hpp>
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 namespace boost { namespace gil { 
 
@@ -61,18 +61,18 @@ typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
 typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;
 
 typedef pixel< double, gray_layout_t       > gray64f_pixel_t;
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 typedef pixel< double, gray_alpha_layout_t > gray_alpha64f_pixel_t;
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 typedef pixel< double, rgb_layout_t        > rgb64f_pixel_t;
 typedef pixel< double, rgba_layout_t       > rgba64f_pixel_t;
 
 typedef image< gray64f_pixel_t      , false > gray64f_image_t;
 typedef image< gray64f_pixel_t      , true  > gray64f_planar_image_t;
-#ifdef ENABLE_GRAY_ALPHA
+#ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 typedef image< gray_alpha64f_pixel_t, false > gray_alpha64f_image_t;
 typedef image< gray_alpha64f_pixel_t, true  > gray_alpha64f_planar_image_t;
-#endif // ENABLE_GRAY_ALPHA
+#endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 typedef image< rgb64f_pixel_t       , false > rgb64f_image_t;
 typedef image< rgb64f_pixel_t       , true  > rgb64f_planar_image_t;
 typedef image< rgba64f_pixel_t      , false > rgba64f_image_t;

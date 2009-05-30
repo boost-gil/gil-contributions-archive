@@ -28,6 +28,8 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
+#include "is_allowed.hpp"
+
 namespace boost { namespace gil { namespace detail {
 
 template<typename Device>
@@ -193,6 +195,16 @@ public:
         jpeg_decompress_struct& cinfo = this->get();
         cinfo.dct_method = this->_settings._dct_method;
 
+        typedef typename is_same< ConversionPolicy
+                                , read_and_no_convert
+                                >::type is_read_and_convert_t;
+
+        io_error_if( !is_allowed< View >( this->_info
+                                        , is_read_and_convert_t()
+                                        )
+                   , "Image types aren't compatible."
+                   );
+
         this->start_decompress();
 
         switch( this->_info._color_space )
@@ -234,17 +246,6 @@ private:
             >
     void read_rows( const View& view )
     {
-/*
-        /// @todo
-        if( !is_allowed< View >( is_same< ConversionPolicy
-                                        , read_and_no_convert
-                                        >::type()
-                               ))
-        {
-            io_error( "Image type aren't compatible." );
-        }
-*/
-
         typedef std::vector<ImagePixel> buffer_t;
 
         buffer_t buffer( this->_info._width );

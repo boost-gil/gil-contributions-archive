@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_TIFF_IO_IS_ALLOWED_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_TIFF_IO_IS_ALLOWED_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP_INCLUDED
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -106,32 +106,31 @@ bool compare_channel_sizes( const channel_sizes_t& channel_sizes // in bits
 
     return fn._b;
 }
+
 } // namespace png
 
 
 template< typename View >
-bool is_allowed( const png_num_channels::type& num_channels
-               , const png_bitdepth::type    & bit_depth
-               , bool paletted
+bool is_allowed( const image_read_info< png_tag >& info
                , mpl::true_   // is read_and_no_convert
                )
 {
-    if( paletted )
+    if( info._color_type == PNG_COLOR_TYPE_PALETTE )
     {
         return false;
     }
 
-    png::channel_sizes_t channel_sizes( num_channels
-                                      , bit_depth
+    png::channel_sizes_t channel_sizes( info._num_channels
+                                      , info._bit_depth
                                       );
 
     typedef typename View::value_type pixel_t;
     typedef typename View::reference  ref_t;
-    typedef typename boost::gil::num_channels< pixel_t >::value_type num_channel_t;
+    typedef typename num_channels< pixel_t >::value_type num_channel_t;
 
-    const num_channel_t dst_n = boost::gil::num_channels< pixel_t >::value;
+    const num_channel_t dst_n = num_channels< pixel_t >::value;
 
-    return (  static_cast< unsigned int >( dst_n ) == num_channels
+    return (  static_cast< unsigned int >( dst_n ) == info._num_channels
            && png::compare_channel_sizes< View >( channel_sizes
                                                 , typename is_bit_aligned< ref_t >::type()
                                                 , typename is_homogeneous< ref_t >::type()
@@ -140,18 +139,15 @@ bool is_allowed( const png_num_channels::type& num_channels
 }
 
 template< typename View >
-bool is_allowed( const png_num_channels::type& num_channels
-               , const png_bitdepth::type    & bit_depth
-               , bool paletted
+bool is_allowed( const image_read_info< png_tag >& info
                , mpl::false_  // is read_and_convert
                )
 {
     return true;
 }
 
-
 } // namespace detail
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_TIFF_IO_IS_ALLOWED_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP_INCLUDED

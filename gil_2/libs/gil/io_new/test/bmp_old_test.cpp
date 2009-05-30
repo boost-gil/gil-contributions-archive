@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE( old_read_dimensions_test )
 BOOST_AUTO_TEST_CASE( old_read_image_test )
 {
     {
-        rgba8_image_t img;
+        rgb8_image_t img;
         bmp_read_image( bmp_filename, img );
 
         BOOST_CHECK_EQUAL( img.width() , 127 );
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE( old_read_and_convert_image_test )
 BOOST_AUTO_TEST_CASE( old_read_view_test )
 {
     {
-        rgba8_image_t img( 127, 64 );
+        rgb8_image_t img( 127, 64 );
         bmp_read_view( bmp_filename, view( img ) );
     }
 }

@@ -30,6 +30,8 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
+#include "is_allowed.hpp"
+
 namespace boost { namespace gil { namespace detail {
 
 /// Color channel mask
@@ -163,6 +165,16 @@ public:
         {
             get_info();
         }
+
+        typedef typename is_same< ConversionPolicy
+                                , read_and_no_convert
+                                >::type is_read_and_convert_t;
+
+        io_error_if( !is_allowed< View >( this->_info
+                                        , is_read_and_convert_t()
+                                        )
+                   , "Image types aren't compatible."
+                   );
 
         // the row pitch must be multiple 4 bytes
         int pitch;

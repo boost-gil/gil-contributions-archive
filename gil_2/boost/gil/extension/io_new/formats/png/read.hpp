@@ -100,14 +100,14 @@ public:
         png_get_pHYs(_png_ptr, _info_ptr, &ret._x_res, &ret._y_res, &res_unit);
         png_get_sBIT(_png_ptr, _info_ptr, &ret._sbits );
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED 
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED 
         if( !png_get_gAMA(_png_ptr, _info_ptr, &ret._gamma ))
         {
             ret._gamma = 1.0;
         }
 #else
         png_get_gAMA_fixed(_png_ptr, _info_ptr, &ret._gamma );
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
         return ret;
     }
 
@@ -152,12 +152,12 @@ public:
             png_set_tRNS_to_alpha( _png_ptr );
         }
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED 
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED 
         png_set_gamma( _png_ptr
                      , this->_settings._gamma
                      , this->_info._gamma
                      );
-#endif
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
         switch( color_type )
         {
@@ -182,7 +182,7 @@ public:
             }
             case PNG_COLOR_TYPE_GA:
             {
-                #ifdef ENABLE_GRAY_ALPHA
+                #ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
                 switch( bit_depth )
                 {
                     case 8: read_rows< gray_alpha8_pixel_t > ( view ); break;
@@ -191,7 +191,7 @@ public:
                 }
                 #else
                     io_error("gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application.");
-                #endif // ENABLE_GRAY_ALPHA
+                #endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 
                 break;
@@ -242,17 +242,11 @@ private:
                                 , read_and_no_convert
                                 >::type is_read_and_convert_t;
 
-        bool paletted = this->_info._color_type == PNG_COLOR_TYPE_PALETTE;
-
-        if( !is_allowed< View >( this->_info._num_channels
-                               , this->_info._bit_depth
-                               , paletted
-                               , is_read_and_convert_t()
-                               )
-          )
-        {
-           io_error( "Image types aren't compatible." );
-        }
+        io_error_if( !is_allowed< View >( this->_info
+                                        , is_read_and_convert_t()
+                                        )
+                   , "Image types aren't compatible."
+                   );
 
         bool interlaced = this->_info._interlace_method != PNG_INTERLACE_NONE;
 

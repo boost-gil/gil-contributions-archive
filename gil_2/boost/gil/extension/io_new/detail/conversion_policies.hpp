@@ -41,7 +41,9 @@ public:
                                                                   >::type 
                                   >::type* ptr = 0
              )
-    {}
+    {
+        io_error( "Data cannot be copied because the pixels are incompatible." );
+    }
 
     template< typename InIterator
             , typename OutIterator
