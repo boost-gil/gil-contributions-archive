@@ -26,13 +26,17 @@ bool is_allowed( const image_read_info< jpeg_tag >& info
                , mpl::true_   // is read_and_no_convert
                )
 {
-    /// @todo
-    /*
-    typedef typename channel_traits< typename View::value_type >::value_type channel_t;
-    return detail::unsigned_integral_num_bits< channel_t >::value == info._bits_per_pixel;
-    */
+    if( info._color_space == JCS_YCbCr )
+    {
+        // We read JCS_YCbCr files as rgb.
+        return ( is_read_supported< typename View::value_type
+                                  , jpeg_tag
+                                  >::_color_space == JCS_RGB );
+    }
 
-    return true;
+    return ( is_read_supported< typename View::value_type
+                              , jpeg_tag
+                              >::_color_space == info._color_space );
 }
 
 template< typename View >

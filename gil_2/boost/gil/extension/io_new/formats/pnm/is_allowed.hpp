@@ -26,13 +26,23 @@ bool is_allowed( const image_read_info< pnm_tag >& info
                , mpl::true_   // is read_and_no_convert
                )
 {
-    /// @todo
-    /*
-    typedef typename channel_traits< typename View::value_type >::value_type channel_t;
-    return detail::unsigned_integral_num_bits< channel_t >::value == info._bits_per_pixel;
-    */
+    pnm_image_type::type asc_type = is_read_supported< get_pixel_type< View >::type
+                                                     , pnm_tag
+                                                     >::_asc_type;
 
-    return true;
+    pnm_image_type::type bin_type = is_read_supported< get_pixel_type< View >::type
+                                                     , pnm_tag
+                                                     >::_bin_type;
+    if( info._type == pnm_type_mono_asc )
+    {
+        // ascii mono images are read gray8_image_t
+        return (  asc_type == pnm_type_gray_asc );
+    }
+
+
+    return (  asc_type == info._type 
+           || bin_type == info._type
+           );
 }
 
 template< typename View >

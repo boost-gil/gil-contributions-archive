@@ -9,6 +9,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "mandel_view.hpp"
 #include "paths.hpp"
 
 using namespace std;
@@ -171,14 +172,18 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
-    rgb8_image_t img( 127, 64 );
-
     {
         string filename( bmp_out + "write_test_ofstream.bmp" );
 
         ofstream out( filename.c_str(), ios::binary );
 
-        write_view( out, view( img ), tag_t() );
+        write_view( out
+                  , create_mandel_view( 127, 64
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , bmp_tag()
+                  );
     }
 
     {
@@ -186,7 +191,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
-        write_view( file, view( img ), tag_t() );
+        write_view( file
+                  , create_mandel_view( 127, 64
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , bmp_tag()
+                  );
     }
 
     {
@@ -195,7 +206,14 @@ BOOST_AUTO_TEST_CASE( write_view_test )
         image_write_info< bmp_tag > info;
 
         FILE* file = fopen( filename.c_str(), "wb" );
-        write_view( file, view( img ), info );
+
+        write_view( file
+                  , create_mandel_view( 127, 64
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , info
+                  );
     }
 }
 

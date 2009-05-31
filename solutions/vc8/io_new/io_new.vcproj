@@ -355,6 +355,10 @@
 					Name="bmp"
 					>
 					<File
+						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\bmp\is_allowed.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\bmp\read.hpp"
 						>
 					</File>
@@ -370,6 +374,10 @@
 				<Filter
 					Name="jpeg"
 					>
+					<File
+						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\jpeg\is_allowed.hpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\jpeg\read.hpp"
 						>
@@ -410,6 +418,10 @@
 				<Filter
 					Name="pnm"
 					>
+					<File
+						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\pnm\is_allowed.hpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\pnm\read.hpp"
 						>
@@ -457,7 +469,7 @@
 			Name="test"
 			>
 			<File
-				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\bmp_file_format_test.cpp"
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\all_formats_test.cpp"
 				>
 			</File>
 			<File
@@ -489,6 +501,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\mandel_view.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\paths.hpp"
 				>
 			</File>
@@ -505,15 +521,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_file_format_test.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_old_test.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_read_test.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_write_test.cpp"
 				>
 			</File>
 			<File
