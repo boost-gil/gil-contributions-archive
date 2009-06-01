@@ -16,7 +16,7 @@ void write( Image&        img
           , const string& file_name
           )
 {
-    write_view( bmp_out + file_name
+    write_view( pnm_out + file_name
               , view( img )
               , tag_t()
               );

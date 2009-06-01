@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     {
         string filename( bmp_out + "write_test_info.bmp" );
 
-        image_write_info< bmp_tag > info;
+        image_write_info< tag_t > info;
 
         FILE* file = fopen( filename.c_str(), "wb" );
 

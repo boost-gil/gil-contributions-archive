@@ -23,7 +23,8 @@ todo list
 * new tests
 	* make sure all members in all image_read_info<> are set when reading header information
 	* read and write tests using read_image and write_view
- 
+	* make sure all writers are working fine with virtual views - use mandel_view.hpp
+
 
 * implement is_allowed for all types
 	* how do we do that with dynamic images???

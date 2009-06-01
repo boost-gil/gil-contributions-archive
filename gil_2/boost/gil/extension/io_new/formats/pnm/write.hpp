@@ -102,8 +102,10 @@ public:
         str += lexical_cast< std::string >( height ) + std::string( " " );
         _out.print_line( str );
 
-        _out.print_line( "255 ");
-
+        if( type != pnm_type_mono_bin )
+        {
+            _out.print_line( "255 ");
+        }
 
         // write data
         write_data( view
@@ -161,42 +163,28 @@ public:
     {
 		byte_vector_t buf( pitch );
 
-        typedef typename get_pixel_type< View >::type pixel_t;
+        typedef typename View::value_type pixel_t;
+        typedef typename view_type_from_pixel< pixel_t >::type view_t;
 
-        View row = interleaved_view( src.width()
-                                   , 1
-                                   , reinterpret_cast< pixel_t* >( &buf.front() )
-                                   , pitch
-                                   );
-
+        view_t row = interleaved_view( src.width()
+                                     , 1
+                                     , reinterpret_cast< pixel_t* >( &buf.front() )
+                                     , pitch
+                                     );
 
         for( typename View::y_coord_t y = 0
            ; y < src.height()
            ; ++y
            )
 		{
-            if( is_bit_aligned< typename View::value_type >::value )
-            {
-                copy_and_convert_pixels( subimage_view( src
-                                                      , 0
-                                                      , (int) y
-                                                      , (int) src.width()
-                                                      , 1
-                                                      )
-                                       , row
-                                       );
-            }
-            else
-            {
-                copy_pixels( subimage_view( src
-                                          , 0
-                                          , (int) y
-                                          , (int) src.width()
-                                          , 1
-                                          )
-                           , row
-                           );
-            }
+            copy_pixels( subimage_view( src
+                                      , 0
+                                      , (int) y
+                                      , (int) src.width()
+                                      , 1
+                                      )
+                       , row
+                       );
 
             _out.write( &buf.front(), pitch );
 		}
