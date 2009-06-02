@@ -489,15 +489,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_file_format_test.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_old_test.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_read_test.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_write_test.cpp"
 				>
 			</File>
 			<File
@@ -509,11 +513,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_file_format_test.cpp"
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_old_test.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_old_test.cpp"
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_read_test.cpp"
 				>
 			</File>
 			<File

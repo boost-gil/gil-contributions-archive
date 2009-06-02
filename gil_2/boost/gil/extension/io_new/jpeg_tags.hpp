@@ -46,6 +46,7 @@ struct jpeg_dct_method : property_base< J_DCT_METHOD >
     static const type slow        = JDCT_ISLOW;
     static const type fast        = JDCT_IFAST;
     static const type floating_pt = JDCT_FLOAT;
+    static const type fastest     = JDCT_FASTEST;
 };
 
 template<>
@@ -57,6 +58,8 @@ struct image_read_info< jpeg_tag >
    jpeg_num_components::type _num_components;
    jpeg_color_space::type    _color_space;
 
+    // I believe this number is always 8 in the case libjpeg is built with 8.
+    // see: http://www.asmail.be/msg0055405033.html
    jpeg_data_precision::type _data_precision;
 };
 

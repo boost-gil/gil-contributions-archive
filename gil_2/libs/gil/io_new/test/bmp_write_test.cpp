@@ -11,6 +11,8 @@
 using namespace std;
 using namespace boost::gil;
 
+typedef bmp_tag tag_t;
+
 BOOST_AUTO_TEST_SUITE( bmp_test )
 
 BOOST_AUTO_TEST_CASE( write_test )
@@ -22,7 +24,7 @@ BOOST_AUTO_TEST_CASE( write_test )
                                       , rgb8_pixel_t( 0,   0, 255 )
                                       , rgb8_pixel_t( 0, 255,   0 )
                                       )
-                  , bmp_tag()
+                  , tag_t()
                   );
     }
 
@@ -32,7 +34,7 @@ BOOST_AUTO_TEST_CASE( write_test )
                                       , rgba8_pixel_t( 0,   0, 255, 0 )
                                       , rgba8_pixel_t( 0, 255,   0, 0 )
                                       )
-                  , bmp_tag()
+                  , tag_t()
                   );
     }
 }

@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
                                       , rgb8_pixel_t( 0,   0, 255 )
                                       , rgb8_pixel_t( 0, 255,   0 )
                                       )
-                  , bmp_tag()
+                  , tag_t()
                   );
     }
 
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE( write_view_test )
                                       , rgb8_pixel_t( 0,   0, 255 )
                                       , rgb8_pixel_t( 0, 255,   0 )
                                       )
-                  , bmp_tag()
+                  , tag_t()
                   );
     }
 
@@ -256,12 +256,12 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
 
     read_image( bmp_filename.c_str()
               , runtime_image
-              , bmp_tag()
+              , tag_t()
               );
 
     write_view( bmp_out + "dynamic_image_test.bmp"
               , view( runtime_image )
-              , bmp_tag()
+              , tag_t()
               );
 }
 
