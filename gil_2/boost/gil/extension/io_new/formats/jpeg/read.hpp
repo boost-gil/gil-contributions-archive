@@ -19,6 +19,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <csetjmp>
 #include <vector>
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
@@ -32,6 +33,8 @@
 
 namespace boost { namespace gil { namespace detail {
 
+jmp_buf mark;
+
 template<typename Device>
 struct jpeg_decompress_mgr
 {
@@ -39,6 +42,16 @@ struct jpeg_decompress_mgr
         : in(file)
     {
         _cinfo.err = jpeg_std_error( &_jerr );
+
+        // Error exit handler: does not return to caller. See setjmp call below.
+        _jerr.error_exit = &jpeg_decompress_mgr::error_exit;
+
+        if( setjmp( mark ))
+        {
+            jpeg_destroy_decompress( &_cinfo );
+
+            io_error( "jpeg is invalid." );
+        }
 
         _src._jsrc.bytes_in_buffer = 0;
         _src._jsrc.next_input_byte = buffer;
@@ -88,6 +101,24 @@ protected:
     void finish_decompress()
     {
         jpeg_finish_decompress ( &_cinfo );
+    }
+
+    // Taken from jerror.c
+    /*
+     * Error exit handler: must not return to caller.
+     *
+     * Applications may override this if they want to get control back after
+     * an error.  Typically one would longjmp somewhere instead of exiting.
+     * The setjmp buffer can be made a private field within an expanded error
+     * handler object.  Note that the info needed to generate an error message
+     * is stored in the error object, so you can generate the message now or
+     * later, at your convenience.
+     * You should make sure that the JPEG object is cleaned up (with jpeg_abort
+     * or jpeg_destroy) at some point.
+     */
+    static void error_exit( j_common_ptr cinfo )
+    {
+        longjmp( mark, 1) ;
     }
 
 private:
@@ -165,19 +196,26 @@ class reader< Device
                         , ConversionPolicy >
 {
 public:
-    reader( Device& device )
+    reader( Device&                                device
+          , const image_read_settings< jpeg_tag >& settings
+          )
     : jpeg_decompress_mgr<Device>( device )
+    , reader_base< jpeg_tag
+                 , ConversionPolicy >( settings )
     {}
 
-    reader( Device& device
+    reader( Device&                                                device
           , const typename ConversionPolicy::color_converter_type& cc
+          , const image_read_settings< jpeg_tag >&                 settings
           )
     : jpeg_decompress_mgr< Device >( device )
     , reader_base< jpeg_tag
-                 , ConversionPolicy >( cc )
+                 , ConversionPolicy >( cc
+                                     , settings
+                                     )
     {}
 
-    image_read_info<jpeg_tag> get_info()
+    image_read_info< jpeg_tag > get_info()
     {
         image_read_info<jpeg_tag> ret;
         ret._width          = this->_cinfo.image_width;
@@ -341,8 +379,12 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device& device )
-    : reader( device )
+    dynamic_image_reader( Device&                                device
+                        , const image_read_settings< jpeg_tag >& settings
+                        )
+    : reader( device
+            , settings
+            )
     {}    
 
     template< typename Images >
@@ -362,7 +404,6 @@ public:
         else
         {
             init_image( images
-                      , _settings
                       , _info
                       );
 
