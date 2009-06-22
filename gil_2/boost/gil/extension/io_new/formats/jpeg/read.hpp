@@ -33,7 +33,7 @@
 
 namespace boost { namespace gil { namespace detail {
 
-jmp_buf mark;
+static jmp_buf mark;
 
 template<typename Device>
 struct jpeg_decompress_mgr

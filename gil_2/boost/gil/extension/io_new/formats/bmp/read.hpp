@@ -68,17 +68,24 @@ private:
 
 public:
 
-    reader( Device& device )
-    : _io_dev( device )
+    reader( Device&                               device
+          , const image_read_settings< bmp_tag >& settings
+          )
+    : reader_base< bmp_tag
+                 , ConversionPolicy >( settings )
+    , _io_dev( device )
     {}
 
-    reader( Device&     device
-          , const cc_t& cc
+    reader( Device&                               device
+          , const cc_t&                           cc
+          , const image_read_settings< bmp_tag >& settings
           )
     : _io_dev( device )
     , reader_base< bmp_tag
                  , ConversionPolicy
-                 >( cc )
+                 >( cc
+                  , settings
+                  )
     {}
 
     image_read_info< bmp_tag > get_info()
@@ -813,8 +820,12 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device& device )
-    : reader( device )
+    dynamic_image_reader( Device&                               device
+                        , const image_read_settings< bmp_tag >& settings
+                        )
+    : reader( device
+            , settings
+            )
     {}    
 
     template< typename Images >
@@ -836,7 +847,6 @@ public:
         else
         {
             init_image( images
-                      , _settings
                       , _info
                       );
 

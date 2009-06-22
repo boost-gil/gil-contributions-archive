@@ -28,3 +28,5 @@ todo list
 
 * implement is_allowed for all types
 	* how do we do that with dynamic images???
+
+* add a error handler for jpeg that throws an exception. See _cinfo.err = jpeg_std_error( &_jerr );

@@ -56,10 +56,10 @@ void read_and_convert_image( Device&                                 file
                   , reader_color_convert
                   > reader( file
                           , cc
+                          , settings
                           );
 
     reader.init_image( img
-                     , settings
                      , reader.get_info()
                      );
 

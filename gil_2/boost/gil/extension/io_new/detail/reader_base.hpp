@@ -31,12 +31,10 @@ struct reader_base
 public:
 
     template< typename Image >
-    void init_image( Image&                                  img
-                   , const image_read_settings< FormatTag >& settings
-                   , const image_read_info< FormatTag >&     info
+    void init_image( Image&                              img
+                   , const image_read_info< FormatTag >& info
                    )
     {
-        _settings = settings;
         _info     = info;
 
         setup( _settings._dim );
@@ -47,12 +45,10 @@ public:
     }
 
     template< typename View >
-    void init_view( const View&                             view
-                  , const image_read_settings< FormatTag >& settings
-                  , const image_read_info< FormatTag >&     info
+    void init_view( const View&                         view
+                  , const image_read_info< FormatTag >& info
                   )
     {
-        _settings = settings;
         _info     = info;
 
         setup( view.dimensions() );
@@ -60,9 +56,14 @@ public:
 
 protected:
 
-    reader_base() {}
-    reader_base( const typename ConversionPolicy::color_converter_type& cc )
+    reader_base( const image_read_settings< FormatTag >& settings )
+    : _settings( settings )
+    {}
+    reader_base( const typename ConversionPolicy::color_converter_type& cc
+               , const image_read_settings< FormatTag >&                settings
+               )
     : _cc_policy( cc )
+    , _settings( settings )
     {}
 
 private:

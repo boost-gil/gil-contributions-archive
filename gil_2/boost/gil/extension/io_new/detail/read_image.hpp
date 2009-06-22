@@ -54,10 +54,11 @@ void read_image( Device&                                 file
     detail::reader< Device
                   , FormatTag
                   , detail::read_and_no_convert
-                  > reader( file );
+                  > reader( file
+                          , settings
+                          );
 
     reader.init_image( img
-                     , settings
                      , reader.get_info()
                      );
 
@@ -91,10 +92,11 @@ void read_image( Device&                                 file
     detail::reader< device_type
                   , FormatTag
                   , detail::read_and_no_convert
-                  > reader( dev );
+                  > reader( dev
+                          , settings
+                          );
 
     reader.init_image( img
-                     , settings
                      , reader.get_info()
                      );
 
@@ -229,10 +231,11 @@ void read_image( Device&                                 file
 {
     detail::dynamic_image_reader< Device
                                 , FormatTag
-                                > dyn_reader( file );
+                                > dyn_reader( file
+                                            , settings
+                                            );
 
     dyn_reader.init_image( images
-                         , settings
                          , dyn_reader.get_info()
                          );
 
@@ -263,10 +266,11 @@ void read_image( Device&                                 file
     detail::reader< device_type
                   , FormatTag
                   , detail::read_and_no_convert
-                  > reader( dev );
+                  > reader( dev
+                          , settings
+                          );
 
     reader.init_image( images
-                     , settings
                      , reader.get_info
                      );
 

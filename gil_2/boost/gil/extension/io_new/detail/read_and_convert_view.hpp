@@ -57,10 +57,10 @@ void read_and_convert_view( Device&                                 file
                   , reader_color_convert
                   > reader( file
                           , cc
+                          , settings
                           );
 
     reader.init_view( view
-                    , settings
                     , reader.get_info()
                     );
 

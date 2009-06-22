@@ -68,15 +68,22 @@ private:
     typedef typename ConversionPolicy::color_converter_type cc_t;
 
 public:
-    reader( Device& device )
-    : _io_dev( device )
-    {}
-
-    reader( Device&     device
-          , const cc_t& cc
+    reader( Device&                                device
+          , const image_read_settings< pnm_tag >& settings
           )
     : reader_base< pnm_tag
-                 , ConversionPolicy >( cc )
+                 , ConversionPolicy >( settings )
+    , _io_dev( device )
+    {}
+
+    reader( Device&                               device
+          , const cc_t&                           cc
+          , const image_read_settings< pnm_tag >& settings
+          )
+    : reader_base< pnm_tag
+                 , ConversionPolicy >( cc
+                                     , settings
+                                     )
     , _io_dev( device )
     {}
 
@@ -415,8 +422,12 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device& device )
-    : reader( device )
+    dynamic_image_reader( Device&                               device
+                        , const image_read_settings< pnm_tag >& settings
+                        )
+    : reader( device
+            , settings
+            )
     {}    
 
     template< typename Images >
@@ -433,7 +444,6 @@ public:
         else
         {
             init_image( images
-                      , _settings
                       , _info
                       );
 

@@ -37,8 +37,8 @@ template< typename Device
         >
 inline
 image_read_info< FormatTag >
-read_image_info( Device&         file
-               , const FormatTag tag
+read_image_info( Device&                                 file
+               , const image_read_settings< FormatTag >& settings
                , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                               , detail::is_input_device< Device >
                                               >
@@ -48,7 +48,60 @@ read_image_info( Device&         file
     return detail::reader< Device
                          , FormatTag
                          , detail::read_and_no_convert
-                         >( file ).get_info();
+                         >( file
+                          , settings
+                          ).get_info();
+}
+
+/// \ingroup IO
+/// \brief Returns the image info. Image info is file format specific.
+template< typename Device
+        , typename FormatTag
+        >
+inline
+image_read_info< FormatTag >
+read_image_info( Device&         file
+               , const FormatTag tag
+               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                              , detail::is_input_device< Device >
+                                              >
+                                   >::type* ptr = 0
+               )
+{
+    return read_image_info( file
+                          , image_read_settings< FormatTag >()
+                          );
+}
+
+/// \ingroup IO
+/// \brief Returns the image info. Image info is file format specific.
+template< typename Device
+        , typename FormatTag
+        >
+inline 
+image_read_info<FormatTag>
+read_image_info( Device&                                 file
+               , const image_read_settings< FormatTag >& settings
+               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                              , detail::is_adaptable_input_device< FormatTag
+                                                                                 , Device
+                                                                                 >
+                                              >
+                                   >::type* ptr = 0
+               )
+{
+    typedef typename detail::is_adaptable_input_device< FormatTag
+                                                      , Device
+                                                      >::device_type device_type;
+
+    device_type dev( file );
+
+    return detail::reader< device_type
+                         , FormatTag
+                         , detail::read_and_no_convert
+                         >( dev
+                          , settings
+                          ).get_info();
 }
 
 /// \ingroup IO
@@ -74,10 +127,34 @@ read_image_info( Device&          file
 
     device_type dev( file );
 
-    return detail::reader< device_type
-                         , FormatTag
-                         , detail::read_and_no_convert
-                         >( dev ).get_info();
+    return read_image_info( dev
+                          , image_read_settings< FormatTag >()
+                          );
+}
+
+/// \ingroup IO
+/// \brief Returns the image info. Image info is file format specific.
+template< typename String
+        , typename FormatTag
+        >
+inline 
+image_read_info<FormatTag>  
+read_image_info( const String&                           file_name
+               , const image_read_settings< FormatTag >& settings
+               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                              , detail::is_supported_path_spec< String >
+                                              >
+                                   >::type* ptr = 0
+               )
+{
+    detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )
+                                                  , typename detail::file_stream_device< FormatTag >::read_tag()
+                                                  );
+
+    return read_image_info( reader
+                          , tag
+                          , settings
+                          );
 }
 
 /// \ingroup IO
@@ -100,7 +177,8 @@ read_image_info( const String&    file_name
                                                   );
 
     return read_image_info( reader
-                          , tag    );
+                          , image_read_settings< FormatTag >()
+                          );
 }
 
 } // namespace gil

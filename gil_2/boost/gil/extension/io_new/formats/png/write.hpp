@@ -82,7 +82,7 @@ public:
                     , info._filter_method
                     );
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
         png_set_gAMA( _png_ptr
                     , _info_ptr
                     , info._gamma

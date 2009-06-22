@@ -48,8 +48,12 @@ class reader< Device
 {
 public:
 
-    reader( Device& io_dev )
+    reader( Device&                               io_dev
+          , const image_read_settings< png_tag >& settings
+          )
     : png_io_base< Device >( io_dev )
+    , reader_base< png_tag
+                 , ConversionPolicy >( settings )
     , _png_ptr ( NULL )
     , _info_ptr( NULL )
     {
@@ -57,11 +61,15 @@ public:
         init_reader();
     }
 
-    reader( Device& io_dev
-          , const typename ConversionPolicy::color_converter_type& cc )
+    reader( Device&                                                io_dev
+          , const typename ConversionPolicy::color_converter_type& cc
+          , const image_read_settings< png_tag >&                  settings
+          )
     : png_io_base< Device >( io_dev )
     , reader_base< png_tag
-                 , ConversionPolicy >( cc )
+                 , ConversionPolicy >( cc
+                                     , settings
+                                     )
     , _png_ptr ( 0 )
     , _info_ptr( 0 )
     {
@@ -81,6 +89,7 @@ public:
     {
         image_read_info< png_tag > ret = { 0 };
 
+        // get PNG_IHDR chunk information from png_info structure
         png_get_IHDR( _png_ptr
                     , _info_ptr
                     , &ret._width
@@ -92,90 +101,415 @@ public:
                     , &ret._filter_method
                     );
 
+        // get number of color channels in image
         ret._num_channels = png_get_channels( _png_ptr
                                             , _info_ptr
                                             );
 
-        int res_unit = PNG_RESOLUTION_METER;
-        png_get_pHYs(_png_ptr, _info_ptr, &ret._x_res, &ret._y_res, &res_unit);
-        png_get_sBIT(_png_ptr, _info_ptr, &ret._sbits );
-
 #ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED 
-        if( !png_get_gAMA(_png_ptr, _info_ptr, &ret._gamma ))
+
+        // Get CIE chromacities and referenced white point for given image
+        if( _settings._read_cie_chromacities )
+        {
+            png_get_cHRM( _png_ptr
+                        , _info_ptr
+                        , &ret._white_x, &ret._white_y
+                        ,   &ret._red_x,   &ret._red_y
+                        , &ret._green_x, &ret._green_y
+                        ,  &ret._blue_x,  &ret._blue_y
+                        );
+        }
+
+        // get the gamma value for given image
+        if( !png_get_gAMA( _png_ptr
+                         , _info_ptr
+                         , &ret._gamma
+                         ) )
         {
             ret._gamma = 1.0;
         }
 #else
-        png_get_gAMA_fixed(_png_ptr, _info_ptr, &ret._gamma );
+
+        // Get CIE chromacities and referenced white point for given image
+        if( _settings._read_cie_chromacities )
+        {
+            png_get_cHRM_fixed( _png_ptr
+                              , _info_ptr
+                              , &ret._white_x, &ret._white_y
+                              ,   &ret._red_x,   &ret._red_y
+                              , &ret._green_x, &ret._green_y
+                              ,  &ret._blue_x,  &ret._blue_y
+                              );
+        }
+
+        // get the gamma value for given image
+        png_get_gAMA_fixed( _png_ptr
+                          , _info_ptr
+                          , &ret._gamma
+                          );
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
-        return ret;
-    }
 
-    template<typename View>
-    void apply( const View& view )
-    {
-        if( little_endian() )
-        {   
-            if( this->_info._bit_depth == 16 )
-                png_set_swap(_png_ptr);
-            if( this->_info._bit_depth < 8 )
-                png_set_packswap(_png_ptr);
-        }
-
-        png_bitdepth::type bit_depth = this->_info._bit_depth;
-        png_color_type::type color_type = this->_info._color_type;
-
-        if(color_type == PNG_COLOR_TYPE_PALETTE)
+        // get the embedded ICC profile data for given image
+        if( _settings._read_icc_profile )
         {
-            color_type = PNG_COLOR_TYPE_RGB;
-            bit_depth = 8;
-            png_set_palette_to_rgb(_png_ptr);
-        }
+            png_charp icc_name = png_charp( NULL );
+            png_charp profile  = png_charp( NULL );
+            png_get_iCCP( _png_ptr
+                        , _info_ptr
+                        , &icc_name
+                        , &ret._iccp_compression_type
+                        , &profile
+                        , &ret._profile_length
+                        );
 
-        if( png_get_valid( _png_ptr
-                         , _info_ptr
-                         , PNG_INFO_tRNS
-                         )
-          ) 
-        {
-            if( color_type == PNG_COLOR_TYPE_RGB )
+            if( icc_name )
             {
-                color_type = PNG_COLOR_TYPE_RGBA;
-                this->_info._num_channels = 4;
-            }
-            else if( color_type== PNG_COLOR_TYPE_GRAY )
-            {
-                color_type = PNG_COLOR_TYPE_GA;
-                this->_info._num_channels = 2;
+                ret._icc_name.append( icc_name
+                                    , std::strlen( icc_name )
+                                    );
             }
 
-            png_set_tRNS_to_alpha( _png_ptr );
+            if( ret._profile_length > 0 )
+            {
+                ret._profile.append( profile
+                                   , ret._profile_length
+                                   );
+            }
+        }
+
+        // get the rendering intent for given image
+        if( _settings._read_intent )
+        {
+            png_get_sRGB( _png_ptr
+                        , _info_ptr
+                        , &ret._intent
+                        );
+        }
+
+        // get image palette information from png_info structure
+        if( _settings._read_palette )
+        {
+            png_colorp palette = png_colorp( NULL );
+            png_get_PLTE( _png_ptr
+                        , _info_ptr
+                        , &palette
+                        , &ret._num_palette
+                        );
+
+            if( ret._num_palette > 0 )
+            {
+                ret._palette.resize( ret._num_palette );
+                std::copy( palette
+                         , palette + ret._num_palette
+                         , &ret._palette.front()
+                         );
+            }
+        }
+
+        // get background color for given image
+        if( _settings._read_background )
+        {
+            png_get_bKGD( _png_ptr
+                        , _info_ptr
+                        , &ret._background
+                        );
+        }
+
+        // get the histogram for given image
+        if( _settings._read_histogram )
+        {
+            png_get_hIST( _png_ptr
+                        , _info_ptr
+                        , &ret._histogram
+                        );
+        }
+
+        // get screen offsets for the given image
+        if( _settings._read_screen_offsets )
+        {
+            png_get_oFFs( _png_ptr
+                        , _info_ptr
+                        , &ret._offset_x
+                        , &ret._offset_y
+                        , &ret._off_unit_type
+                        );
+        }
+
+
+        // get pixel calibration settings
+        if( _settings._read_pixel_calibration )
+        {
+            png_charp purpose = png_charp ( NULL );
+            png_charp units   = png_charp ( NULL );
+            png_charpp params = png_charpp( NULL );
+            png_get_pCAL( _png_ptr
+                        , _info_ptr
+                        , &purpose
+                        , &ret._X0
+                        , &ret._X1
+                        , &ret._cal_type
+                        , &ret._num_params
+                        , &units
+                        , &params
+                        );
+
+            if( purpose )
+            {
+                ret._purpose.append( purpose
+                                   , std::strlen( purpose )
+                                   );
+            }
+
+            if( units )
+            {
+                ret._units.append( units
+                                 , std::strlen( units )
+                                 );
+            }
+
+            if( ret._num_params > 0 )
+            {
+                ret._params.resize( ret._num_params );
+
+                for( png_CAL_nparam::type i = 0
+                   ; i < ret._num_params
+                   ; ++i
+                   )
+                {
+                    ret._params[i].append( params[i]
+                                         , std::strlen( params[i] )
+                                         );
+                }
+            }
+        }
+
+        // get the physical resolution for given image
+        if( _settings._read_physical_resolution )
+        {
+            png_get_pHYs( _png_ptr
+                        , _info_ptr
+                        , &ret._res_x
+                        , &ret._res_y
+                        , &ret._phy_unit_type
+                        );
+        }
+
+        // get number of significant bits for each color channel
+        if( _settings._read_number_of_significant_bits )
+        {
+            png_get_sBIT( _png_ptr
+                        , _info_ptr
+                        , &ret._sig_bits
+                        );
         }
 
 #ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED 
+
+        // get physical scale settings
+        if( _settings._read_scale_factors )
+        {
+            png_get_sCAL( _png_ptr
+                        , _info_ptr
+                        , &ret._scale_unit
+                        , &ret._scale_width
+                        , &ret._scale_height
+                        );
+        }
+#else
+#ifdef BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
+        if( _settings._read_scale_factors )
+        {
+            png_charp scale_width, scale_height;
+
+            png_get_sCAL_s( _png_ptr
+                          , _info_ptr
+                          , &ret._scale_unit
+                          , &scale_width
+                          , &scale_height
+                          );
+
+            if( scale_width )
+            {
+                ret._scale_width.append( scale_width
+                                       , std::strlen( scale_width )
+                                       );
+            }
+            
+            if( scale_height )
+            {
+                ret._scale_height.append( scale_height
+                                        , std::strlen( scale_height )
+                                        );
+            }
+        }
+#endif // BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
+
+        // get comments information from png_info structure
+        if( _settings._read_comments )
+        {
+            png_textp text = png_textp( NULL );
+            png_get_text( _png_ptr
+                        , _info_ptr
+                        , &text
+                        , &ret._num_text
+                        );
+
+            if( ret._num_text > 0 )
+            {
+                ret._text.resize( ret._num_text );
+
+                for( png_num_text::type i = 0
+                   ; i < ret._num_text
+                   ; ++i
+                   )
+                {
+                    ret._text[i]._compression = text[i].compression;
+                    ret._text[i]._key.append( text[i].key
+                                            , std::strlen( text[i].key )
+                                            );
+
+                    ret._text[i]._text.append( text[i].text
+                                             , std::strlen( text[i].text )
+                                             );            
+                }
+            }
+        }
+
+        // get last modification time for the image
+        if( _settings._read_last_modification_time )
+        {
+            png_get_tIME( _png_ptr
+                        , _info_ptr
+                        , &ret._mod_time
+                        );
+        }
+
+        // get transparency data for images
+        if( _settings._read_transparency_data )
+        {
+            png_bytep     trans        = png_bytep    ( NULL );
+            png_color_16p trans_values = png_color_16p( NULL );
+            png_get_tRNS( _png_ptr
+                        , _info_ptr
+                        , &trans
+                        , &ret._num_trans
+                        , &trans_values
+                        );
+
+            if( trans )
+            {
+                //@todo What to do, here? How do I know the length of the "trans" array?
+            }
+
+            if( ret._num_trans )
+            {
+                ret._trans_values.resize( ret._num_trans );
+                std::copy( trans_values
+                         , trans_values + ret._num_trans
+                         , &ret._trans_values.front()
+                         );
+            }
+        }
+
+        // @todo One day!
+        if( false )
+        {
+            png_unknown_chunkp unknowns = png_unknown_chunkp( NULL );
+            int num_unknowns = static_cast< int >( png_get_unknown_chunks( _png_ptr
+                                                                         , _info_ptr
+                                                                         , &unknowns
+                                                                         )
+                                                 );
+        }
+
+        return ret;
+    }
+
+    template< typename View >
+    void apply( const View& view )
+    {
+        // The info structures are filled at this point.
+
+        // Now it's time for some transformations.
+
+        if( little_endian() )
+        {   
+            if( this->_info._bit_depth == 16 )
+            {
+                // Swap bytes of 16 bit files to least significant byte first.
+                png_set_swap( _png_ptr );
+            }
+
+            if( this->_info._bit_depth < 8 )
+            {
+                // swap bits of 1, 2, 4 bit packed pixel formats
+                png_set_packswap( _png_ptr );
+            }
+        }
+
+        if( this->_info._color_type == PNG_COLOR_TYPE_PALETTE )
+        {
+            png_set_palette_to_rgb( _png_ptr );
+        }
+
+        if( this->_info._num_trans > 0 )
+        {
+            png_set_tRNS_to_alpha( _png_ptr );
+        }
+
+        // Tell libpng to handle the gamma conversion for you.  The final call
+        // is a good guess for PC generated images, but it should be configurable
+        // by the user at run time by the user.  It is strongly suggested that
+        // your application support gamma correction.
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED 
         png_set_gamma( _png_ptr
-                     , this->_settings._gamma
+                     , this->_settings._screen_gamma
                      , this->_info._gamma
+                     );
+#else
+        png_set_gamma( _png_ptr
+                     , this->_settings._screen_gamma
+                     , 1.0 //this->_info._gamma // @todo is that correct?
                      );
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
-        switch( color_type )
+
+        // Turn on interlace handling.  REQUIRED if you are not using
+        // png_read_image().  To see how to handle interlacing passes,
+        // see the png_read_row() method below:
+        _number_passes = png_set_interlace_handling( _png_ptr );
+
+
+        // The above transformation might have changed the bit_depth and color type.
+        png_read_update_info( _png_ptr
+                            , _info_ptr
+                            );
+
+        this->_info._bit_depth = png_get_bit_depth( _png_ptr
+                                                  , _info_ptr
+                                                  );
+
+        this->_info._num_channels = png_get_channels( _png_ptr
+                                                    , _info_ptr
+                                                    );
+
+        this->_info._color_type = png_get_color_type( _png_ptr
+                                                    , _info_ptr
+                                                    );
+
+        switch( this->_info._color_type )
         {
             case PNG_COLOR_TYPE_GRAY:
             {
-                if( bit_depth < 8 )
+                switch( this->_info._bit_depth )
                 {
-                    png_set_gray_1_2_4_to_8( _png_ptr );
-                }
-
-                switch( bit_depth )
-                {
-                    case 1:  
-                    case 2:  
-                    case 4:  
-                    case 8:  read_rows< gray8_pixel_t > ( view ); break;
+                    case  1: read_rows< gray1_image_t::view_t::reference >( view ); break;
+                    case  2: read_rows< gray2_image_t::view_t::reference >( view ); break;
+                    case  4: read_rows< gray4_image_t::view_t::reference >( view ); break;
+                    case  8: read_rows< gray8_pixel_t  >( view ); break;
                     case 16: read_rows< gray16_pixel_t >( view ); break;
-                    default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+                    default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
                 }
 
                 break;
@@ -183,14 +517,14 @@ public:
             case PNG_COLOR_TYPE_GA:
             {
                 #ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
-                switch( bit_depth )
+                switch( this->_info._bit_depth )
                 {
-                    case 8: read_rows< gray_alpha8_pixel_t > ( view ); break;
-                    case 16:read_rows< gray_alpha16_pixel_t >( view ); break;
-                    default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+                    case  8: read_rows< gray_alpha8_pixel_t > ( view ); break;
+                    case 16: read_rows< gray_alpha16_pixel_t >( view ); break;
+                    default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
                 }
                 #else
-                    io_error("gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application.");
+                    io_error( "gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application." );
                 #endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 
@@ -198,33 +532,35 @@ public:
             }
             case PNG_COLOR_TYPE_RGB:
             {
-                switch (bit_depth)
+                switch( this->_info._bit_depth )
                 {
                     case 8:  read_rows< rgb8_pixel_t > ( view ); break;
                     case 16: read_rows< rgb16_pixel_t >( view ); break;
-                    default: io_error("png_reader::read_data(): unknown combination of color type and bit depth");
+                    default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
                 }
 
                 break;
             }
             case PNG_COLOR_TYPE_RGBA:
             {
-                switch( bit_depth )
+                switch( this->_info._bit_depth )
                 {
-                    case 8 : read_rows< rgba8_pixel_t > ( view ); break;
+                    case  8: read_rows< rgba8_pixel_t > ( view ); break;
                     case 16: read_rows< rgba16_pixel_t >( view ); break;
-                    default: io_error("png_reader_color_convert::read_data(): unknown combination of color type and bit depth");
+                    default: io_error( "png_reader_color_convert::read_data(): unknown combination of color type and bit depth" );
                 }
 
                 break;
             }
-            default: io_error("png_reader_color_convert::read_data(): unknown color type");
+            default: io_error( "png_reader_color_convert::read_data(): unknown color type" );
         }
 
+        // read rest of file, and get additional chunks in info_ptr
         png_read_end( _png_ptr
                     , NULL
                     );
     }
+
 
 private:
 
@@ -248,101 +584,182 @@ private:
                    , "Image types aren't compatible."
                    );
 
-        bool interlaced = this->_info._interlace_method != PNG_INTERLACE_NONE;
-
-        std::ptrdiff_t width = this->_info._width;
+        std::ptrdiff_t width  = this->_info._width;
         std::ptrdiff_t height = this->_info._height;
 
-        row_buffer_helper_t buffer( static_cast<int>( interlaced ? width * height : width )
-                                  , false
+        std::size_t rowbytes = png_get_rowbytes( _png_ptr
+                                               , _info_ptr
+                                               );
+
+        row_buffer_helper_t buffer( rowbytes
+                                  , true
                                   );
 
-        if( interlaced )
+        png_bytep row_ptr = (png_bytep)( &( buffer.data()[0]));
+
+        for( std::size_t pass = 0; pass < _number_passes; pass++ )
         {
-            std::vector< png_bytep > row_ptrs( height );
-            for( int y = 0; y < height; ++y )
+            //@todo add code for skipping lines.
+
+            if( pass == _number_passes - 1 )
             {
-                row_ptrs[y] = reinterpret_cast< png_bytep >( buffer.data() + y * width );
+                for( int y = 0; y < view.height(); ++y )
+                {
+                    // Read the image using the "sparkle" effect.
+                    png_read_rows( _png_ptr
+                                 , &row_ptr
+                                 , png_bytepp_NULL
+                                 , 1
+                                 );
+
+                    it_t first = buffer.begin() + this->_settings._top_left.x;
+                    it_t last  = buffer.begin() + this->_settings._dim.x; // one after last element
+
+                    this->_cc_policy.read( first
+                                         , last
+                                         , view.row_begin( y ));
+                }
             }
-
-            png_read_image( _png_ptr
-                          , &row_ptrs.front()
-                          );
-
-            for( int y = 0; y < view.height(); ++y )
+            else
             {
-                it_t begin = buffer.begin() + y * width;
-
-                it_t first = begin + this->_settings._top_left.x;
-                it_t last  = begin + this->_settings._dim.x; // one after last element
-
-                this->_cc_policy.read( first
-                                     , last
-                                     , view.row_begin( y ));
+                for( int y = 0; y < view.height(); ++y )
+                {
+                    // Read the image using the "sparkle" effect.
+                    png_read_rows( _png_ptr
+                                 , &row_ptr
+                                 , png_bytepp_NULL
+                                 , 1
+                                 );
+                }
             }
         }
-        else
-        {
-            it_t begin = buffer.begin();
 
-            it_t first = begin + this->_settings._top_left.x;
-            it_t last  = begin + this->_settings._dim.x; // one after last element
-
-            // skip rows
-            for( int y = 0; y < this->_settings._top_left.y; ++y )
-            {
-                png_read_row( _png_ptr
-                            , reinterpret_cast< png_bytep >( buffer.data() )
-                            , 0
-                            );
-            }
-
-            for( int y = 0; y < view.height(); ++y )
-            {
-                png_read_row( _png_ptr
-                            , reinterpret_cast< png_bytep >( buffer.data() )
-                            , 0
-                            );
-
-                 this->_cc_policy.read( first
-                                      , last
-                                      , view.row_begin( y ));
-            }
-        }
     }
 
     void init_reader()
     {
-        _png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
-        io_error_if(_png_ptr==NULL,"png_reader: fail to call png_create_write_struct()");
-        // allocate/initialize the image information data
-        _info_ptr = png_create_info_struct(_png_ptr);
+        // Create and initialize the png_struct with the desired error handler
+        // functions.  If you want to use the default stderr and longjump method,
+        // you can supply NULL for the last three parameters.  We also supply the
+        // the compiler header file version, so that we know if the application
+        // was compiled with a compatible version of the library.  REQUIRED
+        _png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING
+                                         , png_voidp_NULL      // user_error_ptr
+                                         , png_error_ptr_NULL  // user_error_fn
+                                         , png_error_ptr_NULL  // user_warning_fn
+                                         );
 
-        if (_info_ptr == NULL) {
-            png_destroy_read_struct(&_png_ptr,png_infopp_NULL,png_infopp_NULL);
-            io_error("png_reader: fail to call png_create_info_struct()");
+        io_error_if( _png_ptr == NULL
+                   , "png_reader: fail to call png_create_write_struct()"
+                   );
+
+        png_uint_32 user_chunk_data[4];
+        user_chunk_data[0] = 0;
+        user_chunk_data[1] = 0;
+        user_chunk_data[2] = 0;
+        user_chunk_data[3] = 0;
+        png_set_read_user_chunk_fn( _png_ptr
+                                  , user_chunk_data
+                                  , read_user_chunk_callback
+                                  );
+
+        // Allocate/initialize the memory for image information.  REQUIRED.
+        _info_ptr = png_create_info_struct( _png_ptr );
+
+        if( _info_ptr == NULL )
+        {
+            png_destroy_read_struct( &_png_ptr
+                                   , png_infopp_NULL
+                                   , png_infopp_NULL
+                                   );
+
+            io_error( "png_reader: fail to call png_create_info_struct()" );
         }
-        if (setjmp(png_jmpbuf(_png_ptr))) {
+
+        // Set error handling if you are using the setjmp/longjmp method (this is
+        // the normal method of doing things with libpng).  REQUIRED unless you
+        // set up your own error handlers in the png_create_read_struct() earlier.
+        if( setjmp( png_jmpbuf( _png_ptr )))
+        {
             //free all of the memory associated with the png_ptr and info_ptr
-            png_destroy_read_struct(&_png_ptr, &_info_ptr, png_infopp_NULL);
-            io_error("png_reader: fail to call setjmp()");
+            png_destroy_read_struct( &_png_ptr
+                                   , &_info_ptr
+                                   , png_infopp_NULL
+                                   );
+
+            io_error( "png is invalid" );
         }
 
-        init_io( _png_ptr );
+        png_set_read_fn( _png_ptr
+                       , static_cast< png_voidp >( &this->_io_dev )
+                       , png_io_base< Device >::read_data
+                       );
 
-        png_set_sig_bytes(_png_ptr,PNG_BYTES_TO_CHECK);
-        png_read_info(_png_ptr, _info_ptr);
+        // Set up a callback function that will be
+        // called after each row has been read, which you can use to control
+        // a progress meter or the like. 
+        png_set_read_status_fn( _png_ptr
+                              , png_io_base< Device >::read_row_callback
+                              );
+
+        // Set up a callback which implements user defined transformation.
+        // @todo
+        png_set_read_user_transform_fn( _png_ptr
+                                      , png_user_transform_ptr( NULL )
+                                      );
+
+        png_set_keep_unknown_chunks( _png_ptr
+                                   , PNG_HANDLE_CHUNK_ALWAYS
+                                   , png_bytep_NULL
+                                   , 0
+                                   );
+
+
+        // Make sure we read the signature.
+        // @todo make it an option
+        png_set_sig_bytes( _png_ptr
+                         , PNG_BYTES_TO_CHECK
+                         );
+
+        // The call to png_read_info() gives us all of the information from the
+        // PNG file before the first IDAT (image data chunk).  REQUIRED
+        png_read_info( _png_ptr
+                     , _info_ptr
+                     );
     }
 
-    void init_io( png_structp png_ptr )
+    template< typename View >
+    std::size_t get_rowbytes( const View& v
+                            , mpl::true_
+                            )
     {
-        png_set_read_fn(png_ptr, 
-                static_cast<void*>(&this->_io_dev), 
-                static_cast<void(*)(png_structp, png_bytep, png_size_t)>(&png_io_base<Device>::read_data));
+        typedef typename View::reference ref_t;
+
+        std::size_t rowbits = v.width()
+                            * num_channels< ref_t >::type::value
+                            * channel_type< ref_t >::type::num_bits;
+
+        std::size_t rowbytes = rowbits >> 3;
+
+        std::size_t remaining_bits = rowbits - ( rowbytes << 3 );
+
+        return ( remaining_bits ) ? ++rowbytes : rowbytes;
     }
+
+    template< typename View >
+    std::size_t get_rowbytes( const View& v
+                            , mpl::false_
+                            )
+    {
+        return v.width() * num_channels< typename View::value_type >::value;
+    }
+
+private:
 
     png_structp _png_ptr;
     png_infop _info_ptr;
+
+    std::size_t _number_passes;
 };
 
 
@@ -398,8 +815,12 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device& device )
-    : reader( device )
+    dynamic_image_reader( Device&                               device
+                        , const image_read_settings< png_tag >& settings
+                        )
+    : reader( device
+            , settings
+            )
     {}    
 
     template< typename Images >
@@ -418,7 +839,6 @@ public:
         else
         {
             init_image( images
-                      , _settings
                       , _info
                       );
 

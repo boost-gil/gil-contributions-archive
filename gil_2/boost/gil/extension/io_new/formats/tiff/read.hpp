@@ -88,16 +88,24 @@ class reader< Device
 {
 public:
 
-    reader( Device& device )
-    : _io_dev( device )
-    {}
-
-    reader( Device&                                                         device
-          , const typename ConversionPolicy::color_converter_type& cc
+    reader( Device&                                device
+          , const image_read_settings< tiff_tag >& settings
           )
     : reader_base< tiff_tag
                  , ConversionPolicy
-                 >( cc )
+                 >( settings )
+    , _io_dev( device )
+    {}
+
+    reader( Device&                                                device
+          , const typename ConversionPolicy::color_converter_type& cc
+          , const image_read_settings< tiff_tag >&                 settings
+          )
+    : reader_base< tiff_tag
+                 , ConversionPolicy
+                 >( cc
+                  , settings
+                  )
     , _io_dev( device )
     {}
 
@@ -406,8 +414,12 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device& device )
-    : reader( device )
+    dynamic_image_reader( Device&                                device
+                        , const image_read_settings< tiff_tag >& settings
+                        )
+    : reader( device
+            , settings
+            )
     {}    
 
     template< typename Images >
@@ -424,7 +436,6 @@ public:
         else
         {
             init_image( images
-                      , _settings
                       , _info
                       );
 

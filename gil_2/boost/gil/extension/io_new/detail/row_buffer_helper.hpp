@@ -69,14 +69,14 @@ struct row_buffer_helper< Pixel
                      )
     : _c( ( width 
           * num_channels< pixel_type >::type::value
-          * channel_type<pixel_type>::type::num_bits
+          * channel_type< pixel_type >::type::num_bits
           )
           >> 3 
         )
 
     , _r( width
-        * num_channels<pixel_type>::type::value
-        * channel_type<pixel_type>::type::num_bits 
+        * num_channels< pixel_type >::type::value 
+        * channel_type< pixel_type >::type::num_bits 
         - ( _c << 3 )
        )
     {

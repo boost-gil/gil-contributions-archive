@@ -19,7 +19,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <malloc.h>
+#include <cstdlib>
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #include <boost/filesystem/path.hpp>

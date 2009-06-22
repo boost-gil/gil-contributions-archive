@@ -52,10 +52,11 @@ void read_view( Device&                                 file
     detail::reader< Device
                   , FormatTag
                   , detail::read_and_no_convert
-                  > reader( file );
+                  > reader( file
+                          , settings
+                          );
 
     reader.init_view( view
-                    , settings
                     , reader.get_info()
                     );
 
@@ -90,10 +91,11 @@ void read_view( Device&                                 file
     detail::reader< device_type
                   , FormatTag
                   , detail::read_and_no_convert
-                  > reader(dev);
+                  > reader( dev
+                          , settings
+                          );
 
     reader.init_view( view
-                    , settings
                     , reader.get_info()
                     );
 
