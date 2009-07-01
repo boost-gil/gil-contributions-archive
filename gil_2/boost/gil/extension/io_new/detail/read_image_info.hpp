@@ -152,7 +152,6 @@ read_image_info( const String&                           file_name
                                                   );
 
     return read_image_info( reader
-                          , tag
                           , settings
                           );
 }

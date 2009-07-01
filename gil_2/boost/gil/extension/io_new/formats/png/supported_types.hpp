@@ -168,7 +168,21 @@ template< typename BitField
 struct png_write_support< packed_dynamic_channel_reference< BitField
                                                           , 1
                                                           , Mutable
-                                                          >
+                                                          > 
+                        , gray_t
+                        > : write_support_true
+                          , png_rw_support_base< 1
+                                               , PNG_COLOR_TYPE_GRAY
+                                               >
+{};
+
+template< typename BitField
+        , bool     Mutable
+        >
+struct png_write_support< packed_dynamic_channel_reference< BitField
+                                                          , 1
+                                                          , Mutable
+                                                          > const
                         , gray_t
                         > : write_support_true
                           , png_rw_support_base< 1
@@ -182,7 +196,21 @@ template< typename BitField
 struct png_write_support< packed_dynamic_channel_reference< BitField
                                                           , 2
                                                           , Mutable
-                                                          >
+                                                          > 
+                        , gray_t
+                        > : write_support_true
+                          , png_rw_support_base< 2
+                                               , PNG_COLOR_TYPE_GRAY
+                                               >
+{};
+
+template< typename BitField
+        , bool     Mutable
+        >
+struct png_write_support< packed_dynamic_channel_reference< BitField
+                                                          , 2
+                                                          , Mutable
+                                                          > const
                         , gray_t
                         > : write_support_true
                           , png_rw_support_base< 2
@@ -196,7 +224,21 @@ template< typename BitField
 struct png_write_support< packed_dynamic_channel_reference< BitField
                                                           , 4
                                                           , Mutable
-                                                          >
+                                                          > 
+                        , gray_t
+                        > : write_support_true
+                          , png_rw_support_base< 4
+                                               , PNG_COLOR_TYPE_GRAY
+                                               >
+{};
+
+template< typename BitField
+        , bool     Mutable
+        >
+struct png_write_support< packed_dynamic_channel_reference< BitField
+                                                          , 4
+                                                          , Mutable
+                                                          > const
                         , gray_t
                         > : write_support_true
                           , png_rw_support_base< 4

@@ -87,7 +87,7 @@ public:
 
     image_read_info<png_tag> get_info() const
     {
-        image_read_info< png_tag > ret = { 0 };
+        image_read_info< png_tag > ret;
 
         // get PNG_IHDR chunk information from png_info structure
         png_get_IHDR( _png_ptr
@@ -111,42 +111,54 @@ public:
         // Get CIE chromacities and referenced white point for given image
         if( _settings._read_cie_chromacities )
         {
-            png_get_cHRM( _png_ptr
-                        , _info_ptr
-                        , &ret._white_x, &ret._white_y
-                        ,   &ret._red_x,   &ret._red_y
-                        , &ret._green_x, &ret._green_y
-                        ,  &ret._blue_x,  &ret._blue_y
-                        );
+            ret._valid_cie_colors = png_get_cHRM( _png_ptr
+                                                , _info_ptr
+                                                , &ret._white_x, &ret._white_y
+                                                ,   &ret._red_x,   &ret._red_y
+                                                , &ret._green_x, &ret._green_y
+                                                ,  &ret._blue_x,  &ret._blue_y
+                                                );
         }
 
         // get the gamma value for given image
-        if( !png_get_gAMA( _png_ptr
-                         , _info_ptr
-                         , &ret._gamma
-                         ) )
+        if( _settings._read_file_gamma )
         {
-            ret._gamma = 1.0;
+            ret._valid_file_gamma = png_get_gAMA( _png_ptr
+                                                , _info_ptr
+                                                , &ret._file_gamma
+                                                );
+            if( ret._valid_file_gamma == false )
+            {
+                ret._file_gamma = 1.0;
+            }
         }
 #else
 
         // Get CIE chromacities and referenced white point for given image
         if( _settings._read_cie_chromacities )
         {
-            png_get_cHRM_fixed( _png_ptr
-                              , _info_ptr
-                              , &ret._white_x, &ret._white_y
-                              ,   &ret._red_x,   &ret._red_y
-                              , &ret._green_x, &ret._green_y
-                              ,  &ret._blue_x,  &ret._blue_y
-                              );
+            ret._valid_cie_colors = png_get_cHRM_fixed( _png_ptr
+                                                      , _info_ptr
+                                                      , &ret._white_x, &ret._white_y
+                                                      ,   &ret._red_x,   &ret._red_y
+                                                      , &ret._green_x, &ret._green_y
+                                                      ,  &ret._blue_x,  &ret._blue_y
+                                                      );
         }
 
         // get the gamma value for given image
-        png_get_gAMA_fixed( _png_ptr
-                          , _info_ptr
-                          , &ret._gamma
-                          );
+        if( _settings._read_file_gamma )
+        {
+            ret._valid_file_gamma = png_get_gAMA_fixed( _png_ptr
+                                                      , _info_ptr
+                                                      , &ret._file_gamma
+                                                      );
+
+            if( ret._valid_file_gamma == false )
+            {
+                ret._file_gamma = 1;
+            }
+        }
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
         // get the embedded ICC profile data for given image
@@ -154,85 +166,122 @@ public:
         {
             png_charp icc_name = png_charp( NULL );
             png_charp profile  = png_charp( NULL );
-            png_get_iCCP( _png_ptr
-                        , _info_ptr
-                        , &icc_name
-                        , &ret._iccp_compression_type
-                        , &profile
-                        , &ret._profile_length
-                        );
-
-            if( icc_name )
+            if( ret._valid_icc_profile = png_get_iCCP( _png_ptr
+                                                     , _info_ptr
+                                                     , &icc_name
+                                                     , &ret._iccp_compression_type
+                                                     , &profile
+                                                     , &ret._profile_length
+                                                     )
+              )
             {
-                ret._icc_name.append( icc_name
-                                    , std::strlen( icc_name )
-                                    );
-            }
+                if( icc_name )
+                {
+                    ret._icc_name.append( icc_name
+                                        , std::strlen( icc_name )
+                                        );
+                }
 
-            if( ret._profile_length > 0 )
-            {
-                ret._profile.append( profile
-                                   , ret._profile_length
-                                   );
+                if( ret._profile_length > 0 )
+                {
+                    ret._profile.append( profile
+                                       , ret._profile_length
+                                       );
+                }
             }
         }
 
         // get the rendering intent for given image
         if( _settings._read_intent )
         {
-            png_get_sRGB( _png_ptr
-                        , _info_ptr
-                        , &ret._intent
-                        );
+            ret._valid_intent = png_get_sRGB( _png_ptr
+                                            , _info_ptr
+                                            , &ret._intent
+                                            );
         }
 
         // get image palette information from png_info structure
         if( _settings._read_palette )
         {
             png_colorp palette = png_colorp( NULL );
-            png_get_PLTE( _png_ptr
-                        , _info_ptr
-                        , &palette
-                        , &ret._num_palette
-                        );
+            if( ret._valid_palette = png_get_PLTE( _png_ptr
+                                                 , _info_ptr
+                                                 , &palette
+                                                 , &ret._num_palette
+                                                 )
+               )
+             {
 
-            if( ret._num_palette > 0 )
-            {
-                ret._palette.resize( ret._num_palette );
-                std::copy( palette
-                         , palette + ret._num_palette
-                         , &ret._palette.front()
-                         );
+                if( ret._num_palette > 0 )
+                {
+                    ret._palette.resize( ret._num_palette );
+                    std::copy( palette
+                             , palette + ret._num_palette
+                             , &ret._palette.front()
+                             );
+                }
             }
         }
 
         // get background color for given image
         if( _settings._read_background )
         {
-            png_get_bKGD( _png_ptr
-                        , _info_ptr
-                        , &ret._background
-                        );
+            png_color_16p background = png_color_16p( NULL );
+            if( ret._valid_background = png_get_bKGD( _png_ptr
+                                                    , _info_ptr
+                                                    , &background
+                                                    )
+              )
+            {
+                if( background )
+                {
+                    ret._background = *background;
+                }
+            }
         }
 
         // get the histogram for given image
         if( _settings._read_histogram )
         {
-            png_get_hIST( _png_ptr
-                        , _info_ptr
-                        , &ret._histogram
-                        );
+            png_uint_16p histogram = png_uint_16p( NULL );
+            if( ret._valid_histogram = png_get_hIST( _png_ptr
+                                                   , _info_ptr
+                                                   , &histogram
+                                                   )
+              )
+            {
+
+                if( histogram )
+                {
+                    // the number of values is set by the number of colors inside 
+                    // the palette.
+                    if( _settings._read_palette == false )
+                    {
+                        png_colorp palette = png_colorp( NULL );
+                        png_get_PLTE( _png_ptr
+                                    , _info_ptr
+                                    , &palette
+                                    , &ret._num_palette
+                                    );
+                    }
+
+                    std::copy( histogram
+                             , histogram + ret._num_palette
+                             , &ret._histogram.front()
+                             );
+                }
+            }
         }
 
         // get screen offsets for the given image
         if( _settings._read_screen_offsets )
         {
-            png_get_oFFs( _png_ptr
-                        , _info_ptr
-                        , &ret._offset_x
-                        , &ret._offset_y
-                        , &ret._off_unit_type
-                        );
+            ret._valid_offset = png_get_oFFs( _png_ptr
+                                            , _info_ptr
+                                            , &ret._offset_x
+                                            , &ret._offset_y
+                                            , &ret._off_unit_type
+                                            );
         }
 
 
@@ -242,43 +291,45 @@ public:
             png_charp purpose = png_charp ( NULL );
             png_charp units   = png_charp ( NULL );
             png_charpp params = png_charpp( NULL );
-            png_get_pCAL( _png_ptr
-                        , _info_ptr
-                        , &purpose
-                        , &ret._X0
-                        , &ret._X1
-                        , &ret._cal_type
-                        , &ret._num_params
-                        , &units
-                        , &params
-                        );
-
-            if( purpose )
+            if( ret._valid_pixel_calibration = png_get_pCAL( _png_ptr
+                                                           , _info_ptr
+                                                           , &purpose
+                                                           , &ret._X0
+                                                           , &ret._X1
+                                                           , &ret._cal_type
+                                                           , &ret._num_params
+                                                           , &units
+                                                           , &params
+                                                           )
+              )
             {
-                ret._purpose.append( purpose
-                                   , std::strlen( purpose )
-                                   );
-            }
-
-            if( units )
-            {
-                ret._units.append( units
-                                 , std::strlen( units )
-                                 );
-            }
-
-            if( ret._num_params > 0 )
-            {
-                ret._params.resize( ret._num_params );
-
-                for( png_CAL_nparam::type i = 0
-                   ; i < ret._num_params
-                   ; ++i
-                   )
+                if( purpose )
                 {
-                    ret._params[i].append( params[i]
-                                         , std::strlen( params[i] )
-                                         );
+                    ret._purpose.append( purpose
+                                       , std::strlen( purpose )
+                                       );
+                }
+
+                if( units )
+                {
+                    ret._units.append( units
+                                     , std::strlen( units )
+                                     );
+                }
+
+                if( ret._num_params > 0 )
+                {
+                    ret._params.resize( ret._num_params );
+
+                    for( png_CAL_nparam::type i = 0
+                       ; i < ret._num_params
+                       ; ++i
+                       )
+                    {
+                        ret._params[i].append( params[i]
+                                             , std::strlen( params[i] )
+                                             );
+                    }
                 }
             }
         }
@@ -286,21 +337,30 @@ public:
         // get the physical resolution for given image
         if( _settings._read_physical_resolution )
         {
-            png_get_pHYs( _png_ptr
-                        , _info_ptr
-                        , &ret._res_x
-                        , &ret._res_y
-                        , &ret._phy_unit_type
-                        );
+            ret._valid_resolution = png_get_pHYs( _png_ptr
+                                                , _info_ptr
+                                                , &ret._res_x
+                                                , &ret._res_y
+                                                , &ret._phy_unit_type
+                                                );
         }
 
         // get number of significant bits for each color channel
         if( _settings._read_number_of_significant_bits )
         {
-            png_get_sBIT( _png_ptr
-                        , _info_ptr
-                        , &ret._sig_bits
-                        );
+            png_color_8p sig_bits = png_color_8p( NULL );
+            if( ret._valid_significant_bits = png_get_sBIT( _png_ptr
+                                                          , _info_ptr
+                                                          , &sig_bits
+                                                          )
+              )
+            {
+                // @todo Is there one or more colors?
+                if( sig_bits )
+                {
+                    ret._sig_bits = *sig_bits;
+                }
+            }
         }
 
 #ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED 
@@ -308,12 +368,12 @@ public:
         // get physical scale settings
         if( _settings._read_scale_factors )
         {
-            png_get_sCAL( _png_ptr
-                        , _info_ptr
-                        , &ret._scale_unit
-                        , &ret._scale_width
-                        , &ret._scale_height
-                        );
+            ret._valid_scale_factors = png_get_sCAL( _png_ptr
+                                                   , _info_ptr
+                                                   , &ret._scale_unit
+                                                   , &ret._scale_width
+                                                   , &ret._scale_height
+                                                   );
         }
 #else
 #ifdef BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
@@ -321,25 +381,27 @@ public:
         {
             png_charp scale_width, scale_height;
 
-            png_get_sCAL_s( _png_ptr
-                          , _info_ptr
-                          , &ret._scale_unit
-                          , &scale_width
-                          , &scale_height
-                          );
-
-            if( scale_width )
+            if( ret._valid_scale_factors = png_get_sCAL_s( _png_ptr
+                                                         , _info_ptr
+                                                         , &ret._scale_unit
+                                                         , &scale_width
+                                                         , &scale_height
+                                                         )
+              )
             {
-                ret._scale_width.append( scale_width
-                                       , std::strlen( scale_width )
-                                       );
-            }
-            
-            if( scale_height )
-            {
-                ret._scale_height.append( scale_height
-                                        , std::strlen( scale_height )
-                                        );
+                if( scale_width )
+                {
+                    ret._scale_width.append( scale_width
+                                           , std::strlen( scale_width )
+                                           );
+                }
+                
+                if( scale_height )
+                {
+                    ret._scale_height.append( scale_height
+                                            , std::strlen( scale_height )
+                                            );
+                }
             }
         }
 #endif // BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
@@ -349,29 +411,31 @@ public:
         if( _settings._read_comments )
         {
             png_textp text = png_textp( NULL );
-            png_get_text( _png_ptr
-                        , _info_ptr
-                        , &text
-                        , &ret._num_text
-                        );
-
-            if( ret._num_text > 0 )
+            if( ret._valid_text = png_get_text( _png_ptr
+                                              , _info_ptr
+                                              , &text
+                                              , &ret._num_text
+                                              )
+              )
             {
-                ret._text.resize( ret._num_text );
-
-                for( png_num_text::type i = 0
-                   ; i < ret._num_text
-                   ; ++i
-                   )
+                if( ret._num_text > 0 )
                 {
-                    ret._text[i]._compression = text[i].compression;
-                    ret._text[i]._key.append( text[i].key
-                                            , std::strlen( text[i].key )
-                                            );
+                    ret._text.resize( ret._num_text );
 
-                    ret._text[i]._text.append( text[i].text
-                                             , std::strlen( text[i].text )
-                                             );            
+                    for( png_num_text::type i = 0
+                       ; i < ret._num_text
+                       ; ++i
+                       )
+                    {
+                        ret._text[i]._compression = text[i].compression;
+                        ret._text[i]._key.append( text[i].key
+                                                , std::strlen( text[i].key )
+                                                );
+
+                        ret._text[i]._text.append( text[i].text
+                                                 , std::strlen( text[i].text )
+                                                 );            
+                    }
                 }
             }
         }
@@ -379,10 +443,16 @@ public:
         // get last modification time for the image
         if( _settings._read_last_modification_time )
         {
-            png_get_tIME( _png_ptr
-                        , _info_ptr
-                        , &ret._mod_time
-                        );
+            png_timep mod_time = png_timep( NULL );
+            if( ret._valid_modification_time = png_get_tIME( _png_ptr
+                                                           , _info_ptr
+                                                           , &mod_time
+                                                           )
+              )
+            {
+                ret._mod_time = *mod_time;
+            }
+
         }
 
         // get transparency data for images
@@ -390,25 +460,27 @@ public:
         {
             png_bytep     trans        = png_bytep    ( NULL );
             png_color_16p trans_values = png_color_16p( NULL );
-            png_get_tRNS( _png_ptr
-                        , _info_ptr
-                        , &trans
-                        , &ret._num_trans
-                        , &trans_values
-                        );
-
-            if( trans )
+            if( ret._valid_transparency_factors = png_get_tRNS( _png_ptr
+                                                              , _info_ptr
+                                                              , &trans
+                                                              , &ret._num_trans
+                                                              , &trans_values
+                                                              )
+              )
             {
-                //@todo What to do, here? How do I know the length of the "trans" array?
-            }
+                if( trans )
+                {
+                    //@todo What to do, here? How do I know the length of the "trans" array?
+                }
 
-            if( ret._num_trans )
-            {
-                ret._trans_values.resize( ret._num_trans );
-                std::copy( trans_values
-                         , trans_values + ret._num_trans
-                         , &ret._trans_values.front()
-                         );
+                if( ret._num_trans )
+                {
+                    ret._trans_values.resize( ret._num_trans );
+                    std::copy( trans_values
+                             , trans_values + ret._num_trans
+                             , &ret._trans_values.front()
+                             );
+                }
             }
         }
 
@@ -462,18 +534,22 @@ public:
         // is a good guess for PC generated images, but it should be configurable
         // by the user at run time by the user.  It is strongly suggested that
         // your application support gamma correction.
+        if( this->_settings._apply_screen_gamma )
+        {
+            // png_set_gamma will change the image data!
+
 #ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED 
         png_set_gamma( _png_ptr
                      , this->_settings._screen_gamma
-                     , this->_info._gamma
+                     , this->_info._file_gamma
                      );
 #else
         png_set_gamma( _png_ptr
                      , this->_settings._screen_gamma
-                     , 1.0 //this->_info._gamma // @todo is that correct?
+                     , this->_info._file_gamma
                      );
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
-
+        }
 
         // Turn on interlace handling.  REQUIRED if you are not using
         // png_read_image().  To see how to handle interlacing passes,

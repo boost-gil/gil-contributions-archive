@@ -38,8 +38,8 @@ static jmp_buf mark;
 template<typename Device>
 struct jpeg_decompress_mgr
 {
-    jpeg_decompress_mgr( Device & file )
-        : in(file)
+    jpeg_decompress_mgr( Device& file )
+    : in(file)
     {
         _cinfo.err = jpeg_std_error( &_jerr );
 
@@ -118,7 +118,7 @@ protected:
      */
     static void error_exit( j_common_ptr cinfo )
     {
-        longjmp( mark, 1) ;
+        longjmp( mark, 1 );
     }
 
 private:
