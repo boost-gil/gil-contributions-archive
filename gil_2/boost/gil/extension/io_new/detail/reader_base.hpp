@@ -103,12 +103,12 @@ private:
                     && ( height ) <  _settings._top_left.y
                     && ( height ) <= dim.y  )
                  , "User provided view has incorrect size."       );
-
+/*
        io_error_if( (  _settings._top_left.x > dim.x
                     && _settings._top_left.y > dim.y
                     )
                  , "User provided view has incorrect size." );
-
+*/
        io_error_if( (  ( _settings._top_left.x + dim.x ) > width
                     || ( _settings._top_left.y + dim.y ) > height
                    )

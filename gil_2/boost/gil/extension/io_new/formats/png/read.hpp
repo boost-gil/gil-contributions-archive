@@ -675,11 +675,23 @@ private:
 
         for( std::size_t pass = 0; pass < _number_passes; pass++ )
         {
-            //@todo add code for skipping lines.
-
             if( pass == _number_passes - 1 )
             {
-                for( int y = 0; y < view.height(); ++y )
+                // skip lines if necessary
+                for( std::ptrdiff_t y = 0; y < this->_settings._top_left.y; ++y )
+                {
+                    // Read the image using the "sparkle" effect.
+                    png_read_rows( _png_ptr
+                                 , &row_ptr
+                                 , png_bytepp_NULL
+                                 , 1
+                                 );
+                }
+
+                for( std::ptrdiff_t y = 0
+                   ; y < this->_settings._dim.y
+                   ; ++y
+                   )
                 {
                     // Read the image using the "sparkle" effect.
                     png_read_rows( _png_ptr
@@ -689,11 +701,28 @@ private:
                                  );
 
                     it_t first = buffer.begin() + this->_settings._top_left.x;
-                    it_t last  = buffer.begin() + this->_settings._dim.x; // one after last element
+                    it_t last  = first + this->_settings._dim.x; // one after last element
 
                     this->_cc_policy.read( first
                                          , last
                                          , view.row_begin( y ));
+                }
+
+                // Read the rest of the image. libpng needs that.
+                std::ptrdiff_t remaining_rows = static_cast< std::ptrdiff_t >( this->_info._height ) 
+                                              - this->_settings._top_left.y
+                                              - this->_settings._dim.y;
+                for( std::ptrdiff_t y = 0
+                   ; y < remaining_rows
+                   ; ++y
+                   )
+                {
+                    // Read the image using the "sparkle" effect.
+                    png_read_rows( _png_ptr
+                                 , &row_ptr
+                                 , png_bytepp_NULL
+                                 , 1
+                                 );
                 }
             }
             else
@@ -802,32 +831,6 @@ private:
         png_read_info( _png_ptr
                      , _info_ptr
                      );
-    }
-
-    template< typename View >
-    std::size_t get_rowbytes( const View& v
-                            , mpl::true_
-                            )
-    {
-        typedef typename View::reference ref_t;
-
-        std::size_t rowbits = v.width()
-                            * num_channels< ref_t >::type::value
-                            * channel_type< ref_t >::type::num_bits;
-
-        std::size_t rowbytes = rowbits >> 3;
-
-        std::size_t remaining_bits = rowbits - ( rowbytes << 3 );
-
-        return ( remaining_bits ) ? ++rowbytes : rowbytes;
-    }
-
-    template< typename View >
-    std::size_t get_rowbytes( const View& v
-                            , mpl::false_
-                            )
-    {
-        return v.width() * num_channels< typename View::value_type >::value;
     }
 
 private:

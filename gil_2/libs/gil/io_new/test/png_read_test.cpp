@@ -10,6 +10,7 @@
 
 #include <iostream>
 
+#include "cmp_view.hpp"
 #include "paths.hpp"
 
 #pragma warning( disable: 4244 ) 
@@ -29,29 +30,6 @@ typedef image< gray_alpha8_pixel_t, false   > gray_alpha8_image_t;
 
 typedef pixel< uint16_t, gray_alpha_layout_t > gray_alpha16_pixel_t;
 typedef image< gray_alpha16_pixel_t, false   > gray_alpha16_image_t;
-
-template< typename View >
-void cmp_images( const View& v1
-               , const View& v2
-               )
-{
-    typename View::x_coord_t width  = v1.width();
-    typename View::y_coord_t height = v1.height();
-
-    for( typename View::y_coord_t y = 0; y < height; ++y )
-    {
-        typename const View::x_iterator src_it = v1.row_begin( y );
-        typename const View::x_iterator dst_it = v2.row_begin( y );
-
-        for( typename View::x_coord_t x = 0; x < width; ++x )
-        {
-            if( *src_it != *dst_it )
-            {
-                throw runtime_error( "Images are not equal." );
-            }
-        }
-    }
-}
 
 template< typename Image >
 void test_file( string filename )
@@ -81,7 +59,7 @@ void test_file( string filename )
 
     read_image( png_out + filename, dst, tag_t() );
 
-    cmp_images( view( src ), view( dst ) );
+    cmp_view( view( src ), view( dst ) );
 }
 
 BOOST_AUTO_TEST_CASE( read_header_test )
