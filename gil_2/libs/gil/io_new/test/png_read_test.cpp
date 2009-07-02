@@ -59,7 +59,8 @@ void test_file( string filename )
     Image src, dst;
 
     image_read_settings< png_tag > settings;
-    settings._read_file_gamma = true;
+    settings._read_file_gamma        = true;
+    settings._read_transparency_data = true;
 
     image_read_info< png_tag > info = read_image_info( png_in + filename
                                                      , settings
@@ -347,7 +348,8 @@ BOOST_AUTO_TEST_CASE( background_test )
 BOOST_AUTO_TEST_CASE( transparency_test )
 {
     // tbbn1g04 - transparent, black background chunk 
-    test_file< gray_alpha8_image_t >( "tbbn1g04.png" );
+    // file missing
+    //test_file< gray_alpha8_image_t >( "tbbn1g04.png" );
 
     // tbbn2c16 - transparent, blue background chunk 
     test_file< rgba16_image_t >( "tbbn2c16.png" );
