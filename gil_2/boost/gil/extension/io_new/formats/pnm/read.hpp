@@ -58,7 +58,7 @@ template< typename Device
 class reader< Device
             , pnm_tag
             , ConversionPolicy
-            > 
+            >
     : public reader_base< pnm_tag
                         , ConversionPolicy
                         >
@@ -139,10 +139,10 @@ public:
             // reading mono text is reading grayscale but with only two values
 			case pnm_type_mono_asc:  { read_text_data< gray8_view_t >( view ); break; }
 			case pnm_type_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
-			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; } 
-			
+			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; }
+
 			case pnm_type_mono_bin:  { read_bin_data< gray1_image_t::view_t >( view ); break; }
-			case pnm_type_gray_bin:  { read_bin_data< gray8_view_t          >( view ); break; } 
+			case pnm_type_gray_bin:  { read_bin_data< gray8_view_t          >( view ); break; }
 			case pnm_type_color_bin: { read_bin_data< rgb8_view_t           >( view ); break; }
 		}
     }
@@ -192,14 +192,14 @@ private:
 
                 int value = atoi( buf );
 
-                
+
                 if( this->_info._max_value == 1 )
                 {
-                    typedef channel_type< typename get_pixel_type< View_Dst >::type >::type channel_t;
+                    typedef typename channel_type< typename get_pixel_type< View_Dst >::type >::type channel_t;
 
                     // for pnm format 0 is white
-                    row[x] = ( value != 0 ) 
-                             ? 0 
+                    row[x] = ( value != 0 )
+                             ? typename channel_traits< channel_t >::value_type( 0 )
                              : channel_traits< channel_t >::max_value();
                 }
                 else
@@ -213,7 +213,7 @@ private:
             copy_data< View_Dst, View_Src >( dst
                                            , src
                                            , y
-                                           , is_same< View_Dst
+                                           , typename is_same< View_Dst
                                                     , gray1_image_t::view_t
                                                     >::type()
                                            );
@@ -276,7 +276,7 @@ private:
     void read_bin_data( const View_Dst& view )
     {
         typedef typename View_Dst::y_coord_t y_t;
-        typedef typename is_bit_aligned< 
+        typedef typename is_bit_aligned<
                     typename View_Src::value_type >::type is_bit_aligned_t;
 
         uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
@@ -409,7 +409,7 @@ template< typename Device
         >
 class dynamic_image_reader< Device
                           , pnm_tag
-                          > 
+                          >
     : public reader< Device
                    , pnm_tag
                    , detail::read_and_no_convert
@@ -425,15 +425,15 @@ public:
     dynamic_image_reader( Device&                               device
                         , const image_read_settings< pnm_tag >& settings
                         )
-    : reader( device
-            , settings
-            )
-    {}    
+    : parent_t( device
+              , settings
+              )
+    {}
 
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        pnm_type_format_checker format_checker( _info._type );
+        pnm_type_format_checker format_checker( this->_info._type );
 
         if( !construct_matched( images
                               , format_checker
@@ -444,7 +444,7 @@ public:
         else
         {
             init_image( images
-                      , _info
+                      , this->_info
                       );
 
             dynamic_io_fnobj< pnm_read_is_supported
@@ -457,7 +457,6 @@ public:
         }
     }
 };
-
 
 } // detail
 } // gil

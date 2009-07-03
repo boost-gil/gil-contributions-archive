@@ -417,9 +417,9 @@ public:
     dynamic_image_reader( Device&                                device
                         , const image_read_settings< tiff_tag >& settings
                         )
-    : reader( device
-            , settings
-            )
+    : parent_t( device
+              , settings
+              )
     {}    
 
     template< typename Images >
@@ -436,7 +436,7 @@ public:
         else
         {
             init_image( images
-                      , _info
+                      , this->_info
                       );
 
             dynamic_io_fnobj< tiff_read_is_supported

@@ -41,11 +41,11 @@ template <> struct buff_item< void >
 
 /*!
  * Implements the IODevice concept c.f. to \ref IODevice required by Image libraries like
- * libjpeg and libpng. 
+ * libjpeg and libpng.
  *
- * \todo switch to a sane interface as soon as there is 
+ * \todo switch to a sane interface as soon as there is
  * something good in boost. I.E. the IOChains library
- * would fit very well here. 
+ * would fit very well here.
  *
  * This implementation is based on FILE*.
  */
@@ -339,6 +339,8 @@ public:
                , std::size_t count )
     {
         io_error( "Bad io error." );
+
+        return 0;
     }
 
     void seek( long count, int whence )
@@ -420,7 +422,7 @@ private:
 
 
 /**
- * Metafunction to detect input devices. 
+ * Metafunction to detect input devices.
  * Should be replaced by an external facility in the future.
  */
 template< typename IODevice  > struct is_input_device : mpl::false_{};
@@ -460,7 +462,7 @@ struct is_adaptable_input_device< FormatTag
 
 
 /**
- * Metafunction to detect output devices. 
+ * Metafunction to detect output devices.
  * Should be replaced by an external facility in the future.
  */
 template<typename IODevice> struct is_output_device : mpl::false_{};

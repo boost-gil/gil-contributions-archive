@@ -57,7 +57,7 @@ template< typename Device
 class reader< Device
             , bmp_tag
             , ConversionPolicy
-            > 
+            >
     : public reader_base< bmp_tag
                         , ConversionPolicy
                         >
@@ -106,7 +106,7 @@ public:
         _io_dev.read_int16();
         // reserved; actual value depends on the application that creates the image
         _io_dev.read_int16();
-        
+
         _info._offset = _io_dev.read_int32();
 
 
@@ -246,7 +246,7 @@ public:
 
             case 4:
             {
-				switch ( _info._compression )				 
+				switch ( _info._compression )
 				{
 				    case ct_rle4:
 				    {
@@ -334,7 +334,7 @@ public:
                             , yend
                             , yinc
                             , offset
-                            ); 
+                            );
 
                 break;
             }
@@ -399,7 +399,7 @@ private:
         // we have to swap bits
         Byte_Manipulator byte_manipulator;
 
-        for( std::size_t y = ybeg; y != yend; y += yinc )
+        for( std::ptrdiff_t y = ybeg; y != yend; y += yinc )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
@@ -484,7 +484,7 @@ private:
         typedef rgb8_image_t image_t;
         typedef image_t::view_t::x_iterator it_t;
 
-        for( std::size_t y = ybeg; y != yend; y += yinc )
+        for( std::ptrdiff_t y = ybeg; y != yend; y += yinc )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
@@ -547,7 +547,7 @@ private:
         typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
         typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
-        for( std::size_t y = ybeg; y != yend; y += yinc )
+        for( std::ptrdiff_t y = ybeg; y != yend; y += yinc )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
@@ -704,7 +704,7 @@ private:
 
                         dst_it = buf.begin() + x;
                         dst_end = buf.end();
-                        
+
                         break;
                     }
 
@@ -796,7 +796,7 @@ private:
 
 struct bmp_read_is_supported
 {
-    template< typename View > 
+    template< typename View >
     struct apply : public is_read_supported< typename get_pixel_type< View >::type
                                            , bmp_tag
                                            >
@@ -807,7 +807,7 @@ template< typename Device
         >
 class dynamic_image_reader< Device
                           , bmp_tag
-                          > 
+                          >
     : public reader< Device
                    , bmp_tag
                    , detail::read_and_no_convert
@@ -823,20 +823,20 @@ public:
     dynamic_image_reader( Device&                               device
                         , const image_read_settings< bmp_tag >& settings
                         )
-    : reader( device
-            , settings
-            )
-    {}    
+    : parent_t( device
+              , settings
+              )
+    {}
 
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        if( !_info._valid )
+        if( !this->_info._valid )
         {
             get_info();
         }
 
-        bmp_type_format_checker format_checker( _info._bits_per_pixel );
+        bmp_type_format_checker format_checker( this->_info._bits_per_pixel );
 
         if( !construct_matched( images
                               , format_checker
@@ -847,7 +847,7 @@ public:
         else
         {
             init_image( images
-                      , _info
+                      , this->_info
                       );
 
             dynamic_io_fnobj< bmp_read_is_supported

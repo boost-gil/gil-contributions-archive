@@ -13,8 +13,6 @@
 #include "cmp_view.hpp"
 #include "paths.hpp"
 
-#pragma warning( disable: 4244 ) 
-
 using namespace std;
 using namespace boost;
 using namespace gil;

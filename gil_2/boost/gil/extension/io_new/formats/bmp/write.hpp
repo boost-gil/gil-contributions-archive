@@ -168,7 +168,7 @@ private:
 struct bmp_write_is_supported
 {
     template< typename View >
-    struct apply 
+    struct apply
         : public is_write_supported< typename get_pixel_type< View >::type
                                    , bmp_tag
                                    >
@@ -190,7 +190,7 @@ class dynamic_image_writer< Device
 public:
 
     dynamic_image_writer( Device& file )
-    : writer( file )
+    : parent_t( file )
     {}
 
     template< typename Views >

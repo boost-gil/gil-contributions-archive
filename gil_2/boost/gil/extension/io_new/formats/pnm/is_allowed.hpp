@@ -26,11 +26,11 @@ bool is_allowed( const image_read_info< pnm_tag >& info
                , mpl::true_   // is read_and_no_convert
                )
 {
-    pnm_image_type::type asc_type = is_read_supported< get_pixel_type< View >::type
+    pnm_image_type::type asc_type = is_read_supported< typename get_pixel_type< View >::type
                                                      , pnm_tag
                                                      >::_asc_type;
 
-    pnm_image_type::type bin_type = is_read_supported< get_pixel_type< View >::type
+    pnm_image_type::type bin_type = is_read_supported< typename get_pixel_type< View >::type
                                                      , pnm_tag
                                                      >::_bin_type;
     if( info._type == pnm_type_mono_asc )
@@ -40,7 +40,7 @@ bool is_allowed( const image_read_info< pnm_tag >& info
     }
 
 
-    return (  asc_type == info._type 
+    return (  asc_type == info._type
            || bin_type == info._type
            );
 }

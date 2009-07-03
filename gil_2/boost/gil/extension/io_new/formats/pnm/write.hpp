@@ -220,7 +220,7 @@ class dynamic_image_writer< Device
 public:
 
     dynamic_image_writer( Device& file )
-    : writer( file )
+    : parent_t( file )
     {}
 
     template< typename Views >

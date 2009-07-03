@@ -1,6 +1,6 @@
 /*
     Copyright 2005-2007 Adobe Systems Incorporated
-   
+
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -23,6 +23,8 @@
 #include <boost/mpl/size.hpp>
 #include <boost/gil/gil_config.hpp>
 #include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
+
+#include "base.hpp"
 
 namespace boost { namespace gil {
 

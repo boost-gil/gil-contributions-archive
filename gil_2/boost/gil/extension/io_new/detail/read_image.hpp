@@ -274,7 +274,7 @@ void read_image( Device&                                 file
                      , reader.get_info
                      );
 
-    reader.apply( view( img ));
+    reader.apply( view( images ));
 }
 
 template < typename String

@@ -8,6 +8,7 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include "cmp_view.hpp"
+#include "mandel_view.hpp"
 #include "paths.hpp"
 
 using namespace std;
@@ -171,8 +172,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     {
         string filename( png_out + "write_test_string.png" );
 
-        gray8_image_t img( 320, 240 );
-        write_view( filename, view( img ), tag_t() );
+        write_view( filename
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
     }
 
     {
@@ -180,8 +186,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
-        rgb8_image_t img( 320, 240 );
-        write_view( out, view( img ), tag_t() );
+        write_view( out
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
     }
 
     {
@@ -189,8 +200,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
-        rgb8_image_t img( 320, 240 );
-        write_view( file, view( img ), tag_t() );
+        write_view( file
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
     }
 
     {
@@ -198,8 +214,14 @@ BOOST_AUTO_TEST_CASE( write_view_test )
         FILE* file = fopen( filename.c_str(), "wb" );
 
         image_write_info< png_tag > info;
-        rgb8_image_t img( 320, 240 );
-        write_view( file, view( img ), info );
+
+        write_view( file
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , info
+                  );
     }
 }
 

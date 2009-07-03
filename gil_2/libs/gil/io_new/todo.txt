@@ -8,9 +8,6 @@ todo list
 * also add John Femiani suggestions ( same date )
 * support tiled tiff
 
-* png extension crashes when image is empty
-
-
 * dynamic image needs to call is_allowed
 * try to test all interface functions seperately
 * make sure all fields are set in the read info structure
@@ -23,10 +20,8 @@ todo list
 * new tests
 	* make sure all members in all image_read_info<> are set when reading header information
 	* read and write tests using read_image and write_view
-	* make sure all writers are working fine with virtual views - use mandel_view.hpp
+	* all formats must have a subimage read tests
 
 
 * implement is_allowed for all types
 	* how do we do that with dynamic images???
-
-* add a error handler for jpeg that throws an exception. See _cinfo.err = jpeg_std_error( &_jerr );

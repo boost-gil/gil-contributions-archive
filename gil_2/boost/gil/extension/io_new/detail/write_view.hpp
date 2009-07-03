@@ -285,7 +285,7 @@ template< typename Device
 inline
 void write_view( Device&                           device
                , const any_image_view< Views >&    views
-               , const image_write_info< FormatTag 
+               , const image_write_info< FormatTag
                                        , Log
                                        >&           info
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
@@ -312,7 +312,7 @@ template< typename Device
 inline
 void write_view( Device&                           device
                , const any_image_view< Views >&    views
-               , const image_write_info< FormatTag 
+               , const image_write_info< FormatTag
                                        , Log
                                        >&          info
                , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
@@ -340,7 +340,7 @@ template< typename String
         >
 inline
 void write_view( const String&                      file_name
-               , const any_image_view< Views >&     view
+               , const any_image_view< Views >&     views
                , const image_write_info< FormatTag
                                        , Log
                                        >&           info

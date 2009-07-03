@@ -3,6 +3,7 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/png_io_old.hpp>
 
+#include "mandel_view.hpp"
 #include "paths.hpp"
 
 using namespace std;
@@ -62,10 +63,12 @@ BOOST_AUTO_TEST_CASE( old_read_and_convert_view_test )
 BOOST_AUTO_TEST_CASE( old_write_view_test )
 {
     {
-        string filename( png_out + "test5.png" );
-
-        gray8_image_t img( 320, 240 );
-        png_write_view( filename, view( img ) );
+        png_write_view( png_out + "old_write_view_test.png"
+                      , create_mandel_view( 320, 240
+                                          , rgb8_pixel_t( 0,   0, 255 )
+                                          , rgb8_pixel_t( 0, 255,   0 )
+                                          )
+                      );
     }
 }
 

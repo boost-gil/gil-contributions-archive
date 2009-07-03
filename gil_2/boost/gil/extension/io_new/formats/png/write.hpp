@@ -109,6 +109,10 @@ public:
                                  , typename color_space_type< View >::type
                                  > png_rw_info_t;
 
+        io_error_if( view.width() == 0 && view.height() == 0
+                   , "png format cannot handle empty views."
+                   );
+
         // Set the image information here.  Width and height are up to 2^31,
         // bit_depth is one of 1, 2, 4, 8, or 16, but valid values also depend on
         // the color_type selected. color_type is one of PNG_COLOR_TYPE_GRAY,
@@ -496,7 +500,7 @@ class dynamic_image_writer< Device
 public:
 
     dynamic_image_writer( Device& file )
-    : writer( file )
+    : parent_t( file )
     {}
 
     template< typename Views >

@@ -382,16 +382,16 @@ public:
     dynamic_image_reader( Device&                                device
                         , const image_read_settings< jpeg_tag >& settings
                         )
-    : reader( device
-            , settings
-            )
+    : parent_t( device
+              , settings
+              )
     {}    
 
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        jpeg_type_format_checker format_checker( _info._color_space != JCS_YCbCr 
-                                               ? _info._color_space
+        jpeg_type_format_checker format_checker( this->_info._color_space != JCS_YCbCr 
+                                               ? this->_info._color_space
                                                : JCS_RGB
                                                );
 
@@ -404,7 +404,7 @@ public:
         else
         {
             init_image( images
-                      , _info
+                      , this->_info
                       );
 
             dynamic_io_fnobj< jpeg_read_is_supported
