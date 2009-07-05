@@ -159,39 +159,61 @@ private:
         uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
 
         byte_vector_t row( pitch );
+
+        //Skip scanlines if necessary.
+        for( int y = 0; y <  this->_settings._top_left.y; ++y )
+        {
+            read_text_row< View_Src >( dst, row, pitch, y, false );
+        }
+
+        for( y_t y = 0; y < dst.height(); ++y )
+        {
+            read_text_row< View_Src >( dst, row, pitch, y, true );
+        }
+    }
+
+    template< typename View_Src
+            , typename View_Dst
+            >
+    void read_text_row( const View_Dst&              dst
+                      , byte_vector_t&               row
+                      , uint32_t                     pitch
+                      , typename View_Dst::y_coord_t y
+                      , bool                         process
+                      )
+    {
+        static char buf[16];
+
         View_Src src = interleaved_view( this->_info._width
                                        , 1
                                        , (typename View_Src::value_type*) &row.front()
                                        , pitch
                                        );
 
-        char buf[16];
-
-        for( y_t y = 0; y < dst.height(); ++y )
+        for( uint32_t x = 0; x < pitch; ++x )
         {
-            for( uint32_t x = 0; x < pitch; ++x )
+            for( uint32_t k = 0; ; )
             {
-                for( uint32_t k = 0; ; )
-                {
-					int ch = _io_dev.getc_unchecked();
+				int ch = _io_dev.getc_unchecked();
 
-					if( isdigit( ch ))
-					{
-                        buf[ k++ ] = ch;
-					}
-					else if( k )
-					{
-						buf[ k ] = 0;
-						break;
-					}
-					else if( ch == EOF || !isspace( ch ))
-					{
-						return;
-					}
-                }
+				if( isdigit( ch ))
+				{
+                    buf[ k++ ] = ch;
+				}
+				else if( k )
+				{
+					buf[ k ] = 0;
+					break;
+				}
+				else if( ch == EOF || !isspace( ch ))
+				{
+					return;
+				}
+            }
 
+            if( process )
+            {
                 int value = atoi( buf );
-
 
                 if( this->_info._max_value == 1 )
                 {
@@ -207,16 +229,20 @@ private:
                     row[x] = value;
                 }
             }
+        }
 
+        if( process )
+        {
             // We are reading a gray1_image like a gray8_image but the two pixel_t
             // aren't compatible. Though, read_and_no_convert::read(...) wont work.
-            copy_data< View_Dst, View_Src >( dst
-                                           , src
-                                           , y
-                                           , typename is_same< View_Dst
-                                                    , gray1_image_t::view_t
-                                                    >::type()
-                                           );
+            copy_data< View_Dst
+                     , View_Src >( dst
+                                 , src
+                                 , y
+                                 , typename is_same< View_Dst
+                                                   , gray1_image_t::view_t
+                                                   >::type()
+                                 );
         }
     }
 
@@ -255,12 +281,12 @@ private:
             , typename View_Src
             >
     void copy_data( const View_Dst&              view
-                  , const View_Src&              dst
+                  , const View_Src&              src
                   , typename View_Dst::y_coord_t y
                   , mpl::false_ // is gray1_view
                   )
     {
-        typename View_Src::x_iterator beg = dst.row_begin( 0 ) + this->_settings._top_left.x;
+        typename View_Src::x_iterator beg = src.row_begin( 0 ) + this->_settings._top_left.x;
         typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
         this->_cc_policy.read( beg
@@ -296,6 +322,14 @@ private:
         swap_half_bytes< typename rh_t::buffer_t
                        , is_bit_aligned_t
                        > swhb;
+
+        //Skip scanlines if necessary.
+        for( y_t y = 0; y < this->_settings._top_left.y; ++y )
+        {
+            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
+                        , pitch
+                        );
+        }
 
         for( y_t y = 0; y < view.height(); ++y )
         {

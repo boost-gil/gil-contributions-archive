@@ -10,6 +10,7 @@
 #include "cmp_view.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
+#include "subimage_test.hpp"
 
 using namespace std;
 using namespace boost;
@@ -251,65 +252,17 @@ BOOST_AUTO_TEST_CASE( stream_test )
     write_view( out, view( dst ), tag_t() );
 }
 
-BOOST_AUTO_TEST_CASE( sub_image_test )
+BOOST_AUTO_TEST_CASE( subimage_test )
 {
-    {
-        rgba8_image_t original, subimage;
+    run_subimage_test< rgba8_image_t, tag_t >( png_filename
+                                             , point_t(  0,  0 )
+                                             , point_t( 50, 50 )
+                                             );
 
-        read_image( png_filename
-                  , original
-                  , png_tag()
-                  );
-
-        point_t top_left( 0, 0 );
-        point_t dim( 50, 50 );
-
-        image_read_settings< png_tag > settings( top_left
-                                               , dim
-                                               );
-
-
-        read_image( png_filename
-                  , subimage
-                  , settings
-                  );
-
-        cmp_view( view( subimage )
-                , subimage_view( view( original )
-                               , top_left
-                               , dim
-                               )
-                );
-    }
-
-    {
-        rgba8_image_t original, subimage;
-
-        read_image( png_filename
-                  , original
-                  , png_tag()
-                  );
-
-        point_t top_left( 135, 95 );
-        point_t dim( 50, 50 );
-
-        image_read_settings< png_tag > settings( top_left
-                                               , dim
-                                               );
-
-
-        read_image( png_filename
-                  , subimage
-                  , settings
-                  );
-
-        cmp_view( view( subimage )
-                , subimage_view( view( original )
-                               , top_left
-                               , dim
-                               )
-                );
-    }
+    run_subimage_test< rgba8_image_t, tag_t >( png_filename
+                                             , point_t( 135, 95 )
+                                             , point_t(  50, 50 )
+                                             );
 }
 
 BOOST_AUTO_TEST_CASE( dynamic_image_test )

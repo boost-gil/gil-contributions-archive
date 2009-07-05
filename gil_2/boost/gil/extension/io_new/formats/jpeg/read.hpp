@@ -247,31 +247,23 @@ public:
 
         switch( this->_info._color_space )
         {
-        case JCS_GRAYSCALE:
-            io_error_if(this->_info._num_components!=1,"reader<jpeg>: error in image data");
-            read_rows<gray8_pixel_t>( view );
-            break;
-        case JCS_RGB:
-            io_error_if(this->_info._num_components!=3,"reader<jpeg>: error in image data");
-            read_rows<rgb8_pixel_t>( view );
-        case JCS_YCbCr:
-            io_error_if(this->_info._num_components!=3,"reader<jpeg>: error in image data");
+            case JCS_GRAYSCALE: { read_rows< gray8_pixel_t >( view ); break; }
+            case JCS_RGB:       { read_rows< rgb8_pixel_t  >( view ); break; }
+
             //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
-            read_rows<rgb8_pixel_t>( view );
-            break;
-        case JCS_CMYK:
-            io_error_if(this->_info._num_components!=4,"reader<jpeg>: error in image data");
-            read_rows<cmyk8_pixel_t>( view );
-            break;
-        case JCS_YCCK:
-            io_error_if(this->_info._num_components!=4,"reader<jpeg>: error in image data");
+            case JCS_YCbCr:     { read_rows< rgb8_pixel_t  >( view ); break; }
+
+            case JCS_CMYK:      { read_rows< cmyk8_pixel_t >( view ); break; }
+
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
-            this->_cinfo.out_color_space = JCS_CMYK;
-            read_rows<cmyk8_pixel_t>( view );
-            break;
-        default:
-            break;
-            // unknown
+            case JCS_YCCK:
+            { 
+                this->_cinfo.out_color_space = JCS_CMYK;
+                read_rows< cmyk8_pixel_t >( view );
+
+                break;
+            }
+            default: { io_error( "Unsupported jpeg color space." ); }
         }
 
         this->finish_decompress();

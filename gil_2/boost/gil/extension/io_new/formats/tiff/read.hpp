@@ -302,7 +302,7 @@ private:
       it_t begin = row_buffer_helper.begin();
 
       it_t first = begin + this->_settings._top_left.x;
-      it_t last  = begin + this->_settings._dim.x; // one after last element
+      it_t last  = first + this->_settings._dim.x; // one after last element
 
       skip_over_rows( row_buffer_helper.buffer()
                     , plane
@@ -319,10 +319,8 @@ private:
                  , typename is_bit_aligned< View >::type
                  > mirror_bits;
 
-      typename point_t::value_type num_rows = this->_settings._dim.y - this->_settings._top_left.y;
-
-      for( std::ptrdiff_t row = this->_settings._top_left.y
-         ; row < num_rows
+      for( std::ptrdiff_t row = 0
+         ; row < this->_settings._dim.y
          ; ++row
          )
       {

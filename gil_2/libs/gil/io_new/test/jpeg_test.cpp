@@ -9,8 +9,10 @@
 #define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
+#include "cmp_view.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
+#include "subimage_test.hpp"
 
 using namespace std;
 using namespace boost;
@@ -251,6 +253,19 @@ BOOST_AUTO_TEST_CASE( stream_test )
     string filename( jpeg_out + "stream_test.jpg" );
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
+}
+
+BOOST_AUTO_TEST_CASE( subimage_test )
+{
+    run_subimage_test< rgb8_image_t, tag_t >( jpeg_filename
+                                            , point_t(  0,  0 )
+                                            , point_t( 50, 50 )
+                                            );
+
+    run_subimage_test< rgb8_image_t, tag_t >( jpeg_filename
+                                            , point_t( 43, 24 )
+                                            , point_t( 50, 50 )
+                                            );
 }
 
 BOOST_AUTO_TEST_CASE( dynamic_image_test )

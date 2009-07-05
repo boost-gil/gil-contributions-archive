@@ -72,9 +72,9 @@ struct image_read_settings< jpeg_tag > : public image_read_settings_base
     , _dct_method( jpeg_dct_method::slow )
     {}
 
-    image_read_settings( const point_t&               top_left
-                       , const point_t&               dim
-                       , const jpeg_dct_method::type& dct_method
+    image_read_settings( const point_t&        top_left
+                       , const point_t&        dim
+                       , jpeg_dct_method::type dct_method = JDCT_ISLOW
                        )
     : image_read_settings_base( top_left
                               , dim
