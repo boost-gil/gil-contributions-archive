@@ -253,11 +253,12 @@ BOOST_AUTO_TEST_CASE( stream_test )
 
 BOOST_AUTO_TEST_CASE( subimage_test )
 {
+/*
     run_subimage_test< rgb8_image_t, tag_t >( tiff_filename
                                             , point_t(  0,  0 )
                                             , point_t( 50, 50 )
                                             );
-
+*/
 /*
     // @todo
         cmp_view( view( subimage )

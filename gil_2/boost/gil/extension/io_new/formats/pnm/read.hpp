@@ -133,7 +133,6 @@ public:
                    , "Image types aren't compatible."
                    );
 
-
         switch( this->_info._type )
 		{
             // reading mono text is reading grayscale but with only two values

@@ -49,13 +49,14 @@ void test_file( string filename )
 
     image_write_info< png_tag > write_info;
     write_info._file_gamma = info._file_gamma;
-    
+
     write_view( png_out + filename
               , view( src )
               , write_info
               );
 
     read_image( png_out + filename, dst, tag_t() );
+
 
     cmp_view( view( src ), view( dst ) );
 }
