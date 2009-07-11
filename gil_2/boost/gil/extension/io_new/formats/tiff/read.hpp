@@ -222,7 +222,7 @@ private:
       tiff_color_map::green_t green = NULL;
       tiff_color_map::blue_t  blue  = NULL;
 
-      int ret = _io_dev.get_field_defaulted( red, green, blue );
+      _io_dev.get_field_defaulted( red, green, blue );
 
       typedef typename channel_traits<
                     typename element_type<
@@ -248,7 +248,7 @@ private:
 
          for( ; it != end; ++it, ++indices_it )
          {
-            bits16 i = at_c<0>( *indices_it );
+            bits16 i = gil::at_c<0>( *indices_it );
 
             *it = palette[i];
          }
@@ -399,7 +399,7 @@ template< typename Device
         >
 class dynamic_image_reader< Device
                           , tiff_tag
-                          > 
+                          >
     : public reader< Device
                    , tiff_tag
                    , detail::read_and_no_convert
@@ -418,7 +418,7 @@ public:
     : parent_t( device
               , settings
               )
-    {}    
+    {}
 
     template< typename Images >
     void apply( any_image< Images >& images )
