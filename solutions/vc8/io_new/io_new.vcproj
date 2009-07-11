@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;BOOST_TEST_DETECT_MEMORY_LEAK=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -489,6 +489,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\cmp_view.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_old_test.cpp"
 				>
 			</File>
@@ -538,6 +542,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_write_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\subimage_test.hpp"
 				>
 			</File>
 			<File
