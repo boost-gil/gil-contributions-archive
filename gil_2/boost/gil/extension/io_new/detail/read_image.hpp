@@ -34,6 +34,12 @@ namespace boost{ namespace gil {
 // ------ Image --- Reader -------- no conversion -----------
 
 /// \ingroup IO
+
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename Device
          , typename Image
          , typename FormatTag
@@ -65,6 +71,11 @@ void read_image( Device&                                 file
     reader.apply( view( img ));
 }
 
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename Device
          , typename Image
          , typename FormatTag
@@ -103,6 +114,11 @@ void read_image( Device&                                 file
     reader.apply( view( img ));
 }
 
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename String
          , typename Image
          , typename FormatTag
@@ -132,7 +148,11 @@ void read_image( const String&                           file_name
               );
 }
 
-/// \ingroup IO
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file It's a device. Must satisfy is_input_device metafunction.
+/// \param img  The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction.     
+/// \throw std::ios_base::failure
 template < typename Device
          , typename Image
          , typename FormatTag
@@ -156,7 +176,11 @@ void read_image( Device&          file
               );
 }
 
-/// \ingroup IO
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction.
+/// \throw std::ios_base::failure
 template < typename Device
          , typename Image
          , typename FormatTag
@@ -185,7 +209,11 @@ void read_image( Device&          file
               );
 }
 
-/// \ingroup IO
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
+/// \throw std::ios_base::failure
 template < typename String
          , typename Image
          , typename FormatTag
@@ -215,6 +243,10 @@ void read_image( const String&    file_name
 
 ///////////////////////////// dynamic images
 
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
+/// \param images    Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
+/// \param settings  Specifies read settings depending on the image format.
 template < typename Device
          , typename Images
          , typename FormatTag
@@ -241,6 +273,12 @@ void read_image( Device&                                 file
 
     dyn_reader.apply( images );
 }
+
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param images    Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 
 template < typename Device
          , typename Images
@@ -277,6 +315,11 @@ void read_image( Device&                                 file
     reader.apply( view( images ));
 }
 
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param images    Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename String
          , typename Images
          , typename FormatTag
@@ -303,6 +346,31 @@ void read_image( const String&                           file_name
               );
 }
 
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
+
+template < typename Device
+         , typename Images
+         , typename FormatTag
+         >
+inline
+void read_image( Device&              file
+               , any_image< Images >& images
+               , const FormatTag&     tag
+               , typename enable_if< mpl::and_< detail::is_input_device< Device    >
+                                              , is_format_tag          < FormatTag >
+                                              >
+                                   >::type* ptr = 0
+               )
+{
+    read_image( dev
+              , images
+              , image_read_settings< FormatTag >()
+              );
+}
+
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
 template < typename Device
          , typename Images
          , typename FormatTag
@@ -330,7 +398,6 @@ void read_image( Device&              file
               );
 }
 
-/// \ingroup IO
 template < typename String
          , typename Images
          , typename FormatTag
