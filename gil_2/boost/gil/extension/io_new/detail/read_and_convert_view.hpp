@@ -30,10 +30,14 @@
 
 namespace boost{ namespace gil {
 
-// ----- View --- Reader --------- With ColorConverter -----------------
-
-
 /// \ingroup IO
+
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \param cc        Color converter function object.
+/// \throw std::ios_base::failure
 template< typename Device
         , typename View
         , typename ColorConverter
@@ -47,7 +51,7 @@ void read_and_convert_view( Device&                                 file
                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                                          , detail::is_input_device< Device >
                                                          >
-                                              >::type* ptr = 0
+                                              >::type* /* ptr */ = 0
                           )
 {
     typedef detail::read_and_convert< ColorConverter > reader_color_convert;
@@ -67,6 +71,12 @@ void read_and_convert_view( Device&                                 file
     reader.apply( view );
 }
 
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \param cc        Color converter function object.
+/// \throw std::ios_base::failure
 template< typename Device
         , typename View
         , typename ColorConverter
@@ -82,7 +92,7 @@ void read_and_convert_view( Device&                                 file
                                                                                             >
                                                          , is_format_tag< FormatTag >
                                                          >
-                                              >::type* ptr = 0
+                                              >::type* /* ptr */ = 0
                           )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -98,6 +108,12 @@ void read_and_convert_view( Device&                                 file
                          );
 }
 
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \param cc        Color converter function object.
+/// \throw std::ios_base::failure
 template < typename String
          , typename View
          , typename ColorConverter
@@ -111,7 +127,7 @@ void read_and_convert_view( const String&                           file_name
                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                                          , detail::is_supported_path_spec< String >
                                                          >
-                                            >::type* ptr = 0
+                                            >::type* /* ptr */ = 0
                           )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
@@ -125,7 +141,12 @@ void read_and_convert_view( const String&                           file_name
                          );
 }
 
-/// \ingroup IO
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param cc        Color converter function object.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \throw std::ios_base::failure
 template < typename String
          , typename View
          , typename ColorConverter
@@ -135,11 +156,11 @@ inline
 void read_and_convert_view( const String&         file_name
                           , const View&           view
                           , const ColorConverter& cc
-                          , const FormatTag&      tag
+                          , const FormatTag&
                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                                          , detail::is_supported_path_spec< String >
                                                          >
-                                            >::type* ptr = 0
+                                            >::type* /* ptr */ = 0
                           )
 {
     read_and_convert_view( file_name
@@ -149,6 +170,12 @@ void read_and_convert_view( const String&         file_name
                          );
 }
 
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
+/// \param view The image view in which the data is read into.
+/// \param cc   Color converter function object.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \throw std::ios_base::failure
 template < typename Device
          , typename View
          , typename ColorConverter
@@ -158,7 +185,7 @@ inline
 void read_and_convert_view( Device&               device
                           , const View&           view
                           , const ColorConverter& cc
-                          , const FormatTag&      tag
+                          , const FormatTag&
                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
                                                                    , detail::is_adaptable_input_device< FormatTag
                                                                                                       , Device
@@ -166,7 +193,7 @@ void read_and_convert_view( Device&               device
                                                                    >
                                                          , is_format_tag< FormatTag >
                                                          >
-                                               >::type* ptr = 0
+                                               >::type* /* ptr */ = 0
                           )
 {
     read_and_convert_view( device
@@ -176,7 +203,11 @@ void read_and_convert_view( Device&               device
                          );
 }
 
-/// \ingroup IO
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename String
          , typename View
          , typename FormatTag
@@ -188,7 +219,7 @@ void read_and_convert_view( const String&                           file_name
                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                                          , detail::is_supported_path_spec< String >
                                                          >
-                                            >::type* ptr = 0
+                                            >::type* /* ptr */ = 0
                           )
 {
    read_and_convert_view( file_name
@@ -198,7 +229,11 @@ void read_and_convert_view( const String&                           file_name
                         );
 }
 
-
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file      It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename Device
          , typename View
          , typename FormatTag
@@ -214,7 +249,7 @@ void read_and_convert_view( Device&                                 device
                                                                     >
                                                          , is_format_tag< FormatTag >
                                                          >
-                                               >::type* ptr = 0
+                                               >::type* /* ptr */ = 0
                           )
 {
    read_and_convert_view( device
@@ -224,7 +259,11 @@ void read_and_convert_view( Device&                                 device
                         );
 }
 
-/// \ingroup IO
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \throw std::ios_base::failure
 template < typename String
          , typename View
          , typename FormatTag
@@ -232,11 +271,11 @@ template < typename String
 inline
 void read_and_convert_view( const String&    file_name
                           , const View&      view
-                          , const FormatTag& tag
+                          , const FormatTag&
                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                                          , detail::is_supported_path_spec< String >
                                                          >
-                                              >::type* ptr = 0
+                                              >::type* /* ptr */ = 0
                           )
 {
    read_and_convert_view( file_name
@@ -246,6 +285,11 @@ void read_and_convert_view( const String&    file_name
                         );
 }
 
+/// \brief Reads and color-converts an image view. No memory is allocated.
+/// \param file It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
+/// \param view The image view in which the data is read into.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \throw std::ios_base::failure
 template < typename Device
          , typename View
          , typename FormatTag
@@ -253,7 +297,7 @@ template < typename Device
 inline
 void read_and_convert_view( Device&          device
                           , const View&      view
-                          , const FormatTag& tag
+                          , const FormatTag&
                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
                                                                    , detail::is_adaptable_input_device< FormatTag
                                                                                                       , Device
@@ -261,7 +305,7 @@ void read_and_convert_view( Device&          device
                                                                    >
                                                          , is_format_tag< FormatTag >
                                                          >
-                                               >::type* ptr = 0
+                                               >::type* /* ptr */ = 0
                           )
 {
    read_and_convert_view( device

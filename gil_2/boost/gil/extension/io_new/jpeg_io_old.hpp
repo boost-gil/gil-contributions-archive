@@ -163,12 +163,12 @@ template< typename String
 inline
 void jpeg_write_view( const String& filename
                     , const View&   view
-                    , int   quality=100
+                    , int   quality = 100
                     )
 {
     write_view( filename
               , view
-              , jpeg_tag()
+              , image_write_info< jpeg_tag >( quality )
               );
 }
 

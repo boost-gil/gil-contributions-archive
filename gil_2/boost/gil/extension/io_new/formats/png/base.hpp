@@ -74,17 +74,17 @@ protected:
     }
 
 
-    static int read_user_chunk_callback( png_struct*        png_ptr
-                                       , png_unknown_chunkp chunk
+    static int read_user_chunk_callback( png_struct*        /* png_ptr */
+                                       , png_unknown_chunkp /* chunk */
                                        )
     {
         // @todo
         return 0;
     }
 
-    static void read_row_callback( png_structp png_ptr
-                                 , png_uint_32 row_number
-                                 , int         pass
+    static void read_row_callback( png_structp /* png_ptr    */
+                                 , png_uint_32 /* row_number */
+                                 , int         /* pass       */
                                  )
     {
         // @todo

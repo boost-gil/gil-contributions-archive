@@ -251,7 +251,6 @@ public:
 				    case ct_rle4:
 				    {
 					    read_palette_image_rle( dst_view
-					                          , pitch
 					                          , ybeg
 					                          , yend
 					                          , yinc
@@ -293,7 +292,6 @@ public:
 				    case ct_rle8:
 				    {
 					    read_palette_image_rle( dst_view
-					                          , pitch
 					                          , ybeg
 					                          , yend
 					                          , yinc
@@ -435,7 +433,7 @@ private:
         byte_vector_t row( pitch );
 
         // read the color masks
-        color_mask mask;
+        color_mask mask = { 0 };
         if( _info._compression == ct_bitfield )
         {
             mask.red.mask    = _io_dev.read_int32();
@@ -507,9 +505,9 @@ private:
                 int g = ((p & mask.green.mask) >> mask.green.shift) << (8 - mask.green.width);
                 int b = ((p & mask.blue.mask)  >> mask.blue.shift)  << (8 - mask.blue.width);
 
-                get_color( it[i], red_t()   ) = r;
-                get_color( it[i], green_t() ) = g;
-                get_color( it[i], blue_t()  ) = b;
+                get_color( it[i], red_t()   ) = static_cast< byte_t >( r );
+                get_color( it[i], green_t() ) = static_cast< byte_t >( g );
+                get_color( it[i], blue_t()  ) = static_cast< byte_t >( b );
             }
 
             this->_cc_policy.read( beg
@@ -586,7 +584,6 @@ private:
 
     template< typename View_Dst >
     void read_palette_image_rle( const View_Dst& view
-                               , int             pitch
                                , std::ptrdiff_t  ybeg
                                , std::ptrdiff_t  yend
                                , std::ptrdiff_t  yinc

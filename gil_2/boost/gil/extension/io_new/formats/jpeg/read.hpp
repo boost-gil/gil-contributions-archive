@@ -116,7 +116,7 @@ protected:
      * You should make sure that the JPEG object is cleaned up (with jpeg_abort
      * or jpeg_destroy) at some point.
      */
-    static void error_exit( j_common_ptr cinfo )
+    static void error_exit( j_common_ptr /* cinfo */ )
     {
         longjmp( mark, 1 );
     }
@@ -163,9 +163,7 @@ private:
         }
     }
 
-    static void close_device( jpeg_decompress_struct * cinfo )
-    {
-    }
+    static void close_device( jpeg_decompress_struct* ) {}
 
 protected:
     jpeg_decompress_struct _cinfo;

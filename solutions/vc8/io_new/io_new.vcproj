@@ -120,9 +120,10 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;BOOST_TEST_DETECT_MEMORY_LEAK=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="0"
+				DisableSpecificWarnings="4512;4510;4714;4610;4127"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

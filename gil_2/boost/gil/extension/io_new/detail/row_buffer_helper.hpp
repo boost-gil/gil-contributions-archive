@@ -35,7 +35,8 @@ struct row_buffer_helper
     typedef typename buffer_t::iterator iterator_t;
 
     row_buffer_helper( std::size_t width
-                     , bool        in_bytes )
+                     , bool
+                     )
     : _row_buffer( width )
     {}
 

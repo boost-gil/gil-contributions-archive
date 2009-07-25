@@ -79,7 +79,7 @@ struct image_read_settings< jpeg_tag > : public image_read_settings_base
     : image_read_settings_base( top_left
                               , dim
                               )
-    , _dct_method()
+    , _dct_method( dct_method )
     {}
 
     jpeg_dct_method::type _dct_method;

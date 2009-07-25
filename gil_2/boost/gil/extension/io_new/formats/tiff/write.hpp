@@ -153,7 +153,7 @@ private:
         _io_dev.template set_property< tiff_image_height >( height );
 
         // write planar configuration
-        if( is_bit_aligned<View>::value == false )
+        if( is_bit_aligned< View >::value == false )
         {
             _io_dev.template set_property<tiff_planar_configuration>( info._planar_configuration );
         }
@@ -193,7 +193,7 @@ private:
 
     template< typename View >
     void write_data( const View&   src_view
-                   , const info_t& info
+                   , const info_t& /* info */
                    , std::size_t   row_size_in_bytes
                    , const mpl::true_&    // bit_aligned
                    )
@@ -221,7 +221,7 @@ private:
 
     template< typename View >
     void write_data( const View&   src_view
-                   , const info_t& info
+                   , const info_t& /* info */
                    , std::size_t   row_size_in_bytes
                    , const mpl::false_&    // bit_aligned
                    )

@@ -39,14 +39,14 @@ template< typename Device
 inline
 void write_view( Device&          device
                , const View&      view
-               , const FormatTag& tag
+               , const FormatTag&
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        , typename is_write_supported< typename get_pixel_type< View >::type
                                                                                     , FormatTag
                                                                                     >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::writer< Device
@@ -67,12 +67,12 @@ void write_view( Device&          device
                , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
                                                                                                     , Device
                                                                                                     >::type
-                                                                              , typename is_format_tag< FormatTag >::type
-                                                                              , typename is_write_supported< typename get_pixel_type< View >::type
-                                                                                                           , FormatTag
-                                                                                                           >::type
-                                                                              >::type
-                                                          >::type* ptr = 0
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                    , FormatTag
+                                                                                    >::type
+                                                       >::type
+                                   >::type* /* ptr */ = 0
         )
 {
     typedef typename detail::is_adaptable_output_device< FormatTag
@@ -100,7 +100,7 @@ void write_view( const String&    file_name
                                                                                     , FormatTag
                                                                                     >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -124,12 +124,12 @@ void write_view( Device&                            device
                , const View&                        view
                , const image_write_info<FormatTag, Log>& info
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
-                                                                        , typename is_format_tag< FormatTag >::type
-                                                                        , typename is_write_supported< typename get_pixel_type< View >::type
-                                                                                                     , FormatTag
-                                                                                                     >::type
-                                                                        >::type
-                                                    >::type* ptr = 0
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                    , FormatTag
+                                                                                    >::type
+                                                       >::type
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::writer< Device
@@ -153,12 +153,12 @@ void write_view( Device&                                   device
                , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
                                                                                                     , Device
                                                                                                     >::type
-                                                                              , typename is_format_tag< FormatTag >::type
-                                                                              , typename is_write_supported< typename get_pixel_type< View >::type
-                                                                                                           , FormatTag
-                                                                                                           >::type
-                                                                              >::type
-                                                          >::type* ptr = 0
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                    , FormatTag
+                                                                                    >::type
+                                                       >::type
+                                   >::type* /* ptr */ = 0
                )
 {
     typename detail::is_adaptable_output_device< FormatTag
@@ -186,7 +186,7 @@ void write_view( const String&                        file_name
                                                                                     , FormatTag
                                                                                     >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
@@ -210,11 +210,11 @@ template< typename Device
 inline
 void write_view( Device&                        device
                , const any_image_view< Views >& view
-               , const FormatTag&               tag
+               , const FormatTag&
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::dynamic_image_writer< Device
@@ -237,7 +237,7 @@ void write_view( Device&                        device
                                                                                                     >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
         )
 {
     typedef typename detail::is_adaptable_output_device< FormatTag
@@ -262,7 +262,7 @@ void write_view( const String&                  file_name
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -291,17 +291,16 @@ void write_view( Device&                           device
                , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
-    detail::writer< Device
+    detail::dynamic_image_writer< Device
                   , FormatTag
                   , Log
-                  > writer( device );
+                  > dyn_writer( device );
 
-    writer.apply( views
-                , info
-                );
+    /// @todo dynamic_writer don't take the settings. Fix that!
+    dyn_writer.apply( views );
 }
 
 template< typename Device
@@ -318,9 +317,9 @@ void write_view( Device&                           device
                , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
                                                                                                     , Device
                                                                                                     >::type
-                                                                              , typename is_format_tag< FormatTag >::type
-                                                                              >::type
-                                                          >::type* ptr = 0
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       >::type
+                                   >::type* /* ptr */ = 0
                )
 {
     typename detail::is_adaptable_output_device< FormatTag
@@ -347,7 +346,7 @@ void write_view( const String&                      file_name
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        >::type
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )

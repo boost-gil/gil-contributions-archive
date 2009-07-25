@@ -26,6 +26,9 @@ todo list
 * implement is_allowed for all types
 	* how do we do that with dynamic images???
 
-* incorporate Kenny Riddile suggestions ( see email from Jun 23rd 2009 )
-
 * reading p4.pnm is incorrect, reading 1bit binary pnm
+
+* add read_image_info for any_image
+
+
+* dynamic_writer don't take the settings. see write_view.hpp ( @todo )

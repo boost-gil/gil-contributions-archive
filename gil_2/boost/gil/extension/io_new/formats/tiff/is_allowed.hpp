@@ -50,8 +50,6 @@ int format_value( mpl::false_ ) // is_bit_aligned
     }
 
     io_error( "Unkown channel format." );
-
-    return 0;
 }
 
 // The following two functions look the same but are different since one is using
@@ -162,7 +160,7 @@ bool is_allowed( const image_read_info< tiff_tag >& info
 }
 
 template< typename View >
-bool is_allowed( const image_read_info< tiff_tag >& info
+bool is_allowed( const image_read_info< tiff_tag >& /* info */
                , mpl::false_ // is read_and_no_convert
                )
 {

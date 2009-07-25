@@ -29,9 +29,13 @@
 
 namespace boost{ namespace gil {
 
-
 /// \ingroup IO
+
 /// \brief Returns the image info. Image info is file format specific.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
+/// \param settings  Specifies read settings depending on the image format.
+/// \return image_read_info object dependent on the image format.
+/// \throw std::ios_base::failure
 template< typename Device
         , typename FormatTag
         >
@@ -42,7 +46,7 @@ read_image_info( Device&                                 file
                , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                               , detail::is_input_device< Device >
                                               >
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     return detail::reader< Device
@@ -53,19 +57,22 @@ read_image_info( Device&                                 file
                           ).get_info();
 }
 
-/// \ingroup IO
 /// \brief Returns the image info. Image info is file format specific.
+/// \param file It's a device. Must satisfy is_input_device metafunction.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \return image_read_info object dependent on the image format.
+/// \throw std::ios_base::failure
 template< typename Device
         , typename FormatTag
         >
 inline
 image_read_info< FormatTag >
-read_image_info( Device&         file
-               , const FormatTag tag
+read_image_info( Device&          file
+               , const FormatTag&
                , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                               , detail::is_input_device< Device >
                                               >
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     return read_image_info( file
@@ -73,8 +80,12 @@ read_image_info( Device&         file
                           );
 }
 
-/// \ingroup IO
+
 /// \brief Returns the image info. Image info is file format specific.
+/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param settings  Specifies read settings depending on the image format.
+/// \return image_read_info object dependent on the image format.
+/// \throw std::ios_base::failure
 template< typename Device
         , typename FormatTag
         >
@@ -87,7 +98,7 @@ read_image_info( Device&                                 file
                                                                                  , Device
                                                                                  >
                                               >
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -104,21 +115,24 @@ read_image_info( Device&                                 file
                           ).get_info();
 }
 
-/// \ingroup IO
 /// \brief Returns the image info. Image info is file format specific.
+/// \param file It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \return image_read_info object dependent on the image format.
+/// \throw std::ios_base::failure
 template< typename Device
         , typename FormatTag
         >
 inline 
-image_read_info<FormatTag>
+image_read_info< FormatTag >
 read_image_info( Device&          file
-               , const FormatTag& tag
+               , const FormatTag&
                , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                               , detail::is_adaptable_input_device< FormatTag
                                                                                  , Device
                                                                                  >
                                               >
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -132,19 +146,22 @@ read_image_info( Device&          file
                           );
 }
 
-/// \ingroup IO
 /// \brief Returns the image info. Image info is file format specific.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param settings  Specifies read settings depending on the image format.
+/// \return image_read_info object dependent on the image format.
+/// \throw std::ios_base::failure
 template< typename String
         , typename FormatTag
         >
 inline 
-image_read_info<FormatTag>  
+image_read_info< FormatTag >
 read_image_info( const String&                           file_name
                , const image_read_settings< FormatTag >& settings
                , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                               , detail::is_supported_path_spec< String >
                                               >
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )
@@ -156,19 +173,22 @@ read_image_info( const String&                           file_name
                           );
 }
 
-/// \ingroup IO
 /// \brief Returns the image info. Image info is file format specific.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \return image_read_info object dependent on the image format.
+/// \throw std::ios_base::failure
 template< typename String
         , typename FormatTag
         >
 inline 
-image_read_info<FormatTag>  
+image_read_info< FormatTag >
 read_image_info( const String&    file_name
-               , const FormatTag& tag
+               , const FormatTag&
                , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                               , detail::is_supported_path_spec< String >
                                               >
-                                   >::type* ptr = 0
+                                   >::type* /* ptr */ = 0
                )
 {
     detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )

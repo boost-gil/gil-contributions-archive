@@ -197,7 +197,7 @@ private:
 
 				if( isdigit( ch ))
 				{
-                    buf[ k++ ] = ch;
+                    buf[ k++ ] = static_cast< char >( ch );
 				}
 				else if( k )
 				{
@@ -225,7 +225,7 @@ private:
                 }
                 else
                 {
-                    row[x] = value;
+                    row[x] = static_cast< byte_t >( value );
                 }
             }
         }

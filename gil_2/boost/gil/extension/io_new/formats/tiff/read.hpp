@@ -70,9 +70,13 @@ struct plane_recursion< -1 >
            , typename ConversionPolicy
            >
    static
-   void read_plane( const View& dst_view, reader< Device
-                                                , tiff_tag
-                                                , ConversionPolicy >* p ) {}
+   void read_plane( const View&               /* dst_view */
+                  , reader< Device
+                          , tiff_tag
+                          , ConversionPolicy
+                          >*                  /* p         */ 
+                  )
+    {}
 };
 
 
@@ -259,8 +263,8 @@ private:
            , typename Indices_View
            >
    inline
-   void read_palette_image( const View&         dst_view
-                          , const Indices_View& indices_view
+   void read_palette_image( const View&         /* dst_view     */
+                          , const Indices_View& /* indices_view */
                           , mpl::false_  // is View rgb16_view_t
                           )
    {
@@ -269,7 +273,8 @@ private:
 
    template< typename Buffer >
    void skip_over_rows( Buffer& buffer
-                      , uint32  plane  )
+                      , int     plane
+                      )
    {
       if( this->_info._compression != COMPRESSION_NONE )
       {
@@ -279,7 +284,7 @@ private:
          {
             _io_dev.read_scaline( buffer
                                 , row
-                                , plane  );
+                                , static_cast< tsample_t >( plane ));
          }
       }
    }
@@ -326,7 +331,7 @@ private:
       {
          _io_dev.read_scaline( row_buffer_helper.buffer()
                              , row
-                             , plane
+                             , static_cast< tsample_t >( plane )
                              );
 
          mirror_bits( row_buffer_helper.buffer() );
@@ -351,7 +356,7 @@ private:
    }
 
    template< typename Pixel >
-   std::size_t buffer_size( std::size_t width
+   std::size_t buffer_size( std::size_t /* width */
                           , mpl::true_  // is_bit_aligned
                           )
    {

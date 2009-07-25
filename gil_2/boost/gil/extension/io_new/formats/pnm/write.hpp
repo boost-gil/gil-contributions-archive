@@ -59,7 +59,8 @@ public:
 
     template<typename View>
     void apply( const View&   view
-              , const info_t& info )
+              , const info_t& /* info */
+              )
     {
         typedef typename get_pixel_type< View >::type pixel_t;
 

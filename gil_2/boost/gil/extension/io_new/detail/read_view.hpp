@@ -29,9 +29,13 @@
 
 namespace boost{ namespace gil {
 
-// ------ View --- Reader -------- no conversion -----------
-
 /// \ingroup IO
+
+/// \brief Reads an image view without conversion. No memory is allocated.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename Device
          , typename View
          , typename FormatTag
@@ -46,7 +50,7 @@ void read_view( Device&                                 file
                                                                                         , FormatTag
                                                                                         >::type
                                                        >::type
-                                  >::type* ptr = 0
+                                  >::type* /* ptr */ = 0
               )
 {
     detail::reader< Device
@@ -63,6 +67,11 @@ void read_view( Device&                                 file
     reader.apply( view );
 }
 
+/// \brief Reads an image view without conversion. No memory is allocated.
+/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename Device
          , typename View
          , typename FormatTag
@@ -79,7 +88,7 @@ void read_view( Device&                                 file
                                                                                   , FormatTag
                                                                                   >::type
                                                       >::type
-                                  >::type* ptr = 0
+                                  >::type* /* ptr */ = 0
               )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
@@ -102,6 +111,11 @@ void read_view( Device&                                 file
     reader.apply( view );
 }
 
+/// \brief Reads an image view without conversion. No memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename String
          , typename View
          , typename FormatTag
@@ -116,7 +130,7 @@ void read_view( const String&                           file_name
                                                                                   , FormatTag
                                                                                   >::type
                                                       >::type
-                                  >::type* ptr = 0
+                                  >::type* /* ptr */ = 0
               )
 {
     detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
@@ -129,8 +143,11 @@ void read_view( const String&                           file_name
              );
 }
 
-/// \ingroup IO
-/// \brief Loads the image specified by the \a file_name into the given \a view.
+/// \brief Reads an image view without conversion. No memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param view      The image view in which the data is read into.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \throw std::ios_base::failure
 template < typename String
          , typename View
          , typename FormatTag
@@ -138,14 +155,14 @@ template < typename String
 inline
 void read_view( const String&    file_name
               , const View&      view
-              , const FormatTag& tag
+              , const FormatTag&
               , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                       , typename is_format_tag< FormatTag >::type
                                                       , typename is_read_supported< typename get_pixel_type< View >::type
                                                                                   , FormatTag
                                                                                   >::type
                                                       >::type
-                                  >::type* ptr = 0
+                                  >::type* /* ptr */ = 0
               )
 {
     read_view( file_name
@@ -154,6 +171,11 @@ void read_view( const String&    file_name
              );
 }
 
+/// \brief Reads an image view without conversion. No memory is allocated.
+/// \param file It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
+/// \param view The image view in which the data is read into.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \throw std::ios_base::failure
 template< typename Device
         , typename View
         , typename FormatTag
@@ -161,7 +183,7 @@ template< typename Device
 inline
 void read_view( Device&          device
               , const View&      view
-              , const FormatTag& tag
+              , const FormatTag&
               , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
                                                       , typename mpl::or_< typename detail::is_input_device< Device >::type
                                                                          , typename detail::is_adaptable_input_device< FormatTag
@@ -172,7 +194,7 @@ void read_view( Device&          device
                                                                                   , FormatTag
                                                                                   >::type
                                                       >::type
-                                  >::type* ptr = 0
+                                  >::type* /* ptr */ = 0
               )
 {
     read_view( device

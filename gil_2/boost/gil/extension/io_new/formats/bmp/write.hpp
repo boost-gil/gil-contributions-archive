@@ -56,8 +56,9 @@ public:
     }
 
     template<typename View>
-    void apply( const View&                        view
-              , const image_write_info< bmp_tag >& info )
+    void apply( const View&                           view
+              , const image_write_info< bmp_tag >& /* info */
+              )
     {
         // Add code here, once image_write_info< bmp_tag > isn't empty anymore.
 
@@ -109,10 +110,10 @@ private:
 
         // writes Windows information header
         _out.write_int32( bmp_win32_info_size );
-        _out.write_int32( (uint32_t) view.width()  );
-        _out.write_int32( (uint32_t) view.height() );
+        _out.write_int32( static_cast< uint32_t >( view.width()  ));
+        _out.write_int32( static_cast< uint32_t >( view.height() ));
         _out.write_int16( 1 );
-        _out.write_int16( bpp );
+        _out.write_int16( static_cast< uint16_t >( bpp ));
         _out.write_int32( ct_rgb );
         _out.write_int32( 0 );
         _out.write_int32( 0 );

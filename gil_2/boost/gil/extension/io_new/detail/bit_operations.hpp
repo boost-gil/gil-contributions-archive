@@ -43,13 +43,12 @@ struct mirror_bits< Buffer
 {
    mirror_bits()
    {
-        for( int i = 0; i < 256; ++i )
+        byte_t i = 0;
+        do
         {
-            byte_t c = i;
-            mirror( c );
-
-            _lookup[i] = c;
+            _lookup[i] = mirror( i );
         }
+        while( i++ != 255 );
    }
 
    void operator() ( Buffer& buf )
@@ -72,7 +71,7 @@ private:
         c = _lookup[ c ];
     }
 
-    static void mirror( byte_t& c )
+    static byte_t mirror( byte_t c )
     {
         byte_t result = 0;
         for( int i = 0; i < 8; ++i )
@@ -82,7 +81,7 @@ private:
             c = c >> 1;
         }
 
-        c = result;
+        return result;
     }
  
 private:

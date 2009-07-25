@@ -166,28 +166,26 @@ public:
         {
             png_charp icc_name = png_charp( NULL );
             png_charp profile  = png_charp( NULL );
-            if( ret._valid_icc_profile = png_get_iCCP( _png_ptr
-                                                     , _info_ptr
-                                                     , &icc_name
-                                                     , &ret._iccp_compression_type
-                                                     , &profile
-                                                     , &ret._profile_length
-                                                     )
-              )
-            {
-                if( icc_name )
-                {
-                    ret._icc_name.append( icc_name
-                                        , std::strlen( icc_name )
-                                        );
-                }
 
-                if( ret._profile_length > 0 )
-                {
-                    ret._profile.append( profile
-                                       , ret._profile_length
-                                       );
-                }
+            ret._valid_icc_profile = png_get_iCCP( _png_ptr
+                                                 , _info_ptr
+                                                 , &icc_name
+                                                 , &ret._iccp_compression_type
+                                                 , &profile
+                                                 , &ret._profile_length
+                                                 );
+            if( icc_name )
+            {
+                ret._icc_name.append( icc_name
+                                    , std::strlen( icc_name )
+                                    );
+            }
+
+            if( ret._profile_length > 0 )
+            {
+                ret._profile.append( profile
+                                   , ret._profile_length
+                                   );
             }
         }
 
@@ -204,22 +202,20 @@ public:
         if( this->_settings._read_palette )
         {
             png_colorp palette = png_colorp( NULL );
-            if( ret._valid_palette = png_get_PLTE( _png_ptr
-                                                 , _info_ptr
-                                                 , &palette
-                                                 , &ret._num_palette
-                                                 )
-               )
-             {
 
-                if( ret._num_palette > 0 )
-                {
-                    ret._palette.resize( ret._num_palette );
-                    std::copy( palette
-                             , palette + ret._num_palette
-                             , &ret._palette.front()
-                             );
-                }
+            ret._valid_palette = png_get_PLTE( _png_ptr
+                                             , _info_ptr
+                                             , &palette
+                                             , &ret._num_palette
+                                             );
+
+            if( ret._num_palette > 0 )
+            {
+                ret._palette.resize( ret._num_palette );
+                std::copy( palette
+                         , palette + ret._num_palette
+                         , &ret._palette.front()
+                         );
             }
         }
 
@@ -227,16 +223,14 @@ public:
         if( this->_settings._read_background )
         {
             png_color_16p background = png_color_16p( NULL );
-            if( ret._valid_background = png_get_bKGD( _png_ptr
-                                                    , _info_ptr
-                                                    , &background
-                                                    )
-              )
+
+            ret._valid_background = png_get_bKGD( _png_ptr
+                                                , _info_ptr
+                                                , &background
+                                                );
+            if( background )
             {
-                if( background )
-                {
-                    ret._background = *background;
-                }
+                ret._background = *background;
             }
         }
 
@@ -244,32 +238,30 @@ public:
         if( this->_settings._read_histogram )
         {
             png_uint_16p histogram = png_uint_16p( NULL );
-            if( ret._valid_histogram = png_get_hIST( _png_ptr
-                                                   , _info_ptr
-                                                   , &histogram
-                                                   )
-              )
+
+            ret._valid_histogram = png_get_hIST( _png_ptr
+                                               , _info_ptr
+                                               , &histogram
+                                               );
+
+            if( histogram )
             {
-
-                if( histogram )
+                // the number of values is set by the number of colors inside
+                // the palette.
+                if( this->_settings._read_palette == false )
                 {
-                    // the number of values is set by the number of colors inside
-                    // the palette.
-                    if( this->_settings._read_palette == false )
-                    {
-                        png_colorp palette = png_colorp( NULL );
-                        png_get_PLTE( _png_ptr
-                                    , _info_ptr
-                                    , &palette
-                                    , &ret._num_palette
-                                    );
-                    }
-
-                    std::copy( histogram
-                             , histogram + ret._num_palette
-                             , &ret._histogram.front()
-                             );
+                    png_colorp palette = png_colorp( NULL );
+                    png_get_PLTE( _png_ptr
+                                , _info_ptr
+                                , &palette
+                                , &ret._num_palette
+                                );
                 }
+
+                std::copy( histogram
+                         , histogram + ret._num_palette
+                         , &ret._histogram.front()
+                         );
             }
         }
 
@@ -291,45 +283,43 @@ public:
             png_charp purpose = png_charp ( NULL );
             png_charp units   = png_charp ( NULL );
             png_charpp params = png_charpp( NULL );
-            if( ret._valid_pixel_calibration = png_get_pCAL( _png_ptr
-                                                           , _info_ptr
-                                                           , &purpose
-                                                           , &ret._X0
-                                                           , &ret._X1
-                                                           , &ret._cal_type
-                                                           , &ret._num_params
-                                                           , &units
-                                                           , &params
-                                                           )
-              )
+
+            ret._valid_pixel_calibration = png_get_pCAL( _png_ptr
+                                                       , _info_ptr
+                                                       , &purpose
+                                                       , &ret._X0
+                                                       , &ret._X1
+                                                       , &ret._cal_type
+                                                       , &ret._num_params
+                                                       , &units
+                                                       , &params
+                                                       );
+            if( purpose )
             {
-                if( purpose )
-                {
-                    ret._purpose.append( purpose
-                                       , std::strlen( purpose )
-                                       );
-                }
+                ret._purpose.append( purpose
+                                   , std::strlen( purpose )
+                                   );
+            }
 
-                if( units )
-                {
-                    ret._units.append( units
-                                     , std::strlen( units )
-                                     );
-                }
+            if( units )
+            {
+                ret._units.append( units
+                                 , std::strlen( units )
+                                 );
+            }
 
-                if( ret._num_params > 0 )
-                {
-                    ret._params.resize( ret._num_params );
+            if( ret._num_params > 0 )
+            {
+                ret._params.resize( ret._num_params );
 
-                    for( png_CAL_nparam::type i = 0
-                       ; i < ret._num_params
-                       ; ++i
-                       )
-                    {
-                        ret._params[i].append( params[i]
-                                             , std::strlen( params[i] )
-                                             );
-                    }
+                for( png_CAL_nparam::type i = 0
+                   ; i < ret._num_params
+                   ; ++i
+                   )
+                {
+                    ret._params[i].append( params[i]
+                                         , std::strlen( params[i] )
+                                         );
                 }
             }
         }
@@ -349,17 +339,16 @@ public:
         if( this->_settings._read_number_of_significant_bits )
         {
             png_color_8p sig_bits = png_color_8p( NULL );
-            if( ret._valid_significant_bits = png_get_sBIT( _png_ptr
-                                                          , _info_ptr
-                                                          , &sig_bits
-                                                          )
-              )
+
+            ret._valid_significant_bits = png_get_sBIT( _png_ptr
+                                                      , _info_ptr
+                                                      , &sig_bits
+                                                      );
+
+            // @todo Is there one or more colors?
+            if( sig_bits )
             {
-                // @todo Is there one or more colors?
-                if( sig_bits )
-                {
-                    ret._sig_bits = *sig_bits;
-                }
+                ret._sig_bits = *sig_bits;
             }
         }
 
@@ -411,31 +400,30 @@ public:
         if( this->_settings._read_comments )
         {
             png_textp text = png_textp( NULL );
-            if( ret._valid_text = png_get_text( _png_ptr
-                                              , _info_ptr
-                                              , &text
-                                              , &ret._num_text
-                                              )
-              )
+
+            ret._valid_text = png_get_text( _png_ptr
+                                          , _info_ptr
+                                          , &text
+                                          , &ret._num_text
+                                          );
+
+            if( ret._num_text > 0 )
             {
-                if( ret._num_text > 0 )
+                ret._text.resize( ret._num_text );
+
+                for( png_num_text::type i = 0
+                   ; i < ret._num_text
+                   ; ++i
+                   )
                 {
-                    ret._text.resize( ret._num_text );
+                    ret._text[i]._compression = text[i].compression;
+                    ret._text[i]._key.append( text[i].key
+                                            , std::strlen( text[i].key )
+                                            );
 
-                    for( png_num_text::type i = 0
-                       ; i < ret._num_text
-                       ; ++i
-                       )
-                    {
-                        ret._text[i]._compression = text[i].compression;
-                        ret._text[i]._key.append( text[i].key
-                                                , std::strlen( text[i].key )
-                                                );
-
-                        ret._text[i]._text.append( text[i].text
-                                                 , std::strlen( text[i].text )
-                                                 );
-                    }
+                    ret._text[i]._text.append( text[i].text
+                                             , std::strlen( text[i].text )
+                                             );
                 }
             }
         }
@@ -444,15 +432,11 @@ public:
         if( this->_settings._read_last_modification_time )
         {
             png_timep mod_time = png_timep( NULL );
-            if( ret._valid_modification_time = png_get_tIME( _png_ptr
-                                                           , _info_ptr
-                                                           , &mod_time
-                                                           )
-              )
-            {
-                ret._mod_time = *mod_time;
-            }
-
+            ret._valid_modification_time = png_get_tIME( _png_ptr
+                                                       , _info_ptr
+                                                       , &mod_time
+                                                       );
+            ret._mod_time = *mod_time;
         }
 
         // get transparency data for images
@@ -460,27 +444,26 @@ public:
         {
             png_bytep     trans        = png_bytep    ( NULL );
             png_color_16p trans_values = png_color_16p( NULL );
-            if( ret._valid_transparency_factors = png_get_tRNS( _png_ptr
-                                                              , _info_ptr
-                                                              , &trans
-                                                              , &ret._num_trans
-                                                              , &trans_values
-                                                              )
-              )
-            {
-                if( trans )
-                {
-                    //@todo What to do, here? How do I know the length of the "trans" array?
-                }
 
-                if( ret._num_trans )
-                {
-                    ret._trans_values.resize( ret._num_trans );
-                    std::copy( trans_values
-                             , trans_values + ret._num_trans
-                             , &ret._trans_values.front()
-                             );
-                }
+            ret._valid_transparency_factors = png_get_tRNS( _png_ptr
+                                                          , _info_ptr
+                                                          , &trans
+                                                          , &ret._num_trans
+                                                          , &trans_values
+                                                          );
+
+            if( trans )
+            {
+                //@todo What to do, here? How do I know the length of the "trans" array?
+            }
+
+            if( ret._num_trans )
+            {
+                ret._trans_values.resize( ret._num_trans );
+                std::copy( trans_values
+                         , trans_values + ret._num_trans
+                         , &ret._trans_values.front()
+                         );
             }
         }
 

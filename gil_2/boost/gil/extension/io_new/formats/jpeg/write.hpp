@@ -84,11 +84,11 @@ public:
         write_rows( view );
     }
 
-    template<typename View>
-    void apply( const View&                       view
-              , const image_write_info<jpeg_tag>& info )
+    template< typename View >
+    void apply( const View&                         view
+              , const image_write_info< jpeg_tag >& info )
     {
-        typedef typename channel_type< View >::type channel_t;
+        typedef typename channel_type< typename View::value_type >::type channel_t;
 
         _cinfo.image_width  = JDIMENSION(view.width());
         _cinfo.image_height = JDIMENSION(view.height());

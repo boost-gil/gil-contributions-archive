@@ -39,14 +39,20 @@ public:
 
 private:
 
-    static void error( const char* module, const char* fmt, va_list ap )
+    static void error( const char* /* module */
+                     , const char* fmt
+                     , va_list ap
+                     )
     {
         char buf[1000];
         sprintf(buf, fmt, ap);
         std::cout << "error: " << buf << std::endl;
     }
 
-    static void warning( char const *module, char const *fmt, va_list ap )
+    static void warning( char const* /* module */
+                       , char const* fmt
+                       , va_list ap
+                       )
     {
         char buf[1000];
         sprintf(buf, fmt, ap);

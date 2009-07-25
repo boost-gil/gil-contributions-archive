@@ -26,7 +26,7 @@ bool is_allowed( const image_read_info< bmp_tag >& info
                , mpl::true_   // is read_and_no_convert
                )
 {
-    bmp_bits_per_pixel::type src_bits_per_pixel; 
+    bmp_bits_per_pixel::type src_bits_per_pixel = 0; 
 
     switch( info._bits_per_pixel )
     {
@@ -78,7 +78,7 @@ bool is_allowed( const image_read_info< bmp_tag >& info
 }
 
 template< typename View >
-bool is_allowed( const image_read_info< bmp_tag >& info
+bool is_allowed( const image_read_info< bmp_tag >& /* info */
                , mpl::false_  // is read_and_convert
                )
 {

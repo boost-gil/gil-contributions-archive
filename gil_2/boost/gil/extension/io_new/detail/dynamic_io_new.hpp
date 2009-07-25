@@ -62,7 +62,7 @@ class dynamic_io_fnobj {
     template <typename View>
     void apply(const View& view,mpl::true_ ) {_op->apply(view);}
     template <typename View>
-    void apply(const View& view,mpl::false_) {io_error("dynamic_io: unsupported view type for the given file format");}
+    void apply(const View& /* view */ ,mpl::false_) {io_error("dynamic_io: unsupported view type for the given file format");}
 public:
     dynamic_io_fnobj(OpClass* op) : _op(op) {}
 

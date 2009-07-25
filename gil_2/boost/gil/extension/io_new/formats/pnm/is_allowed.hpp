@@ -46,7 +46,7 @@ bool is_allowed( const image_read_info< pnm_tag >& info
 }
 
 template< typename View >
-bool is_allowed( const image_read_info< pnm_tag >& info
+bool is_allowed( const image_read_info< pnm_tag >& /* info */
                , mpl::false_  // is read_and_convert
                )
 {
