@@ -251,10 +251,8 @@ public:
 				    case ct_rle4:
 				    {
 					    read_palette_image_rle( dst_view
-					                          , ybeg
 					                          , yend
 					                          , yinc
-					                          , offset
 					                          );
 
 					    break;
@@ -292,10 +290,8 @@ public:
 				    case ct_rle8:
 				    {
 					    read_palette_image_rle( dst_view
-					                          , ybeg
 					                          , yend
 					                          , yinc
-					                          , offset
 					                          );
 					    break;
                     }
@@ -569,7 +565,7 @@ private:
 						   )
 	{
 		if(  y >= this->_settings._top_left.y
-		  && y <  this->_settings._dim.y
+          && y <  this->_settings._top_left.y + this->_settings._dim.y
 		  )
 		{
             typename Buffer::const_iterator beg = buf.begin() + this->_settings._top_left.x;
@@ -577,17 +573,15 @@ private:
 
 			std::copy( beg
 			         , end
-			         , view.row_begin( y )
+			         , view.row_begin( y - this->_settings._top_left.y )
 			         );
 		}
 	}
 
     template< typename View_Dst >
     void read_palette_image_rle( const View_Dst& view
-                               , std::ptrdiff_t  ybeg
                                , std::ptrdiff_t  yend
                                , std::ptrdiff_t  yinc
-                               , int             offset
                                )
     {
         assert(  _info._compression == ct_rle4
@@ -598,17 +592,22 @@ private:
         read_palette( pal );
 
         // jump to start of rle4 data
-        _io_dev.seek( offset );
+        _io_dev.seek( _info._offset );
 
         // we need to know the stream position for padding purposes
-        std::size_t stream_pos = offset;
+        std::size_t stream_pos = _info._offset;
 
         typedef std::vector< rgba8_pixel_t > Buf_type;
-        Buf_type buf( this->_settings._dim.x );
+
+        // for simplicity reasons we decode the whole scanline into the buffer
+        // then copy _settings._dim.x pixels to the destination view
+        Buf_type buf( this->_info._width );
+
         Buf_type::iterator dst_it  = buf.begin();
         Buf_type::iterator dst_end = buf.end();
 
-        std::ptrdiff_t y = ybeg;
+        std::ptrdiff_t y = (_info._height > 0 ? _info._height : -_info._height) - 1;
+
         bool finished = false;
 
         while ( !finished )
@@ -740,7 +739,7 @@ private:
                         }
 
                         // pad to word boundary
-                        if( ( stream_pos - offset ) & 1 )
+                        if( ( stream_pos - _info._offset ) & 1 )
                         {
                             _io_dev.seek( 1, SEEK_CUR );
                             ++stream_pos;
