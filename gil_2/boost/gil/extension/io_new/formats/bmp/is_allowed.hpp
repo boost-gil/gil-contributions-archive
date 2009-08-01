@@ -34,9 +34,9 @@ bool is_allowed( const image_read_info< bmp_tag >& info
         case 4:
         case 8:
         {
-            if(  info._header_size == bmp_win32_info_size
-              && info._compression != ct_rle8 
-              && info._compression != ct_rle4
+            if(  info._header_size == bmp_header_size::_win32_info_size
+              && info._compression != bmp_compression::_rle8 
+              && info._compression != bmp_compression::_rle4
               )
             {
                 src_bits_per_pixel = 32;

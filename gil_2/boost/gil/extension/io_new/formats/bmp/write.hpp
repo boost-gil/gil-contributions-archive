@@ -98,7 +98,10 @@ private:
 */
 
         std::size_t spn = ( view.width() * num_channels< View >::value + 3 ) & ~3;
-        std::size_t ofs = bmp_header_size + bmp_win32_info_size + entries * 4;
+        std::size_t ofs = bmp_header_size::_size 
+                        + bmp_header_size::_win32_info_size 
+                        + entries * 4;
+
         std::size_t siz = ofs + spn * view.height();
 
         // write the BMP file header
@@ -109,12 +112,12 @@ private:
         _out.write_int32( (uint32_t) ofs );
 
         // writes Windows information header
-        _out.write_int32( bmp_win32_info_size );
+        _out.write_int32( bmp_header_size::_win32_info_size );
         _out.write_int32( static_cast< uint32_t >( view.width()  ));
         _out.write_int32( static_cast< uint32_t >( view.height() ));
         _out.write_int16( 1 );
         _out.write_int16( static_cast< uint16_t >( bpp ));
-        _out.write_int32( ct_rgb );
+        _out.write_int32( bmp_compression::_rgb );
         _out.write_int32( 0 );
         _out.write_int32( 0 );
         _out.write_int32( 0 );

@@ -23,40 +23,61 @@
 
 namespace boost { namespace gil {
 
+/// Defines pnm tag.
 struct pnm_tag : format_tag {};
 
-static const uint32_t pnm_type_mono_asc  = 1; // Monochrome ASCII encoding
-static const uint32_t pnm_type_gray_asc  = 2; // Gray level ASCII encoding
-static const uint32_t pnm_type_color_asc = 3; // sRGB color ASCII encoding
-static const uint32_t pnm_type_mono_bin  = 4; // Monochrome binary encoding
-static const uint32_t pnm_type_gray_bin  = 5; // Gray level binary encoding
-static const uint32_t pnm_type_color_bin = 6; // sRGB color binary encoding
+/// see http://en.wikipedia.org/wiki/Portable_Bitmap_File_Format for reference
 
-struct pnm_image_type : property_base< uint32_t > {};
+/// Defines type for image type property.
+struct pnm_image_type : property_base< uint32_t >
+{
+    static const type _mono_asc  = 1; // Monochrome ASCII encoding
+    static const type _gray_asc  = 2; // Gray level ASCII encoding
+    static const type _color_asc = 3; // sRGB color ASCII encoding
+    static const type _mono_bin  = 4; // Monochrome binary encoding
+    static const type _gray_bin  = 5; // Gray level binary encoding
+    static const type _color_bin = 6; // sRGB color binary encoding
+};
 
+/// Defines type for image width property.
 struct pnm_image_width : property_base< uint32_t > {};
 
+/// Defines type for image height property.
 struct pnm_image_height : property_base< uint32_t > {};
 
+/// Defines type for image max value property.
 struct pnm_image_max_value : property_base< uint32_t > {};
 
-
+/// Read information for pnm images.
+///
+/// The structure is returned when using read_image_info.
 template<>
 struct image_read_info< pnm_tag >
 {
+    /// The image type.
     pnm_image_type::type      _type;
+    /// The image width.
     pnm_image_width::type     _width;
+    /// The image height.
     pnm_image_height::type    _height;
+    /// The image max value.
     pnm_image_max_value::type _max_value;
 };
 
+/// Read settings for pnm images.
+///
+/// The structure can be used for all read_xxx functions, except read_image_info.
 template<>
 struct image_read_settings< pnm_tag > : public image_read_settings_base
 {
+    /// Default constructor
     image_read_settings< pnm_tag >()
     : image_read_settings_base()
     {}
 
+    /// Constructor
+    /// \param top_left   Top left coordinate for reading partial image.
+    /// \param dim        Dimensions for reading partial image.
     image_read_settings( const point_t& top_left
                        , const point_t& dim
                        )
@@ -66,7 +87,9 @@ struct image_read_settings< pnm_tag > : public image_read_settings_base
     {}
 };
 
-
+/// Write information for pnm images.
+///
+/// The structure can be used for write_view() function.
 template<>
 struct image_write_info< pnm_tag >
 {

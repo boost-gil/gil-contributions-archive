@@ -29,10 +29,10 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                                        , tag_t()
                                                        );
 
-        BOOST_CHECK_EQUAL( info._type     , pnm_type_color_asc );
-        BOOST_CHECK_EQUAL( info._width    , 256                );
-        BOOST_CHECK_EQUAL( info._height   , 256                );
-        BOOST_CHECK_EQUAL( info._max_value, 255                );
+        BOOST_CHECK_EQUAL( info._type     , pnm_image_type::_color_asc );
+        BOOST_CHECK_EQUAL( info._width    , 256                        );
+        BOOST_CHECK_EQUAL( info._height   , 256                        );
+        BOOST_CHECK_EQUAL( info._max_value, 255                        );
     }
 }
 

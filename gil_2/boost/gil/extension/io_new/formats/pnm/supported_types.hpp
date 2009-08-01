@@ -53,16 +53,16 @@ struct pnm_read_support< packed_dynamic_channel_reference< BitField
                                                          >
                        , gray_t
                        > : read_support_true
-                         , pnm_rw_support_base< pnm_type_mono_asc
-                                              , pnm_type_mono_bin
+                         , pnm_rw_support_base< pnm_image_type::_mono_asc
+                                              , pnm_image_type::_mono_bin
                                               > {};
 
 template<>
 struct pnm_read_support< bits8
                        , gray_t
                        > : read_support_true
-                         , pnm_rw_support_base< pnm_type_gray_asc
-                                              , pnm_type_gray_bin
+                         , pnm_rw_support_base< pnm_image_type::_gray_asc
+                                              , pnm_image_type::_gray_bin
                                               > {};
 
 
@@ -70,8 +70,8 @@ template<>
 struct pnm_read_support< bits8
                        , rgb_t
                        > : read_support_true
-                         , pnm_rw_support_base< pnm_type_color_asc
-                                              , pnm_type_color_bin
+                         , pnm_rw_support_base< pnm_image_type::_color_asc
+                                              , pnm_image_type::_color_bin
                                               > {};
 
 // Write support
@@ -89,8 +89,8 @@ struct pnm_write_support< packed_dynamic_channel_reference< BitField
                                                           >
                         , gray_t
                         > : write_support_true
-                          , pnm_rw_support_base< pnm_type_mono_asc
-                                               , pnm_type_mono_bin
+                          , pnm_rw_support_base< pnm_image_type::_mono_asc
+                                               , pnm_image_type::_mono_bin
                                                > {};
 
 
@@ -98,8 +98,8 @@ template<>
 struct pnm_write_support< bits8
                         , gray_t
                         > : write_support_true
-                          , pnm_rw_support_base< pnm_type_gray_asc
-                                               , pnm_type_gray_bin
+                          , pnm_rw_support_base< pnm_image_type::_gray_asc
+                                               , pnm_image_type::_gray_bin
                                                > {};
 
 
@@ -107,8 +107,8 @@ template<>
 struct pnm_write_support< bits8
                         , rgb_t
                         > : write_support_true
-                          , pnm_rw_support_base< pnm_type_color_asc
-                                               , pnm_type_color_bin
+                          , pnm_rw_support_base< pnm_image_type::_color_asc
+                                               , pnm_image_type::_color_bin
                                                > {};
 
 } // namespace detail
@@ -117,12 +117,12 @@ template< typename Pixel >
 struct is_read_supported< Pixel
                         , pnm_tag
                         >
-    : mpl::bool_< detail::pnm_read_support< typename channel_type< Pixel >::type
+    : mpl::bool_< detail::pnm_read_support< typename channel_type    < Pixel >::type
                                           , typename color_space_type< Pixel >::type
                                           >::is_supported
                 >
 {
-    typedef detail::pnm_read_support< typename channel_type< Pixel >::type
+    typedef detail::pnm_read_support< typename channel_type    < Pixel >::type
                                     , typename color_space_type< Pixel >::type
                                     > parent_t;
 
@@ -134,7 +134,7 @@ template< typename Pixel >
 struct is_write_supported< Pixel
                          , pnm_tag
                          >
-    : mpl::bool_< detail::pnm_write_support< typename channel_type< Pixel >::type
+    : mpl::bool_< detail::pnm_write_support< typename channel_type    < Pixel >::type
                                            , typename color_space_type< Pixel >::type
                                            >::is_supported
                 > {};

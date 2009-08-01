@@ -33,10 +33,10 @@ bool is_allowed( const image_read_info< pnm_tag >& info
     pnm_image_type::type bin_type = is_read_supported< typename get_pixel_type< View >::type
                                                      , pnm_tag
                                                      >::_bin_type;
-    if( info._type == pnm_type_mono_asc )
+    if( info._type == pnm_image_type::_mono_asc )
     {
         // ascii mono images are read gray8_image_t
-        return (  asc_type == pnm_type_gray_asc );
+        return (  asc_type == pnm_image_type::_gray_asc );
     }
 
 

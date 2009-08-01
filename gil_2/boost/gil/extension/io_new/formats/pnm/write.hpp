@@ -75,16 +75,16 @@ public:
         {
             if( is_bit_aligned< pixel_t >::value )
             {
-                type = pnm_type_mono_bin;
+                type = pnm_image_type::_mono_bin;
             }
             else
             {
-                type = pnm_type_gray_bin;
+                type = pnm_image_type::_gray_bin;
             }
         }
         else
         {
-            type = pnm_type_color_bin;
+            type = pnm_image_type::_color_bin;
         }
 
         // write header
@@ -103,7 +103,7 @@ public:
         str += lexical_cast< std::string >( height ) + std::string( " " );
         _out.print_line( str );
 
-        if( type != pnm_type_mono_bin )
+        if( type != pnm_image_type::_mono_bin )
         {
             _out.print_line( "255 ");
         }

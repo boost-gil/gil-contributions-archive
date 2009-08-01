@@ -32,3 +32,9 @@ todo list
 
 
 * dynamic_writer don't take the settings. see write_view.hpp ( @todo )
+
+* see libjpeg for cropping support
+
+* make sure to read all tiff properties
+
+* add a log facility for all image formats

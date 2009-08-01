@@ -115,7 +115,7 @@ public:
         // the size of this header ( 40 bytes )
         _info._header_size = _io_dev.read_int32();
 
-        if( _info._header_size == bmp_win32_info_size )
+        if( _info._header_size == bmp_header_size::_win32_info_size )
         {
             _info._width  = _io_dev.read_int32();
             _info._height = _io_dev.read_int32();
@@ -136,7 +136,7 @@ public:
             _info._num_important_colors = _io_dev.read_int32();
 
         }
-        else if( _info._header_size == bmp_os2_info_size )
+        else if( _info._header_size == bmp_header_size::_os2_info_size )
         {
             _info._width  = static_cast< bmp_image_width::type  >( _io_dev.read_int16() );
             _info._height = static_cast< bmp_image_height::type >( _io_dev.read_int16() );
@@ -146,7 +146,7 @@ public:
 
             _info._bits_per_pixel = _io_dev.read_int16();
 
-            _info._compression = ct_rgb;
+            _info._compression = bmp_compression::_rgb;
 
             // not used
             _info._image_size            = 0;
@@ -248,17 +248,19 @@ public:
             {
 				switch ( _info._compression )
 				{
-				    case ct_rle4:
+				    case bmp_compression::_rle4:
 				    {
 					    read_palette_image_rle( dst_view
+					                          , ybeg
 					                          , yend
 					                          , yinc
+					                          , offset
 					                          );
 
 					    break;
                     }
 
-				    case ct_rgb:
+				    case bmp_compression::_rgb:
 				    {
 					    read_palette_image< gray4_image_t::view_t
 									      , swap_half_bytes< byte_vector_t
@@ -287,16 +289,18 @@ public:
             {
 				switch ( _info._compression )
 				{
-				    case ct_rle8:
+				    case bmp_compression::_rle8:
 				    {
 					    read_palette_image_rle( dst_view
+					                          , ybeg
 					                          , yend
 					                          , yinc
+					                          , offset
 					                          );
 					    break;
                     }
 
-				    case ct_rgb:
+				    case bmp_compression::_rgb:
 				    {
 					    read_palette_image< gray8_image_t::view_t
 									      , do_nothing< std::vector< gray8_pixel_t > >
@@ -359,7 +363,7 @@ private:
 
             // there are 4 entries when windows header
             // but 3 for os2 header
-            if( _info._header_size == bmp_win32_info_size )
+            if( _info._header_size == bmp_header_size::_win32_info_size )
             {
                 _io_dev.read_int8();
             }
@@ -430,7 +434,7 @@ private:
 
         // read the color masks
         color_mask mask = { 0 };
-        if( _info._compression == ct_bitfield )
+        if( _info._compression == bmp_compression::_bitfield )
         {
             mask.red.mask    = _io_dev.read_int32();
             mask.green.mask  = _io_dev.read_int32();
@@ -444,7 +448,7 @@ private:
             mask.green.shift = trailing_zeros( mask.green.mask );
             mask.blue.shift  = trailing_zeros( mask.blue.mask  );
         }
-        else if( _info._compression == ct_rgb )
+        else if( _info._compression == bmp_compression::_rgb )
         {
             switch( _info._bits_per_pixel )
             {
@@ -565,7 +569,7 @@ private:
 						   )
 	{
 		if(  y >= this->_settings._top_left.y
-          && y <  this->_settings._top_left.y + this->_settings._dim.y
+		  && y <  this->_settings._dim.y
 		  )
 		{
             typename Buffer::const_iterator beg = buf.begin() + this->_settings._top_left.x;
@@ -573,41 +577,38 @@ private:
 
 			std::copy( beg
 			         , end
-			         , view.row_begin( y - this->_settings._top_left.y )
+			         , view.row_begin( y )
 			         );
 		}
 	}
 
     template< typename View_Dst >
     void read_palette_image_rle( const View_Dst& view
+                               , std::ptrdiff_t  ybeg
                                , std::ptrdiff_t  yend
                                , std::ptrdiff_t  yinc
+                               , int             offset
                                )
     {
-        assert(  _info._compression == ct_rle4
-              || _info._compression == ct_rle8
+        assert(  _info._compression == bmp_compression::_rle4
+              || _info._compression == bmp_compression::_rle8
               );
 
         std::vector< rgba8_pixel_t > pal;
         read_palette( pal );
 
         // jump to start of rle4 data
-        _io_dev.seek( _info._offset );
+        _io_dev.seek( offset );
 
         // we need to know the stream position for padding purposes
-        std::size_t stream_pos = _info._offset;
+        std::size_t stream_pos = offset;
 
         typedef std::vector< rgba8_pixel_t > Buf_type;
-
-        // for simplicity reasons we decode the whole scanline into the buffer
-        // then copy _settings._dim.x pixels to the destination view
-        Buf_type buf( this->_info._width );
-
+        Buf_type buf( this->_settings._dim.x );
         Buf_type::iterator dst_it  = buf.begin();
         Buf_type::iterator dst_end = buf.end();
 
-        std::ptrdiff_t y = (_info._height > 0 ? _info._height : -_info._height) - 1;
-
+        std::ptrdiff_t y = ybeg;
         bool finished = false;
 
         while ( !finished )
@@ -626,7 +627,7 @@ private:
                     count = dst_end - dst_it;
                 }
 
-                if( _info._compression == ct_rle4 )
+                if( _info._compression == bmp_compression::_rle4 )
                 {
                     std::ptrdiff_t cs[2] = { second >> 4, second & 0x0f };
 
@@ -714,7 +715,7 @@ private:
                             count = dst_end - dst_it;
                         }
 
-                        if ( _info._compression == ct_rle4 )
+                        if ( _info._compression == bmp_compression::_rle4 )
                         {
                             for( int i = 0; i < count; ++i )
                             {
@@ -739,7 +740,7 @@ private:
                         }
 
                         // pad to word boundary
-                        if( ( stream_pos - _info._offset ) & 1 )
+                        if( ( stream_pos - offset ) & 1 )
                         {
                             _io_dev.seek( 1, SEEK_CUR );
                             ++stream_pos;

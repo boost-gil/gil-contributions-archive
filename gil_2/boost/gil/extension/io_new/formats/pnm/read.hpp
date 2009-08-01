@@ -96,14 +96,14 @@ public:
 
         ret._type = read_char() - '0';
 
-		io_error_if( ret._type < pnm_type_mono_asc || ret._type > pnm_type_color_bin
+		io_error_if( ret._type < pnm_image_type::_mono_asc || ret._type > pnm_image_type::_color_bin
 		           , "Invalid PNM file (supports P1 to P6)"
 		           );
 
         ret._width  = read_int();
         ret._height = read_int();
 
-        if( ret._type == pnm_type_mono_asc || ret._type == pnm_type_mono_bin )
+        if( ret._type == pnm_image_type::_mono_asc || ret._type == pnm_image_type::_mono_bin )
         {
             ret._max_value = 1;
         }
@@ -136,13 +136,13 @@ public:
         switch( this->_info._type )
 		{
             // reading mono text is reading grayscale but with only two values
-			case pnm_type_mono_asc:  { read_text_data< gray8_view_t >( view ); break; }
-			case pnm_type_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
-			case pnm_type_color_asc: { read_text_data< rgb8_view_t  >( view ); break; }
+			case pnm_image_type::_mono_asc:  { read_text_data< gray8_view_t >( view ); break; }
+			case pnm_image_type::_gray_asc:  { read_text_data< gray8_view_t >( view ); break; }
+			case pnm_image_type::_color_asc: { read_text_data< rgb8_view_t  >( view ); break; }
 
-			case pnm_type_mono_bin:  { read_bin_data< gray1_image_t::view_t >( view ); break; }
-			case pnm_type_gray_bin:  { read_bin_data< gray8_view_t          >( view ); break; }
-			case pnm_type_color_bin: { read_bin_data< rgb8_view_t           >( view ); break; }
+			case pnm_image_type::_mono_bin:  { read_bin_data< gray1_image_t::view_t >( view ); break; }
+			case pnm_image_type::_gray_bin:  { read_bin_data< gray8_view_t          >( view ); break; }
+			case pnm_image_type::_color_bin: { read_bin_data< rgb8_view_t           >( view ); break; }
 		}
     }
 
