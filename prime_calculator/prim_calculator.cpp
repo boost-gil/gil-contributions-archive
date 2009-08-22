@@ -12,16 +12,16 @@ namespace prime_calculator
 
 bool is_prime( std::size_t number )
 {
-    if( number % 2 )
+    if( number == 2 )
+        return true;
+        
+    if( number % 2 == 0 )
         return false;
 
     long n = static_cast<long>( number );
 
     if( number == 0 || number == 1 )
         return false;
-
-    if( number == 2 )
-        return true;
 
     n = std::abs( n );
     std::size_t sqrt_number = static_cast< std::size_t >( std::sqrt( static_cast< double >( n )));
@@ -154,7 +154,7 @@ int main( int argc, char* argv[])
     boost::mapreduce::specification spec;
 
     boost::mapreduce::results result;
-    prime_calculator::job::datasource_type datasource( 0, 1000 );
+    prime_calculator::job::datasource_type datasource( 0, 1000000 );
 
     spec.map_tasks    = 0;
     spec.reduce_tasks = std::max( 1U, boost::thread::hardware_concurrency() );
