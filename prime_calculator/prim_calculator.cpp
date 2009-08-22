@@ -12,6 +12,9 @@ namespace prime_calculator
 
 bool is_prime( std::size_t number )
 {
+    if( number % 2 )
+        return false;
+
     long n = static_cast<long>( number );
 
     if( number == 0 || number == 1 )
@@ -111,18 +114,12 @@ struct reduce_task : public boost::mapreduce::reduce_task< bool        // key_ty
     {
         if( key )
         {
-            for( ; it != ite; it++  )
-            {
-                assert( is_prime( *it ));
-                std::cout << *it << " ";
-            }
-
             for_each( it
                     , ite
                     , boost::bind( &Runtime::emit
-                                 , &runtime
+                                 , boost::ref( runtime )
+                                 , true
                                  , _1
-                                 , 0
                                  )
                     );
         }
@@ -140,14 +137,16 @@ typedef boost::mapreduce::job< prime_calculator::map_task
                                                                                  , prime_calculator::reduce_task
                                                                                  >
                             > job;
+
 /*
 typedef
 boost::mapreduce::job< prime_calculator::map_task
                      , prime_calculator::reduce_task
                      , boost::mapreduce::null_combiner
                      , prime_calculator::number_source< prime_calculator::map_task >
-> job;
+                     > job;
 */
+
 } // namespace prime_calculator
 
 int main( int argc, char* argv[])
