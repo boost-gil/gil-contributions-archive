@@ -82,35 +82,41 @@ private:
     std::size_t _current;
 };
 
-struct map_task : public boost::mapreduce::map_task< std::size_t // MapKey
-                                                   , std::size_t // MapValue
+struct map_task : public boost::mapreduce::map_task< std::size_t // key_type
+                                                   , std::size_t // value_type
                                                    >
 {
     template<typename Runtime>
     static void map( Runtime& runtime
-                   , const std::size_t& //key
-                   , value_type&        value
+                   , const key_type& //key
+                   , value_type&     value
                    )
     {
         runtime.emit_intermediate( is_prime( value ), value );
     }
 };
 
-struct reduce_task : public boost::mapreduce::reduce_task< bool
-                                                         , std::size_t
+struct reduce_task : public boost::mapreduce::reduce_task< bool        // key_type
+                                                         , std::size_t // value_type
                                                          >
 {
     template< typename Runtime
             , typename It
             >
-    static void reduce( Runtime&    runtime
-                      , const bool& key
-                      , It          it
-                      , const It    ite
+    static void reduce( Runtime&        runtime
+                      , const key_type& key
+                      , It              it
+                      , const It        ite
                       )
     {
         if( key )
         {
+            for( ; it != ite; it++  )
+            {
+                assert( is_prime( *it ));
+                std::cout << *it << " ";
+            }
+
             for_each( it
                     , ite
                     , boost::bind( &Runtime::emit
@@ -122,7 +128,6 @@ struct reduce_task : public boost::mapreduce::reduce_task< bool
         }
     }
 };
-
 
 typedef boost::mapreduce::job< prime_calculator::map_task
                              , prime_calculator::reduce_task
