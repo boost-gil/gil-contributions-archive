@@ -37,7 +37,9 @@ typedef std::vector< cvpoint_array_t > cvpoint_array_vec_t;
 inline
 CvPoint make_cvPoint( point_t point )
 {
-   return cvPoint( point.x, point.y );
+   return cvPoint( static_cast< int >( point.x )
+                 , static_cast< int >( point.y )
+                 );
 }
 
 inline
@@ -58,7 +60,9 @@ cvpoint_array_t make_cvPoint_array( const curve_t& curve )
 inline
 CvSize make_cvSize( point_t point )
 {
-   return cvSize( point.x, point.y );
+   return cvSize( static_cast< int >( point.x )
+                , static_cast< int >( point.y )
+                );
 }
 
 template< class PIXEL >

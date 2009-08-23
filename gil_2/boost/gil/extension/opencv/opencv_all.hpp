@@ -26,5 +26,5 @@
 #include "resize.hpp"
 #include "smooth.hpp"
 #include "text.hpp"
-
+#include "utilities.hpp"
 #endif // BOOST_GIL_EXTENSION_OPENCV_UTILITIES_HPP_INCLUDED

@@ -63,6 +63,7 @@
 				AdditionalDependencies="libjpegd.lib libpng13d.lib zlib1d.lib libtiffd.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\chh\software\lib\debug"
+				GenerateManifest="false"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"

@@ -19,6 +19,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost\shared_ptr.hpp>
 #include <boost\gil\gil_all.hpp>
 
 #include "utilities.hpp"
@@ -48,6 +49,7 @@ public:
     typedef boost::shared_ptr< IplImage > ipl_image_ptr_t;
 
 public:
+    ipl_image_wrapper() {}
     ipl_image_wrapper( IplImage* img ) : _img( img, ipl_deleter ) {}
 
     IplImage*       get()       { return _img.get(); }
