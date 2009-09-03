@@ -203,7 +203,7 @@ public:
         std::ptrdiff_t yinc = 1;
 
         // offset to first scanline
-        int offset = 0;
+        std::ptrdiff_t offset = 0;
 
         if( _info._height > 0 )
         {
@@ -380,14 +380,14 @@ private:
                            , std::ptrdiff_t  ybeg
                            , std::ptrdiff_t  yend
                            , std::ptrdiff_t  yinc
-                           , int             offset
+                           , std::ptrdiff_t  offset
                            )
     {
         std::vector< rgba8_pixel_t > pal;
         read_palette( pal );
 
         // jump to first scanline
-        _io_dev.seek( offset );
+        _io_dev.seek( static_cast< long >( offset ));
 
         typedef row_buffer_helper_view< View_Src > rh_t;
         typedef typename rh_t::iterator_t          it_t;
@@ -427,7 +427,7 @@ private:
                      , std::ptrdiff_t ybeg
                      , std::ptrdiff_t yend
                      , std::ptrdiff_t yinc
-                     , int            offset
+                     , std::ptrdiff_t offset
                      )
     {
         byte_vector_t row( pitch );
@@ -477,7 +477,7 @@ private:
         }
 
         // jump to first scanline
-        _io_dev.seek( offset );
+        _io_dev.seek( static_cast< long >( offset ));
 
         typedef rgb8_image_t image_t;
         typedef image_t::view_t::x_iterator it_t;
@@ -528,13 +528,13 @@ private:
                   , std::ptrdiff_t  ybeg
                   , std::ptrdiff_t  yend
                   , std::ptrdiff_t  yinc
-                  , int             offset
+                  , std::ptrdiff_t  offset
                   )
     {
         byte_vector_t row( pitch );
 
         // jump to first scanline
-        _io_dev.seek( offset );
+        _io_dev.seek( static_cast< long >( offset ));
 
         View_Src v = interleaved_view( _info._width
                                      , 1
@@ -587,7 +587,7 @@ private:
                                , std::ptrdiff_t  ybeg
                                , std::ptrdiff_t  yend
                                , std::ptrdiff_t  yinc
-                               , int             offset
+                               , std::ptrdiff_t  offset
                                )
     {
         assert(  _info._compression == bmp_compression::_rle4
@@ -598,7 +598,7 @@ private:
         read_palette( pal );
 
         // jump to start of rle4 data
-        _io_dev.seek( offset );
+        _io_dev.seek( static_cast< long >( offset ));
 
         // we need to know the stream position for padding purposes
         std::size_t stream_pos = offset;
