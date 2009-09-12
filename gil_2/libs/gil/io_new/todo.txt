@@ -29,7 +29,7 @@ todo list
 * add read_image_info for any_image
 
 
-* dynamic_writer don't take the settings. see write_view.hpp ( @todo )
+* dynamic_writer don't take the settings. -FIXED- But need to wait for codes in boost/gil dynamic image extension
 
 * see libjpeg for cropping support
 
