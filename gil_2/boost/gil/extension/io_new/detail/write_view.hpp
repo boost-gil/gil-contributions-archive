@@ -299,8 +299,9 @@ void write_view( Device&                           device
                   , Log
                   > dyn_writer( device );
 
-    /// @todo dynamic_writer don't take the settings. Fix that!
-    dyn_writer.apply( views );
+    dyn_writer.apply( views
+                    , info
+                    );
 }
 
 template< typename Device

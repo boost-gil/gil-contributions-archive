@@ -61,8 +61,28 @@ class dynamic_io_fnobj {
 
     template <typename View>
     void apply(const View& view,mpl::true_ ) {_op->apply(view);}
+
+    template <typename View, typename Info >
+    void apply( const View& view
+              , const Info& info
+              , const mpl::true_
+              )
+    {
+        _op->apply( view, info );
+    }
+
     template <typename View>
     void apply(const View& /* view */ ,mpl::false_) {io_error("dynamic_io: unsupported view type for the given file format");}
+
+    template <typename View, typename Info >
+    void apply( const View& /* view */
+              , const Info& /* info */
+              , const mpl::false_
+              )
+    {
+        io_error( "dynamic_io: unsupported view type for the given file format" );
+    }
+
 public:
     dynamic_io_fnobj(OpClass* op) : _op(op) {}
 
@@ -70,6 +90,16 @@ public:
 
     template <typename View>
     void operator()(const View& view) {apply(view,typename IsSupported::template apply<View>::type());}
+
+    template< typename View, typename Info >
+    void operator()(const View& view, const Info& info )
+    {
+        apply( view
+             , info
+             , typename IsSupported::template apply< View >::type()
+             );
+    }
+
 };
 
 } // namespace detail
