@@ -186,6 +186,29 @@ struct jpeg_write_is_supported
     {};
 };
 
+
+/// \ingroup Variant
+/// \brief Invokes a generic constant operation (represented as a binary function object) on two variants
+template< typename Types1
+        , typename BinaryOp
+        >
+GIL_FORCEINLINE
+typename BinaryOp::result_type apply_operation( const variant<Types1>&              arg1
+                                              , const image_write_info< jpeg_tag >& info
+                                              , BinaryOp op
+                                              )
+{    
+    return apply_operation_base< Types1
+                               , image_write_info< jpeg_tag >
+                               >( arg1._bits
+                                , arg1._index
+                                , arg2._bits
+                                , arg2._index
+                                , op
+                                );
+}
+
+
 template< typename Device >
 class dynamic_image_writer< Device
                           , jpeg_tag
@@ -212,6 +235,18 @@ public:
                         > op( this );
 
         apply_operation( views, op );
+    }
+
+    template< typename Views >
+    void apply( const any_image_view  < Views    >& views
+              , const image_write_info< jpeg_tag >& info
+              )
+    {
+        dynamic_io_fnobj< jpeg_write_is_supported
+                        , parent_t
+                        > op( this );
+
+        //apply_operation( views, info, op );
     }
 };
 
