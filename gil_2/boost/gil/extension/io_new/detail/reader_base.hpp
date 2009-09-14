@@ -23,6 +23,14 @@
 
 namespace boost { namespace gil { namespace detail {
 
+/// Reader Base Class
+/// 
+/// It provides some basic functionality which is shared for all readers.
+/// For instance, it recreates images when necessary. It checks whether
+/// user supplied coordinates are valid.
+///
+/// @tparam FormatTag        A format tag, like jpeg_tag.
+/// @tparam ConversionPolicy Conversion policy, see coversion_policies.hpp.
 template< typename FormatTag
         , typename ConversionPolicy
         >
@@ -30,12 +38,18 @@ struct reader_base
 {
 public:
 
+    /// Initializes an image. But also does some check ups.
+    ///
+    /// @tparam Image Image which implements boost::gil's ImageConcept.
+    ///
+    /// @param img  The image.
+    /// @param info The image read info.
     template< typename Image >
     void init_image( Image&                              img
                    , const image_read_info< FormatTag >& info
                    )
     {
-        _info     = info;
+        _info = info;
 
         setup( _settings._dim );
 
@@ -49,7 +63,7 @@ public:
                   , const image_read_info< FormatTag >& info
                   )
     {
-        _info     = info;
+        _info = info;
 
         setup( view.dimensions() );
     }
