@@ -22,7 +22,7 @@
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/gil/gil_config.hpp>
-#include "dynamic_image_all_io_new.hpp"
+#include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
 
 #include "base.hpp"
 
