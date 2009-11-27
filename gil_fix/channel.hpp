@@ -396,7 +396,7 @@ public:
 
 // CHH - Begin
     //static const BitField channel_mask = parent_t::max_val<<FirstBit;
-    static const BitField channel_mask = static_cast< bitfield_t >( parent_t::max_val ) << FirstBit;
+    static const BitField channel_mask = static_cast< BitField >( parent_t::max_val ) << FirstBit;
 // CHH - End
 public:
     typedef const packed_channel_reference<BitField,FirstBit,NumBits,false> const_reference;
@@ -418,7 +418,7 @@ public:
     integer_t get()                               const { return integer_t((this->get_data()&channel_mask) >> FirstBit); }
     void set_unsafe(integer_t value)              const
     {
-        this->set_data((this->get_data() & ~channel_mask) | ( static_cast< bitfield_t >( value ) << FirstBit));
+        this->set_data((this->get_data() & ~channel_mask) | ( static_cast< BitField >( value ) << FirstBit));
     }
 private:
     void set_from_reference(const BitField& other_bits) const { this->set_data((this->get_data() & ~channel_mask) | (other_bits & channel_mask)); }
