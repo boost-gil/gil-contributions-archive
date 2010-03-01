@@ -333,7 +333,7 @@ struct jpeg_type_format_checker
     template< typename Image >
     bool apply()
     {
-        return is_read_supported< typename get_pixel_type< Image::view_t >::type
+        return is_read_supported< typename get_pixel_type< typename Image::view_t >::type
                                 , jpeg_tag
                                 >::_color_space == _color_space;
     }

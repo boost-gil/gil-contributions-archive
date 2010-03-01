@@ -33,6 +33,7 @@
 #include <boost/gil/bit_aligned_pixel_iterator.hpp>
 
 #include "typedefs.hpp"
+#include "io_error.hpp"
 #include "gil_extensions.hpp"
 
 namespace boost { namespace gil {
@@ -89,20 +90,6 @@ struct property_base
 {
     typedef Property type;
 };
-
-
-inline 
-void io_error( const std::string& descr )
-{
-   throw std::ios_base::failure( descr );
-}
-
-inline 
-void io_error_if( bool expr, const std::string& descr )
-{
-   if( expr ) 
-      io_error( descr );
-}
 
 struct read_support_true  { BOOST_STATIC_CONSTANT( bool, is_supported = true );  };
 struct read_support_false { BOOST_STATIC_CONSTANT( bool, is_supported = false ); };

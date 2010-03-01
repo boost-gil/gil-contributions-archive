@@ -830,7 +830,7 @@ public:
     {
         if( !this->_info._valid )
         {
-            get_info();
+            parent_t::get_info();
         }
 
         bmp_type_format_checker format_checker( this->_info._bits_per_pixel );

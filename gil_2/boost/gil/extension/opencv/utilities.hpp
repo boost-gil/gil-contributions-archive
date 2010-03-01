@@ -21,6 +21,8 @@
 
 #include <cv.h>
 
+#include <vector>
+
 #include <boost/shared_array.hpp>
 
 #include <boost/gil/gil_all.hpp>

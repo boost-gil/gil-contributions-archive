@@ -416,7 +416,7 @@ struct pnm_type_format_checker
     template< typename Image >
     bool apply()
     {
-        typedef is_read_supported< typename get_pixel_type< Image::view_t >::type
+        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
                                  , pnm_tag
                                  > is_supported_t;
 
