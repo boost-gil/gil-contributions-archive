@@ -282,9 +282,9 @@ private:
          // page ( diagnostics section ) for more information.
          for( std::ptrdiff_t row = 0; row < this->_settings._top_left.y; ++row )
          {
-            _io_dev.read_scaline( buffer
-                                , row
-                                , static_cast< tsample_t >( plane ));
+            _io_dev.read_scanline( buffer
+                                 , row
+                                 , static_cast< tsample_t >( plane ));
          }
       }
    }
@@ -329,10 +329,10 @@ private:
          ; ++row
          )
       {
-         _io_dev.read_scaline( row_buffer_helper.buffer()
-                             , row
-                             , static_cast< tsample_t >( plane )
-                             );
+         _io_dev.read_scanline( row_buffer_helper.buffer()
+                              , row
+                              , static_cast< tsample_t >( plane )
+                              );
 
          mirror_bits( row_buffer_helper.buffer() );
 

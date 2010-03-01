@@ -106,9 +106,10 @@ public:
     }
 
     template< typename Buffer >
-    void read_scaline( Buffer&        buffer
-                     , std::ptrdiff_t row
-                     , tsample_t      plane   )
+    void read_scanline( Buffer&        buffer
+                      , std::ptrdiff_t row
+                      , tsample_t      plane
+                      )
     {
         io_error_if( TIFFReadScanline( _tiff_file.get()
                                      , reinterpret_cast< tdata_t >( &buffer.front() )
