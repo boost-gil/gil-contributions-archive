@@ -33,7 +33,7 @@ namespace boost { namespace gil { namespace detail {
 template< typename Device >
 class writer< Device
             , jpeg_tag
-            > 
+            >
 {
 public:
 
@@ -149,7 +149,7 @@ private:
         gil_jpeg_destination_mgr* dest = reinterpret_cast< gil_jpeg_destination_mgr* >( cinfo->dest );
 
         dest->_this->out.write( dest->_this->buffer
-                              , buffer_size 
+                              , buffer_size
                               );
 
         writer<Device,jpeg_tag>::init_device( cinfo );
@@ -179,7 +179,7 @@ private:
 struct jpeg_write_is_supported
 {
     template< typename View >
-    struct apply 
+    struct apply
         : public is_write_supported< typename get_pixel_type< View >::type
                                    , jpeg_tag
                                    >
@@ -187,7 +187,7 @@ struct jpeg_write_is_supported
 };
 
 // unary application
-template <typename Types, typename Tag, typename Bits, typename Op> 
+template <typename Types, typename Tag, typename Bits, typename Op>
 typename Op::result_type GIL_FORCEINLINE apply_operation_basec( const Bits& bits
                                                               , std::size_t index
                                                               , const image_write_info< Tag >& info
@@ -233,10 +233,12 @@ typename BinaryOp::result_type apply_operation( const variant< Types1 >& arg1
                                               , const Info&              info
                                               , BinaryOp op
                                               )
-{    
+{
+    typename variant< Types1 >::base_t bits = arg1.bits();
+
     return apply_operation_base< Types1
                                , image_write_info< jpeg_tag >
-                               >( arg1.bits()
+                               >( bits
                                 , arg1.index()
                                 , info
                                 , op
