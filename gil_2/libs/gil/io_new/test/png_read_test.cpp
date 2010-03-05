@@ -84,342 +84,342 @@ BOOST_AUTO_TEST_CASE( read_header_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( basic_format_test )
+BOOST_AUTO_TEST_CASE( BASIc_format_test )
 {
     // Basic format test files (non-interlaced)
 
-    // basn0g01    -   black & white
-    test_file< gray1_image_t >( "basn0g01.png" );
+    // BASN0g01    -   black & white
+    test_file< gray1_image_t >( "BASN0G01.png" );
 
-    // basn0g02    -   2 bit (4 level) grayscale
-    test_file< gray2_image_t >( "basn0g02.png" );
+    // BASN0g02    -   2 bit (4 level) grayscale
+    test_file< gray2_image_t >( "BASN0G02.png" );
 
-    // basn0g04    -   4 bit (16 level) grayscale
-    test_file< gray4_image_t >( "basn0g04.png" );
+    // BASN0g04    -   4 bit (16 level) grayscale
+    test_file< gray4_image_t >( "BASN0G04.png" );
 
-    // basn0g08    -   8 bit (256 level) grayscale
-    test_file< gray8_image_t >( "basn0g08.png" );
+    // BASN0g08    -   8 bit (256 level) grayscale
+    test_file< gray8_image_t >( "BASN0G08.png" );
 
-    // basn0g16    -   16 bit (64k level) grayscale
-    test_file< gray16_image_t >( "basn0g16.png" );
+    // BASN0g16    -   16 bit (64k level) grayscale
+    test_file< gray16_image_t >( "BASN0G16.png" );
 
-    // basn2c08    -   3x8 bits rgb color
-    test_file< rgb8_image_t >( "basn2c08.png" );
+    // BASN2c08    -   3x8 bits rgb color
+    test_file< rgb8_image_t >( "BASN2C08.png" );
 
-    // basn2c16    -   3x16 bits rgb color
-    test_file< rgb16_image_t >( "basn2c16.png" );
+    // BASN2c16    -   3x16 bits rgb color
+    test_file< rgb16_image_t >( "BASN2C16.png" );
 
-    // basn3p01    -   1 bit (2 color) paletted
-    test_file< rgb8_image_t >( "basn3p01.png" );
+    // BASN3p01    -   1 bit (2 color) paletted
+    test_file< rgb8_image_t >( "BASN3P01.png" );
 
-    // basn3p02    -   2 bit (4 color) paletted
-    test_file< rgb8_image_t >( "basn3p02.png" );
+    // BASN3p02    -   2 bit (4 color) paletted
+    test_file< rgb8_image_t >( "BASN3P02.png" );
 
-    // basn3p04    -   4 bit (16 color) paletted
-    test_file< rgb8_image_t >( "basn3p04.png" );
+    // BASN3p04    -   4 bit (16 color) paletted
+    test_file< rgb8_image_t >( "BASN3P04.png" );
 
-    // basn3p08    -   8 bit (256 color) paletted
-    test_file< rgb8_image_t >( "basn3p08.png" );
+    // BASN3p08    -   8 bit (256 color) paletted
+    test_file< rgb8_image_t >( "BASN3P08.png" );
 
-    // basn4a08    -   8 bit grayscale + 8 bit alpha-channel
-    test_file< gray_alpha8_image_t >( "basn4a08.png" );
+    // BASN4a08    -   8 bit grayscale + 8 bit alpha-channel
+    test_file< gray_alpha8_image_t >( "BASN4A08.png" );
 
-    // basn4a16    -   16 bit grayscale + 16 bit alpha-channel
-    test_file< gray_alpha16_image_t >( "basn4a16.png" );
+    // BASN4a16    -   16 bit grayscale + 16 bit alpha-channel
+    test_file< gray_alpha16_image_t >( "BASN4A16.png" );
 
-    // basn6a08    -   3x8 bits rgb color + 8 bit alpha-channel
-    test_file< rgba8_image_t >( "basn6a08.png" );
+    // BASN6a08    -   3x8 bits rgb color + 8 bit alpha-channel
+    test_file< rgba8_image_t >( "BASN6A08.png" );
 
-    // basn6a16    -   3x16 bits rgb color + 16 bit alpha-channel
-    test_file< rgba16_image_t >( "basn6a16.png" );
+    // BASN6a16    -   3x16 bits rgb color + 16 bit alpha-channel
+    test_file< rgba16_image_t >( "BASN6A16.png" );
 }
 
-BOOST_AUTO_TEST_CASE( basic_format_interlaced_test )
+BOOST_AUTO_TEST_CASE( BASIc_format_interlaced_test )
 {
     // Basic format test files (Adam-7 interlaced)
 
-    // basi0g01    -   black & white
-    test_file< gray1_image_t >( "basi0g01.png" );
+    // BASI0g01    -   black & white
+    test_file< gray1_image_t >( "BASI0G01.png" );
 
-    // basi0g02    -   2 bit (4 level) grayscale
-    test_file< gray2_image_t >( "basi0g02.png" );
+    // BASI0g02    -   2 bit (4 level) grayscale
+    test_file< gray2_image_t >( "BASI0G02.png" );
 
-    // basi0g04    -   4 bit (16 level) grayscale
-    test_file< gray4_image_t >( "basi0g04.png" );
+    // BASI0g04    -   4 bit (16 level) grayscale
+    test_file< gray4_image_t >( "BASI0G04.png" );
 
-    // basi0g08    -   8 bit (256 level) grayscale
-    test_file< gray8_image_t >( "basi0g08.png" );
+    // BASI0g08    -   8 bit (256 level) grayscale
+    test_file< gray8_image_t >( "BASI0G08.png" );
 
-    // basi0g16    -   16 bit (64k level) grayscale
-    test_file< gray16_image_t >( "basi0g16.png" );
+    // BASI0g16    -   16 bit (64k level) grayscale
+    test_file< gray16_image_t >( "BASI0G16.png" );
 
-    // basi2c08    -   3x8 bits rgb color
-    test_file< rgb8_image_t >( "basi2c08.png" );
+    // BASI2c08    -   3x8 bits rgb color
+    test_file< rgb8_image_t >( "BASI2C08.png" );
 
-    // basi2c16    -   3x16 bits rgb color
-    test_file< rgb16_image_t >( "basi2c16.png" );
+    // BASI2c16    -   3x16 bits rgb color
+    test_file< rgb16_image_t >( "BASI2C16.png" );
 
-    // basi3p01    -   1 bit (2 color) paletted
-    test_file< rgb8_image_t >( "basi3p01.png" );
+    // BASI3p01    -   1 bit (2 color) paletted
+    test_file< rgb8_image_t >( "BASI3P01.png" );
 
-    // basi3p02    -   2 bit (4 color) paletted
-    test_file< rgb8_image_t >( "basi3p02.png" );
+    // BASI3p02    -   2 bit (4 color) paletted
+    test_file< rgb8_image_t >( "BASI3P02.png" );
 
-    // basi3p04    -   4 bit (16 color) paletted
-    test_file< rgb8_image_t >( "basi3p04.png" );
+    // BASI3p04    -   4 bit (16 color) paletted
+    test_file< rgb8_image_t >( "BASI3P04.png" );
 
-    // basi3p08    -   8 bit (256 color) paletted
-    test_file< rgb8_image_t >( "basi3p08.png" );
+    // BASI3p08    -   8 bit (256 color) paletted
+    test_file< rgb8_image_t >( "BASI3P08.png" );
 
-    // basi4a08    -   8 bit grayscale + 8 bit alpha-channel
-    test_file< gray_alpha8_image_t >( "basi4a08.png" );
+    // BASI4a08    -   8 bit grayscale + 8 bit alpha-channel
+    test_file< gray_alpha8_image_t >( "BASI4A08.png" );
 
-    // basi4a16    -   16 bit grayscale + 16 bit alpha-channel
-    test_file< gray_alpha16_image_t >( "basi4a16.png" );
+    // BASI4a16    -   16 bit grayscale + 16 bit alpha-channel
+    test_file< gray_alpha16_image_t >( "BASI4A16.png" );
 
-    // basi6a08    -   3x8 bits rgb color + 8 bit alpha-channel
-    test_file< rgba8_image_t >( "basi6a08.png" );
+    // BASI6a08    -   3x8 bits rgb color + 8 bit alpha-channel
+    test_file< rgba8_image_t >( "BASI6A08.png" );
 
-    // basi6a16    -   3x16 bits rgb color + 16 bit alpha-channel
-    test_file< rgba16_image_t >( "basi6a16.png" );
+    // BASI6a16    -   3x16 bits rgb color + 16 bit alpha-channel
+    test_file< rgba16_image_t >( "BASI6A16.png" );
 }
 
 BOOST_AUTO_TEST_CASE( odd_sizes_test )
 {
-    // s01i3p01 - 1x1 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s01i3p01.png" );
+    // S01I3P01 - 1x1 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S01I3P01.png" );
 
-    // s01n3p01 - 1x1 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s01n3p01.png" );
+    // S01N3P01 - 1x1 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S01N3P01.png" );
 
-    // s02i3p01 - 2x2 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s02i3p01.png" );
+    // S02I3P01 - 2x2 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S02I3P01.png" );
 
-    // s02n3p01 - 2x2 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s02n3p01.png" );
+    // S02N3P01 - 2x2 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S02N3P01.png" );
 
-    // s03i3p01 - 3x3 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s03i3p01.png" );
+    // S03I3P01 - 3x3 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S03I3P01.png" );
 
-    // s03n3p01 - 3x3 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s03n3p01.png" );
+    // S03N3P01 - 3x3 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S03N3P01.png" );
 
-    // s04i3p01 - 4x4 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s04i3p01.png" );
+    // S04I3P01 - 4x4 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S04I3P01.png" );
 
-    // s04n3p01 - 4x4 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s04n3p01.png" );
+    // S04N3P01 - 4x4 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S04N3P01.png" );
 
-    // s05i3p02 - 5x5 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s05i3p02.png" );
+    // S05I3P02 - 5x5 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S05I3P02.png" );
 
-    // s05n3p02 - 5x5 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s05n3p02.png" );
+    // S05N3P02 - 5x5 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S05N3P02.png" );
 
-    // s06i3p02 - 6x6 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s06i3p02.png" );
+    // S06I3P02 - 6x6 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S06I3P02.png" );
 
-    // s06n3p02 - 6x6 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s06n3p02.png" );
+    // S06N3P02 - 6x6 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S06N3P02.png" );
 
-    // s07i3p02 - 7x7 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s07i3p02.png" );
+    // S07I3P02 - 7x7 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S07I3P02.png" );
 
-    // s07n3p02 - 7x7 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s07n3p02.png" );
+    // S07N3P02 - 7x7 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S07N3P02.png" );
 
-    // s08i3p02 - 8x8 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s08i3p02.png" );
+    // S08I3P02 - 8x8 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S08I3P02.png" );
 
-    // s08n3p02 - 8x8 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s08n3p02.png" );
+    // S08N3P02 - 8x8 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S08N3P02.png" );
 
-    // s09i3p02 - 9x9 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s09i3p02.png" );
+    // S09I3P02 - 9x9 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S09I3P02.png" );
 
-    // s09n3p02 - 9x9 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s09n3p02.png" );
+    // S09N3P02 - 9x9 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S09N3P02.png" );
 
-    // s32i3p04 - 32x32 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s32i3p04.png" );
+    // S32I3P04 - 32x32 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S32I3P04.png" );
 
-    // s32n3p04 - 32x32 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s32n3p04.png" );
+    // S32N3P04 - 32x32 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S32N3P04.png" );
 
-    // s33i3p04 - 33x33 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s33i3p04.png" );
+    // S33I3P04 - 33x33 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S33I3P04.png" );
 
-    // s33n3p04 - 33x33 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s33n3p04.png" );
+    // S33N3P04 - 33x33 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S33N3P04.png" );
 
-    // s34i3p04 - 34x34 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s34i3p04.png" );
+    // S34I3P04 - 34x34 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S34I3P04.png" );
 
-    // s34n3p04 - 34x34 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s34n3p04.png" );
+    // S34N3P04 - 34x34 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S34N3P04.png" );
 
-    // s35i3p04 - 35x35 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s35i3p04.png" );
+    // S35I3P04 - 35x35 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S35I3P04.png" );
 
-    // s35n3p04 - 35x35 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s35n3p04.png" );
+    // S35N3P04 - 35x35 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S35N3P04.png" );
 
-    // s36i3p04 - 36x36 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s36i3p04.png" );
+    // S36I3P04 - 36x36 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S36I3P04.png" );
 
-    // s36n3p04 - 36x36 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s36n3p04.png" );
+    // S36N3P04 - 36x36 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S36N3P04.png" );
 
-    // s37i3p04 - 37x37 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s37i3p04.png" );
+    // S37I3P04 - 37x37 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S37I3P04.png" );
 
-    // s37n3p04 - 37x37 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s37n3p04.png" );
+    // S37N3P04 - 37x37 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S37N3P04.png" );
 
-    // s38i3p04 - 38x38 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s38i3p04.png" );
+    // S38I3P04 - 38x38 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S38I3P04.png" );
 
-    // s38n3p04 - 38x38 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s38n3p04.png" );
+    // S38N3P04 - 38x38 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S38N3P04.png" );
 
-    // s39i3p04 - 39x39 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s39i3p04.png" );
+    // S39I3P04 - 39x39 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S39I3P04.png" );
 
-    // s39n3p04 - 39x39 paletted file, no interlacing 
-    test_file< rgb8_image_t >( "s39n3p04.png" );
+    // S39N3P04 - 39x39 paletted file, no interlacing 
+    test_file< rgb8_image_t >( "S39N3P04.png" );
 
-    // s40i3p04 - 40x40 paletted file, interlaced 
-    test_file< rgb8_image_t >( "s40i3p04.png" );
+    // S40I3P04 - 40x40 paletted file, interlaced 
+    test_file< rgb8_image_t >( "S40I3P04.png" );
 
-    // s40n3p04 - 40x40 paletted file, no interlacing
-    test_file< rgb8_image_t >( "s40n3p04.png" );
+    // S40N3P04 - 40x40 paletted file, no interlacing
+    test_file< rgb8_image_t >( "S40N3P04.png" );
 }
 
 BOOST_AUTO_TEST_CASE( background_test )
 {
-    // bgai4a08 - 8 bit grayscale, alpha, no background chunk, interlaced 
-    test_file< gray_alpha8_image_t >( "bgai4a08.png" );
+    // BGAI4A08 - 8 bit grayscale, alpha, no background chunk, interlaced 
+    test_file< gray_alpha8_image_t >( "BGAI4A08.png" );
 
-    // bgai4a16 - 16 bit grayscale, alpha, no background chunk, interlaced 
-    test_file< gray_alpha16_image_t >( "bgai4a16.png" );
+    // BGAI4A16 - 16 bit grayscale, alpha, no background chunk, interlaced 
+    test_file< gray_alpha16_image_t >( "BGAI4A16.png" );
 
-    // bgan6a08 - 3x8 bits rgb color, alpha, no background chunk 
-    test_file< rgba8_image_t >( "bgan6a08.png" );
+    // BGAN6A08 - 3x8 bits rgb color, alpha, no background chunk 
+    test_file< rgba8_image_t >( "BGAN6A08.png" );
 
-    // bgan6a16 - 3x16 bits rgb color, alpha, no background chunk 
-    test_file< rgba16_image_t >( "bgan6a16.png" );
+    // BGAN6A16 - 3x16 bits rgb color, alpha, no background chunk 
+    test_file< rgba16_image_t >( "BGAN6A16.png" );
 
-    // bgbn4a08 - 8 bit grayscale, alpha, black background chunk 
-    test_file< gray_alpha8_image_t >( "bgbn4a08.png" );
+    // BGBN4A08 - 8 bit grayscale, alpha, black background chunk 
+    test_file< gray_alpha8_image_t >( "BGBN4A08.png" );
 
-    // bggn4a16 - 16 bit grayscale, alpha, gray background chunk 
-    test_file< gray_alpha16_image_t >( "bggn4a16.png" );
+    // BGGN4A16 - 16 bit grayscale, alpha, gray background chunk 
+    test_file< gray_alpha16_image_t >( "BGGN4A16.png" );
 
-    // bgwn6a08 - 3x8 bits rgb color, alpha, white background chunk 
-    test_file< rgba8_image_t >( "bgwn6a08.png" );
+    // BGWN6A08 - 3x8 bits rgb color, alpha, white background chunk 
+    test_file< rgba8_image_t >( "BGWN6A08.png" );
 
-    // bgyn6a16 - 3x16 bits rgb color, alpha, yellow background chunk
-    test_file< rgba16_image_t >( "bgyn6a16.png" );
+    // BGYN6A16 - 3x16 bits rgb color, alpha, yellow background chunk
+    test_file< rgba16_image_t >( "BGYN6A16.png" );
 }
 
 BOOST_AUTO_TEST_CASE( transparency_test )
 {
-    // tbbn1g04 - transparent, black background chunk 
+    // TBBN1G04 - transparent, black background chunk 
     // file missing
-    //test_file< gray_alpha8_image_t >( "tbbn1g04.png" );
+    //test_file< gray_alpha8_image_t >( "TBBN1G04.png" );
 
-    // tbbn2c16 - transparent, blue background chunk 
-    test_file< rgba16_image_t >( "tbbn2c16.png" );
+    // TBBN2C16 - transparent, blue background chunk 
+    test_file< rgba16_image_t >( "TBBN2C16.png" );
 
-    // tbbn3p08 - transparent, black background chunk 
-    test_file< rgba8_image_t >( "tbbn3p08.png" );
+    // TBBN3P08 - transparent, black background chunk 
+    test_file< rgba8_image_t >( "TBBN3P08.png" );
 
-    // tbgn2c16 - transparent, green background chunk 
-    test_file< rgba16_image_t >( "tbgn2c16.png" );
+    // TBGN2C16 - transparent, green background chunk 
+    test_file< rgba16_image_t >( "TBGN2C16.png" );
 
-    // tbgn3p08 - transparent, light-gray background chunk 
-    test_file< rgba8_image_t >( "tbgn3p08.png" );
+    // TBGN3P08 - transparent, light-gray background chunk 
+    test_file< rgba8_image_t >( "TBGN3P08.png" );
 
-    // tbrn2c08 - transparent, red background chunk 
-    test_file< rgba8_image_t >( "tbrn2c08.png" );
+    // TBRN2C08 - transparent, red background chunk 
+    test_file< rgba8_image_t >( "TBRN2C08.png" );
 
-    // tbwn1g16 - transparent, white background chunk 
-    test_file< gray_alpha16_image_t >( "tbwn1g16.png" );
+    // TBWN1G16 - transparent, white background chunk 
+    test_file< gray_alpha16_image_t >( "TBWN1G16.png" );
 
-    // tbwn3p08 - transparent, white background chunk 
-    test_file< rgba8_image_t >( "tbwn3p08.png" );
+    // TBWN3P08 - transparent, white background chunk 
+    test_file< rgba8_image_t >( "TBWN3P08.png" );
 
-    // tbyn3p08 - transparent, yellow background chunk 
-    test_file< rgba8_image_t >( "tbyn3p08.png" );
+    // TBYN3P08 - transparent, yellow background chunk 
+    test_file< rgba8_image_t >( "TBYN3P08.png" );
 
-    // tp0n1g08 - not transparent for reference (logo on gray) 
-    test_file< gray8_image_t >( "tp0n1g08.png" );
+    // TP0N1G08 - not transparent for reference (logo on gray) 
+    test_file< gray8_image_t >( "TP0N1G08.png" );
 
-    // tp0n2c08 - not transparent for reference (logo on gray) 
-    test_file< rgb8_image_t >( "tp0n2c08.png" );
+    // TP0N2C08 - not transparent for reference (logo on gray) 
+    test_file< rgb8_image_t >( "TP0N2C08.png" );
 
-    // tp0n3p08 - not transparent for reference (logo on gray) 
-    test_file< rgb8_image_t >( "tp0n3p08.png" );
+    // TP0N3P08 - not transparent for reference (logo on gray) 
+    test_file< rgb8_image_t >( "TP0N3P08.png" );
 
-    // tp1n3p08 - transparent, but no background chunk
-    test_file< rgba8_image_t >( "tp1n3p08.png" );
+    // TP1N3P08 - transparent, but no background chunk
+    test_file< rgba8_image_t >( "TP1N3P08.png" );
 }
 
 BOOST_AUTO_TEST_CASE( gamma_test )
 {
-    // g03n0g16 - grayscale, file-gamma = 0.35 
-    test_file< gray16_image_t >( "g03n0g16.png" );
+    // G03N0G16 - grayscale, file-gamma = 0.35 
+    test_file< gray16_image_t >( "G03N0G16.png" );
 
-    // g03n2c08 - color, file-gamma = 0.35 
-    test_file< rgb8_image_t >( "g03n2c08.png" );
+    // G03N2C08 - color, file-gamma = 0.35 
+    test_file< rgb8_image_t >( "G03N2C08.png" );
 
-    // g03n3p04 - paletted, file-gamma = 0.35 
-    test_file< rgb8_image_t >( "g03n3p04.png" );
+    // G03N3P04 - paletted, file-gamma = 0.35 
+    test_file< rgb8_image_t >( "G03N3P04.png" );
 
-    // g04n0g16 - grayscale, file-gamma = 0.45 
-    test_file< gray16_image_t >( "g04n0g16.png" );
+    // G04N0G16 - grayscale, file-gamma = 0.45 
+    test_file< gray16_image_t >( "G04N0G16.png" );
 
-    // g04n2c08 - color, file-gamma = 0.45 
-    test_file< rgb8_image_t >( "g04n2c08.png" );
+    // G04N2C08 - color, file-gamma = 0.45 
+    test_file< rgb8_image_t >( "G04N2C08.png" );
 
-    // g04n3p04 - paletted, file-gamma = 0.45 
-    test_file< rgb8_image_t >( "g04n3p04.png" );
+    // G04N3P04 - paletted, file-gamma = 0.45 
+    test_file< rgb8_image_t >( "G04N3P04.png" );
 
-    // g05n0g16 - grayscale, file-gamma = 0.55 
-    test_file< gray16_image_t >( "g05n0g16.png" );
+    // G05N0G16 - grayscale, file-gamma = 0.55 
+    test_file< gray16_image_t >( "G05N0G16.png" );
 
-    // g05n2c08 - color, file-gamma = 0.55 
-    test_file< rgb8_image_t >( "g05n2c08.png" );
+    // G05N2C08 - color, file-gamma = 0.55 
+    test_file< rgb8_image_t >( "G05N2C08.png" );
 
-    // g05n3p04 - paletted, file-gamma = 0.55 
-    test_file< rgb8_image_t >( "g05n3p04.png" );
+    // G05N3P04 - paletted, file-gamma = 0.55 
+    test_file< rgb8_image_t >( "G05N3P04.png" );
 
-    // g07n0g16 - grayscale, file-gamma = 0.70 
-    test_file< gray16_image_t >( "g07n0g16.png" );
+    // G07N0G16 - grayscale, file-gamma = 0.70 
+    test_file< gray16_image_t >( "G07N0G16.png" );
 
-    // g07n2c08 - color, file-gamma = 0.70 
-    test_file< rgb8_image_t >( "g07n2c08.png" );
+    // G07N2C08 - color, file-gamma = 0.70 
+    test_file< rgb8_image_t >( "G07N2C08.png" );
 
-    // g07n3p04 - paletted, file-gamma = 0.70 
-    test_file< rgb8_image_t >( "g07n3p04.png" );
+    // G07N3P04 - paletted, file-gamma = 0.70 
+    test_file< rgb8_image_t >( "G07N3P04.png" );
 
-    // g10n0g16 - grayscale, file-gamma = 1.00 
-    test_file< gray16_image_t >( "g10n0g16.png" );
+    // G10N0G16 - grayscale, file-gamma = 1.00 
+    test_file< gray16_image_t >( "G10N0G16.png" );
 
-    // g10n2c08 - color, file-gamma = 1.00 
-    test_file< rgb8_image_t >( "g10n2c08.png" );
+    // G10N2C08 - color, file-gamma = 1.00 
+    test_file< rgb8_image_t >( "G10N2C08.png" );
 
-    // g10n3p04 - paletted, file-gamma = 1.00 
-    test_file< rgb8_image_t >( "g10n3p04.png" );
+    // G10N3P04 - paletted, file-gamma = 1.00 
+    test_file< rgb8_image_t >( "G10N3P04.png" );
 
-    // g25n0g16 - grayscale, file-gamma = 2.50 
-    test_file< gray16_image_t >( "g25n0g16.png" );
+    // G25N0G16 - grayscale, file-gamma = 2.50 
+    test_file< gray16_image_t >( "G25N0G16.png" );
 
-    // g25n2c08 - color, file-gamma = 2.50 
-    test_file< rgb8_image_t >( "g25n2c08.png" );
+    // G25N2C08 - color, file-gamma = 2.50 
+    test_file< rgb8_image_t >( "G25N2C08.png" );
 
-    // g25n3p04 - paletted, file-gamma = 2.50
-    test_file< rgb8_image_t >( "g25n3p04.png" );
+    // G25N3P04 - paletted, file-gamma = 2.50
+    test_file< rgb8_image_t >( "G25N3P04.png" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
