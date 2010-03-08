@@ -31,12 +31,12 @@ struct pnm_tag : format_tag {};
 /// Defines type for image type property.
 struct pnm_image_type : property_base< uint32_t >
 {
-    static const type _mono_asc  = 1; // Monochrome ASCII encoding
-    static const type _gray_asc  = 2; // Gray level ASCII encoding
-    static const type _color_asc = 3; // sRGB color ASCII encoding
-    static const type _mono_bin  = 4; // Monochrome binary encoding
-    static const type _gray_bin  = 5; // Gray level binary encoding
-    static const type _color_bin = 6; // sRGB color binary encoding
+    BOOST_STATIC_CONSTANT( type, _mono_asc  = 1 ); // Monochrome ASCII encoding
+    BOOST_STATIC_CONSTANT( type, _gray_asc  = 2 ); // Gray level ASCII encoding
+    BOOST_STATIC_CONSTANT( type, _color_asc = 3 ); // sRGB color ASCII encoding
+    BOOST_STATIC_CONSTANT( type, _mono_bin  = 4 ); // Monochrome binary encoding
+    BOOST_STATIC_CONSTANT( type, _gray_bin  = 5 ); // Gray level binary encoding
+    BOOST_STATIC_CONSTANT( type, _color_bin = 6 ); // sRGB color binary encoding
 };
 
 /// Defines type for image width property.
