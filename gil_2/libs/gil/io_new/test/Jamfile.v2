@@ -1,4 +1,4 @@
-# (C) Copyright 2009: Christian Henning
+# (C) Copyright 2010: Christian Henning
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,28 +16,33 @@ project
         <link>static
     ;
 
-test-suite "proto"
+test-suite "gil::io_new"
     :
-        [ run bmp_file_format_test.cpp ]
+        [ run all_formats_test.cpp ]
+
         [ run bmp_old_test.cpp ]
         [ run bmp_read_test.cpp ]
         [ run bmp_test.cpp ]
         [ run bmp_write_test.cpp ]
 
-        [ run jpeg_file_format_test.cpp ]
         [ run jpeg_old_test.cpp ]
+        [ run jpeg_read_test.cpp ]
         [ run jpeg_test.cpp ]
+        [ run jpeg_write_test.cpp ]
 
         [ run png_file_format_test.cpp ]
         [ run png_old_test.cpp ]
+        [ run png_read_test.cpp ]
         [ run png_test.cpp ]
 
-        [ run pnm_file_format_test.cpp ]
         [ run pnm_old_test.cpp ]
+        [ run pnm_read_test.cpp ]
         [ run pnm_test.cpp ]
-        
+        [ run pnm_write_test.cpp ]
+
+        [ run test.cpp ]
+
         [ run tiff_file_format_test.cpp ]
         [ run tiff_old_test.cpp ]
         [ run tiff_test.cpp ]
     ;
-
