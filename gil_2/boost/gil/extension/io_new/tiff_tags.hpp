@@ -156,6 +156,20 @@ struct tiff_sample_format : tiff_property_base< uint16_t, TIFFTAG_SAMPLEFORMAT >
 /// Defines type for indexed property.
 struct tiff_indexed : tiff_property_base< uint16_t, TIFFTAG_INDEXED > {};
 
+/// Tile related tags
+
+/// Defines type for tile width
+struct tiff_tile_width : tiff_property_base< uint32_t, TIFFTAG_TILEWIDTH > {};
+
+/// Defines type for tile length
+struct tiff_tile_length : tiff_property_base< uint32_t, TIFFTAG_TILELENGTH > {};
+
+/// Defines type for tile offsets
+struct tiff_tile_offsets : tiff_property_base< uint32_t, TIFFTAG_TILEOFFSETS > {};
+
+/// Defines type for tile byte counts
+struct tiff_tile_byte_counts : tiff_property_base< uint32_t, TIFFTAG_TILEBYTECOUNTS > {};
+
 /// Read information for tiff images.
 ///
 /// The structure is returned when using read_image_info.
@@ -182,6 +196,15 @@ struct image_read_info< tiff_tag >
 
     /// The color space of the image data.
     tiff_photometric_interpretation::type _photometric_interpretation;
+
+    /// Tile width
+    tiff_tile_width::type _tile_width;
+    /// Tile length
+    tiff_tile_length::type _tile_length;
+    /// Tile offsets
+    tiff_tile_offsets::type _tile_offsets;
+    /// Tile byte counts
+    tiff_tile_byte_counts::type _tile_byte_counts;
 };
 
 /// Read settings for tiff images.

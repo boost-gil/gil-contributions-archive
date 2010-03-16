@@ -113,7 +113,7 @@ public:
     , _io_dev( device )
     {}
 
-   image_read_info<tiff_tag> get_info()
+   image_read_info<tiff_tag> get_info() const
    {
       image_read_info<tiff_tag> info;
 
@@ -133,6 +133,12 @@ public:
                  , "cannot read tiff tag." );
       io_error_if( _io_dev.template get_property<tiff_photometric_interpretation>( info._photometric_interpretation  ) == false
                  , "cannot read tiff tag." );
+
+      // Tile tags
+      _io_dev.template get_property<tiff_tile_width>      ( info._tile_width );
+      _io_dev.template get_property<tiff_tile_length>     ( info._tile_length );
+      _io_dev.template get_property<tiff_tile_offsets>    ( info._tile_offsets );
+      _io_dev.template get_property<tiff_tile_byte_counts>( info._tile_byte_counts );
 
       return info;
    }
