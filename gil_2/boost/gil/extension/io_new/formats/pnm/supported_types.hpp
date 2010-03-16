@@ -53,16 +53,16 @@ struct pnm_read_support< packed_dynamic_channel_reference< BitField
                                                          >
                        , gray_t
                        > : read_support_true
-                         , pnm_rw_support_base< pnm_image_type::_mono_asc
-                                              , pnm_image_type::_mono_bin
+                         , pnm_rw_support_base< pnm_image_type::mono_asc_t::value
+                                              , pnm_image_type::mono_bin_t::value
                                               > {};
 
 template<>
 struct pnm_read_support< bits8
                        , gray_t
                        > : read_support_true
-                         , pnm_rw_support_base< pnm_image_type::_gray_asc
-                                              , pnm_image_type::_gray_bin
+                         , pnm_rw_support_base< pnm_image_type::gray_asc_t::value
+                                              , pnm_image_type::gray_bin_t::value
                                               > {};
 
 
@@ -70,8 +70,8 @@ template<>
 struct pnm_read_support< bits8
                        , rgb_t
                        > : read_support_true
-                         , pnm_rw_support_base< pnm_image_type::_color_asc
-                                              , pnm_image_type::_color_bin
+                         , pnm_rw_support_base< pnm_image_type::color_asc_t::value
+                                              , pnm_image_type::color_bin_t::value
                                               > {};
 
 // Write support
@@ -89,8 +89,8 @@ struct pnm_write_support< packed_dynamic_channel_reference< BitField
                                                           >
                         , gray_t
                         > : write_support_true
-                          , pnm_rw_support_base< pnm_image_type::_mono_asc
-                                               , pnm_image_type::_mono_bin
+                          , pnm_rw_support_base< pnm_image_type::mono_asc_t::value
+                                               , pnm_image_type::mono_bin_t::value
                                                > {};
 
 
@@ -98,8 +98,8 @@ template<>
 struct pnm_write_support< bits8
                         , gray_t
                         > : write_support_true
-                          , pnm_rw_support_base< pnm_image_type::_gray_asc
-                                               , pnm_image_type::_gray_bin
+                          , pnm_rw_support_base< pnm_image_type::gray_asc_t::value
+                                               , pnm_image_type::gray_bin_t::value
                                                > {};
 
 
@@ -107,8 +107,8 @@ template<>
 struct pnm_write_support< bits8
                         , rgb_t
                         > : write_support_true
-                          , pnm_rw_support_base< pnm_image_type::_color_asc
-                                               , pnm_image_type::_color_bin
+                          , pnm_rw_support_base< pnm_image_type::color_asc_t::value
+                                               , pnm_image_type::color_bin_t::value
                                                > {};
 
 } // namespace detail
