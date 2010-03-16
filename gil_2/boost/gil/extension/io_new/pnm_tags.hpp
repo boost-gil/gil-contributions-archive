@@ -33,13 +33,13 @@ struct pnm_tag : format_tag {};
 /// Defines type for image type property.
 struct pnm_image_type : property_base< uint32_t >
 {
-    typedef boost::mpl::integral_c< type, 1 > _mono_asc;
-    typedef boost::mpl::integral_c< type, 2 > _gray_asc;
-    typedef boost::mpl::integral_c< type, 3 > _color_asc;
+    typedef boost::mpl::integral_c< type, 1 > mono_asc_t;
+    typedef boost::mpl::integral_c< type, 2 > gray_asc_t;
+    typedef boost::mpl::integral_c< type, 3 > color_asc_t;
 
-    typedef boost::mpl::integral_c< type, 4 > _mono_bin;
-    typedef boost::mpl::integral_c< type, 5 > _gray_bin;
-    typedef boost::mpl::integral_c< type, 6 > _color_bin;
+    typedef boost::mpl::integral_c< type, 4 > mono_bin_t;
+    typedef boost::mpl::integral_c< type, 5 > gray_bin_t;
+    typedef boost::mpl::integral_c< type, 6 > color_bin_t;
 };
 
 /// Defines type for image width property.
