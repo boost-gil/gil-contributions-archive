@@ -19,6 +19,8 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/mpl/integral_c.hpp>
+
 #include "detail/base.hpp"
 
 namespace boost { namespace gil {
@@ -31,12 +33,13 @@ struct pnm_tag : format_tag {};
 /// Defines type for image type property.
 struct pnm_image_type : property_base< uint32_t >
 {
-    BOOST_STATIC_CONSTANT( type, _mono_asc  = 1 ); // Monochrome ASCII encoding
-    BOOST_STATIC_CONSTANT( type, _gray_asc  = 2 ); // Gray level ASCII encoding
-    BOOST_STATIC_CONSTANT( type, _color_asc = 3 ); // sRGB color ASCII encoding
-    BOOST_STATIC_CONSTANT( type, _mono_bin  = 4 ); // Monochrome binary encoding
-    BOOST_STATIC_CONSTANT( type, _gray_bin  = 5 ); // Gray level binary encoding
-    BOOST_STATIC_CONSTANT( type, _color_bin = 6 ); // sRGB color binary encoding
+    typedef boost::mpl::integral_c< type, 1 > _mono_asc;
+    typedef boost::mpl::integral_c< type, 2 > _gray_asc;
+    typedef boost::mpl::integral_c< type, 3 > _color_asc;
+
+    typedef boost::mpl::integral_c< type, 4 > _mono_bin;
+    typedef boost::mpl::integral_c< type, 5 > _gray_bin;
+    typedef boost::mpl::integral_c< type, 6 > _color_bin;
 };
 
 /// Defines type for image width property.
