@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE( stream_test )
     ofstream out( filename.c_str(), ios_base::binary );
     write_view( out, view( dst ), tag_t() );
 }
-/*
+
 BOOST_AUTO_TEST_CASE( subimage_test )
 {
     run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE( subimage_test )
                                             , point_t( 50, 50 )
                                             );
 }
-*/
+
 BOOST_AUTO_TEST_CASE( dynamic_image_test )
 {
     typedef mpl::vector< gray8_image_t
