@@ -43,6 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,10 +64,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpegd.lib libpng13d.lib zlib1d.lib libtiffd.lib"
+				AdditionalDependencies="libjpeg.lib libpng.lib zlib.lib libtiff.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\chh\software\lib\debug"
-				GenerateManifest="false"
+				AdditionalLibraryDirectories="C:\chh\image libs\lib\dynamic_libs\debug"
+				GenerateManifest="true"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -146,6 +148,8 @@
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="17"
@@ -219,7 +223,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng13.lib zlib1.lib libtiff.lib"
+				AdditionalDependencies="libjpeg.lib libpng.lib zlib1.lib libtiff.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="C:\chh\software\lib\release"
 				GenerateDebugInformation="true"
@@ -455,10 +459,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image_all_io_new.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_io_new.hpp"
 					>
 				</File>
@@ -472,6 +472,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\io_device.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\io_error.hpp"
 					>
 				</File>
 				<File
@@ -514,46 +518,6 @@
 					RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\write_view.hpp"
 					>
 				</File>
-				<Filter
-					Name="dynamic_image_io_new"
-					>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\algorithm_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\any_image_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\any_image_view_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\apply_operation_base_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\apply_operation_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\dynamic_at_c_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\image_view_factory_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\reduce_io_new.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_image\variant_io_new.hpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="format"
@@ -678,57 +642,30 @@
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\all_formats_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\bmp_old_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\bmp_read_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\bmp_test.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|x64"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+						GeneratePreprocessedFile="0"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\bmp_write_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\cmp_view.hpp"
@@ -744,46 +681,18 @@
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_old_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_read_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_write_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\mandel_view.hpp"
@@ -800,6 +709,13 @@
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\paths.hpp"
 				>
 				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Debug|x64"
 					>
 					<Tool
@@ -810,79 +726,30 @@
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_old_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_read_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\png_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_old_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_read_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\pnm_write_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\subimage_test.hpp"
@@ -898,19 +765,12 @@
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_file_format_test.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|x64"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -921,7 +781,7 @@
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_old_test.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|x64"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -932,7 +792,7 @@
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_test.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|x64"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
