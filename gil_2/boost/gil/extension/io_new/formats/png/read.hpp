@@ -81,7 +81,7 @@ public:
     {
         png_destroy_read_struct( &_png_ptr
                                , &_info_ptr
-                               , png_infopp_NULL
+                               , NULL
                                );
     }
 
@@ -665,7 +665,7 @@ private:
                     // Read the image using the "sparkle" effect.
                     png_read_rows( _png_ptr
                                  , &row_ptr
-                                 , png_bytepp_NULL
+                                 , NULL
                                  , 1
                                  );
                 }
@@ -678,7 +678,7 @@ private:
                     // Read the image using the "sparkle" effect.
                     png_read_rows( _png_ptr
                                  , &row_ptr
-                                 , png_bytepp_NULL
+                                 , NULL
                                  , 1
                                  );
 
@@ -702,7 +702,7 @@ private:
                     // Read the image using the "sparkle" effect.
                     png_read_rows( _png_ptr
                                  , &row_ptr
-                                 , png_bytepp_NULL
+                                 , NULL
                                  , 1
                                  );
                 }
@@ -714,7 +714,7 @@ private:
                     // Read the image using the "sparkle" effect.
                     png_read_rows( _png_ptr
                                  , &row_ptr
-                                 , png_bytepp_NULL
+                                 , NULL
                                  , 1
                                  );
                 }
@@ -731,9 +731,9 @@ private:
         // the compiler header file version, so that we know if the application
         // was compiled with a compatible version of the library.  REQUIRED
         _png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING
-                                         , png_voidp_NULL      // user_error_ptr
-                                         , png_error_ptr_NULL  // user_error_fn
-                                         , png_error_ptr_NULL  // user_warning_fn
+                                         , NULL  // user_error_ptr
+                                         , NULL  // user_error_fn
+                                         , NULL  // user_warning_fn
                                          );
 
         io_error_if( _png_ptr == NULL
@@ -756,8 +756,8 @@ private:
         if( _info_ptr == NULL )
         {
             png_destroy_read_struct( &_png_ptr
-                                   , png_infopp_NULL
-                                   , png_infopp_NULL
+                                   , NULL
+                                   , NULL
                                    );
 
             io_error( "png_reader: fail to call png_create_info_struct()" );
@@ -771,7 +771,7 @@ private:
             //free all of the memory associated with the png_ptr and info_ptr
             png_destroy_read_struct( &_png_ptr
                                    , &_info_ptr
-                                   , png_infopp_NULL
+                                   , NULL
                                    );
 
             io_error( "png is invalid" );
@@ -797,7 +797,7 @@ private:
 
         png_set_keep_unknown_chunks( _png_ptr
                                    , PNG_HANDLE_CHUNK_ALWAYS
-                                   , png_bytep_NULL
+                                   , NULL
                                    , 0
                                    );
 

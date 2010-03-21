@@ -51,9 +51,9 @@ public:
         // the library version is compatible with the one used at compile time,
         // in case we are using dynamically linked libraries.  REQUIRED.
         _png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING
-                                          , png_voidp_NULL      // user_error_ptr
-                                          , png_error_ptr_NULL  // user_error_fn
-                                          , png_error_ptr_NULL  // user_warning_fn
+                                          , NULL  // user_error_ptr
+                                          , NULL  // user_error_fn
+                                          , NULL  // user_warning_fn
                                           );
 
         io_error_if( _png_ptr == NULL
@@ -66,7 +66,7 @@ public:
         if( _info_ptr == NULL )
         {
             png_destroy_write_struct( &_png_ptr
-                                    , png_infopp_NULL
+                                    , NULL
                                     );
 
             io_error( "png_writer: fail to call png_create_info_struct()" );
