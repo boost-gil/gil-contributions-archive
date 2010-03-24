@@ -37,17 +37,23 @@ class writer< Device
 {
 public:
 
-    writer( Device & file )
-        : out(file)
+    writer( Device& file )
+    : out( file )
     {
-        _dest._jdest.free_in_buffer = sizeof(buffer);
-        _dest._jdest.next_output_byte = buffer;
-        _dest._jdest.init_destination = reinterpret_cast<void(*)(j_compress_ptr)>(&writer<Device,jpeg_tag>::init_device);
-        _dest._jdest.empty_output_buffer = reinterpret_cast<boolean(*)(j_compress_ptr)>(&writer<Device,jpeg_tag>::empty_buffer);
-        _dest._jdest.term_destination = reinterpret_cast<void(*)(j_compress_ptr)>(&writer<Device,jpeg_tag>::close_device);
-        _dest._this = this;
-
         _cinfo.err = jpeg_std_error( &_jerr );
+
+        // Error exit handler: does not return to caller.
+        _jerr.error_exit = &writer< Device, jpeg_tag >::error_exit;
+
+        // Fire exception in case of error.
+        if( setjmp( mark )) { raise_error(); }
+
+        _dest._jdest.free_in_buffer      = sizeof( buffer );
+        _dest._jdest.next_output_byte    = buffer;
+        _dest._jdest.init_destination    = reinterpret_cast< void(*)   ( j_compress_ptr ) >( &writer< Device, jpeg_tag >::init_device  );
+        _dest._jdest.empty_output_buffer = reinterpret_cast< boolean(*)( j_compress_ptr ) >( &writer< Device, jpeg_tag >::empty_buffer );
+        _dest._jdest.term_destination    = reinterpret_cast< void(*)   ( j_compress_ptr ) >( &writer< Device, jpeg_tag >::close_device );
+        _dest._this = this;
 
         jpeg_create_compress( &_cinfo  );
         _cinfo.dest = &_dest._jdest;
@@ -60,58 +66,58 @@ public:
         jpeg_destroy_compress( &_cinfo );
     }
 
-    jpeg_compress_struct& get()
-    {
-        return _cinfo;
-    }
-
-
     template<typename View>
     void apply( const View& view )
     {
-        typedef typename channel_type< View >::type channel_t;
-
-        _cinfo.image_width  = JDIMENSION(view.width());
-        _cinfo.image_height = JDIMENSION(view.height());
-        _cinfo.input_components = num_channels<View>::value;
-        _cinfo.in_color_space = detail::jpeg_write_support< channel_t
-                                                          , typename color_space_type<View>::type
-                                                          >::_color_space;
-
-        jpeg_set_defaults(&_cinfo);
-        jpeg_set_quality(&_cinfo, 100, TRUE);
-
-        write_rows( view );
+        write_rows( view
+                  , jpeg_quality::default_value
+                  , jpeg_dct_method::default_value
+                  );
     }
 
     template< typename View >
     void apply( const View&                         view
               , const image_write_info< jpeg_tag >& info )
     {
-        typedef typename channel_type< typename View::value_type >::type channel_t;
-
-        _cinfo.image_width  = JDIMENSION(view.width());
-        _cinfo.image_height = JDIMENSION(view.height());
-        _cinfo.input_components = num_channels<View>::value;
-        _cinfo.in_color_space = detail::jpeg_write_support< channel_t
-                                                          , typename color_space_type<View>::type
-                                                          >::_color_space;
-
-        jpeg_set_defaults( &_cinfo);
-        jpeg_set_quality ( &_cinfo
-                         , info._quality
-                         , TRUE
-                         );
-
-        write_rows( view );
+        write_rows( view
+                  , info._quality
+                  , info._dct_method
+                  );
     }
 
 private:
 
     template<typename View>
-    void write_rows( const View& view )
+    void write_rows( const View&                 view
+                   , const jpeg_quality::type    quality
+                   , const jpeg_dct_method::type dct_method
+                   )
     {
-        jpeg_start_compress(&_cinfo, TRUE);
+        // Fire exception in case of error.
+        if( setjmp( mark )) { raise_error(); }
+
+        typedef typename channel_type< typename View::value_type >::type channel_t;
+
+        _cinfo.image_width      = JDIMENSION( view.width()  );
+        _cinfo.image_height     = JDIMENSION( view.height() );
+        _cinfo.input_components = num_channels<View>::value;
+        _cinfo.in_color_space   = detail::jpeg_write_support< channel_t
+                                                            , typename color_space_type< View >::type
+                                                            >::_color_space;
+
+
+        jpeg_set_defaults( &_cinfo);
+        jpeg_set_quality ( &_cinfo
+                         , quality
+                         , TRUE
+                         );
+
+        // Needs to be done after jpeg_set_defaults() since it's overridding this value back to slow.
+        _cinfo.dct_method = dct_method;
+ 
+        jpeg_start_compress( &_cinfo
+                           , TRUE
+                           );
 
         std::vector<typename View::value_type> row_buffer( view.width() );
         JSAMPLE* row_addr = reinterpret_cast<JSAMPLE*>( &row_buffer[0] );
@@ -164,6 +170,20 @@ private:
 
         dest->_this->out.flush();
     }
+
+    void raise_error()
+    {
+        jpeg_destroy_compress( &_cinfo );
+
+        io_error( "Cannot write jpeg file." );
+    }
+
+    static void error_exit( j_common_ptr /* cinfo */ )
+    {
+        longjmp( mark, 1 );
+    }
+
+private:
 
     Device &out;
 

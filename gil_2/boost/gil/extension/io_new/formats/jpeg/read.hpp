@@ -43,23 +43,20 @@ struct jpeg_decompress_mgr
     {
         _cinfo.err = jpeg_std_error( &_jerr );
 
-        // Error exit handler: does not return to caller. See setjmp call below.
+        // Error exit handler: does not return to caller.
         _jerr.error_exit = &jpeg_decompress_mgr::error_exit;
 
-        if( setjmp( mark ))
-        {
-            jpeg_destroy_decompress( &_cinfo );
+        if( setjmp( mark )) { raise_error(); }
 
-            io_error( "jpeg is invalid." );
-        }
-
-        _src._jsrc.bytes_in_buffer = 0;
-        _src._jsrc.next_input_byte = buffer;
-        _src._jsrc.init_source = reinterpret_cast<void(*)(j_decompress_ptr)>(&jpeg_decompress_mgr<Device>::init_device);
-        _src._jsrc.fill_input_buffer = reinterpret_cast<boolean(*)(j_decompress_ptr)>(&jpeg_decompress_mgr<Device>::fill_buffer);
-        _src._jsrc.skip_input_data = reinterpret_cast<void(*)(j_decompress_ptr, long num_bytes)>(&jpeg_decompress_mgr<Device>::skip_input_data);
-        _src._jsrc.resync_to_restart= jpeg_resync_to_restart;
-        _src._jsrc.term_source= reinterpret_cast<void(*)(j_decompress_ptr)>(&jpeg_decompress_mgr<Device>::close_device);
+        _src._jsrc.bytes_in_buffer   = 0;
+        _src._jsrc.next_input_byte   = buffer;
+        _src._jsrc.init_source       = reinterpret_cast< void(*)   ( j_decompress_ptr )>( &jpeg_decompress_mgr< Device >::init_device );
+        _src._jsrc.fill_input_buffer = reinterpret_cast< boolean(*)( j_decompress_ptr )>( &jpeg_decompress_mgr< Device >::fill_buffer );
+        _src._jsrc.skip_input_data   = reinterpret_cast< void(*)   ( j_decompress_ptr
+                                                                   , long num_bytes
+                                                                   ) >( &jpeg_decompress_mgr< Device >::skip_input_data );
+        _src._jsrc.term_source       = reinterpret_cast< void(*)   ( j_decompress_ptr ) >( &jpeg_decompress_mgr< Device >::close_device );
+        _src._jsrc.resync_to_restart = jpeg_resync_to_restart;
         _src._this = this;
 
 
@@ -78,30 +75,7 @@ struct jpeg_decompress_mgr
         jpeg_destroy_decompress( &_cinfo );
     }
 
-    const jpeg_decompress_struct& get() const
-    {
-        return _cinfo;
-    }
-
-    jpeg_decompress_struct& get()
-    {
-        return _cinfo;
-    }
-
 protected:
-
-    void start_decompress()
-    {
-        if( jpeg_start_decompress( &_cinfo ) == false )
-        {
-            io_error( "Cannot start decompression." );
-        }
-    }
-
-    void finish_decompress()
-    {
-        jpeg_finish_decompress ( &_cinfo );
-    }
 
     // Taken from jerror.c
     /*
@@ -119,6 +93,13 @@ protected:
     static void error_exit( j_common_ptr /* cinfo */ )
     {
         longjmp( mark, 1 );
+    }
+
+    void raise_error()
+    {
+        jpeg_destroy_decompress( &_cinfo );
+
+        io_error( "jpeg is invalid." );
     }
 
 private:
@@ -228,7 +209,10 @@ public:
     template<typename View>
     void apply( const View& view )
     {
-        jpeg_decompress_struct& cinfo = this->get();
+        // Fire exception in case of error.
+        if( setjmp( mark )) { this->raise_error(); }
+
+        jpeg_decompress_struct& cinfo = this->_cinfo;
         cinfo.dct_method = this->_settings._dct_method;
 
         typedef typename is_same< ConversionPolicy
@@ -241,7 +225,10 @@ public:
                    , "Image types aren't compatible."
                    );
 
-        this->start_decompress();
+        if( jpeg_start_decompress( &this->_cinfo ) == false )
+        {
+            io_error( "Cannot start decompression." );
+        }
 
         switch( this->_info._color_space )
         {
@@ -264,7 +251,7 @@ public:
             default: { io_error( "Unsupported jpeg color space." ); }
         }
 
-        this->finish_decompress();
+        jpeg_finish_decompress ( &this->_cinfo );
     }
 
 private:
@@ -274,6 +261,9 @@ private:
             >
     void read_rows( const View& view )
     {
+        // Fire exception in case of error.
+        if( setjmp( mark )) { this->raise_error(); }
+
         typedef std::vector<ImagePixel> buffer_t;
 
         buffer_t buffer( this->_info._width );
@@ -310,7 +300,7 @@ private:
                                  );
         }
 
-        //@todo: Finish up. There might be a better way to do that.
+        //@todo: There might be a better way to do that.
         while( this->_cinfo.output_scanline <  this->_cinfo.image_height )
         {
             io_error_if( jpeg_read_scanlines( &this->_cinfo
