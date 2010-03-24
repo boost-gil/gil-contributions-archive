@@ -163,7 +163,7 @@ template< typename String
 inline
 void jpeg_write_view( const String& filename
                     , const View&   view
-                    , int   quality = 100
+                    , int   quality = jpeg_quality::default_value
                     )
 {
     write_view( filename
