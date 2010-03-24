@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
     }
 }
 
-BOOST_AUTO_TEST_CASE( dct_method_test )
+BOOST_AUTO_TEST_CASE( dct_method_read_test )
 {
     {
         typedef rgb8_image_t image_t;
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( dct_method_test )
                   , settings
                   );
 
-        write_view( jpeg_out + "fast_dct_test.jpg"
+        write_view( jpeg_out + "fast_dct_read_test.jpg"
                   , view( img )
                   , tag_t()
                   );
