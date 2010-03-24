@@ -80,6 +80,11 @@ public:
       return ( TIFFIsByteSwapped( _tiff_file.get() )) ? true : false;
     }
 
+    bool is_tiled() const
+    {
+        return ( TIFFIsTiled( _tiff_file.get() )) ? true : false;
+    }
+
     unsigned int get_default_strip_size()
     {
         return TIFFDefaultStripSize( _tiff_file.get()
@@ -116,6 +121,24 @@ public:
                                      , (uint32) row
                                      , plane           ) == -1
                    , "Read error."
+                   );
+    }
+
+    template< typename Buffer >
+    void read_tile( Buffer&        buffer
+                  , std::ptrdiff_t x
+                  , std::ptrdiff_t y
+                  , std::ptrdiff_t z
+                  , tsample_t      plane
+                  )
+    {
+        io_error_if( TIFFReadTile( _tiff_file.get()
+                                 , reinterpret_cast< tdata_t >( &buffer.front() )
+                                 , (uint32) x
+                                 , (uint32) y
+                                 , (uint32) z
+                                 , plane           ) == -1
+                   , "Read tile error."
                    );
     }
 

@@ -290,47 +290,4 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
               );
 }
 
-BOOST_AUTO_TEST_CASE( read_tile_test )
-{
-    {
-        image_read_info< tag_t > info = read_image_info( tiff_in + "GraphicsMagick/tiff-sample-images/tiger-minisblack-float-tile-16.tif"
-                                                       , tag_t() );
-
-        BOOST_CHECK_EQUAL( info._tile_width , 16 );
-        BOOST_CHECK_EQUAL( info._tile_length, 16 );
-    }
-
-    {
-        image_read_info< tag_t > info = read_image_info( tiff_in + "GraphicsMagick/tiff-sample-images/tiger-minisblack-tile-08.tif"
-                                                       , tag_t() );
-
-        BOOST_CHECK_EQUAL( info._tile_width , 16 );
-        BOOST_CHECK_EQUAL( info._tile_length, 16 );
-    }
-
-    {
-        image_read_info< tag_t > info = read_image_info( tiff_in + "GraphicsMagick/tiff-sample-images/tiger-palette-tile-08.tif"
-                                                       , tag_t() );
-
-        BOOST_CHECK_EQUAL( info._tile_width , 16 );
-        BOOST_CHECK_EQUAL( info._tile_length, 16 );
-    }
-
-    {
-        image_read_info< tag_t > info = read_image_info( tiff_in + "GraphicsMagick/tiff-sample-images/tiger-rgb-tile-contig-08.tif"
-                                                       , tag_t() );
-
-        BOOST_CHECK_EQUAL( info._tile_width , 16 );
-        BOOST_CHECK_EQUAL( info._tile_length, 16 );
-    }
-
-    {
-        image_read_info< tag_t > info = read_image_info( tiff_in + "GraphicsMagick/tiff-sample-images/tiger-rgb-tile-planar-08.tif"
-                                                       , tag_t() );
-
-        BOOST_CHECK_EQUAL( info._tile_width , 16 );
-        BOOST_CHECK_EQUAL( info._tile_length, 16 );
-    }
-}
-
 BOOST_AUTO_TEST_SUITE_END()
