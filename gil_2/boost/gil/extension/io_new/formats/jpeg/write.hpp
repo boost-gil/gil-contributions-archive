@@ -26,6 +26,7 @@
 
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
+#include "base.hpp"
 #include "supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
@@ -33,20 +34,21 @@ namespace boost { namespace gil { namespace detail {
 template< typename Device >
 class writer< Device
             , jpeg_tag
-            >
+            > : public jpeg_io_base
 {
 public:
 
     writer( Device& file )
     : out( file )
     {
-        _cinfo.err = jpeg_std_error( &_jerr );
+        _cinfo.err         = jpeg_std_error( &_jerr );
+        _cinfo.client_data = this;
 
         // Error exit handler: does not return to caller.
         _jerr.error_exit = &writer< Device, jpeg_tag >::error_exit;
 
         // Fire exception in case of error.
-        if( setjmp( mark )) { raise_error(); }
+        if( setjmp( _mark )) { raise_error(); }
 
         _dest._jdest.free_in_buffer      = sizeof( buffer );
         _dest._jdest.next_output_byte    = buffer;
@@ -93,8 +95,13 @@ private:
                    , const jpeg_dct_method::type dct_method
                    )
     {
-        // Fire exception in case of error.
-        if( setjmp( mark )) { raise_error(); }
+        std::vector< typename View::value_type > row_buffer( view.width() );
+
+        // In case of an error we'll jump back to here and fire an exception.
+        // @todo Is the buffer above cleaned up when the exception is thrown?
+        //       The strategy right now is to allocate necessary memory before
+        //       the setjmp.
+        if( setjmp( _mark )) { raise_error(); }
 
         typedef typename channel_type< typename View::value_type >::type channel_t;
 
@@ -105,8 +112,7 @@ private:
                                                             , typename color_space_type< View >::type
                                                             >::_color_space;
 
-
-        jpeg_set_defaults( &_cinfo);
+        jpeg_set_defaults( &_cinfo );
         jpeg_set_quality ( &_cinfo
                          , quality
                          , TRUE
@@ -119,8 +125,7 @@ private:
                            , TRUE
                            );
 
-        std::vector<typename View::value_type> row_buffer( view.width() );
-        JSAMPLE* row_addr = reinterpret_cast<JSAMPLE*>( &row_buffer[0] );
+        JSAMPLE* row_addr = reinterpret_cast< JSAMPLE* >( &row_buffer[0] );
 
         for( int y =0; y != view.height(); ++ y )
         {
@@ -173,14 +178,14 @@ private:
 
     void raise_error()
     {
-        jpeg_destroy_compress( &_cinfo );
-
         io_error( "Cannot write jpeg file." );
     }
 
-    static void error_exit( j_common_ptr /* cinfo */ )
+    static void error_exit( j_common_ptr cinfo )
     {
-        longjmp( mark, 1 );
+        writer< Device, jpeg_tag >* mgr = reinterpret_cast< writer< Device, jpeg_tag >* >( cinfo->client_data );
+
+        longjmp( mgr->_mark, 1 );
     }
 
 private:
@@ -188,7 +193,6 @@ private:
     Device &out;
 
     jpeg_compress_struct _cinfo;
-    jpeg_error_mgr       _jerr;
 
     gil_jpeg_destination_mgr _dest;
 

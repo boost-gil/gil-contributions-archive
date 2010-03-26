@@ -29,24 +29,24 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
+#include "base.hpp"
 #include "is_allowed.hpp"
 
 namespace boost { namespace gil { namespace detail {
 
-static jmp_buf mark;
-
 template<typename Device>
-struct jpeg_decompress_mgr
+struct jpeg_decompress_mgr : public jpeg_io_base
 {
     jpeg_decompress_mgr( Device& file )
     : in(file)
     {
-        _cinfo.err = jpeg_std_error( &_jerr );
+        _cinfo.err         = jpeg_std_error( &_jerr );
+        _cinfo.client_data = this;
 
         // Error exit handler: does not return to caller.
         _jerr.error_exit = &jpeg_decompress_mgr::error_exit;
 
-        if( setjmp( mark )) { raise_error(); }
+        if( setjmp( _mark )) { raise_error(); }
 
         _src._jsrc.bytes_in_buffer   = 0;
         _src._jsrc.next_input_byte   = buffer;
@@ -67,7 +67,9 @@ struct jpeg_decompress_mgr
         jpeg_read_header( &_cinfo
                         , TRUE    );
 
-        io_error_if( _cinfo.data_precision != 8, "Image file is not supported." );
+        io_error_if( _cinfo.data_precision != 8
+                   , "Image file is not supported."
+                   );
     }
 
     ~jpeg_decompress_mgr()
@@ -90,15 +92,15 @@ protected:
      * You should make sure that the JPEG object is cleaned up (with jpeg_abort
      * or jpeg_destroy) at some point.
      */
-    static void error_exit( j_common_ptr /* cinfo */ )
+    static void error_exit( j_common_ptr cinfo )
     {
-        longjmp( mark, 1 );
+        jpeg_decompress_mgr< Device >* mgr = reinterpret_cast< jpeg_decompress_mgr< Device >* >( cinfo->client_data );
+
+        longjmp( mgr->_mark, 1 );
     }
 
     void raise_error()
     {
-        jpeg_destroy_decompress( &_cinfo );
-
         io_error( "jpeg is invalid." );
     }
 
@@ -110,13 +112,14 @@ private:
         src->_jsrc.bytes_in_buffer = 0;
         src->_jsrc.next_input_byte = src->_this->buffer;
     }
+
     static boolean fill_buffer( jpeg_decompress_struct * cinfo )
     {
         gil_jpeg_source_mgr * src = reinterpret_cast<gil_jpeg_source_mgr*>(cinfo->src);
         size_t count= src->_this->in.read(src->_this->buffer, sizeof(src->_this->buffer) );
-        if( count <= 0 ) 
+        if( count <= 0 )
         {
-            // libjpeg does that: adding an EOF marker 
+            // libjpeg does that: adding an EOF marker
             src->_this->buffer[0] = (JOCTET) 0xFF;
             src->_this->buffer[1] = (JOCTET) JPEG_EOI;
             count = 2;
@@ -127,11 +130,12 @@ private:
 
         return TRUE;
     }
+
     static void skip_input_data( jpeg_decompress_struct * cinfo, long num_bytes  )
     {
         gil_jpeg_source_mgr * src = reinterpret_cast<gil_jpeg_source_mgr*>(cinfo->src);
 
-        if (num_bytes > 0) 
+        if (num_bytes > 0)
         {
             if( num_bytes > long(src->_jsrc.bytes_in_buffer) )
             {
@@ -148,7 +152,7 @@ private:
 
 protected:
     jpeg_decompress_struct _cinfo;
-    jpeg_error_mgr         _jerr;
+
 
 private:
     Device &in;
@@ -169,7 +173,7 @@ template< typename Device
 class reader< Device
             , jpeg_tag
             , ConversionPolicy
-            > 
+            >
     : public jpeg_decompress_mgr< Device >
     , public reader_base< jpeg_tag
                         , ConversionPolicy >
@@ -210,7 +214,7 @@ public:
     void apply( const View& view )
     {
         // Fire exception in case of error.
-        if( setjmp( mark )) { this->raise_error(); }
+        if( setjmp( this->_mark )) { this->raise_error(); }
 
         jpeg_decompress_struct& cinfo = this->_cinfo;
         cinfo.dct_method = this->_settings._dct_method;
@@ -242,7 +246,7 @@ public:
 
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             case JCS_YCCK:
-            { 
+            {
                 this->_cinfo.out_color_space = JCS_CMYK;
                 read_rows< cmyk8_pixel_t >( view );
 
@@ -261,12 +265,15 @@ private:
             >
     void read_rows( const View& view )
     {
-        // Fire exception in case of error.
-        if( setjmp( mark )) { this->raise_error(); }
-
         typedef std::vector<ImagePixel> buffer_t;
-
         buffer_t buffer( this->_info._width );
+
+        // In case of an error we'll jump back to here and fire an exception.
+        // @todo Is the buffer above cleaned up when the exception is thrown?
+        //       The strategy right now is to allocate necessary memory before
+        //       the setjmp.
+        if( setjmp( this->_mark )) { this->raise_error(); }
+
 
         JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
 
@@ -335,7 +342,7 @@ private:
 
 struct jpeg_read_is_supported
 {
-    template< typename View > 
+    template< typename View >
     struct apply : public is_read_supported< typename get_pixel_type< View >::type
                                            , jpeg_tag
                                            >
@@ -346,7 +353,7 @@ template< typename Device
         >
 class dynamic_image_reader< Device
                           , jpeg_tag
-                          > 
+                          >
     : public reader< Device
                    , jpeg_tag
                    , detail::read_and_no_convert
@@ -365,12 +372,12 @@ public:
     : parent_t( device
               , settings
               )
-    {}    
+    {}
 
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        jpeg_type_format_checker format_checker( this->_info._color_space != JCS_YCbCr 
+        jpeg_type_format_checker format_checker( this->_info._color_space != JCS_YCbCr
                                                ? this->_info._color_space
                                                : JCS_RGB
                                                );
