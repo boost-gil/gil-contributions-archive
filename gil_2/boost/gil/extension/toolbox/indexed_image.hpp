@@ -168,8 +168,8 @@ public:
 
     indexed_image() {}
 
-    indexed_image( const point_t& dimensions
-                 , std::size_t    num_colors
+    indexed_image( const point_t&    dimensions
+                 , const std::size_t num_colors
                  )
     : _indices( dimensions    )
     , _palette( num_colors, 1 )
