@@ -15,8 +15,9 @@ static const std::string png_out = base + "output/png/";
 static const std::string pnm_in  = base + "test_images/pnm/";
 static const std::string pnm_out = base + "output/pnm/";
 
-static const std::string tiff_in  = base + "test_images/tiff/";
-static const std::string tiff_out = base + "output/tiff/";
+static const std::string tiff_in    = base + "test_images/tiff/";
+static const std::string tiff_out   = base + "output/tiff/";
+static const std::string tiff_in_GM = tiff_in + "GraphicsMagick/tiff-sample-images/";
 
 static const std::string bmp_filename ( bmp_in  + "rgb.bmp"                );
 static const std::string jpeg_filename( jpeg_in + "found online/test.jpg" );
