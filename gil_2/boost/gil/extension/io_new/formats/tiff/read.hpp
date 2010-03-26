@@ -383,7 +383,7 @@ private:
 
                         this->_cc_policy.read( first
                                              , last
-                                             , tile_subimage_view.begin() + tile_row*this->_info._tile_width
+                                             , tile_subimage_view.begin() + tile_row*current_tile_width
                                              );
                     }
                 }

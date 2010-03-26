@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_8bit )
         read_image( filename_strip, img_strip, tag_t() );
         read_image( filename_tile, img_tile, tag_t() );
 
-        equal_pixels( const_view(img_strip), const_view(img_tile) );
+        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_8bit_bit_align
         read_image( filename_strip, img_strip, tag_t() );
         read_image( filename_tile, img_tile, tag_t() );
 
-        equal_pixels( const_view(img_strip), const_view(img_tile) );
+        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
 */
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_16bit )
         read_image( filename_strip, img_strip, tag_t() );
         read_image( filename_tile, img_tile, tag_t() );
 
-        equal_pixels( const_view(img_strip), const_view(img_tile) );
+        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
 
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_32bit )
         read_image( filename_strip, img_strip, tag_t() );
         read_image( filename_tile, img_tile, tag_t() );
 
-        equal_pixels( const_view(img_strip), const_view(img_tile) );
+        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
 
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_palette_strip_8bit )
         read_image( filename_strip, img_strip, tag_t() );
         read_image( filename_tile, img_tile, tag_t() );
 
-        equal_pixels( const_view(img_strip), const_view(img_tile) );
+        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
 */
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_contig_strip_32bit )
         read_image( filename_strip, img_strip, tag_t() );
         read_image( filename_tile, img_tile, tag_t() );
 
-        equal_pixels( const_view(img_strip), const_view(img_tile) );
+        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
 
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_32bit )
         read_image( filename_strip, img_strip, tag_t() );
         read_image( filename_tile, img_tile, tag_t() );
 
-        equal_pixels( const_view(img_strip), const_view(img_tile) );
+        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
 
