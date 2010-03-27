@@ -28,7 +28,6 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <boost/static_assert.hpp>
-#include <boost/function.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
@@ -327,8 +326,7 @@ private:
 
        // TIFFReadTile always read _tile_length*_tile_width pixels, even if the tile is on image border (and is thus smaller).
        // So, allocate enough memory, and always use it, whatever the size of the current tile is.
-       std::size_t size_to_allocate = buffer_size< typename View::value_type >( this->_info._tile_length * this->_info._tile_width
-                                                                              , is_view_bit_aligned_t() );
+       std::size_t size_to_allocate = _io_dev.get_tile_size();
        row_buffer_helper_t row_buffer_helper( size_to_allocate, true );
 
        skip_over_rows( row_buffer_helper.buffer()
@@ -349,7 +347,7 @@ private:
        {
            for (unsigned int x = 0; x < this->_info._width; x += this->_info._tile_width)
            {
-               uint32_t current_tile_width = (x+this->_info._tile_width<this->_info._width) ? this->_info._tile_width : this->_info._width-x;
+               uint32_t current_tile_width  = (x+this->_info._tile_width<this->_info._width  ) ? this->_info._tile_width  : this->_info._width -x;
                uint32_t current_tile_length = (y+this->_info._tile_length<this->_info._height) ? this->_info._tile_length : this->_info._height-y;
 
                _io_dev.read_tile( row_buffer_helper.buffer()

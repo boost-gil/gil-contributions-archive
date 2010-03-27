@@ -96,6 +96,11 @@ public:
       return TIFFScanlineSize( _tiff_file.get() );
     }
 
+    std::size_t get_tile_size()
+    {
+      return TIFFTileSize( _tiff_file.get() );
+    }
+
 
     int get_field_defaulted( uint16_t*& red
                            , uint16_t*& green
