@@ -82,24 +82,6 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_8bit )
     }
 }
 
-
-/*
-BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_8bit_bit_aligned )
-{
-    std::string filename_strip( tiff_in_GM + "tiger-minisblack-strip-08.tif" );
-    std::string filename_tile ( tiff_in_GM + "tiger-minisblack-tile-08.tif"  );
-    {
-        typedef bit_aligned_image1_type< 8, gray_layout_t >::type image_t;
-        image_t img_strip, img_tile;
-
-        read_image( filename_strip, img_strip, tag_t() );
-        read_image( filename_tile, img_tile, tag_t() );
-
-        BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
-    }
-}
-*/
-
 BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_16bit )
 {
     std::string filename_strip( tiff_in_GM + "tiger-minisblack-strip-16.tif" );
@@ -149,6 +131,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_palette_strip_8bit )
 }
 */
 
+    /*
 // RGB contig 
 BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_contig_strip_32bit )
 {
@@ -164,6 +147,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_contig_strip_32bit )
         BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
     }
 }
+*/
 
 // RGB planar
 BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_32bit )
@@ -171,7 +155,8 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_32bit )
     std::string filename_strip( tiff_in_GM + "tiger-rgb-strip-planar-32.tif" );
     std::string filename_tile ( tiff_in_GM + "tiger-rgb-tile-planar-32.tif"  );
     {
-        typedef rgb32_image_t image_t;
+        typedef bit_aligned_image3_type< 32, 32, 32, rgb_layout_t >::type image_t;
+        //typedef rgb32_image_t image_t;
         image_t img_strip, img_tile;
 
         read_image( filename_strip, img_strip, tag_t() );

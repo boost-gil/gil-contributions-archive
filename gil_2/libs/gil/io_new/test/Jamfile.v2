@@ -46,4 +46,9 @@ test-suite "gil::io_new"
         [ run tiff_old_test.cpp ]
         [ run tiff_test.cpp ]
         [ run tiff_tiled_test.cpp ]
+        [ run tiff_tiled_float_test.cpp ]
+        [ run tiff_tiled_palette_test.cpp ]
+        [ run tiff_tiled_minisblack_test.cpp ]
+        [ run tiff_tiled_rgb_contig_test.cpp ]
+        [ run tiff_tiled_rgb_planar_test.cpp ]
     ;
