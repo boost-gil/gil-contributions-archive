@@ -546,6 +546,10 @@
 					Name="jpeg"
 					>
 					<File
+						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\jpeg\base.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\gil_2\boost\gil\extension\io_new\formats\jpeg\is_allowed.hpp"
 						>
 					</File>
@@ -668,17 +672,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\cmp_view.hpp"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\jpeg_old_test.cpp"
 				>
 			</File>
@@ -769,35 +762,38 @@
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_file_format_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_old_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_float_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_minisblack_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_palette_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_rgb_contig_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_rgb_planar_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_test.cpp"
+				>
 			</File>
 		</Filter>
 	</Files>

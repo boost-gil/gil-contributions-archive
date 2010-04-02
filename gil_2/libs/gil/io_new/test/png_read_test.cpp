@@ -10,7 +10,6 @@
 
 #include <iostream>
 
-#include "cmp_view.hpp"
 #include "paths.hpp"
 
 using namespace std;
@@ -58,7 +57,10 @@ void test_file( string filename )
     read_image( png_out + filename, dst, tag_t() );
 
 
-    cmp_view( view( src ), view( dst ) );
+    BOOST_CHECK( equal_pixels( const_view( src )
+                             , const_view( dst )
+                             )
+               );
 }
 
 BOOST_AUTO_TEST_CASE( read_header_test )

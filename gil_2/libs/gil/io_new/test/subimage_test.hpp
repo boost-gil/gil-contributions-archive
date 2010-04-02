@@ -2,7 +2,6 @@
 #define _GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP_
 
 #include <boost/gil/gil_all.hpp>
-#include "cmp_view.hpp"
 
 using namespace std;
 using namespace boost;
@@ -33,13 +32,13 @@ void run_subimage_test( string filename
               , settings
               );
 
-    cmp_view( view( subimage )
-            , subimage_view( view( original )
-                           , top_left
-                           , dimension
-                           )
-            );
-
+    BOOST_CHECK( equal_pixels( const_view( subimage )
+                             , subimage_view( const_view( original )
+                                            , top_left
+                                            , dimension
+                                            )
+                             )
+               );
 }
 
 #endif // _GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP_

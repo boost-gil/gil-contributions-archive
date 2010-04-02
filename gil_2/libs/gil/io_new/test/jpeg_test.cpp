@@ -9,7 +9,6 @@
 #define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
-#include "cmp_view.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"

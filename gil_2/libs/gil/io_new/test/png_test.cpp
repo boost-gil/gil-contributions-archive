@@ -7,7 +7,6 @@
 
 #include <boost/type_traits/is_same.hpp>
 
-#include "cmp_view.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
