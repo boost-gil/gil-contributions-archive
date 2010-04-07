@@ -54,7 +54,7 @@ void test_file( string filename )
               , write_info
               );
 
-    read_image( png_out + filename, dst, tag_t() );
+    read_image( png_out + filename, dst, settings/*tag_t()*/ );
 
 
     BOOST_CHECK( equal_pixels( const_view( src )
