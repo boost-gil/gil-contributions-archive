@@ -15,6 +15,22 @@
 
 typedef boost::gil::tiff_tag tag_t;
 
+namespace boost { namespace gil {
+typedef float   bits32F;
+GIL_DEFINE_BASE_TYPEDEFS(32F,gray)
+GIL_DEFINE_ALL_TYPEDEFS (32F,gray)
+GIL_DEFINE_BASE_TYPEDEFS(32F,rgb)
+GIL_DEFINE_ALL_TYPEDEFS (32F,rgb)
+GIL_DEFINE_ALL_TYPEDEFS_INTERNAL(32F, dev3n, devicen_t<3>, devicen_layout_t<3>)
+
+typedef double  bits64F;
+GIL_DEFINE_BASE_TYPEDEFS(64F,gray)
+GIL_DEFINE_ALL_TYPEDEFS (64F,gray)
+GIL_DEFINE_BASE_TYPEDEFS(64F,rgb)
+GIL_DEFINE_ALL_TYPEDEFS (64F,rgb)
+GIL_DEFINE_ALL_TYPEDEFS_INTERNAL(64F, dev3n, devicen_t<3>, devicen_layout_t<3>)
+} }
+
 #define GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED(z, n, data)\
     BOOST_AUTO_TEST_CASE( BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(read_tile_and_compare_with_,BOOST_PP_TUPLE_ELEM(2,0,data)),_strip_),n), bit_bit_aligned) )\
     { \
@@ -29,7 +45,11 @@ typedef boost::gil::tiff_tag tag_t;
       filename_strip = filename_strip + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
       filename_tile  = filename_tile  + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
       typedef mpl::vector< bit_aligned_image3_type< n, n, n, rgb_layout_t  >::type \
-                         , bit_aligned_image1_type< n,       gray_layout_t >::type > image_types; \
+                         , bit_aligned_image1_type< n,       gray_layout_t >::type \
+                         , gray32F_image_t \
+                         , gray64F_image_t \
+                         , rgb32F_image_t  \
+                         , rgb64F_image_t > image_types; \
       any_image< image_types > img_strip, img_tile; \
       read_image( filename_strip, img_strip, tag_t() ); \
       read_image( filename_tile,  img_tile,  tag_t() ); \
