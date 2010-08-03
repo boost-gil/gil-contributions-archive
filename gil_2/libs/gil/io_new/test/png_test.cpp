@@ -251,6 +251,20 @@ BOOST_AUTO_TEST_CASE( stream_test )
     write_view( out, view( dst ), tag_t() );
 }
 
+BOOST_AUTO_TEST_CASE( stream_test_2 )
+{
+    filebuf in_buf;
+    if( !in_buf.open( png_filename.c_str(), ios::in | ios::binary ) )
+    {
+        BOOST_CHECK( false );
+    }
+
+    istream in( &in_buf );
+
+    rgba8_image_t img;
+    read_image( in, img, tag_t() );
+}
+
 BOOST_AUTO_TEST_CASE( subimage_test )
 {
     run_subimage_test< rgba8_image_t, tag_t >( png_filename
