@@ -162,16 +162,10 @@ struct tiff_indexed : tiff_property_base< bool, TIFFTAG_INDEXED > {};
 struct tiff_is_tiled : tiff_property_base< bool, false > {};
 
 /// Defines type for tile width
-struct tiff_tile_width : tiff_property_base< uint32_t, TIFFTAG_TILEWIDTH > {};
+struct tiff_tile_width : tiff_property_base< long, TIFFTAG_TILEWIDTH > {};
 
 /// Defines type for tile length
-struct tiff_tile_length : tiff_property_base< uint32_t, TIFFTAG_TILELENGTH > {};
-
-/// Defines type for tile offsets
-struct tiff_tile_offsets : tiff_property_base< uint32_t, TIFFTAG_TILEOFFSETS > {};
-
-/// Defines type for tile byte counts
-struct tiff_tile_byte_counts : tiff_property_base< uint32_t, TIFFTAG_TILEBYTECOUNTS > {};
+struct tiff_tile_length : tiff_property_base< long, TIFFTAG_TILELENGTH > {};
 
 /// Read information for tiff images.
 ///
@@ -179,6 +173,26 @@ struct tiff_tile_byte_counts : tiff_property_base< uint32_t, TIFFTAG_TILEBYTECOU
 template<>
 struct image_read_info< tiff_tag >
 {
+    image_read_info()
+    : _width( 0 )
+    , _height( 0 )
+
+    , _compression( COMPRESSION_NONE )
+
+    , _bits_per_sample( 0 )
+    , _samples_per_pixel( 0 )
+    , _sample_format( SAMPLEFORMAT_UINT )
+
+    , _planar_configuration( PLANARCONFIG_CONTIG )
+
+    , _photometric_interpretation( PHOTOMETRIC_MINISWHITE )
+
+    , _is_tiled( false )
+
+    , _tile_width ( 0 )
+    , _tile_length( 0 )
+    {}
+
     /// The number of rows of pixels in the image.
     tiff_image_width::type  _width;
     /// The number of columns in the image, i.e., the number of pixels per row.
@@ -206,10 +220,6 @@ struct image_read_info< tiff_tag >
     tiff_tile_width::type _tile_width;
     /// Tile length
     tiff_tile_length::type _tile_length;
-    /// Tile offsets
-    tiff_tile_offsets::type _tile_offsets;
-    /// Tile byte counts
-    tiff_tile_byte_counts::type _tile_byte_counts;
 };
 
 /// Read settings for tiff images.
