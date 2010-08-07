@@ -141,17 +141,14 @@ public:
       info._is_tiled = false;
 
       // Tile tags
-      if(_io_dev.is_tiled())
+      if( _io_dev.is_tiled() )
       {
           info._is_tiled = true;
-          io_error_if( !_io_dev.template get_property<tiff_tile_width>      ( info._tile_width )
+
+          io_error_if( !_io_dev.template get_property< tiff_tile_width  >( info._tile_width )
                        , "cannot read tiff_tile_width tag." );
-          io_error_if( !_io_dev.template get_property<tiff_tile_length>     ( info._tile_length )
+          io_error_if( !_io_dev.template get_property< tiff_tile_length >( info._tile_length )
                        , "cannot read tiff_tile_length tag." );
-          io_error_if( !_io_dev.template get_property<tiff_tile_offsets>    ( info._tile_offsets )
-                       , "cannot read tiff_tile_offsets tag." );
-          io_error_if( !_io_dev.template get_property<tiff_tile_byte_counts>( info._tile_byte_counts )
-                       , "cannot read tiff_tile_byte_counts tag." );
       }
 
       return info;
@@ -320,7 +317,6 @@ private:
    void read_tiled_data( const View& dst_view
                          , int         plane     )
    {
-       typedef typename is_bit_aligned< typename View::value_type >::type is_view_bit_aligned_t;
        typedef row_buffer_helper_view< View > row_buffer_helper_t;
        typedef typename row_buffer_helper_t::buffer_t   buffer_t;
        typedef typename row_buffer_helper_t::iterator_t it_t;
