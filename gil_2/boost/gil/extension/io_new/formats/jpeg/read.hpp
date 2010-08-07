@@ -100,6 +100,8 @@ protected:
 
     void raise_error()
     {
+        // we clean up in the destructor
+
         io_error( "jpeg is invalid." );
     }
 
