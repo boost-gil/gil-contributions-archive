@@ -167,6 +167,12 @@ struct tiff_tile_width : tiff_property_base< long, TIFFTAG_TILEWIDTH > {};
 /// Defines type for tile length
 struct tiff_tile_length : tiff_property_base< long, TIFFTAG_TILELENGTH > {};
 
+/// Defines the page to read in a multipage tiff file.
+struct tiff_directory : property_base< tdir_t >
+{
+    static const type default_value = 0;
+};
+
 /// Read information for tiff images.
 ///
 /// The structure is returned when using read_image_info.
@@ -231,18 +237,25 @@ struct image_read_settings< tiff_tag > : public image_read_settings_base
     /// Default constructor
     image_read_settings< tiff_tag >()
     : image_read_settings_base()
+    , _directory( tiff_directory::default_value )
     {}
 
     /// Constructor
-    /// \param top_left Top left coordinate for reading partial image.
-    /// \param dim      Dimensions for reading partial image.
-    image_read_settings( const point_t& top_left
-                       , const point_t& dim
+    /// \param top_left  Top left coordinate for reading partial image.
+    /// \param dim       Dimensions for reading partial image.
+    /// \param directory Defines the page to read in a multipage tiff file.
+    image_read_settings( const point_t&              top_left
+                       , const point_t&              dim
+                       , const tiff_directory::type& directory = tiff_directory::default_value
                        )
     : image_read_settings_base( top_left
                               , dim
                               )
+    , _directory( directory )
     {}
+
+    /// Defines the page to read in a multipage tiff file.
+    tiff_directory::type _directory;
 };
 
 /// Read settings for tiff images.
