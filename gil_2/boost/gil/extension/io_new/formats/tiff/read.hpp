@@ -103,7 +103,9 @@ public:
                  , ConversionPolicy
                  >( settings )
     , _io_dev( device )
-    {}
+    {
+        init_multipage_read( settings );
+    }
 
     reader( Device&                                                device
           , const typename ConversionPolicy::color_converter_type& cc
@@ -115,7 +117,9 @@ public:
                   , settings
                   )
     , _io_dev( device )
-    {}
+    {
+        init_multipage_read( settings );
+    }
 
    image_read_info<tiff_tag> get_info() const
    {
@@ -222,6 +226,14 @@ public:
     }
 
 private:
+
+    void init_multipage_read( const image_read_settings< tiff_tag >& settings )
+    {
+        if( settings._directory > 0 )
+        {
+            _io_dev.set_directory( settings._directory );
+        }
+    } 
 
    template< typename PaletteImage
            , typename View

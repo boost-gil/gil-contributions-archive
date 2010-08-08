@@ -148,7 +148,6 @@ public:
     }
 
     template< typename Buffer >
-    inline 
     void write_scaline( Buffer&     buffer
                       , uint32      row
                       , tsample_t   plane
@@ -160,6 +159,15 @@ public:
                                      , plane 
                                      ) == -1
                    , "Write error"
+                   );
+    }
+
+    void set_directory( tdir_t directory )
+    {
+        io_error_if( TIFFSetDirectory( _tiff_file.get()
+                                     , directory
+                                     ) != 1
+                   , "Failing to set directory"
                    );
     }
 
