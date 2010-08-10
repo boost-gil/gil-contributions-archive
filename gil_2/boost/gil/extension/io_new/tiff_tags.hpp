@@ -168,9 +168,10 @@ struct tiff_tile_width : tiff_property_base< long, TIFFTAG_TILEWIDTH > {};
 struct tiff_tile_length : tiff_property_base< long, TIFFTAG_TILELENGTH > {};
 
 /// Defines the page to read in a multipage tiff file.
+#include <boost/mpl/integral_c.hpp>
 struct tiff_directory : property_base< tdir_t >
 {
-    static const type default_value = 0;
+    typedef boost::mpl::integral_c< type, 0 > default_value;
 };
 
 /// Read information for tiff images.
@@ -237,7 +238,7 @@ struct image_read_settings< tiff_tag > : public image_read_settings_base
     /// Default constructor
     image_read_settings< tiff_tag >()
     : image_read_settings_base()
-    , _directory( tiff_directory::default_value )
+    , _directory( tiff_directory::default_value::value )
     {}
 
     /// Constructor
@@ -246,7 +247,7 @@ struct image_read_settings< tiff_tag > : public image_read_settings_base
     /// \param directory Defines the page to read in a multipage tiff file.
     image_read_settings( const point_t&              top_left
                        , const point_t&              dim
-                       , const tiff_directory::type& directory = tiff_directory::default_value
+                       , const tiff_directory::type& directory = tiff_directory::default_value::value
                        )
     : image_read_settings_base( top_left
                               , dim
