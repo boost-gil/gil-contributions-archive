@@ -11,9 +11,9 @@
 BOOST_AUTO_TEST_SUITE( tiff_test )
 
 BOOST_PP_REPEAT_FROM_TO(21, 32, GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED, (rgb,planar) )
-//GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED( , 64, (rgb,planar) );
 
-BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_32 )
+// TODO: move in a rgb_float test file
+BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_float_planar_strip_32 )
 {
     using namespace std;
     using namespace boost;
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_32 )
     BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
 }
 
-BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_64 )
+BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_float_planar_strip_64 )
 {
     using namespace std;
     using namespace boost;

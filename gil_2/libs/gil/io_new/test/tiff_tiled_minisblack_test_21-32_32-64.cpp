@@ -12,8 +12,6 @@
 BOOST_AUTO_TEST_SUITE( tiff_test )
 
 BOOST_PP_REPEAT_FROM_TO(21, 32, GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED_MINISBLACK, minisblack )
-//GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED_MINISBLACK( , 64, minisblack );
-
 
 BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_32 )
 {
@@ -42,7 +40,6 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_64 )
     string filename_strip( tiff_in_GM + "tiger-minisblack-strip-64.tif" );
     string filename_tile ( tiff_in_GM + "tiger-minisblack-tile-64.tif"  );
 
-    //typedef pixel< unsigned __int64, gray_layout_t > gray64_pixel_t;
     typedef pixel< uint64_t, gray_layout_t > gray64_pixel_t;
     image< gray64_pixel_t, false > img_strip, img_tile;
 
