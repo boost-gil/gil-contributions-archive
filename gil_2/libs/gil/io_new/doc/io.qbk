@@ -1,8 +1,8 @@
 [library Boost.GIL.io
     [authors [Henning, Christian] ]
-    [copyright 2009 Christian Henning]
+    [copyright 2010 Christian Henning]
     [purpose
-        An generic, user-friendly interface for reading different image formats.
+        An generic, user-friendly interface for reading and writing different image formats.
     ]
     [id gil.io]
     [dirname gil/extension/io]
@@ -221,7 +221,7 @@ refer to the format specific sections under 3.3. A basic example follows:
 
     ``
 
-GIL also comes with a dynamic image extension. In the context of GIL.IO a user can define a any_image based
+GIL also comes with a dynamic image extension. In the context of GIL.IO a user can define an any_image type based
 on several image types. The IO extension would then pick the matching image type to the current image file.
 The following example shows this feature:
 
@@ -334,7 +334,7 @@ Write: gray1, gray8, rgb8
 When reading a mono text image the data is read as a gray8 image.
 
 [h3 TIFF]
-For a general overview of the PNM image file format go to the following _TIFF_Wiki_.
+For a general overview of the TIFF image file format go to the following _TIFF_Wiki_.
 
 This tiff extension is based on the libtiff, which can be found, _TIFF_Lib_.
 
@@ -350,6 +350,9 @@ integer values or floating point values. For a complete set of options please co
 
 The author of this extension is not claiming all tiff format are readable or writeable. This extension is
 likely to be a moving target adding new features with each new milestone.
+
+As of now the TIFF code allows to read multi-page tiff and also tiled TIFF. Writing such formats is not 
+supported right now.
 
 [h2 Extending GIL::IO with new Formats]
 Extending the gil::io with new formats is meant to be simple and straightforward. Before adding I would
