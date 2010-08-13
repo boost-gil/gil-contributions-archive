@@ -15,7 +15,7 @@
 
 typedef boost::gil::tiff_tag tag_t;
 
-#define GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED(z, n, data)\
+#define GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED_RGB(z, n, data)\
     BOOST_AUTO_TEST_CASE( BOOST_PP_CAT( \
                                 BOOST_PP_CAT( \
                                     BOOST_PP_CAT( \
@@ -43,11 +43,8 @@ typedef boost::gil::tiff_tag tag_t;
         padding = "0"; \
       filename_strip = filename_strip + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
       filename_tile  = filename_tile  + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
-      typedef mpl::vector< bit_aligned_image3_type< n, n, n, rgb_layout_t  >::type \
-                         , bit_aligned_image1_type< n,       gray_layout_t >::type \
-                         , gray32f_image_t \
-                         , gil::detail::gray64f_image_t \
-                         , rgb32f_image_t  \
+      typedef mpl::vector< bit_aligned_image3_type< n, n, n, rgb_layout_t >::type \
+                         , rgb32f_image_t \
                          , gil::detail::rgb64f_image_t > image_types; \
       any_image< image_types > img_strip, img_tile; \
       read_image( filename_strip, img_strip, tag_t() ); \
@@ -71,12 +68,9 @@ typedef boost::gil::tiff_tag tag_t;
         padding = "0"; \
       filename_strip = filename_strip + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
       filename_tile  = filename_tile  + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
-      typedef mpl::vector< bit_aligned_image3_type< n, n, n, rgb_layout_t  >::type \
-                         , bit_aligned_image1_type< n,       gray_layout_t >::type \
+      typedef mpl::vector< bit_aligned_image1_type< n, gray_layout_t >::type \
                          , gray32f_image_t \
-                         , gil::detail::gray64f_image_t \
-                         , rgb32f_image_t  \
-                         , gil::detail::rgb64f_image_t > image_types; \
+                         , gil::detail::gray64f_image_t > image_types; \
       any_image< image_types > img_strip, img_tile; \
       read_image( filename_strip, img_strip, tag_t() ); \
       read_image( filename_tile,  img_tile,  tag_t() ); \

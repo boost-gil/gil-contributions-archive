@@ -10,7 +10,7 @@
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
 
-BOOST_PP_REPEAT_FROM_TO(21, 32, GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED, (rgb,planar) )
+BOOST_PP_REPEAT_FROM_TO(21, 32, GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED_RGB, (rgb,planar) )
 
 // TODO: move in a rgb_float test file
 BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_float_planar_strip_32 )
