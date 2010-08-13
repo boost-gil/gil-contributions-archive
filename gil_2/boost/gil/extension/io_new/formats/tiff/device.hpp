@@ -137,14 +137,18 @@ public:
                   , tsample_t      plane
                   )
     {
-        io_error_if( TIFFReadTile( _tiff_file.get()
-                                 , reinterpret_cast< tdata_t >( &buffer.front() )
-                                 , (uint32) x
-                                 , (uint32) y
-                                 , (uint32) z
-                                 , plane           ) == -1
-                   , "Read tile error."
-                   );
+        if( TIFFReadTile( _tiff_file.get()
+                        , reinterpret_cast< tdata_t >( &buffer.front() )
+                        , (uint32) x
+                        , (uint32) y
+                        , (uint32) z
+                        , plane
+                        ) == -1 )
+        {
+            std::ostringstream oss;
+            oss << "Read tile error (" << x << "," << y << "," << z << "," << plane << ").";
+            io_error(oss.str());
+        }
     }
 
     template< typename Buffer >
@@ -160,6 +164,28 @@ public:
                                      ) == -1
                    , "Write error"
                    );
+    }
+
+    template< typename Buffer >
+    void write_tile( Buffer&     buffer
+                   , uint32      x
+                   , uint32      y
+                   , uint32      z
+                   , tsample_t   plane
+                   )
+    {
+       if( TIFFWriteTile( _tiff_file.get()
+                        , &buffer.front()
+                        , x
+                        , y
+                        , z
+                        , plane
+                        ) == -1 )
+           {
+               std::ostringstream oss;
+               oss << "Write tile error (" << x << "," << y << "," << z << "," << plane << ").";
+               io_error(oss.str());
+           }
     }
 
     void set_directory( tdir_t directory )

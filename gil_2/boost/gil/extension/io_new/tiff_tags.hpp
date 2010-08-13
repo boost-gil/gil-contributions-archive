@@ -271,6 +271,9 @@ struct image_write_info< tiff_tag, Log >
     , _compression               ( COMPRESSION_NONE       )
     , _orientation               ( ORIENTATION_TOPLEFT    )
     , _planar_configuration      ( PLANARCONFIG_CONTIG    )
+    , _is_tiled                  ( false )
+    , _tile_width                ( 16 ) // todo Olivier: use default value
+    , _tile_length               ( 16 ) // todo Olivier: use default value
     {}
 
     /// The color space of the image data.
@@ -281,6 +284,13 @@ struct image_write_info< tiff_tag, Log >
     tiff_orientation::type                _orientation;
     /// How the components of each pixel are stored.
     tiff_planar_configuration::type       _planar_configuration;
+
+    /// Is the image tiled?
+    tiff_is_tiled::type                   _is_tiled;
+    /// Tiles width
+    tiff_tile_width::type                 _tile_width;
+    /// Tiles length
+    tiff_tile_length::type                _tile_length;
 
     /// A log to transcript error and warning messages issued by libtiff.
     Log                                   _log;
