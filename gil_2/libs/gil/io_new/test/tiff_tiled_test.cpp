@@ -168,9 +168,8 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_32bit )
 // todo Olivier: move this test
 BOOST_AUTO_TEST_CASE( write_tile )
 {
-    std::string filename ( tiff_in_GM + "tiger-minisblack-tile-09.tif"  );
+    std::string filename ( tiff_in_GM + "tiger-minisblack-tile-16.tif"  );
     {
-        /*
         typedef gray16_image_t image_t;
         image_t img_strip;
 
@@ -181,7 +180,7 @@ BOOST_AUTO_TEST_CASE( write_tile )
         info._tile_width = info._tile_length = 16;
 
         write_view( "/home/olivier/Bureau/test.tif", view(img_strip), info );
-        */
+        /*
         typedef bit_aligned_image1_type< 9,       gray_layout_t >::type image_t;
         image_t img_strip;
 
@@ -192,6 +191,7 @@ BOOST_AUTO_TEST_CASE( write_tile )
         info._tile_width = info._tile_length = 16;
 
         write_view( "/home/olivier/Bureau/test_bitaligned.tif", view(img_strip), info );
+        */
     }
 }
 

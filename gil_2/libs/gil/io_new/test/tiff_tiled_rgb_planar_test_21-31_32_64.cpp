@@ -12,6 +12,42 @@ BOOST_AUTO_TEST_SUITE( tiff_test )
 
 BOOST_PP_REPEAT_FROM_TO(21, 32, GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED_RGB, (rgb,planar) )
 
+BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_32 )
+{
+    using namespace std;
+    using namespace boost;
+    using namespace gil;
+
+    string filename_strip( tiff_in_GM + "tiger-rgb-strip-planar-32.tif" );
+    string filename_tile ( tiff_in_GM + "tiger-rgb-tile-planar-32.tif"  );
+
+    typedef pixel< unsigned int, rgb_layout_t > rgb32_pixel_t;
+    image< rgb32_pixel_t, false > img_strip, img_tile;
+
+    read_image( filename_strip, img_strip, tag_t() );
+    read_image( filename_tile,  img_tile,  tag_t() );
+
+    BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
+}
+
+BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_64 )
+{
+    using namespace std;
+    using namespace boost;
+    using namespace gil;
+
+    string filename_strip( tiff_in_GM + "tiger-rgb-strip-planar-64.tif" );
+    string filename_tile ( tiff_in_GM + "tiger-rgb-tile-planar-64.tif"  );
+
+    typedef pixel< uint64_t, rgb_layout_t > rgb64_pixel_t;
+    image< rgb64_pixel_t, false > img_strip, img_tile;
+
+    read_image( filename_strip, img_strip, tag_t() );
+    read_image( filename_tile,  img_tile,  tag_t() );
+
+    BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
+}
+
 // TODO: move in a rgb_float test file
 BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_float_planar_strip_32 )
 {

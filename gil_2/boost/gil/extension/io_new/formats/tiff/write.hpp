@@ -37,9 +37,6 @@ extern "C" {
 
 #include "device.hpp"
 
-// todo Olivier: remove!! !!!!!!!
-#include <boost/gil/extension/io_new/detail/base.hpp>
-
 namespace boost { namespace gil { namespace detail {
 
 template <typename PixelReference>
@@ -202,7 +199,6 @@ private:
 
             write_tiled_data( src_view
                             , info
-                            , (src_view.width() * samples_per_pixel * bits_per_sample + 7) / 8
                             , typename is_bit_aligned< pixel_t >::type()
                             );
         }
@@ -239,71 +235,15 @@ private:
     template< typename View >
     void write_tiled_data( const View&   src_view
                          , const info_t& info
-                         , std::size_t   row_size_in_bytes
                          , const mpl::true_&    // bit_aligned
                          )
     {
-        // todo Olivier
         byte_vector_t row( _io_dev.get_tile_size() );
 
         typedef typename View::x_iterator x_it_t;
         x_it_t row_it = x_it_t( &(*row.begin()));
 
-        uint32 i = 0, j = 0;
-        View tile_subimage_view;
-        while(i<src_view.height())
-        {
-            while(j<src_view.width())
-            {
-                if(j+info._tile_width<src_view.width() && i+info._tile_length<src_view.height())
-                {
-                    // a tile is fully included in the image: just copy values
-                    tile_subimage_view = subimage_view( src_view
-                                                      , j
-                                                      , i
-                                                      , info._tile_width
-                                                      , info._tile_length
-                                                      );
-                    std::copy( tile_subimage_view.begin()
-                             , tile_subimage_view.end()
-                             , row_it
-                             );
-                }
-                else
-                {
-                    uint32 current_tile_width  = (j+info._tile_width<src_view.width()  ) ? info._tile_width  : src_view.width() -j;
-                    uint32 current_tile_length = (i+info._tile_length<src_view.height()) ? info._tile_length : src_view.height()-i;
-
-                    tile_subimage_view = subimage_view( src_view
-                                                      , j
-                                                      , i
-                                                      , current_tile_width
-                                                      , current_tile_length
-                                                      );
-
-                    for( typename View::y_coord_t y = 0; y < tile_subimage_view.height(); ++y )
-                    {
-                        std::copy( tile_subimage_view.row_begin( y )
-                                 , tile_subimage_view.row_end( y )
-                                 , row_it
-                                 );
-                        std::advance(row_it, info._tile_width);
-                    }
-                    row_it = x_it_t( &(*row.begin()));
-                }
-
-                _io_dev.write_tile( row
-                                  , j
-                                  , i
-                                  , 0
-                                  , 0
-                                  );
-                j += info._tile_width;
-            }
-            j = 0;
-            i += info._tile_length;
-        }
-        // @todo: do optional bit swapping here if you need to...
+        internal_write_tiled_data(src_view, info, row, row_it);
     }
 
     template< typename View >
@@ -339,7 +279,6 @@ private:
     template< typename View >
     void write_tiled_data( const View&   src_view
                          , const info_t& info
-                         , std::size_t   row_size_in_bytes
                          , const mpl::false_&    // bit_aligned
                          )
     {
@@ -349,6 +288,17 @@ private:
                                                                                 >::type x_iterator;
         x_iterator row_it = x_iterator( &(*row.begin()));
 
+        internal_write_tiled_data(src_view, info, row, row_it);
+    }
+
+    template< typename View,
+              typename IteratorType >
+    void internal_write_tiled_data( const View&    src_view
+                                  , const info_t&  info
+                                  , byte_vector_t& row
+                                  , IteratorType   it
+                                  )
+    {
         uint32 i = 0, j = 0;
         View tile_subimage_view;
         while(i<src_view.height())
@@ -366,7 +316,7 @@ private:
                                                       );
                     std::copy( tile_subimage_view.begin()
                              , tile_subimage_view.end()
-                             , row_it
+                             , it
                              );
                 }
                 else
@@ -385,11 +335,11 @@ private:
                     {
                         std::copy( tile_subimage_view.row_begin( y )
                                  , tile_subimage_view.row_end( y )
-                                 , row_it
+                                 , it
                                  );
-                        std::advance(row_it, info._tile_width);
+                        std::advance(it, info._tile_width);
                     }
-                    row_it = x_iterator( &(*row.begin()));
+                    it = IteratorType( &(*row.begin()));
                 }
 
                 _io_dev.write_tile( row
