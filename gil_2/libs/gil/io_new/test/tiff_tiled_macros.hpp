@@ -77,6 +77,26 @@ typedef boost::gil::tiff_tag tag_t;
       BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
     } \
 
+// Special case for palette images
+#define GENERATE_TILE_STRIP_COMPARISON_PALETTE(z, n, data)\
+    BOOST_AUTO_TEST_CASE( BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(read_tile_and_compare_with_,data),_strip_),n), bit) )\
+    { \
+      using namespace std; \
+      using namespace boost; \
+      using namespace gil; \
+      string filename_strip( tiff_in_GM + "tiger-" + BOOST_PP_STRINGIZE(data) + "-strip-" ); \
+      string filename_tile ( tiff_in_GM + "tiger-" + BOOST_PP_STRINGIZE(data) + "-tile-"  ); \
+      string padding(""); \
+      if(BOOST_PP_LESS(n, 10)==1) \
+        padding = "0"; \
+      filename_strip = filename_strip + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
+      filename_tile  = filename_tile  + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
+      rgb16_image_t img_strip, img_tile; \
+      read_image( filename_strip, img_strip, tag_t() ); \
+      read_image( filename_tile,  img_tile,  tag_t() ); \
+      BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
+    } \
+
 
 
 #endif // __TIFF_TILED_MACROS_HPP__
