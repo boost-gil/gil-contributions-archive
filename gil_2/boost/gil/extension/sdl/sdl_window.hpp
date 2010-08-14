@@ -107,7 +107,7 @@ private:
                {
                   lock();
 
-                  if( key_up() == true )
+				  if( KEYBOARD_EVENTS::key_up() == true )
                   {
                      _redraw_handler->redraw( wrap_sdl_image( _screen ));
                   }
@@ -121,7 +121,7 @@ private:
                {
                   std::cout << "received quit event." << std::endl;
 
-                  quit();
+                  QUIT_EVENT::quit();
                }
             }
          }
