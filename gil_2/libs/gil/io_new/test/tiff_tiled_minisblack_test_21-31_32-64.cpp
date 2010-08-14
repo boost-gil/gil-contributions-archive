@@ -6,8 +6,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/cstdint.hpp>
-
-#include "tiff_tiled_macros.hpp"
+#include "tiff_tiled_read_macros.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
 
@@ -28,7 +27,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_32 )
     read_image( filename_strip, img_strip, tag_t() );
     read_image( filename_tile,  img_tile,  tag_t() );
 
-    BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
+    BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
 }
 
 BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_64 )
@@ -46,7 +45,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_minisblack_strip_64 )
     read_image( filename_strip, img_strip, tag_t() );
     read_image( filename_tile,  img_tile,  tag_t() );
 
-    BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
+    BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

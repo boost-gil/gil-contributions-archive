@@ -1,9 +1,9 @@
-#ifndef __TIFF_TILED_MACROS_HPP__
-#define __TIFF_TILED_MACROS_HPP__
+#ifndef __TIFF_TILED_READ_MACROS_HPP__
+#define __TIFF_TILED_READ_MACROS_HPP__
 
 #include <boost/mpl/vector.hpp>
 #include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/io_new/tiff_all.hpp>
+#include <boost/gil/extension/io_new/tiff_read.hpp>
 
 #include "paths.hpp"
 
@@ -91,4 +91,4 @@ typedef boost::gil::tiff_tag tag_t;
 
 
 
-#endif // __TIFF_TILED_MACROS_HPP__
+#endif // __TIFF_TILED_READ_MACROS_HPP__

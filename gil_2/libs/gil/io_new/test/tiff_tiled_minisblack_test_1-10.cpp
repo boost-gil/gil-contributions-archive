@@ -5,8 +5,7 @@
  *******************************************************/
 
 #include <boost/test/unit_test.hpp>
-
-#include "tiff_tiled_macros.hpp"
+#include "tiff_tiled_read_macros.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
 

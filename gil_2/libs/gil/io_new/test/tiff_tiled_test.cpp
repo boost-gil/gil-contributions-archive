@@ -5,7 +5,7 @@
  *
  **************************************************/
 
-#include <boost/gil/extension/io_new/tiff_all.hpp>
+#include <boost/gil/extension/io_new/tiff_read.hpp>
 #include "paths.hpp"
 
 #include <boost/test/unit_test.hpp>
@@ -63,36 +63,6 @@ BOOST_AUTO_TEST_CASE( read_tile_infos_test )
 
         BOOST_CHECK_EQUAL( info._tile_width , 16 );
         BOOST_CHECK_EQUAL( info._tile_length, 16 );
-    }
-}
-
-// todo Olivier: move this test
-BOOST_AUTO_TEST_CASE( write_tile )
-{
-    std::string filename ( tiff_in_GM + "tiger-minisblack-tile-16.tif"  );
-    {
-        typedef gray16_image_t image_t;
-        image_t img_strip;
-
-        read_image( filename, img_strip, tag_t() );
-
-        image_write_info<tag_t> info;
-        info._is_tiled = true;
-        info._tile_width = info._tile_length = 0;
-
-        write_view( "/home/olivier/Bureau/test.tif", view(img_strip), info );
-        /*
-        typedef bit_aligned_image1_type< 9,       gray_layout_t >::type image_t;
-        image_t img_strip;
-
-        read_image( filename, img_strip, tag_t() );
-
-        image_write_info<tag_t> info;
-        info._is_tiled = true;
-        info._tile_width = info._tile_length = 16;
-
-        write_view( "/home/olivier/Bureau/test_bitaligned.tif", view(img_strip), info );
-        */
     }
 }
 
