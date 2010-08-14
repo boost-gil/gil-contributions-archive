@@ -243,7 +243,15 @@ private:
       PaletteImage indices( this->_info._width  - this->_settings._top_left.x
                           , this->_info._height - this->_settings._top_left.y );
 
-      read_data( view( indices ), 0 );
+
+      if( _io_dev.is_tiled() )
+      {
+          read_tiled_data( view( indices ), 0 );
+      }
+      else
+      {
+          read_data( view( indices ), 0 );
+      }
 
       read_palette_image( dst_view
                         , view( indices )
