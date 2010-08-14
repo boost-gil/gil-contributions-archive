@@ -42,7 +42,7 @@ typedef mpl::vector3< hsv_color_space::hue_t
 typedef layout<hsv_t> hsv_layout_t;
 
 
-GIL_DEFINE_ALL_TYPEDEFS( 32f, hsv );
+GIL_DEFINE_ALL_TYPEDEFS( 32f, hsv )
 
 /// \ingroup ColorConvert
 /// \brief RGB to HSV
@@ -68,7 +68,7 @@ struct default_color_converter_impl< rgb_t, hsv_t >
 
       bits32f diff = max_color - min_color;
 
-      if( max_color < 0.0001 )
+      if( max_color < 0.0001f )
       {  
          saturation = 0.f;
       }
@@ -78,14 +78,14 @@ struct default_color_converter_impl< rgb_t, hsv_t >
       }
 
 
-      if( saturation < 0.0001 )
+      if( saturation < 0.0001f )
       {
          //it doesn't matter what value it has
          hue = 0.f; 
       }   
       else
       { 
-         if( (std::abs)( boost::numeric_cast<int>(temp_red - max_color) ) < 0.0001 )
+         if( (std::abs)( boost::numeric_cast<int>(temp_red - max_color) ) < 0.0001f )
          {
             hue = ( temp_green - temp_blue )
                 / diff;
@@ -129,7 +129,7 @@ struct default_color_converter_impl<hsv_t,rgb_t>
       bits32f red, green, blue;
 
       //If saturation is 0, the color is a shade of gray
-      if( abs( get_color( src, saturation_t() )) < 0.0001  )
+      if( abs( get_color( src, saturation_t() )) < 0.0001f  )
       {
          // If saturation is 0, the color is a shade of gray
          red   = get_color( src, value_t() );
