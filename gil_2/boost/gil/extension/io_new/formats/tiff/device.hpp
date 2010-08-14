@@ -197,6 +197,31 @@ public:
                    );
     }
 
+    // return false if the given tile width or height is not TIFF compliant (multiple of 16) or larger than image size, true otherwise
+    bool check_tile_size( uint32& width
+                        , uint32& height )
+    {
+        bool result = true;
+        uint32 tw = width;
+        uint32 th = height;
+        TIFFDefaultTileSize( _tiff_file.get()
+                           , &tw
+                           , &th );
+        if(width==0 || width%16!=0)
+        {
+            width = tw;
+            set_property<tiff_tile_width> ( width );
+            result = false;
+        }
+        if(height==0 || height%16!=0)
+        {
+            height = th;
+            set_property<tiff_tile_length>( height );
+            result = false;
+        }
+        return result;
+    }
+
 protected:
 
    typedef shared_ptr<TIFF> tiff_file_t;

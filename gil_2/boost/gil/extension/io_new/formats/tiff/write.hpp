@@ -193,12 +193,17 @@ private:
         }
         else
         {
+            uint32 tw = info._tile_width, th = info._tile_length;
+            if(!_io_dev.check_tile_size( tw, th ))
+                ; // @todo: warn the user?
+
             // tile related tags
-            _io_dev.template set_property<tiff_tile_width> ( info._tile_width );
-            _io_dev.template set_property<tiff_tile_length>( info._tile_length );
+            _io_dev.template set_property<tiff_tile_width> ( tw );
+            _io_dev.template set_property<tiff_tile_length>( th );
 
             write_tiled_data( src_view
-                            , info
+                            , tw
+                            , th
                             , typename is_bit_aligned< pixel_t >::type()
                             );
         }
@@ -234,7 +239,8 @@ private:
 
     template< typename View >
     void write_tiled_data( const View&   src_view
-                         , const info_t& info
+                         , uint32 tw
+                         , uint32 th
                          , const mpl::true_&    // bit_aligned
                          )
     {
@@ -243,7 +249,7 @@ private:
         typedef typename View::x_iterator x_it_t;
         x_it_t row_it = x_it_t( &(*row.begin()));
 
-        internal_write_tiled_data(src_view, info, row, row_it);
+        internal_write_tiled_data(src_view, tw, th, row, row_it);
     }
 
     template< typename View >
@@ -278,7 +284,8 @@ private:
 
     template< typename View >
     void write_tiled_data( const View&   src_view
-                         , const info_t& info
+                         , uint32 tw
+                         , uint32 th
                          , const mpl::false_&    // bit_aligned
                          )
     {
@@ -288,13 +295,14 @@ private:
                                                                                 >::type x_iterator;
         x_iterator row_it = x_iterator( &(*row.begin()));
 
-        internal_write_tiled_data(src_view, info, row, row_it);
+        internal_write_tiled_data(src_view, tw, th, row, row_it);
     }
 
     template< typename View,
               typename IteratorType >
     void internal_write_tiled_data( const View&    src_view
-                                  , const info_t&  info
+                                  , uint32 tw
+                                  , uint32 th
                                   , byte_vector_t& row
                                   , IteratorType   it
                                   )
@@ -305,14 +313,14 @@ private:
         {
             while(j<src_view.width())
             {
-                if(j+info._tile_width<src_view.width() && i+info._tile_length<src_view.height())
+                if(j+tw<src_view.width() && i+th<src_view.height())
                 {
                     // a tile is fully included in the image: just copy values
                     tile_subimage_view = subimage_view( src_view
                                                       , j
                                                       , i
-                                                      , info._tile_width
-                                                      , info._tile_length
+                                                      , tw
+                                                      , th
                                                       );
                     std::copy( tile_subimage_view.begin()
                              , tile_subimage_view.end()
@@ -321,8 +329,8 @@ private:
                 }
                 else
                 {
-                    uint32 current_tile_width  = (j+info._tile_width<src_view.width()  ) ? info._tile_width  : src_view.width() -j;
-                    uint32 current_tile_length = (i+info._tile_length<src_view.height()) ? info._tile_length : src_view.height()-i;
+                    uint32 current_tile_width  = (j+tw<src_view.width() ) ? tw : src_view.width() -j;
+                    uint32 current_tile_length = (i+th<src_view.height()) ? th : src_view.height()-i;
 
                     tile_subimage_view = subimage_view( src_view
                                                       , j
@@ -337,7 +345,7 @@ private:
                                  , tile_subimage_view.row_end( y )
                                  , it
                                  );
-                        std::advance(it, info._tile_width);
+                        std::advance(it, tw);
                     }
                     it = IteratorType( &(*row.begin()));
                 }
@@ -348,10 +356,10 @@ private:
                                   , 0
                                   , 0
                                   );
-                j += info._tile_width;
+                j += tw;
             }
             j = 0;
-            i += info._tile_length;
+            i += th;
         }
         // @todo: do optional bit swapping here if you need to...
     }

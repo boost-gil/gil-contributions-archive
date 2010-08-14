@@ -272,8 +272,8 @@ struct image_write_info< tiff_tag, Log >
     , _orientation               ( ORIENTATION_TOPLEFT    )
     , _planar_configuration      ( PLANARCONFIG_CONTIG    )
     , _is_tiled                  ( false )
-    , _tile_width                ( 16 ) // todo Olivier: use default value
-    , _tile_length               ( 16 ) // todo Olivier: use default value
+    , _tile_width                ( 0 ) // todo Olivier: use default value
+    , _tile_length               ( 0 ) // todo Olivier: use default value
     {}
 
     /// The color space of the image data.

@@ -43,15 +43,10 @@ typedef boost::gil::tiff_tag tag_t;
         padding = "0"; \
       filename_strip = filename_strip + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
       filename_tile  = filename_tile  + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
-      typedef mpl::vector< bit_aligned_image3_type< n, n, n, rgb_layout_t >::type \
-                         , rgb32f_image_t \
-                         , gil::detail::rgb64f_image_t > image_types; \
-      any_image< image_types > img_strip, img_tile; \
+      bit_aligned_image3_type< n, n, n, rgb_layout_t >::type img_strip, img_tile; \
       read_image( filename_strip, img_strip, tag_t() ); \
       read_image( filename_tile,  img_tile,  tag_t() ); \
       BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \
-      rgb8_image_t dst( view( img_strip ).dimensions() ); \
-      copy_and_convert_pixels( view( img_strip ), view( dst )); \
     } \
 
 // Special case for minisblack images
@@ -68,10 +63,7 @@ typedef boost::gil::tiff_tag tag_t;
         padding = "0"; \
       filename_strip = filename_strip + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
       filename_tile  = filename_tile  + padding + BOOST_PP_STRINGIZE(n) + ".tif"; \
-      typedef mpl::vector< bit_aligned_image1_type< n, gray_layout_t >::type \
-                         , gray32f_image_t \
-                         , gil::detail::gray64f_image_t > image_types; \
-      any_image< image_types > img_strip, img_tile; \
+      bit_aligned_image1_type< n, gray_layout_t >::type img_strip, img_tile; \
       read_image( filename_strip, img_strip, tag_t() ); \
       read_image( filename_tile,  img_tile,  tag_t() ); \
       BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true); \

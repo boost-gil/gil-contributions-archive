@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( write_tile )
 
         image_write_info<tag_t> info;
         info._is_tiled = true;
-        info._tile_width = info._tile_length = 16;
+        info._tile_width = info._tile_length = 0;
 
         write_view( "/home/olivier/Bureau/test.tif", view(img_strip), info );
         /*
