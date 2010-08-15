@@ -2,9 +2,9 @@
 // This test is more of a compilation test.
 
 
+#include <boost/gil/extension/io_new/png_all.hpp>
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
-#include <boost/gil/extension/io_new/png_all.hpp>
 #include <boost/gil/extension/io_new/pnm_all.hpp>
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 
