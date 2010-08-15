@@ -31,8 +31,8 @@ typedef boost::gil::tiff_tag tag_t;
       image_write_info<tag_t> info; \
       info._is_tiled = true; \
       info._tile_width = info._tile_length = 16; \
-      write_view( "./temp.tif", view(img_strip), info ); \
-      read_image( "./temp.tif", img_saved, tag_t() ); \
+      write_view( tiff_out + "temp.tif", view(img_strip), info ); \
+      read_image( tiff_out + "temp.tif", img_saved, tag_t() ); \
       BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_saved) ), true); \
     } \
 
