@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< jpeg_tag > info = read_image_info( jpeg_filename
                                                           , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 136 );
-        BOOST_CHECK_EQUAL( info._height, 98  );
+        BOOST_CHECK_EQUAL( info._width , 136u );
+        BOOST_CHECK_EQUAL( info._height, 98u  );
     }
 
     {
@@ -39,8 +39,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< jpeg_tag > info = read_image_info( in
                                                           , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 136 );
-        BOOST_CHECK_EQUAL( info._height, 98  );
+        BOOST_CHECK_EQUAL( info._width , 136u );
+        BOOST_CHECK_EQUAL( info._height, 98u  );
     }
 
     {
@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< tag_t > info = boost::gil::read_image_info( file
                                                                    , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 136 );
-        BOOST_CHECK_EQUAL( info._height, 98  );
+        BOOST_CHECK_EQUAL( info._width , 136u );
+        BOOST_CHECK_EQUAL( info._height, 98u  );
     }
 
     {
@@ -58,8 +58,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< tag_t > info = boost::gil::read_image_info( my_path
                                                                    , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 136 );
-        BOOST_CHECK_EQUAL( info._height, 98  );
+        BOOST_CHECK_EQUAL( info._width , 136u );
+        BOOST_CHECK_EQUAL( info._height, 98u  );
     }
 
 
@@ -71,8 +71,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( jpeg_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 136 );
-        BOOST_CHECK_EQUAL( img.height(), 98 );
+        BOOST_CHECK_EQUAL( img.width() , 136u );
+        BOOST_CHECK_EQUAL( img.height(), 98u );
     }
 
     {
@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 136 );
-        BOOST_CHECK_EQUAL( img.height(), 98 );
+        BOOST_CHECK_EQUAL( img.width() , 136u );
+        BOOST_CHECK_EQUAL( img.height(), 98u );
     }
 
     {
@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 136 );
-        BOOST_CHECK_EQUAL( img.height(), 98 );
+        BOOST_CHECK_EQUAL( img.width() , 136u );
+        BOOST_CHECK_EQUAL( img.height(), 98u );
     }
 
     {
@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
 
         read_image( jpeg_filename, img, settings );
 
-        BOOST_CHECK_EQUAL( img.width() , 10 );
-        BOOST_CHECK_EQUAL( img.height(), 10 );
+        BOOST_CHECK_EQUAL( img.width() , 10u );
+        BOOST_CHECK_EQUAL( img.height(), 10u );
     }
 
 }

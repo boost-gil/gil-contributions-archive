@@ -24,8 +24,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
     {
         image_read_info< pnm_tag > info = read_image_info( pnm_filename
                                                          , tag_t() );
-        BOOST_CHECK_EQUAL( info._width , 256 );
-        BOOST_CHECK_EQUAL( info._height, 256 );
+        BOOST_CHECK_EQUAL( info._width , 256u );
+        BOOST_CHECK_EQUAL( info._height, 256u );
     }
 
     {
@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
         image_read_info< tag_t > info = read_image_info( in
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 256 );
-        BOOST_CHECK_EQUAL( info._height, 256 );
+        BOOST_CHECK_EQUAL( info._width , 256u );
+        BOOST_CHECK_EQUAL( info._height, 256u );
     }
 
     {
@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
         image_read_info< tag_t > info = read_image_info( file
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 256 );
-        BOOST_CHECK_EQUAL( info._height, 256 );
+        BOOST_CHECK_EQUAL( info._width , 256u );
+        BOOST_CHECK_EQUAL( info._height, 256u );
     }
 }
 
@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( pnm_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 256 );
-        BOOST_CHECK_EQUAL( img.height(), 256 );
+        BOOST_CHECK_EQUAL( img.width() , 256u );
+        BOOST_CHECK_EQUAL( img.height(), 256u );
     }
 
     {
@@ -65,8 +65,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 256 );
-        BOOST_CHECK_EQUAL( img.height(), 256 );
+        BOOST_CHECK_EQUAL( img.width() , 256u );
+        BOOST_CHECK_EQUAL( img.height(), 256u );
     }
 
     {
@@ -75,8 +75,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 256 );
-        BOOST_CHECK_EQUAL( img.height(), 256 );
+        BOOST_CHECK_EQUAL( img.width() , 256u );
+        BOOST_CHECK_EQUAL( img.height(), 256u );
     }
 }
 
@@ -86,8 +86,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( pnm_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 256 );
-        BOOST_CHECK_EQUAL( img.height(), 256 );
+        BOOST_CHECK_EQUAL( img.width() , 256u );
+        BOOST_CHECK_EQUAL( img.height(), 256u );
     }
 
     {
@@ -96,8 +96,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 256 );
-        BOOST_CHECK_EQUAL( img.height(), 256 );
+        BOOST_CHECK_EQUAL( img.width() , 256u );
+        BOOST_CHECK_EQUAL( img.height(), 256u );
     }
 
     {
@@ -106,8 +106,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 256 );
-        BOOST_CHECK_EQUAL( img.height(), 256 );
+        BOOST_CHECK_EQUAL( img.width() , 256u );
+        BOOST_CHECK_EQUAL( img.height(), 256u );
     }
 }
 

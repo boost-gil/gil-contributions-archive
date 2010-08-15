@@ -24,8 +24,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
     {
         image_read_info< png_tag > info = read_image_info( png_filename
                                                          , tag_t() );
-        BOOST_CHECK_EQUAL( info._width , 320 );
-        BOOST_CHECK_EQUAL( info._height, 240 );
+        BOOST_CHECK_EQUAL( info._width , 320u );
+        BOOST_CHECK_EQUAL( info._height, 240u );
     }
 
     {
@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
         image_read_info< tag_t > info = read_image_info( in
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 320 );
-        BOOST_CHECK_EQUAL( info._height, 240 );
+        BOOST_CHECK_EQUAL( info._width , 320u );
+        BOOST_CHECK_EQUAL( info._height, 240u );
     }
 
     {
@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
         image_read_info< tag_t > info = read_image_info( file
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 320 );
-        BOOST_CHECK_EQUAL( info._height, 240 );
+        BOOST_CHECK_EQUAL( info._width , 320u );
+        BOOST_CHECK_EQUAL( info._height, 240u );
     }
 }
 
@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgba8_image_t img;
         read_image( png_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
+        BOOST_CHECK_EQUAL( img.width() , 320u );
+        BOOST_CHECK_EQUAL( img.height(), 240u );
     }
 
     {
@@ -65,8 +65,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgba8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
+        BOOST_CHECK_EQUAL( img.width() , 320u );
+        BOOST_CHECK_EQUAL( img.height(), 240u );
     }
 
     {
@@ -75,8 +75,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgba8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
+        BOOST_CHECK_EQUAL( img.width() , 320u );
+        BOOST_CHECK_EQUAL( img.height(), 240u );
     }
 }
 
@@ -86,16 +86,16 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( png_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
+        BOOST_CHECK_EQUAL( img.width() , 320u );
+        BOOST_CHECK_EQUAL( img.height(), 240u );
     }
 
     {
         rgba8_image_t img;
         read_and_convert_image( png_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
+        BOOST_CHECK_EQUAL( img.width() , 320u );
+        BOOST_CHECK_EQUAL( img.height(), 240u );
     }
 
     {
@@ -104,8 +104,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
+        BOOST_CHECK_EQUAL( img.width() , 320u );
+        BOOST_CHECK_EQUAL( img.height(), 240u );
     }
 
     {
@@ -114,8 +114,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 320 );
-        BOOST_CHECK_EQUAL( img.height(), 240 );
+        BOOST_CHECK_EQUAL( img.width() , 320u );
+        BOOST_CHECK_EQUAL( img.height(), 240u );
     }
 }
 

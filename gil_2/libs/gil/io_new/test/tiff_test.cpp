@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< tag_t > info = read_image_info( tiff_filename
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 200 );
-        BOOST_CHECK_EQUAL( info._height, 133 );
+        BOOST_CHECK_EQUAL( info._width , 200u );
+        BOOST_CHECK_EQUAL( info._height, 133u );
     }
 
     {
@@ -41,8 +41,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< tag_t > info = read_image_info( in
                                                        , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 200 );
-        BOOST_CHECK_EQUAL( info._height, 133 );
+        BOOST_CHECK_EQUAL( info._width , 200u );
+        BOOST_CHECK_EQUAL( info._height, 133u );
     }
 
     {
@@ -51,8 +51,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< tag_t > info = read_image_info( file
                                                        , tag_t() );
         
-        BOOST_CHECK_EQUAL( info._width , 200 );
-        BOOST_CHECK_EQUAL( info._height, 133 );
+        BOOST_CHECK_EQUAL( info._width , 200u );
+        BOOST_CHECK_EQUAL( info._height, 133u );
     }
 }
 
@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( tiff_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 
     {
@@ -73,8 +73,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 
     {
@@ -83,8 +83,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 }
 
@@ -94,8 +94,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( tiff_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 
     {
@@ -104,8 +104,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 
     {
@@ -114,8 +114,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 }
 
@@ -132,8 +132,8 @@ BOOST_AUTO_TEST_CASE( read_view_test )
         rgb8_image_t img( 200, 133 );
         read_view( in, view( img ), tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 
     {
@@ -157,8 +157,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
         rgb8_image_t img( 200, 133 );
         read_and_convert_view( in, view( img ), tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200 );
-        BOOST_CHECK_EQUAL( img.height(), 133 );
+        BOOST_CHECK_EQUAL( img.width() , 200u );
+        BOOST_CHECK_EQUAL( img.height(), 133u );
     }
 
     {

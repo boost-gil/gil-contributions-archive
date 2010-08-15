@@ -19,8 +19,8 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                                        , tag_t()
                                                        );
 
-        BOOST_CHECK_EQUAL( info._width         , 136 );
-        BOOST_CHECK_EQUAL( info._height        , 98  );
+        BOOST_CHECK_EQUAL( info._width         , 136u );
+        BOOST_CHECK_EQUAL( info._height        , 98u  );
 
         BOOST_CHECK_EQUAL( info._num_components, 3         );
         BOOST_CHECK_EQUAL( info._color_space   , JCS_YCbCr );

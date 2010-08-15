@@ -32,18 +32,18 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                                        , tag_t()
                                                        );
 
-        BOOST_CHECK_EQUAL( info._offset               ,    54 );
-        BOOST_CHECK_EQUAL( info._header_size          ,    40 );
-        BOOST_CHECK_EQUAL( info._width                ,   127 );
-        BOOST_CHECK_EQUAL( info._height               ,    64 );
-        BOOST_CHECK_EQUAL( info._bits_per_pixel       ,    24 );
-        BOOST_CHECK_EQUAL( info._compression          ,     0 );
-        BOOST_CHECK_EQUAL( info._image_size           , 24576 );
-        BOOST_CHECK_EQUAL( info._horizontal_resolution,     0 );
-        BOOST_CHECK_EQUAL( info._vertical_resolution  ,     0 );
-        BOOST_CHECK_EQUAL( info._num_colors           ,     0 );
-        BOOST_CHECK_EQUAL( info._num_important_colors ,     0 );
-        BOOST_CHECK_EQUAL( info._valid                ,  true );
+        BOOST_CHECK_EQUAL( info._offset               ,    54u );
+        BOOST_CHECK_EQUAL( info._header_size          ,    40u );
+        BOOST_CHECK_EQUAL( info._width                ,   127  );
+        BOOST_CHECK_EQUAL( info._height               ,    64  );
+        BOOST_CHECK_EQUAL( info._bits_per_pixel       ,    24  );
+        BOOST_CHECK_EQUAL( info._compression          ,     0u );
+        BOOST_CHECK_EQUAL( info._image_size           , 24576u );
+        BOOST_CHECK_EQUAL( info._horizontal_resolution,     0  );
+        BOOST_CHECK_EQUAL( info._vertical_resolution  ,     0  );
+        BOOST_CHECK_EQUAL( info._num_colors           ,     0u );
+        BOOST_CHECK_EQUAL( info._num_important_colors ,     0u );
+        BOOST_CHECK_EQUAL( info._valid                ,  true  );
     }
 }
 
@@ -56,8 +56,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g01bw.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g01bw.bmp" );
     }
@@ -68,8 +68,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g01wb.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g01wb.bmp" );
     }
@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g01bg.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g01bg.bmp" );
     }
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g01p1.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g01p1.bmp" );
     }
@@ -101,8 +101,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g04.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g04.bmp" );
     }
@@ -112,8 +112,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( bmp_in + "g04rle.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g04rle.bmp" );
     }
@@ -123,8 +123,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g04p4.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g04p4.bmp" );
     }
@@ -134,8 +134,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08.bmp" );
     }
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08p256.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08p256.bmp" );
     }
@@ -156,8 +156,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08pi256.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08pi256.bmp" );
     }
@@ -169,8 +169,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08pi64.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08pi64.bmp" );
     }
@@ -180,8 +180,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( bmp_in + "g08rle.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08rle.bmp" );
     }
@@ -193,8 +193,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( bmp_in + "g08os2.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08os2.bmp" );
     }
@@ -204,8 +204,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08res22.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08res22.bmp" );
     }
@@ -215,8 +215,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08res11.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08res11.bmp" );
     }
@@ -229,8 +229,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08res21.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08res21.bmp" );
     }
@@ -240,8 +240,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08s0.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08s0.bmp" );
     }
@@ -252,8 +252,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08offs.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08offs.bmp" );
     }
@@ -263,8 +263,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08w126.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 126 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  63 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 126u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  63u );
 
         write( img, "g08w126.bmp" );
     }
@@ -274,8 +274,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08w125.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 125 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  62 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 125u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  62u );
 
         write( img, "g08w125.bmp" );
     }
@@ -285,8 +285,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08w124.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 124 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  61 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 124u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  61u );
 
         write( img, "g08w124.bmp" );
     }
@@ -296,8 +296,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g08p64.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g08p64.bmp" );
     }
@@ -307,8 +307,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( bmp_in + "g16def555.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g16def555.bmp" );
     }
@@ -318,8 +318,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( bmp_in + "g16bf555.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g16bf555.bmp" );
     }
@@ -329,8 +329,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( bmp_in + "g16bf565.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g16bf565.bmp" );
     }
@@ -340,8 +340,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( bmp_in + "g24.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g24.bmp" );
     }
@@ -351,8 +351,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
         
         read_image( bmp_in + "g32def.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g32def.bmp" );
     }
@@ -362,8 +362,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgba8_image_t img;
 
         read_image( bmp_in + "g32bf.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127 );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
         write( img, "g32bf.bmp" );
     }

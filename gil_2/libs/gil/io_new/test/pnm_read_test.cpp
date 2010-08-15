@@ -30,9 +30,9 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                                        );
 
         BOOST_CHECK_EQUAL( info._type     , pnm_image_type::color_asc_t::value );
-        BOOST_CHECK_EQUAL( info._width    , 256                        );
-        BOOST_CHECK_EQUAL( info._height   , 256                        );
-        BOOST_CHECK_EQUAL( info._max_value, 255                        );
+        BOOST_CHECK_EQUAL( info._width    , 256u                        );
+        BOOST_CHECK_EQUAL( info._height   , 256u                        );
+        BOOST_CHECK_EQUAL( info._max_value, 255u                        );
     }
 }
 
@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         gray8_image_t img;
         
         read_image( pnm_in + "p1.pnm", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 200 );
-        BOOST_CHECK_EQUAL( view( img ).height(), 200 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 200u );
+        BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p1.pnm" );
     }
@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         gray8_image_t img;
         
         read_image( pnm_in + "p2.pnm", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 200 );
-        BOOST_CHECK_EQUAL( view( img ).height(), 200 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 200u );
+        BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p2.pnm" );
     }
@@ -65,8 +65,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( pnm_in + "p3.pnm", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 256 );
-        BOOST_CHECK_EQUAL( view( img ).height(), 256 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 256u );
+        BOOST_CHECK_EQUAL( view( img ).height(), 256u );
 
         write( img, "p3.pnm" );
     }
@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         detail::gray1_image_t img;
         
         read_image( pnm_in + "p4.pnm", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 200 );
-        BOOST_CHECK_EQUAL( view( img ).height(), 200 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 200u );
+        BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p4.pnm" );
     }
@@ -87,8 +87,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         gray8_image_t img;
         
         read_image( pnm_in + "p5.pnm", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 200 );
-        BOOST_CHECK_EQUAL( view( img ).height(), 200 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 200u );
+        BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p5.pnm" );
     }
@@ -98,8 +98,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         rgb8_image_t img;
         
         read_image( pnm_in + "p6.pnm", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 256 );
-        BOOST_CHECK_EQUAL( view( img ).height(), 256 );
+        BOOST_CHECK_EQUAL( view( img ).width() , 256u );
+        BOOST_CHECK_EQUAL( view( img ).height(), 256u );
 
         write( img, "p6.pnm" );
     }

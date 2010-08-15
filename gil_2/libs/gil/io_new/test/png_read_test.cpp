@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                                        , tag_t()
                                                        );
 
-        BOOST_CHECK_EQUAL( info._width , 320 );
-        BOOST_CHECK_EQUAL( info._height, 240 );
+        BOOST_CHECK_EQUAL( info._width , 320u );
+        BOOST_CHECK_EQUAL( info._height, 240u );
 
         BOOST_CHECK_EQUAL( info._num_channels, 4                   );
         BOOST_CHECK_EQUAL( info._bit_depth   , 8                   );
