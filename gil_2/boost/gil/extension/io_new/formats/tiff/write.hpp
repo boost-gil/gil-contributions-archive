@@ -195,6 +195,7 @@ private:
         {
             uint32 tw = info._tile_width, th = info._tile_length;
             if(!_io_dev.check_tile_size( tw, th ))
+                int i = 9;
                 ; // @todo: warn the user?
 
             // tile related tags
@@ -329,8 +330,11 @@ private:
                 }
                 else
                 {
-                    uint32 current_tile_width  = (j+tw<src_view.width() ) ? tw : src_view.width() -j;
-                    uint32 current_tile_length = (i+th<src_view.height()) ? th : src_view.height()-i;
+                    uint32 width  = static_cast< uint32 >( src_view.width()  );
+                    uint32 height = static_cast< uint32 >( src_view.height() );
+
+                    uint32 current_tile_width  = (j+tw<width ) ? tw : width -j;
+                    uint32 current_tile_length = (i+th<height) ? th : height-i;
 
                     tile_subimage_view = subimage_view( src_view
                                                       , j
