@@ -210,13 +210,11 @@ public:
         if(width==0 || width%16!=0)
         {
             width = tw;
-            set_property<tiff_tile_width> ( width );
             result = false;
         }
         if(height==0 || height%16!=0)
         {
             height = th;
-            set_property<tiff_tile_length>( height );
             result = false;
         }
         return result;
