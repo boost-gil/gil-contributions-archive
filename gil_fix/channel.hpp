@@ -155,6 +155,8 @@ struct scoped_channel_value {
     typedef const value_type*       const_pointer;
     BOOST_STATIC_CONSTANT(bool, is_mutable=channel_traits<BaseChannelValue>::is_mutable);
 
+    typedef BaseChannelValue base_channel_t;
+
     static value_type min_value() { return MinVal::apply(); }
     static value_type max_value() { return MaxVal::apply(); }
 
@@ -261,7 +263,7 @@ public:
     packed_channel_value() {}
     packed_channel_value(integer_t v) { _value = static_cast< integer_t >( v % num_values ); }
     packed_channel_value(const packed_channel_value& v) : _value(v._value) {}
-    template <typename Scalar> packed_channel_value(Scalar v) { _value = static_cast< integer_t >( v % num_values ); }
+    template <typename Scalar> packed_channel_value(Scalar v) { _value = static_cast< integer_t >( v ) % num_values; }
 
     static unsigned int num_bits() { return NumBits; }
 
