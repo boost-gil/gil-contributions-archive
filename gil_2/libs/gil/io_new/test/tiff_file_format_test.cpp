@@ -774,4 +774,84 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_separated_CMYK_image_test )
     }
 }
 
+BOOST_AUTO_TEST_CASE( tiger_separated_strip_contig_08 )
+{
+    std::string filename( tiff_in_GM + "tiger-separated-strip-contig-08.tif" );
+
+    {
+        typedef cmyk8_planar_image_t image_t;
+        image_t img;
+
+        read_image( filename
+                  , img
+                  , tag_t()
+                  );
+
+        write_view( tiff_out + "test40.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( tiger_separated_strip_contig_16 )
+{
+    std::string filename( tiff_in_GM + "tiger-separated-strip-contig-16.tif" );
+
+    {
+        typedef cmyk16_planar_image_t image_t;
+        image_t img;
+
+        read_image( filename
+                  , img
+                  , tag_t()
+                  );
+
+        write_view( tiff_out + "test41.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( tiger_separated_strip_planar_08 )
+{
+    std::string filename( tiff_in_GM + "tiger-separated-strip-planar-08.tif" );
+
+    {
+        typedef cmyk8_planar_image_t image_t;
+        image_t img;
+
+        read_image( filename
+                  , img
+                  , tag_t()
+                  );
+
+        write_view( tiff_out + "test42.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( tiger_separated_strip_planar_16 )
+{
+    std::string filename( tiff_in_GM + "tiger-separated-strip-planar-16.tif" );
+
+    {
+        typedef cmyk16_planar_image_t image_t;
+        image_t img;
+
+        read_image( filename
+                  , img
+                  , tag_t()
+                  );
+
+        write_view( tiff_out + "test43.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
