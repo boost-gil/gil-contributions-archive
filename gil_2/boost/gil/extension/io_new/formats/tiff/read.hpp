@@ -347,15 +347,9 @@ private:
 
        uint32_t plain_tile_size = this->_info._tile_width * this->_info._tile_length;
 
-       //@todo Is _io_dev.are_bytes_swapped() == true when reading bit_aligned images?
-       //      If the following fires then we need to pass a boolean to the constructor.
-       io_error_if( is_bit_aligned< View >::value && !_io_dev.are_bytes_swapped()
-                    , "Cannot be read."
-                    );
-
        mirror_bits< buffer_t
                , typename is_bit_aligned< View >::type
-               > mirror_bits;
+               > mirror_bits( _io_dev.are_bytes_swapped() );
 
        for( unsigned int y = 0; y < this->_info._height; y += this->_info._tile_length )
        {
@@ -429,22 +423,15 @@ private:
       it_t first = begin + this->_settings._top_left.x;
       it_t last  = first + this->_settings._dim.x; // one after last element
 
-      // I don't think libtiff allows for random access of rows, that's why we need 
+      // I don't think tiff allows for random access of row, that's why we need 
       // to read and discard rows when reading subimages.
       skip_over_rows( row_buffer_helper.buffer()
                     , plane
                     );
 
-      //@todo Is _io_dev.are_bytes_swapped() == true when reading bit_aligned images?
-      //      If the following fires then we need to pass a boolean to the constructor.
-      io_error_if( is_bit_aligned< View >::value && !_io_dev.are_bytes_swapped()
-                 , "Cannot be read."
-                 );
-
       mirror_bits< buffer_t
                  , typename is_bit_aligned< View >::type
-                 > mirror_bits;
-
+                 > mirror_bits( _io_dev.are_bytes_swapped() );
 
       std::ptrdiff_t row     = this->_settings._top_left.y;
       std::ptrdiff_t row_end = row + this->_settings._dim.y;
