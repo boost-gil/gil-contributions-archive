@@ -272,13 +272,10 @@ BOOST_AUTO_TEST_CASE( subimage_test )
                                             , point_t( 50, 50 )
                                             );
 
-/*
-    /// @todo not working
     run_subimage_test< rgb8_image_t, tag_t >( tiff_filename
                                             , point_t(  50,  50 )
                                             , point_t(  50,  50 )
                                             );
-*/
 }
 
 BOOST_AUTO_TEST_CASE( dynamic_image_test )
