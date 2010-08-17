@@ -429,10 +429,11 @@ private:
       it_t first = begin + this->_settings._top_left.x;
       it_t last  = first + this->_settings._dim.x; // one after last element
 
+      // I don't think libtiff allows for random access of rows, that's why we need 
+      // to read and discard rows when reading subimages.
       skip_over_rows( row_buffer_helper.buffer()
                     , plane
                     );
-
 
       //@todo Is _io_dev.are_bytes_swapped() == true when reading bit_aligned images?
       //      If the following fires then we need to pass a boolean to the constructor.
@@ -444,9 +445,14 @@ private:
                  , typename is_bit_aligned< View >::type
                  > mirror_bits;
 
-      for( std::ptrdiff_t row = 0
-         ; row < this->_settings._dim.y
-         ; ++row
+
+      std::ptrdiff_t row     = this->_settings._top_left.y;
+      std::ptrdiff_t row_end = row + this->_settings._dim.y;
+      std::ptrdiff_t dst_row = 0;
+
+      for( 
+         ; row < row_end
+         ; ++row, ++dst_row
          )
       {
          _io_dev.read_scanline( row_buffer_helper.buffer()
@@ -458,7 +464,7 @@ private:
 
          this->_cc_policy.read( first
                               , last
-                              , dst_view.row_begin( row ));
+                              , dst_view.row_begin( dst_row ));
       }
    }
 
