@@ -4,7 +4,7 @@ todo list
 * when reading an indexed tiff image, it's better to use a virtual view.
 * incorporate Phil Endecott suggestions ( email 04/27/2008 )
 * also add John Femiani suggestions ( same date )
-* support tiled tiff
+
 
 * dynamic image needs to call is_allowed
 * try to test all interface functions seperately
