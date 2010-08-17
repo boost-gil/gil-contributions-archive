@@ -29,7 +29,7 @@ template< typename Buffer
         >
 struct mirror_bits
 {
-   mirror_bits() {}
+   mirror_bits( bool ) {}
 
    void operator() ( Buffer& ) {}
 };
@@ -43,27 +43,34 @@ struct mirror_bits< Buffer
                   , mpl::true_
                   >
 {
-   mirror_bits()
+   mirror_bits( bool apply_operation = true )
+   : _apply_operation( apply_operation )
    {
-        byte_t i = 0;
-        do
+        if( _apply_operation == true )
         {
-            _lookup[i] = mirror( i );
+            byte_t i = 0;
+            do
+            {
+                _lookup[i] = mirror( i );
+            }
+            while( i++ != 255 );
         }
-        while( i++ != 255 );
    }
 
    void operator() ( Buffer& buf )
    {
-        for_each( buf.begin()
-                , buf.end()
-                , boost::bind( &mirror_bits< Buffer
-                                           , mpl::true_
-                                           >::lookup
-                       , *this
-                       , _1
-                       )
-                );
+        if( _apply_operation == true )
+        {
+            for_each( buf.begin()
+                    , buf.end()
+                    , boost::bind( &mirror_bits< Buffer
+                                               , mpl::true_
+                                               >::lookup
+                           , *this
+                           , _1
+                           )
+                    );
+        }
    }
 
 private:
@@ -87,7 +94,9 @@ private:
     }
  
 private:
- 
+
+    bool _apply_operation;
+
     array< byte_t, 256 > _lookup;
 };
 
