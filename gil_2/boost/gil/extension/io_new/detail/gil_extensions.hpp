@@ -158,7 +158,7 @@ struct gen_chan_ref
 
 
 //! This implementation works for bit_algined_pixel_reference 
-//! with a homegeneous channel layout. 
+//! with a homogeneous channel layout. 
 //! The result type will be a packed_dynamic_channel_reference, since the 
 //! offset info will be missing. 
 
