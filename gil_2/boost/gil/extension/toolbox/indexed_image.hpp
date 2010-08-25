@@ -14,7 +14,10 @@
 /// \author Christian Henning \n
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/gil/gil_all.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/utility/enable_if.hpp>
+
+#include <boost/gil/image.hpp>
 
 #include <boost/gil/extension/io_new/detail/gil_extensions.hpp>
 
@@ -22,16 +25,26 @@ namespace boost { namespace gil {
 
 typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
+template< typename Locator >
+struct get_pixel_type_locator : mpl::if_< typename is_bit_aligned< typename Locator::value_type >::type
+                                        , typename Locator::reference
+                                        , typename Locator::value_type
+                                        > {};
+
 // used for virtual locator
 template< typename IndicesLoc
         , typename PaletteLoc
         >
-struct indexed_image_deref_fn
+struct indexed_image_deref_fn_base
 {
     typedef IndicesLoc indices_locator_t;
     typedef PaletteLoc palette_locator_t;
+    //typedef typename get_pixel_type_locator< indices_locator_t >::type index_t;
+ 
+    typedef IndicesLoc indices_locator_t;
+    typedef PaletteLoc palette_locator_t;
 
-    typedef indexed_image_deref_fn          const_t;
+    typedef indexed_image_deref_fn_base     const_t;
     typedef typename PaletteLoc::value_type value_type;
     typedef value_type                      reference;
     typedef value_type                      const_reference;
@@ -40,19 +53,14 @@ struct indexed_image_deref_fn
 
     static const bool is_mutable = false;
 
-    indexed_image_deref_fn() {}
+    indexed_image_deref_fn_base() {}
 
-    indexed_image_deref_fn( const indices_locator_t& indices_loc
-                          , const palette_locator_t& palette_loc
-                          )
+    indexed_image_deref_fn_base( const indices_locator_t& indices_loc
+                               , const palette_locator_t& palette_loc
+                               )
     : _indices_loc( indices_loc )
     , _palette_loc( palette_loc )
     {}
-
-    result_type operator()( const point_t& p ) const
-    {
-        return *_palette_loc.xy_at( *_indices_loc.xy_at( p ), 0 );
-    }
 
     void set_indices( const indices_locator_t& indices_loc ) { _indices_loc = indices_loc; }
     void set_palette( const palette_locator_t& palette_loc ) { _palette_loc = palette_loc; }
@@ -60,10 +68,67 @@ struct indexed_image_deref_fn
     const indices_locator_t& indices() const { return _indices_loc; }
     const palette_locator_t& palette() const { return _palette_loc; }
 
-private:
+protected:
 
     indices_locator_t _indices_loc;
     palette_locator_t _palette_loc;
+};
+
+
+// used for virtual locator
+template< typename IndicesLoc
+        , typename PaletteLoc
+        , typename Enable = void // there is specilization for integral indices
+        >
+struct indexed_image_deref_fn : indexed_image_deref_fn_base< IndicesLoc
+                                                           , PaletteLoc
+                                                           >
+{
+    indexed_image_deref_fn()
+    : indexed_image_deref_fn_base()
+    {}
+
+    indexed_image_deref_fn( const indices_locator_t& indices_loc
+                          , const palette_locator_t& palette_loc
+                          )
+    : indexed_image_deref_fn_base( indices_loc
+                                 , palette_loc
+                                 )
+    {}
+
+    result_type operator()( const point_t& p ) const
+    {
+        return *_palette_loc.xy_at( at_c<0>( *_indices_loc.xy_at( p )), 0 );
+    }
+};
+
+
+template< typename IndicesLoc
+        , typename PaletteLoc
+        >
+struct indexed_image_deref_fn< IndicesLoc
+                             , PaletteLoc
+                             , typename boost::enable_if< boost::is_integral< typename IndicesLoc::value_type > >::type
+                             > : indexed_image_deref_fn_base< IndicesLoc
+                                                            , PaletteLoc
+                                                            >
+{
+    indexed_image_deref_fn()
+    : indexed_image_deref_fn_base()
+    {}
+
+    indexed_image_deref_fn( const indices_locator_t& indices_loc
+                          , const palette_locator_t& palette_loc
+                          )
+    : indexed_image_deref_fn_base( indices_loc
+                                 , palette_loc
+                                 )
+    {}
+
+    result_type operator()( const point_t& p ) const
+    {
+        return *_palette_loc.xy_at( *_indices_loc.xy_at( p ), 0 );
+    }
 };
 
 template< typename IndicesLoc
