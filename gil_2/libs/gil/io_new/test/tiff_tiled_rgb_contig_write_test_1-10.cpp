@@ -28,8 +28,8 @@ BOOST_AUTO_TEST_CASE( write_tile_and_compare_with_rgb_strip_contig_8 )
     info._is_tiled = true;
     info._tile_width = info._tile_length = 16;
 
-    write_view( tiff_out + "temp.tif", view(img_strip), info );
-    read_image( tiff_out + "temp.tif", img_saved, tag_t() );
+    write_view( tiff_out + "write_tile_and_compare_with_rgb_strip_contig_8.tif", view(img_strip), info );
+    read_image( tiff_out + "write_tile_and_compare_with_rgb_strip_contig_8.tif", img_saved, tag_t() );
 
     BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_saved) ), true);
 }
