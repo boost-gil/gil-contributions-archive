@@ -9,8 +9,8 @@
 */
 /*************************************************************************************************/
 
-#ifndef GIL_DYNAMIC_IO_NEW_HPP
-#define GIL_DYNAMIC_IO_NEW_HPP
+#ifndef BOOST_GIL_EXTENSION_TOOLBOX_DYNAMIC_IMAGES_HPP_INCLUDED
+#define BOOST_GIL_EXTENSION_TOOLBOX_DYNAMIC_IMAGES_HPP_INCLUDED
 
 /// \file
 /// \brief  Generic io functions for dealing with dynamic images
@@ -24,8 +24,6 @@
 #include <boost/gil/gil_config.hpp>
 #include <boost/gil/extension/io_new/detail/io_error.hpp>
 #include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
-
-#include "base.hpp"
 
 namespace boost { namespace gil {
 
@@ -114,4 +112,4 @@ inline bool construct_matched(any_image<Images>& im,Pred pred) {
 
 } }  // namespace boost::gil
 
-#endif // GIL_DYNAMIC_IO_NEW_HPP
+#endif // BOOST_GIL_EXTENSION_TOOLBOX_DYNAMIC_IMAGES_HPP_INCLUDED
