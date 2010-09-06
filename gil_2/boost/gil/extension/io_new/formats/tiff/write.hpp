@@ -193,10 +193,13 @@ private:
         }
         else
         {
-            uint32 tw = info._tile_width, th = info._tile_length;
+            tiff_tile_width::type  tw = info._tile_width;
+            tiff_tile_length::type th = info._tile_length;
+
             if(!_io_dev.check_tile_size( tw, th ))
-                int i = 9;
-                ; // @todo: warn the user?
+            {
+                io_error( "Tile sizes need to be multiples of 16." );
+            }
 
             // tile related tags
             _io_dev.template set_property<tiff_tile_width> ( tw );
@@ -239,9 +242,9 @@ private:
     }
 
     template< typename View >
-    void write_tiled_data( const View&   src_view
-                         , uint32 tw
-                         , uint32 th
+    void write_tiled_data( const View&            src_view
+                         , tiff_tile_width::type  tw
+                         , tiff_tile_length::type th
                          , const mpl::true_&    // bit_aligned
                          )
     {
@@ -284,9 +287,9 @@ private:
     }
 
     template< typename View >
-    void write_tiled_data( const View&   src_view
-                         , uint32 tw
-                         , uint32 th
+    void write_tiled_data( const View&            src_view
+                         , tiff_tile_width::type  tw
+                         , tiff_tile_length::type th
                          , const mpl::false_&    // bit_aligned
                          )
     {
@@ -301,28 +304,29 @@ private:
 
     template< typename View,
               typename IteratorType >
-    void internal_write_tiled_data( const View&    src_view
-                                  , uint32 tw
-                                  , uint32 th
-                                  , byte_vector_t& row
-                                  , IteratorType   it
+    void internal_write_tiled_data( const View&            src_view
+                                  , tiff_tile_width::type  tw
+                                  , tiff_tile_length::type th
+                                  , byte_vector_t&         row
+                                  , IteratorType           it
                                   )
     {
-        uint32 i = 0, j = 0;
+        std::ptrdiff_t i = 0, j = 0;
         View tile_subimage_view;
-        while(i<src_view.height())
+        while( i < src_view.height() )
         {
-            while(j<src_view.width())
+            while( j < src_view.width() )
             {
-                if(j+tw<src_view.width() && i+th<src_view.height())
+                if( j + tw < src_view.width() && i + th < src_view.height() )
                 {
                     // a tile is fully included in the image: just copy values
                     tile_subimage_view = subimage_view( src_view
-                                                      , j
-                                                      , i
-                                                      , tw
-                                                      , th
+                                                      , static_cast< int >( j  )
+                                                      , static_cast< int >( i  )
+                                                      , static_cast< int >( tw )
+                                                      , static_cast< int >( th )
                                                       );
+
                     std::copy( tile_subimage_view.begin()
                              , tile_subimage_view.end()
                              , it
@@ -330,17 +334,17 @@ private:
                 }
                 else
                 {
-                    uint32 width  = static_cast< uint32 >( src_view.width()  );
-                    uint32 height = static_cast< uint32 >( src_view.height() );
+                    std::ptrdiff_t width  = src_view.width();
+                    std::ptrdiff_t height = src_view.height();
 
-                    uint32 current_tile_width  = (j+tw<width ) ? tw : width -j;
-                    uint32 current_tile_length = (i+th<height) ? th : height-i;
+                    std::ptrdiff_t current_tile_width  = ( j + tw < width ) ? tw : width  - j;
+                    std::ptrdiff_t current_tile_length = ( i + th < height) ? th : height - i;
 
                     tile_subimage_view = subimage_view( src_view
-                                                      , j
-                                                      , i
-                                                      , current_tile_width
-                                                      , current_tile_length
+                                                      , static_cast< int >( j )
+                                                      , static_cast< int >( i )
+                                                      , static_cast< int >( current_tile_width )
+                                                      , static_cast< int >( current_tile_length )
                                                       );
 
                     for( typename View::y_coord_t y = 0; y < tile_subimage_view.height(); ++y )
@@ -351,12 +355,13 @@ private:
                                  );
                         std::advance(it, tw);
                     }
+
                     it = IteratorType( &(*row.begin()));
                 }
 
                 _io_dev.write_tile( row
-                                  , j
-                                  , i
+                                  , static_cast< uint32 >( j )
+                                  , static_cast< uint32 >( i )
                                   , 0
                                   , 0
                                   );

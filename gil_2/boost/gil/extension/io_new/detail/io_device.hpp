@@ -256,7 +256,7 @@ public:
             std::streamsize c = _in.readsome( reinterpret_cast< char* >( data )
                                             , static_cast< std::streamsize >( count ));
 
-            count -= c;
+            count -= static_cast< std::size_t >( c );
             data += c;
             cr += c;
 

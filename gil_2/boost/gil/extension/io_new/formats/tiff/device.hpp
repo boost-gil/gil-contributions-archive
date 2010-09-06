@@ -198,15 +198,20 @@ public:
     }
 
     // return false if the given tile width or height is not TIFF compliant (multiple of 16) or larger than image size, true otherwise
-    bool check_tile_size( uint32& width
-                        , uint32& height )
+    bool check_tile_size( tiff_tile_width::type&  width
+                        , tiff_tile_length::type& height
+
+                        )
     {
         bool result = true;
-        uint32 tw = width;
-        uint32 th = height;
+        uint32 tw = static_cast< uint32 >( width  );
+        uint32 th = static_cast< uint32 >( height );
+
         TIFFDefaultTileSize( _tiff_file.get()
                            , &tw
-                           , &th );
+                           , &th
+                           );
+
         if(width==0 || width%16!=0)
         {
             width = tw;
