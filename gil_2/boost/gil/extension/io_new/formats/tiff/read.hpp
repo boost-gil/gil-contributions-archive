@@ -338,25 +338,53 @@ private:
                        , int         plane
                        )
    {
+      if(  dst_view.width()  != this->_info._width
+        || dst_view.height() != this->_info._height
+        )
+      {
+          // read a subimage
+          read_tiled_data_subimage( dst_view, plane );
+      }
+      else
+      {
+          // read full image
+          read_tiled_data_full( dst_view, plane );
+      }
+   }
+
+   template< typename View >
+   void read_tiled_data_subimage( const View& dst_view
+                                , int         plane
+                                )
+   {
        typedef row_buffer_helper_view< View >           row_buffer_helper_t;
        typedef typename row_buffer_helper_t::buffer_t   buffer_t;
        typedef typename row_buffer_helper_t::iterator_t it_t;
 
-       // TIFFReadTile needs a buffer with enough memory allocated. This size can easily be computed by TIFFTileSize (implemented in device.hpp)
-       row_buffer_helper_t row_buffer_helper(  _io_dev.get_tile_size(), true );
+       tiff_image_width::type  image_width  = this->_info._width;
+       tiff_image_height::type image_height = this->_info._height;
 
-       uint32_t plain_tile_size = this->_info._tile_width * this->_info._tile_length;
+       tiff_tile_width::type  tile_width  = this->_info._tile_width;
+       tiff_tile_length::type tile_height = this->_info._tile_length;
+
+       std::ptrdiff_t subimage_x = this->_settings._top_left.x;
+       std::ptrdiff_t subimage_y = this->_settings._top_left.y;
+
+       std::ptrdiff_t subimage_width  = this->_settings._dim.x;
+       std::ptrdiff_t subimage_height = this->_settings._dim.y;
+
+       row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
 
        mirror_bits< buffer_t
-               , typename is_bit_aligned< View >::type
-               > mirror_bits( _io_dev.are_bytes_swapped() );
+                  , typename is_bit_aligned< View::value_type >::type
+                  > mirror_bits( _io_dev.are_bytes_swapped() );
 
-       for( unsigned int y = 0; y < this->_info._height; y += this->_info._tile_length )
+       for( unsigned int y = 0; y < image_height; y += tile_height )
        {
-           for( unsigned int x = 0; x < this->_info._width; x += this->_info._tile_width )
+           for( unsigned int x = 0; x < image_width; x += tile_width )
            {
-               uint32_t current_tile_width  = (x + this->_info._tile_width <  this->_info._width  ) ? this->_info._tile_width  : this->_info._width  - x;
-               uint32_t current_tile_length = (y + this->_info._tile_length < this->_info._height ) ? this->_info._tile_length : this->_info._height - y;
+               uint32_t current_tile_width  = ( x + tile_width  <  image_width ) ? tile_width  : image_width  - x;
+               uint32_t current_tile_length = ( y + tile_height < image_height ) ? tile_height : image_height - y;
 
                _io_dev.read_tile( row_buffer_helper.buffer()
                                 , x
@@ -367,38 +395,145 @@ private:
 
                mirror_bits( row_buffer_helper.buffer() );
 
-               View tile_subimage_view = subimage_view( dst_view
-                                                      , x
-                                                      , y
-                                                      , current_tile_width
-                                                      , current_tile_length
-                                                      );
+               // these are all whole image coordinates
+               point_t tile_top_left   ( x, y );
+               point_t tile_lower_right( x + current_tile_width - 1, y + current_tile_length - 1 );
 
-               if ( current_tile_width*current_tile_length == plain_tile_size )
+               point_t view_top_left   ( subimage_x, subimage_y );
+               point_t view_lower_right( subimage_x + subimage_width  - 1
+                                       , subimage_y + subimage_height - 1 );
+
+               if(  tile_top_left.x    > view_lower_right.x
+                 || tile_top_left.y    > view_lower_right.y
+                 || tile_lower_right.x < view_top_left.x
+                 || tile_lower_right.y < view_top_left.y
+                 )
                {
-                   it_t first = row_buffer_helper.begin();
-                   it_t last  = first + current_tile_width * current_tile_length;
-
-                   this->_cc_policy.read( first
-                                        , last
-                                        , tile_subimage_view.begin()
-                                        );
+                   // current tile and dst_view do not overlap
+                   continue;
                }
                else
                {
-                   // When the current tile is smaller than a "normal" tile (image borders), we have to iterate over each row
-                   // to get the firsts 'current_tile_width' pixels.
-                   for( unsigned int tile_row=0; tile_row < current_tile_length; ++tile_row )
-                   {
-                       it_t first = row_buffer_helper.begin() + tile_row*this->_info._tile_width;
-                       it_t last  = first + current_tile_width;
+                   // dst_view is overlapping the current tile
 
-                       this->_cc_policy.read( first
-                                              , last
-                                              , tile_subimage_view.begin() + tile_row * current_tile_width
-                                              );
-                   } // for
-               } // else
+                   // next is to define the portion in the tile that needs to be copied
+
+                   // get the whole image coordinates
+                   std::ptrdiff_t img_x0 = ( tile_top_left.x >= view_top_left.x ) ? tile_top_left.x : view_top_left.x;
+                   std::ptrdiff_t img_y0 = ( tile_top_left.y >= view_top_left.y ) ? tile_top_left.y : view_top_left.y;
+
+                   std::ptrdiff_t img_x1 = ( tile_lower_right.x <= view_lower_right.x ) ? tile_lower_right.x : view_lower_right.x;
+                   std::ptrdiff_t img_y1 = ( tile_lower_right.y <= view_lower_right.y ) ? tile_lower_right.y : view_lower_right.y;
+
+                   // convert to tile coordinates
+                   std::ptrdiff_t tile_x0 = img_x0 - x;
+                   std::ptrdiff_t tile_y0 = img_y0 - y;
+                   std::ptrdiff_t tile_x1 = img_x1 - x;
+                   std::ptrdiff_t tile_y1 = img_y1 - y;
+
+                   assert( tile_x0 >= 0 && tile_y0 >= 0 && tile_x1 >= 0 && tile_y1 >= 0 );
+                   assert( tile_x0 <= img_x1 && tile_y0 <= img_y1 );
+                   assert( tile_x0 < tile_width && tile_y0 < tile_height && tile_x1 < tile_width && tile_y1 < tile_height );
+
+                   std::ptrdiff_t tile_subimage_view_width  = tile_x1 - tile_x0 + 1;
+                   std::ptrdiff_t tile_subimage_view_height = tile_y1 - tile_y0 + 1;
+
+                   // convert to dst_view coordinates
+                   std::ptrdiff_t dst_x0 = img_x0 - subimage_x;
+                   std::ptrdiff_t dst_y0 = img_y0 - subimage_y;
+                   assert( dst_x0 >= 0 && dst_y0 >= 0 );
+
+                   View dst_subimage_view = subimage_view( dst_view
+                                                         , (int) dst_x0
+                                                         , (int) dst_y0
+                                                         , (int) tile_subimage_view_width
+                                                         , (int) tile_subimage_view_height
+                                                         );
+
+                   // the row_buffer is a 1D array which represents a 2D image. We cannot
+                   // use interleaved_view here, since row_buffer could be bit_aligned.
+                   // Interleaved_view's fourth parameter "rowsize_in_bytes" doesn't work
+                   // for bit_aligned pixels.
+
+                   for( std::ptrdiff_t dst_row = 0; dst_row < dst_subimage_view.height(); ++dst_row )
+                   {
+                       std::ptrdiff_t tile_row = dst_row + tile_y0;
+
+                       // jump to the beginning of the current tile row
+                       it_t begin = row_buffer_helper.begin() + tile_row * tile_width;
+
+                       begin    += tile_x0;
+                       it_t end  = begin + dst_subimage_view.width();
+
+                       this->_cc_policy.read( begin
+                                            , end
+                                            , dst_subimage_view.row_begin( dst_row )
+                                            );
+                    } //for
+               }
+           } // for
+       } // for
+   }
+
+   template< typename View >
+   void read_tiled_data_full( const View& dst_view
+                            , int         plane
+                            )
+   {
+       typedef row_buffer_helper_view< View >           row_buffer_helper_t;
+       typedef typename row_buffer_helper_t::buffer_t   buffer_t;
+       typedef typename row_buffer_helper_t::iterator_t it_t;
+
+       tiff_image_width::type  image_width  = this->_info._width;
+       tiff_image_height::type image_height = this->_info._height;
+
+       tiff_tile_width::type  tile_width  = this->_info._tile_width;
+       tiff_tile_length::type tile_height = this->_info._tile_length;
+
+       row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
+
+       mirror_bits< buffer_t
+                  , typename is_bit_aligned< View::value_type >::type
+                  > mirror_bits( _io_dev.are_bytes_swapped() );
+
+       for( unsigned int y = 0; y < image_height; y += tile_height )
+       {
+           for( unsigned int x = 0; x < image_width; x += tile_width )
+           {
+               uint32_t current_tile_width  = ( x + tile_width  <  image_width ) ? tile_width  : image_width  - x;
+               uint32_t current_tile_length = ( y + tile_height < image_height ) ? tile_height : image_height - y;
+
+               _io_dev.read_tile( row_buffer_helper.buffer()
+                                , x
+                                , y
+                                , 0
+                                , static_cast< tsample_t >( plane )
+                                );
+
+               mirror_bits( row_buffer_helper.buffer() );
+
+               View dst_subimage_view = subimage_view( dst_view
+                                                     , x
+                                                     , y
+                                                     , current_tile_width
+                                                     , current_tile_length
+                                                     );
+
+               // the row_buffer is a 1D array which represents a 2D image. We cannot
+               // use interleaved_view here, since row_buffer could be bit_aligned.
+               // Interleaved_view's fourth parameter "rowsize_in_bytes" doesn't work
+               // for bit_aligned pixels.
+
+               for( int row = 0; row < dst_subimage_view.height(); ++row )
+               {
+                   it_t begin = row_buffer_helper.begin() + row * tile_width;
+                   it_t end   = begin + dst_subimage_view.width();
+
+                   this->_cc_policy.read( begin
+                                        , end
+                                        , dst_subimage_view.row_begin( row )
+                                        );
+                } //for
            } // for
        } // for
    }
