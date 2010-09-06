@@ -120,12 +120,6 @@
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\conversion_policies.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_io_new.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\gil_extensions.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\io.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>

@@ -155,8 +155,6 @@
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\base.hpp" />
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\bit_operations.hpp" />
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\conversion_policies.hpp" />
-    <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\dynamic_io_new.hpp" />
-    <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\gil_extensions.hpp" />
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\io.hpp" />
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\io_device.hpp" />
     <ClInclude Include="..\..\..\gil_2\boost\gil\extension\io_new\detail\io_error.hpp" />
