@@ -20,8 +20,10 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/gil/extension/toolbox/gil_extensions.hpp>
+
 #include "typedefs.hpp"
-#include "gil_extensions.hpp"
+
 
 namespace boost { namespace gil { namespace detail {
 

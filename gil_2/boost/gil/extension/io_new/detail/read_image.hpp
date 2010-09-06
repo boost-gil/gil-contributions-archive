@@ -23,8 +23,9 @@
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <boost/gil/extension/toolbox/dynamic_images.hpp>
+
 #include "base.hpp"
-#include "dynamic_io_new.hpp"
 #include "io_device.hpp"
 #include "path_spec.hpp"
 #include "conversion_policies.hpp"
