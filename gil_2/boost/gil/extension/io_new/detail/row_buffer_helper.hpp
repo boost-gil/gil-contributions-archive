@@ -96,7 +96,7 @@ struct row_buffer_helper< Pixel
 
     iterator_t begin() { return iterator_t( &_row_buffer.front(),0 ); }
     iterator_t end()   { return _r == 0 ? iterator_t( &_row_buffer.back() + 1,  0 )
-                                        : iterator_t( &_row_buffer.back()    , _r );
+                                        : iterator_t( &_row_buffer.back()    , (int) _r );
                        }
 
     buffer_t& buffer() { return _row_buffer; }
