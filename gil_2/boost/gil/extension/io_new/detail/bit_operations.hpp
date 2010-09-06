@@ -36,8 +36,7 @@ struct mirror_bits
 
 
 // The functor will generate a lookup table since the
-// mirror operation is quite costly. Some basic benchmarks
-// have proven it.
+// mirror operation is quite costly.
 template< typename Buffer >
 struct mirror_bits< Buffer
                   , mpl::true_
