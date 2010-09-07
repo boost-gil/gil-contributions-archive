@@ -376,7 +376,7 @@ private:
        row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
 
        mirror_bits< buffer_t
-                  , typename is_bit_aligned< View::value_type >::type
+                  , typename is_bit_aligned< typename View::value_type >::type
                   > mirror_bits( _io_dev.are_bytes_swapped() );
 
        for( unsigned int y = 0; y < image_height; y += tile_height )
@@ -493,7 +493,7 @@ private:
        row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
 
        mirror_bits< buffer_t
-                  , typename is_bit_aligned< View::value_type >::type
+                  , typename is_bit_aligned< typename View::value_type >::type
                   > mirror_bits( _io_dev.are_bytes_swapped() );
 
        for( unsigned int y = 0; y < image_height; y += tile_height )
