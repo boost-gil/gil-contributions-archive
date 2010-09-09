@@ -80,12 +80,12 @@ public:
           , const cc_t&                           cc
           , const image_read_settings< bmp_tag >& settings
           )
-    : _io_dev( device )
-    , reader_base< bmp_tag
+    : reader_base< bmp_tag
                  , ConversionPolicy
                  >( cc
                   , settings
                   )
+      , _io_dev( device )
     {}
 
     image_read_info< bmp_tag > get_info()
@@ -433,7 +433,7 @@ private:
         byte_vector_t row( pitch );
 
         // read the color masks
-        color_mask mask = { 0 };
+        color_mask mask = { {0} };
         if( _info._compression == bmp_compression::_bitfield )
         {
             mask.red.mask    = _io_dev.read_int32();

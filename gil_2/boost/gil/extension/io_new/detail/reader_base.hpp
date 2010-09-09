@@ -76,8 +76,8 @@ protected:
     reader_base( const typename ConversionPolicy::color_converter_type& cc
                , const image_read_settings< FormatTag >&                settings
                )
-    : _cc_policy( cc )
-    , _settings( settings )
+    : _settings( settings )
+    , _cc_policy( cc )
     {}
 
 private:
