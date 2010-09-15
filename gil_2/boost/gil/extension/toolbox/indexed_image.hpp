@@ -19,7 +19,7 @@
 
 #include <boost/gil/image.hpp>
 
-#include <boost/gil/extension/io_new/detail/gil_extensions.hpp>
+#include <boost/gil/extension/toolbox/gil_extensions.hpp>
 
 namespace boost { namespace gil {
 
