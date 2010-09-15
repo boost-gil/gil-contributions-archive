@@ -278,36 +278,6 @@ BOOST_AUTO_TEST_CASE( subimage_test )
                                             );
 }
 
-BOOST_AUTO_TEST_CASE( subimage_test_2 )
-{
-    typedef bit_aligned_image1_type< 3, gray_layout_t >::type image_t;
-    image_t img1, img2, img3;
-
-    point_t top_left( 10, 10 );
-    point_t dim( 32, 32 );
-
-    image_read_settings< tag_t > settings( top_left, dim );
-
-    read_image( tiff_in_GM + "tiger-minisblack-strip-03.tif"
-              , img1
-              , settings
-              );
-
-    read_image( tiff_in_GM + "tiger-minisblack-tile-03.tif"
-              , img2
-              , settings
-              );
-
-    read_image( tiff_in_GM + "tiger-minisblack-strip-03.tif"
-              , img3
-              , tag_t()
-              );
-    
-    BOOST_CHECK( equal_pixels( const_view( img1 ), const_view( img2 )));
-    BOOST_CHECK( equal_pixels( const_view( img1 ), subimage_view( view( img3 ), top_left, dim )));
-
-}
-
 BOOST_AUTO_TEST_CASE( dynamic_image_test )
 {
     typedef mpl::vector< gray8_image_t
