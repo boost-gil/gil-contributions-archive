@@ -240,6 +240,7 @@
     <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\test.cpp" />
     <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_file_format_test.cpp" />
     <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_old_test.cpp" />
+    <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_subimage_test.cpp" />
     <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_test.cpp" />
     <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_float_test.cpp" />
     <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_minisblack_test_1-10.cpp" />

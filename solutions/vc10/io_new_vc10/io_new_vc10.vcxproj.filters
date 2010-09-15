@@ -377,5 +377,8 @@
     <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_tiled_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\gil_2\libs\gil\io_new\test\tiff_subimage_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
