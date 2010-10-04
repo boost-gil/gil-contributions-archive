@@ -1,0 +1,77 @@
+
+What is it?
+========
+
+The IO extension to boost::gil provides an easy to use interface for reading 
+and writing various image formats. It also includes a framework for adding new 
+formats.
+
+In addition a BOOST.GIL.Toolbox extension provides new color spaces 
+and other small code to ease programming with GIL.
+
+Boost.GIL.IO is indent to replace the current IO extension which is part of
+Boost for several years now.
+
+Boost.GIL.IO provides:
+
+* A unified way to read and write image encoded in BMP, JPEG, PNG, PNM, and 
+ TIFF formats. The capabilities to read and write in various formats have
+ improved dramatically.
+
+* Image data can be provided via a files or as streams ( e.g. stringstream ).
+
+Boost.GIL.Toolbox
+
+* Provides Gray_Alpha, HSL, HSV, LAB, and XYZ colospaces.
+
+This library is header-only. Although, some image formats come with their format 
+dependency:
+
+JPEG - libjpeg
+PNG  - libpng
+TIFF - libtiff
+
+Getting the library
+=============
+The latest version of this library may be downloaded from
+
+ ZIP: http://gil-contributions.googlecode.com/files/boost_review.zip
+ SVN: http://code.google.com/p/gil-contributions/source/browse/trunk/gil_2/
+ 
+and the docs may be viewed here
+
+ html:  todo
+ pdf: todo
+
+The boost_review.zip is about 20MB due to its extensive collection of test images.
+They are part of the test suite to make sure different variations of each 
+image format is read and written correctly.
+
+Pleas be aware, no guarantee can be made that all formats are completely supported.
+ 
+Writing a review
+================
+
+If you feel this is an interesting library, then please submit your
+review to the developer list (preferably), or to the review manager.
+
+Here are some questions you might want to answer in your review:
+
+- What is your evaluation of the design?
+- What is your evaluation of the implementation?
+- What is your evaluation of the documentation?
+- What is your evaluation of the potential usefulness of the library?
+- Did you try to use the library? With what compiler? Did you have any problems?
+- How much effort did you put into your evaluation? A glance? A quick
+- reading? In-depth study?
+- Are you knowledgeable about the problem domain?
+
+And finally, every review should answer this question:
+
+- Do you think the library should be accepted as a Boost library?
+
+Be sure to say this explicitly so that your other comments don't
+obscure your overall opinion.
+
+Mateusz
+Review Manager for the proposed Boost.GIL.IO and Boost.GIL.Toolbox extensions.
