@@ -42,12 +42,6 @@ extern "C" {
 
 namespace boost { namespace gil { namespace detail {
 
-template < typename Pixel >
-struct create_row_buffer_t
-{
-    typedef row_buffer_helper< Pixel > buffer_t;
-};
-
 template < int K >
 struct plane_recursion
 {
@@ -65,7 +59,7 @@ struct plane_recursion
       typedef typename kth_channel_view_type< K, View >::type plane_t;
       plane_t plane = kth_channel_view<K>( dst_view );
       if(!p->_io_dev.is_tiled())
-        p->read_data< row_buffer_helper_view< View > >( plane, K );
+        p->read_data( plane, K );
       else
           p->read_tiled_data( plane, K );
 
@@ -199,10 +193,10 @@ public:
 
             typedef typename is_same< ConversionPolicy
                                     , read_and_no_convert
-                                    >::type is_read_only;
+                                    >::type is_read_and_convert_t;
 
             io_error_if( !is_allowed< View >( this->_info
-                                            , is_read_only()
+                                            , is_read_and_convert_t()
                                             )
                        , "Image types aren't compatible."
                        );
@@ -221,55 +215,7 @@ public:
                 }
                 else
                 {
-                    if( is_read_only::value == false )
-                    {
-                        // the read_data function needs to know what gil type the source image is
-                        // to have the default color converter function correctly
-
-                        switch( this->_info._photometric_interpretation )
-                        {
-                            case PHOTOMETRIC_MINISWHITE:
-                            case PHOTOMETRIC_MINISBLACK:
-                            {
-                                switch( this->_info._bits_per_sample )
-                                {
-                                    //case  1: { read_data_and_convert< typename create_row_buffer_t< gray1_image_t::view_t::reference >::buffer_t >( dst_view, 0 );  break; }
-                                    //case  2: { read_data_and_convert< typename create_row_buffer_t< gray2_image_t::view_t::reference >::buffer_t >( dst_view, 0 );  break; }
-                                    //case  4: { read_data_and_convert< typename create_row_buffer_t< gray4_image_t::view_t::reference >::buffer_t >( dst_view, 0 );  break; }
-                                    case  8: { read_data_and_convert< row_buffer_helper_view< gray8_view_t > >( dst_view, 0 );  break; }
-                                    //case 16: { read_data_and_convert< typename create_row_buffer_t< gray16_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                                    //case 32: { read_data_and_convert< typename create_row_buffer_t< gray32_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                                    //case 64: { read_data_< typename create_row_buffer_t< gray64_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                                }
-                            }
-
-                            //case PHOTOMETRIC_RGB:
-                            //{
-                            //    switch( this->_info._bits_per_sample )
-                            //    {
-                            //        case  8: { read_data_and_convert< typename create_row_buffer_t< rgb8_pixel_t  >::buffer_t >( dst_view, 0 );  break; }
-                            //        case 16: { read_data_and_convert< typename create_row_buffer_t< rgb16_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                            //        case 32: { read_data_and_convert< typename create_row_buffer_t< rgb32_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                            //        case 64: { read_data_and_convert< typename create_row_buffer_t< rgb64_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                            //    }
-
-                            //    break;
-                            //}
-
-                            //case PHOTOMETRIC_SEPARATED: // CYMK
-                            //{
-                            //        case  8: { read_data_and_convert< typename create_row_buffer_t< cmyk8_pixel_t  >::buffer_t >( dst_view, 0 );  break; }
-                            //        case 16: { read_data_and_convert< typename create_row_buffer_t< cmyk16_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                            //        case 32: { read_data_and_convert< typename create_row_buffer_t< cmyk32_pixel_t >::buffer_t >( dst_view, 0 );  break; }
-                            //}
-
-                            default: { io_error( "Not supported colorspace " ); }
-                        }
-                    }
-                    else
-                    {
-                        read_data< row_buffer_helper_view< View > >( dst_view, 0 );
-                    }
+                    read_data( dst_view, 0 );
                 }
             }
             else
@@ -304,7 +250,7 @@ private:
       }
       else
       {
-          read_data< row_buffer_helper_view< View > >( view( indices ), 0 );
+          read_data( view( indices ), 0 );
       }
 
       read_palette_image( dst_view
@@ -592,81 +538,20 @@ private:
        } // for
    }
 
-   template< typename Buffer
-           , typename View
-           >
-   void read_data_and_convert( const View& dst_view
-                             , int         plane     )
-   {
-      typedef typename is_bit_aligned< typename View::value_type >::type is_view_bit_aligned_t;
-
-      typedef typename Buffer::buffer_t   buffer_t;
-      typedef typename Buffer::iterator_t it_t;
-
-      std::size_t size_to_allocate = _io_dev.get_scanline_size();
-
-      Buffer row_buffer_helper( size_to_allocate, true );
-
-      it_t begin = row_buffer_helper.begin();
-
-      it_t first = begin + this->_settings._top_left.x;
-      it_t last  = first + this->_settings._dim.x; // one after last element
-
-      // I don't think tiff allows for random access of row, that's why we need 
-      // to read and discard rows when reading subimages.
-      skip_over_rows( row_buffer_helper.buffer()
-                    , plane
-                    );
-
-      mirror_bits< buffer_t
-                 , is_view_bit_aligned_t
-                 > mirror_bits( _io_dev.are_bytes_swapped() );
-
-      std::ptrdiff_t row     = this->_settings._top_left.y;
-      std::ptrdiff_t row_end = row + this->_settings._dim.y;
-      std::ptrdiff_t dst_row = 0;
-
-      for( 
-         ; row < row_end
-         ; ++row, ++dst_row
-         )
-      {
-         _io_dev.read_scanline( row_buffer_helper.buffer()
-                              , row
-                              , static_cast< tsample_t >( plane )
-                              );
-
-         //mirror_bits( row_buffer_helper.buffer() );
-
-         this->_cc_policy.read( first
-                              , last
-                              , dst_view.row_begin( dst_row ));
-      }
-   }
-
-
-   template< typename Buffer
-           , typename View
-           >
+   template< typename View >
    void read_data( const View& dst_view
                  , int         plane     )
    {
       typedef typename is_bit_aligned< typename View::value_type >::type is_view_bit_aligned_t;
 
-      std::size_t size_to_allocate = buffer_size< typename View::value_type >( dst_view.width()
-                                                                             , is_view_bit_aligned_t() );
-
-
       typedef row_buffer_helper_view< View > row_buffer_helper_t;
-
-      BOOST_STATIC_ASSERT(( is_same< typename Buffer::buffer_t, typename row_buffer_helper_t::buffer_t >::value ));
-      //BOOST_STATIC_ASSERT(( is_same< int, int >::value ));
-
-
-      row_buffer_helper_t row_buffer_helper( size_to_allocate, true );
 
       typedef typename row_buffer_helper_t::buffer_t   buffer_t;
       typedef typename row_buffer_helper_t::iterator_t it_t;
+
+      std::size_t size_to_allocate = buffer_size< typename View::value_type >( dst_view.width()
+                                                                             , is_view_bit_aligned_t() );
+      row_buffer_helper_t row_buffer_helper( size_to_allocate, true );
 
       it_t begin = row_buffer_helper.begin();
 
@@ -680,7 +565,7 @@ private:
                     );
 
       mirror_bits< buffer_t
-                 , is_view_bit_aligned_t
+                 , typename is_bit_aligned< View >::type
                  > mirror_bits( _io_dev.are_bytes_swapped() );
 
       std::ptrdiff_t row     = this->_settings._top_left.y;
