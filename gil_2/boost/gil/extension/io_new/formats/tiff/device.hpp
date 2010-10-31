@@ -75,9 +75,12 @@ public:
        return false;
     }
 
+    // TIFFIsByteSwapped returns a non-zero value if the image data was in a different 
+    // byte-order than the host machine. Zero is returned if the TIFF file and local 
+    // host byte-orders are the same.
     bool are_bytes_swapped()
     {
-      return ( TIFFIsByteSwapped( _tiff_file.get() )) ? true : false;
+        return ( TIFFIsByteSwapped( _tiff_file.get() )) ? true : false;
     }
 
     bool is_tiled() const
