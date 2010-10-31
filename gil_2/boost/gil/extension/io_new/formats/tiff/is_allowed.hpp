@@ -88,7 +88,7 @@ bool compare_channel_sizes( const channel_sizes_t& channel_sizes // in bits
 
 struct compare_channel_sizes_fn
 {
-    compare_channel_sizes_fn( unsigned int* a )
+    compare_channel_sizes_fn( uint16_t* a )
     : _a( a )
     , _b( true )
     {}
@@ -102,7 +102,7 @@ struct compare_channel_sizes_fn
         }
     }
 
-    unsigned int* _a;
+    uint16_t* _a;
     bool _b;
 };
 
