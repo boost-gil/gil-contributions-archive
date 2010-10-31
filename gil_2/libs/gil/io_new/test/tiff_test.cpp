@@ -119,6 +119,21 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
     }
 }
 
+BOOST_AUTO_TEST_CASE( read_and_convert_image_test_2 )
+{
+    gray8_image_t img;
+    read_and_convert_image( tiff_filename, img, tag_t() );
+
+    rgb8_image_t img2;
+    read_image( tiff_filename, img2, tag_t() );
+
+
+    BOOST_CHECK( equal_pixels( const_view( img )
+                             , color_converted_view< gray8_pixel_t>( const_view( img2 ) )
+                             )
+               );
+}
+
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
@@ -280,6 +295,9 @@ BOOST_AUTO_TEST_CASE( subimage_test )
 
 BOOST_AUTO_TEST_CASE( dynamic_image_test )
 {
+    // This test has been disabled for now because of 
+    // compilation issues with MSVC10.
+
     typedef mpl::vector< gray8_image_t
                        , gray16_image_t
                        , rgb8_image_t
