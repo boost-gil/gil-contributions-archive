@@ -59,7 +59,7 @@ struct plane_recursion
       typedef typename kth_channel_view_type< K, View >::type plane_t;
       plane_t plane = kth_channel_view<K>( dst_view );
 
-      p->read_data< row_buffer_helper_view< plane_t > >( plane, K );
+      p->template read_data< row_buffer_helper_view< plane_t > >( plane, K );
 
       plane_recursion< K - 1 >::read_plane( dst_view, p );
    }
