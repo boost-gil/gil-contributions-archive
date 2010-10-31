@@ -65,9 +65,9 @@ struct mirror_bits< Buffer
                     , boost::bind( &mirror_bits< Buffer
                                                , mpl::true_
                                                >::lookup
-                           , *this
-                           , _1
-                           )
+                                 , *this
+                                 , _1
+                                 )
                     );
         }
    }
