@@ -58,10 +58,8 @@ struct plane_recursion
    {
       typedef typename kth_channel_view_type< K, View >::type plane_t;
       plane_t plane = kth_channel_view<K>( dst_view );
-      if(!p->_io_dev.is_tiled())
-        p->read_data( plane, K );
-      else
-          p->read_tiled_data( plane, K );
+
+      p->read_data< row_buffer_helper_view< plane_t > >( plane, K );
 
       plane_recursion< K - 1 >::read_plane( dst_view, p );
    }
@@ -193,10 +191,10 @@ public:
 
             typedef typename is_same< ConversionPolicy
                                     , read_and_no_convert
-                                    >::type is_read_and_convert_t;
+                                    >::type is_read_only;
 
             io_error_if( !is_allowed< View >( this->_info
-                                            , is_read_and_convert_t()
+                                            , is_read_only()
                                             )
                        , "Image types aren't compatible."
                        );
@@ -209,13 +207,59 @@ public:
             }
             else if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
             {
-                if( _io_dev.is_tiled() )
+                if( is_read_only::value == false )
                 {
-                    read_tiled_data( dst_view, 0 );
+                    // the read_data function needs to know what gil type the source image is
+                    // to have the default color converter function correctly
+
+                    switch( this->_info._photometric_interpretation )
+                    {
+                        case PHOTOMETRIC_MINISWHITE:
+                        case PHOTOMETRIC_MINISBLACK:
+                        {
+                            switch( this->_info._bits_per_sample )
+                            {
+                                case  1: { read_data< row_buffer_helper_view< gray1_image_t::view_t > >( dst_view, 0 );  break; }
+                                case  2: { read_data< row_buffer_helper_view< gray2_image_t::view_t > >( dst_view, 0 );  break; }
+                                case  4: { read_data< row_buffer_helper_view< gray4_image_t::view_t > >( dst_view, 0 );  break; }
+                                case  8: { read_data< row_buffer_helper_view< gray8_view_t  > >( dst_view, 0 );  break; }
+                                case 16: { read_data< row_buffer_helper_view< gray16_view_t > >( dst_view, 0 );  break; }
+                                case 32: { read_data< row_buffer_helper_view< gray32_view_t > >( dst_view, 0 );  break; }
+                            }
+
+                            break;
+                        }
+
+                        case PHOTOMETRIC_RGB:
+                        {
+                            switch( this->_info._bits_per_sample )
+                            {
+                                case  8: { read_data< row_buffer_helper_view< rgb8_view_t  > >( dst_view, 0 );  break; }
+                                case 16: { read_data< row_buffer_helper_view< rgb16_view_t > >( dst_view, 0 );  break; }
+                                case 32: { read_data< row_buffer_helper_view< rgb32_view_t > >( dst_view, 0 );  break; }
+                            }
+
+                            break;
+                        }
+
+                        case PHOTOMETRIC_SEPARATED: // CYMK
+                        {
+                            switch( this->_info._bits_per_sample )
+                            {
+                                case  8: { read_data< row_buffer_helper_view< cmyk8_view_t  > >( dst_view, 0 );  break; }
+                                case 16: { read_data< row_buffer_helper_view< cmyk16_view_t > >( dst_view, 0 );  break; }
+                                case 32: { read_data< row_buffer_helper_view< cmyk32_view_t > >( dst_view, 0 );  break; }
+                            }
+
+                            break;
+                        }
+
+                        default: { io_error( "Not supported colorspace " ); }
+                    }
                 }
                 else
                 {
-                    read_data( dst_view, 0 );
+                    read_data< row_buffer_helper_view< View > >( dst_view, 0 );
                 }
             }
             else
@@ -243,15 +287,8 @@ private:
       PaletteImage indices( this->_info._width  - this->_settings._top_left.x
                           , this->_info._height - this->_settings._top_left.y );
 
-
-      if( _io_dev.is_tiled() )
-      {
-          read_tiled_data( view( indices ), 0 );
-      }
-      else
-      {
-          read_data( view( indices ), 0 );
-      }
+      // read the palette first
+      read_data< row_buffer_helper_view< typename PaletteImage::view_t > >( view( indices ), 0 );
 
       read_palette_image( dst_view
                         , view( indices )
@@ -333,7 +370,26 @@ private:
       }
    }
 
-   template< typename View >
+   template< typename Buffer
+           , typename View
+           >
+   void read_data( const View& dst_view
+                 , int         plane     )
+    {
+        if( _io_dev.is_tiled() )
+        {
+            read_tiled_data< Buffer >( dst_view, 0 );
+        }
+        else
+        {
+            read_stripped_data< Buffer >( dst_view, 0 );
+        }
+    }
+
+
+   template< typename Buffer
+           , typename View
+           >
    void read_tiled_data( const View& dst_view
                        , int         plane
                        )
@@ -343,21 +399,28 @@ private:
         )
       {
           // read a subimage
-          read_tiled_data_subimage( dst_view, plane );
+          read_tiled_data_subimage< Buffer >( dst_view, plane );
       }
       else
       {
           // read full image
-          read_tiled_data_full( dst_view, plane );
+          read_tiled_data_full< Buffer >( dst_view, plane );
       }
    }
 
-   template< typename View >
+   template< typename Buffer
+           , typename View
+           >
    void read_tiled_data_subimage( const View& dst_view
                                 , int         plane
                                 )
    {
+       ///@todo: why is 
+       /// typedef Buffer row_buffer_helper_t;
+       /// not working? I get compiler error with MSVC10.
+       /// read_stripped_data IS working.
        typedef row_buffer_helper_view< View >           row_buffer_helper_t;
+
        typedef typename row_buffer_helper_t::buffer_t   buffer_t;
        typedef typename row_buffer_helper_t::iterator_t it_t;
 
@@ -475,12 +538,19 @@ private:
        } // for
    }
 
-   template< typename View >
+   template< typename Buffer
+           , typename View
+           >
    void read_tiled_data_full( const View& dst_view
                             , int         plane
                             )
    {
+       ///@todo: why is 
+       /// typedef Buffer row_buffer_helper_t;
+       /// not working? I get compiler error with MSVC10.
+       /// read_stripped_data IS working.
        typedef row_buffer_helper_view< View >           row_buffer_helper_t;
+
        typedef typename row_buffer_helper_t::buffer_t   buffer_t;
        typedef typename row_buffer_helper_t::iterator_t it_t;
 
@@ -538,13 +608,16 @@ private:
        } // for
    }
 
-   template< typename View >
-   void read_data( const View& dst_view
-                 , int         plane     )
+   template< typename Buffer
+           , typename View
+           >
+   void read_stripped_data( const View& dst_view
+                          , int         plane     )
    {
       typedef typename is_bit_aligned< typename View::value_type >::type is_view_bit_aligned_t;
 
-      typedef row_buffer_helper_view< View > row_buffer_helper_t;
+      //typedef row_buffer_helper_view< View > row_buffer_helper_t;
+      typedef Buffer row_buffer_helper_t;
 
       typedef typename row_buffer_helper_t::buffer_t   buffer_t;
       typedef typename row_buffer_helper_t::iterator_t it_t;
