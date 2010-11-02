@@ -1,5 +1,5 @@
-#ifndef __TIFF_TILED_WRITE_MACROS_HPP__
-#define __TIFF_TILED_WRITE_MACROS_HPP__
+#ifndef BOOST_GIL_TIFF_TILED_WRITE_MACROS_HPP
+#define BOOST_GIL_TIFF_TILED_WRITE_MACROS_HPP
 
 #include <boost/mpl/vector.hpp>
 #include <boost/gil/gil_all.hpp>
@@ -88,4 +88,4 @@ typedef boost::gil::tiff_tag tag_t;
 
 
 
-#endif // __TIFF_TILED_READ_MACROS_HPP__
+#endif // BOOST_GIL_TIFF_TILED_READ_MACROS_HPP
