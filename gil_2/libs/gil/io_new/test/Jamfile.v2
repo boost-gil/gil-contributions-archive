@@ -1,9 +1,14 @@
-# (C) Copyright 2010: Christian Henning
+# (C) Copyright 2010: Christian Henning and Mateusz Loskot
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # bring in rules for testing
 import testing ;
+
+using jpeg : 6a : /home/mloskot/dev/gil/_svn_review/deps/jpeg-8a ;
+using zlib : 1.2.4 : /home/mloskot/dev/gil/_svn_review/deps/zlib-1.2.4 ;
+using png : 1.4.0 : /home/mloskot/dev/gil/_svn_review/deps/libpng-1.4.1 ;
+using libtiff : 3.9.2 : /home/mloskot/dev/gil/_svn_review/deps/tiff-3.9.2 ;
 
 project
     : requirements
@@ -13,59 +18,61 @@ project
         <toolset>msvc-8.0:<define>_CRT_SECURE_NO_DEPRECATE
         <toolset>msvc-9.0:<define>_SCL_SECURE_NO_DEPRECATE
         <toolset>msvc-10.0:<define>_SCL_SECURE_NO_DEPRECATE
-        <library>/boost/test/boost_unit_test_framework
+        <library>/boost/test//boost_unit_test_framework
         <link>static
+		<library>/boost/system//boost_system
+		<library>/boost/filesystem//boost_filesystem
     ;
 
 test-suite "gil::io_new"
     :
-        [ run all_formats_test.cpp ]
+		[ run all_formats_test.cpp /ext/jpeg//jpeg /ext/png//png /ext/libtiff//tiff ]
 
-        [ run bmp_old_test.cpp ]
+		[ run bmp_old_test.cpp ]
         [ run bmp_read_test.cpp ]
         [ run bmp_test.cpp ]
         [ run bmp_write_test.cpp ]
 
-        [ run jpeg_old_test.cpp ]
-        [ run jpeg_read_test.cpp ]
-        [ run jpeg_test.cpp ]
-        [ run jpeg_write_test.cpp ]
+        [ run jpeg_old_test.cpp /ext/jpeg//jpeg ]
+        [ run jpeg_read_test.cpp /ext/jpeg//jpeg ]
+        [ run jpeg_test.cpp /ext/jpeg//jpeg ]
+        [ run jpeg_write_test.cpp /ext/jpeg//jpeg ]
 
-        [ run png_file_format_test.cpp ]
-        [ run png_old_test.cpp ]
-        [ run png_read_test.cpp ]
-        [ run png_test.cpp ]
+        [ run png_file_format_test.cpp /ext/png//png ]
+        [ run png_old_test.cpp /ext/png//png ]
+        [ run png_read_test.cpp /ext/png//png ]
+        [ run png_test.cpp /ext/png//png ]
 
         [ run pnm_old_test.cpp ]
         [ run pnm_read_test.cpp ]
         [ run pnm_test.cpp ]
         [ run pnm_write_test.cpp ]
 
-        [ run test.cpp ]
+        # [ run test.cpp ] # Test setup error: test tree is empty
 
-        [ run tiff_file_format_test.cpp ]
-        [ run tiff_old_test.cpp ]
-		[ run tiff_subimage_test.cpp ]
-        [ run tiff_test.cpp ]
-        [ run tiff_tiled_float_test.cpp ]
-        [ run tiff_tiled_minisblack_test_1-10.cpp ]
-        [ run tiff_tiled_minisblack_test_11-20.cpp ]
-        [ run tiff_tiled_minisblack_test_21-31_32-64.cpp ]
-        [ run tiff_tiled_minisblack_write_test_1-10.cpp ]
-        [ run tiff_tiled_minisblack_write_test_11-20.cpp ]
-        [ run tiff_tiled_minisblack_write_test_21-31_32-64.cpp ]
-        [ run tiff_tiled_palette_test_1-8.cpp ]
-        [ run tiff_tiled_palette_test_8-16.cpp ]
-        [ run tiff_tiled_palette_write_test_1-8.cpp ]
-        [ run tiff_tiled_palette_write_test_8-16.cpp ]
-        [ run tiff_tiled_rgb_contig_test_1-10.cpp ]
-        [ run tiff_tiled_rgb_contig_test_11-20.cpp ]
-        [ run tiff_tiled_rgb_contig_test_21-31_32_64.cpp ]
-        [ run tiff_tiled_rgb_contig_write_test_1-10.cpp ]
-        [ run tiff_tiled_rgb_contig_write_test_11-20.cpp ]
-        [ run tiff_tiled_rgb_contig_write_test_21-31_32_64.cpp ]
-        [ run tiff_tiled_rgb_planar_test_1-10.cpp ]
-        [ run tiff_tiled_rgb_planar_test_11-20.cpp ]
-        [ run tiff_tiled_rgb_planar_test_21-31_32_64.cpp ]
-        [ run tiff_tiled_test.cpp ]
-        ;
+        [ run tiff_file_format_test.cpp /ext/libtiff//tiff ]
+        [ run tiff_old_test.cpp /ext/libtiff//tiff ]
+		[ run tiff_subimage_test.cpp /ext/libtiff//tiff ]
+        [ run tiff_test.cpp /ext/libtiff//tiff /ext/libtiff//tiffxx ]
+        [ run tiff_tiled_float_test.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_minisblack_test_1-10.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_minisblack_test_11-20.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_minisblack_test_21-31_32-64.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_minisblack_write_test_1-10.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_minisblack_write_test_11-20.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_minisblack_write_test_21-31_32-64.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_palette_test_1-8.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_palette_test_8-16.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_palette_write_test_1-8.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_palette_write_test_8-16.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_contig_test_1-10.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_contig_test_11-20.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_contig_test_21-31_32_64.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_contig_write_test_1-10.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_contig_write_test_11-20.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_contig_write_test_21-31_32_64.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_planar_test_1-10.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_planar_test_11-20.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_rgb_planar_test_21-31_32_64.cpp /ext/libtiff//tiff ]
+        [ run tiff_tiled_test.cpp /ext/libtiff//tiff ]
+    ;
