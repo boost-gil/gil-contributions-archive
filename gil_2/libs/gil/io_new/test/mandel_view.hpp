@@ -1,5 +1,5 @@
-#ifndef _GIL_IO_UNIT_TEST_MANDEL_HPP_
-#define _GIL_IO_UNIT_TEST_MANDEL_HPP_
+#ifndef BOOST_GIL_IO_UNIT_TEST_MANDEL_HPP
+#define BOOST_GIL_IO_UNIT_TEST_MANDEL_HPP
 
 #include <boost/gil/gil_all.hpp>
 
@@ -87,5 +87,4 @@ typename mandel_view< Pixel >::type create_mandel_view( unsigned int width
                  );
 }
 
-
-#endif // _GIL_IO_UNIT_TEST_MANDEL_HPP_
+#endif // BOOST_GIL_IO_UNIT_TEST_MANDEL_HPP

@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -108,4 +108,4 @@ template<typename FormatTag, typename Log = typename detail::no_log > struct ima
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_BASE_HPP

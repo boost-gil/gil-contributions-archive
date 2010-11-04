@@ -1,5 +1,5 @@
-#ifndef _GIL_IO_UNIT_TEST_PATHS_HPP_
-#define _GIL_IO_UNIT_TEST_PATHS_HPP_
+#ifndef BOOST_GIL_IO_UNIT_TEST_PATHS_HPP
+#define BOOST_GIL_IO_UNIT_TEST_PATHS_HPP
 
 static const std::string base = "../../../";
 
@@ -25,4 +25,4 @@ static const std::string png_filename ( base    + "test_images/png/wikipedia/tes
 static const std::string pnm_filename ( pnm_in  + "rgb.pnm"                );
 static const std::string tiff_filename( tiff_in + "test.tif"               );
 
-#endif // _GIL_IO_UNIT_TEST_PATHS_HPP_
+#endif // BOOST_GIL_IO_UNIT_TEST_PATHS_HPP

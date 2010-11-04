@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_PNM_ALL_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_PNM_ALL_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_PNM_ALL_HPP
+#define BOOST_GIL_EXTENSION_IO_PNM_ALL_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
@@ -22,4 +22,4 @@
 #include "pnm_read.hpp"
 #include "pnm_write.hpp"
 
-#endif // BOOST_GIL_EXTENSION_IO_PNM_ALL_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_PNM_ALL_HPP

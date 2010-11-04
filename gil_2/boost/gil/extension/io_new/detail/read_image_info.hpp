@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_IMAGE_READ_INFO_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_IMAGE_READ_INFO_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_IMAGE_READ_INFO_HPP
+#define BOOST_GIL_EXTENSION_IO_IMAGE_READ_INFO_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -203,4 +203,4 @@ read_image_info( const String&    file_name
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_IMAGE_READ_INFO_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_IMAGE_READ_INFO_HPP

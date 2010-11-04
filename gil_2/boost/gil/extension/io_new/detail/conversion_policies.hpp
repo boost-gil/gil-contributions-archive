@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_CONVERSION_POLICIES_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_DETAIL_CONVERSION_POLICIES_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_CONVERSION_POLICIES_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_CONVERSION_POLICIES_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -100,4 +100,4 @@ public:
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_CONVERSION_POLICIES_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_CONVERSION_POLICIES_HPP

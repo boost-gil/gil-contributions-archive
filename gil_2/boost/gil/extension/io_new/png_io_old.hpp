@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_PNG_IO_OLD_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_PNG_IO_OLD_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_PNG_IO_OLD_HPP
+#define BOOST_GIL_EXTENSION_IO_PNG_IO_OLD_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
@@ -172,4 +172,4 @@ void png_write_view( const String& filename
 }  // namespace gil
 }  // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_PNG_IO_OLD_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_PNG_IO_OLD_HPP

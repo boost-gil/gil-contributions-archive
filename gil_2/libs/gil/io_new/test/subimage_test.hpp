@@ -1,5 +1,5 @@
-#ifndef _GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP_
-#define _GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP_
+#ifndef BOOST_GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP
+#define BOOST_GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP
 
 #include <boost/gil/gil_all.hpp>
 
@@ -41,4 +41,4 @@ void run_subimage_test( string filename
                );
 }
 
-#endif // _GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP_
+#endif // BOOST_GIL_IO_UNIT_TEST_SUBIMAGE_TEST_HPP

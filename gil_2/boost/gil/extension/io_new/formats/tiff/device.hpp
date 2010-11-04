@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_TIFF_IO_DEVICE_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_DETAIL_TIFF_IO_DEVICE_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_TIFF_IO_DEVICE_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_TIFF_IO_DEVICE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -357,4 +357,4 @@ struct is_adaptable_output_device< FormatTag
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_TIFF_IO_DEVICE_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_TIFF_IO_DEVICE_HPP

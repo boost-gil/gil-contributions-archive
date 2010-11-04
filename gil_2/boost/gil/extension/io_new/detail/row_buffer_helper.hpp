@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_READ_HELPER_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_DETAIL_READ_HELPER_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_READ_HELPER_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_READ_HELPER_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -151,4 +151,4 @@ struct row_buffer_helper_view< View
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_READ_HELPER_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_READ_HELPER_HPP

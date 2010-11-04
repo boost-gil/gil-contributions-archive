@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP
+#define BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP
 
 #include <boost/type_traits/is_base_and_derived.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
@@ -363,4 +363,4 @@ void write_view( const String&                      file_name
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_WRITE_VIEW_HPP

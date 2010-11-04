@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_TIFF_IO_LOG_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_TIFF_IO_LOG_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_TIFF_IO_LOG_HPP
+#define BOOST_GIL_EXTENSION_IO_TIFF_IO_LOG_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -63,4 +63,4 @@ private:
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_TIFF_IO_LOG_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_TIFF_IO_LOG_HPP

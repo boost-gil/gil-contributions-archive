@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP
+#define BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -52,4 +52,4 @@ bool is_allowed( const image_read_info< png_tag >& /* info */
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_PNG_IO_IS_ALLOWED_HPP

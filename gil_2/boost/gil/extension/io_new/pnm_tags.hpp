@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP
+#define BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
@@ -101,4 +101,4 @@ struct image_write_info< pnm_tag >
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP

@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_BMP_READ_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_BMP_READ_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_BMP_READ_HPP
+#define BOOST_GIL_EXTENSION_IO_BMP_READ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
@@ -29,4 +29,4 @@
 #include "detail/read_and_convert_image.hpp"
 #include "detail/read_and_convert_view.hpp"
 
-#endif // BOOST_GIL_EXTENSION_IO_BMP_READ_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_BMP_READ_HPP

@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -76,4 +76,4 @@ inline std::string convert_to_string( filesystem::basic_path<String,T> const& pa
 
 }}}
 
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PATH_SPEC_HPP

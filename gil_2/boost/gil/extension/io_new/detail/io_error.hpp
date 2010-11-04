@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_IO_ERROR_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_DETAIL_IO_ERROR_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_IO_ERROR_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_IO_ERROR_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -38,4 +38,4 @@ void io_error_if( bool expr, const std::string& descr )
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_IO_ERROR_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_IO_ERROR_HPP

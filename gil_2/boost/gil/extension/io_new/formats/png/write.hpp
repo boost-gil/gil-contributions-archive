@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_WRITE_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_WRITE_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_WRITE_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_WRITE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -518,4 +518,4 @@ public:
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_WRITE_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_WRITE_HPP

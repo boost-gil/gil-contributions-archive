@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_IO_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_IO_HPP_INCLUDED 
+#ifndef BOOST_GIL_EXTENSION_IO_IO_HPP
+#define BOOST_GIL_EXTENSION_IO_IO_HPP 
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -103,4 +103,4 @@
  * 
  */
 
-#endif // BOOST_GIL_EXTENSION_IO_IO_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_IO_HPP

@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_PNM_IO_WRITE_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_PNM_IO_WRITE_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_PNM_IO_WRITE_HPP
+#define BOOST_GIL_EXTENSION_IO_PNM_IO_WRITE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -239,4 +239,4 @@ public:
 } // gil
 } // boost
 
-#endif // BOOST_GIL_EXTENSION_IO_JPEG_IO_WRITE_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_JPEG_IO_WRITE_HPP

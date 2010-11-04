@@ -1,5 +1,5 @@
-#ifndef _GIL_IO_UNIT_TEST_CMP_VIEW_HPP_
-#define _GIL_IO_UNIT_TEST_CMP_VIEW_HPP_
+#ifndef BOOST_GIL_IO_UNIT_TEST_CMP_VIEW_HPP
+#define BOOST_GIL_IO_UNIT_TEST_CMP_VIEW_HPP
 
 #include <boost/gil/gil_all.hpp>
 
@@ -31,4 +31,4 @@ void cmp_view( const View& v1
     }
 }
 
-#endif // _GIL_IO_UNIT_TEST_CMP_VIEW_HPP_
+#endif // BOOST_GIL_IO_UNIT_TEST_CMP_VIEW_HPP

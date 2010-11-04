@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_READ_VIEW_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_IO_READ_VIEW_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_IO_READ_VIEW_HPP
+#define BOOST_GIL_EXTENSION_IO_READ_VIEW_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -206,4 +206,4 @@ void read_view( Device&          device
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_READ_VIEW_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_IO_READ_VIEW_HPP
