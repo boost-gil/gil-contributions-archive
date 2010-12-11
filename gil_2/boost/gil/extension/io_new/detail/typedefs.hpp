@@ -80,7 +80,7 @@ typedef image< rgb64f_pixel_t       , true  > rgb64f_planar_image_t;
 typedef image< rgba64f_pixel_t      , false > rgba64f_image_t;
 typedef image< rgba64f_pixel_t      , true  > rgba64f_planar_image_t;
 
-} // namespace details
+} // namespace detail
 } // namespace gil
 } // namespace boost
 
