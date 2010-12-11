@@ -38,7 +38,7 @@ in section [link _Tutorial_ Tutorial]. Also, this extension requires Boost versi
 
 For adding new image formats please refer to section [link _extenting_io_ Extending GIL::IO with new Formats].
 [h2 Supported Platforms]
-All platforms supoorted by boost which have a decent C++ compiler. Depending on the  
+All platforms supported by boost which have a decent C++ compiler. Depending on the  
 image format one or more of the following image libraries might be needed:
 
     * libtiff
@@ -55,17 +55,16 @@ Please see section [link _Supported_Formats_ Supported Image Formats].
 
 [section Tutorial]
 Thanks to modern C++ programming techniques the interface for this library
-is rather small and easy to use. In this tutorial I'll give you a short walkaround 
+is rather small and easy to use. In this tutorial I'll give you a short walk-around 
 on how to use this boost::gil extension. For more details please refer to section 3.
 
 Since this is an extension to boost::gil I expect the user to have some very basic
 understanding of the gil ( generic image library ). Please see here for the help.
 
 [h2 Header Files]
-Before we can read or write image one thing. The header files to be included all have 
-the same format. For instance, tiff_all.hpp will allow to read and write. Whereas, 
-tiff_read only allows for reading. If the user only wants to write jpeg's include
-jpeg_write.hpp. All formats provide these three types of header files:
+The header files to be included all have the same format. For instance, tiff_all.hpp will 
+allow to read and write. Whereas, tiff_read.hpp only allows for reading. If the user only 
+wants to write jpeg's include jpeg_write.hpp. All formats provide these three types of header files:
     * xxx_all.hpp
     * xxx_read.hpp
     * xxx_write.hpp
@@ -84,13 +83,13 @@ Probably the most common case to read a tiff image can be done as follows:
 The code would be same for all other image formats. The only thing that needs to
 change is the tag type ( tiff_tag ) in the read_image call.
 The read_image() expects the supplied image type to be compatible with the 
-image stored in the file. If the user doesn't know what he is dealing with it
+image stored in the file. If the user doesn't know what format an image has he/she
 can use read_and_convert_image().
 Another important fact is that read_image() will allocate the appropriate
 memory needed for the read operation. There are read_view or read_and_convert_view
 counterparts, if the memory is already allocated.
 
-Sometimes the user only wants to read a subpart of an image, then the above call
+Sometimes the user only wants to read a sub-part of an image, then the above call
 would look as follows:
 
     ``
@@ -100,7 +99,7 @@ would look as follows:
               );
     ``
 
-The image_read_settings class will provide the user with image format independet 
+The image_read_settings class will provide the user with image format independent 
 reading setting but can also serves as a pointer for format dependent settings. Please
 see the specific image format sections [link _Supported_Formats_] for more details.
 
@@ -141,7 +140,7 @@ image_write_info class. For instance, a user can specify the jpeg quality when w
 The above example will write an image where the jpeg quality is set to 95 percent.
 
 [h2 Reading And Writing In-Memory Buffers]
-Reading and writing in-mempory buffers are supported as well. See as follows:
+Reading and writing in-memory buffers are supported as well. See as follows:
 
     ``
     // 1. Read an image.
@@ -318,7 +317,7 @@ Currently the code is able to read and write the following image types:
 Read: gray1, gray2, gray4, gray8, gray16, gray_alpha_8, gray_alpha_16, rgb8, rgb16, rgba8, rgba16
 Write: gray1, gray2, gray4, gray8, gray16, gray_alpha_8, gray_alpha_16, rgb8, rgb16, rgba8, rgba16
 
-For reading gray_alpa images the user has to enable the ENABLE_GRAY_ALPHA compiler switch. This color
+For reading gray_alpha images the user has to enable the ENABLE_GRAY_ALPHA compiler switch. This color
 space is defined in the toolbox by using gray_alpha.hpp.
 
 [h3 PNM]
