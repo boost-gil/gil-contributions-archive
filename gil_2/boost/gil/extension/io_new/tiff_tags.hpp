@@ -154,7 +154,8 @@ struct tiff_copyright : tiff_property_base< std::string, TIFFTAG_COPYRIGHT > {};
 struct tiff_sample_format : tiff_property_base< uint16_t, TIFFTAG_SAMPLEFORMAT > {};
 
 /// Defines type for indexed property.
-struct tiff_indexed : tiff_property_base< bool, TIFFTAG_INDEXED > {};
+/// Not supported yet
+//struct tiff_indexed : tiff_property_base< bool, TIFFTAG_INDEXED > {};
 
 /// Tile related tags
 
