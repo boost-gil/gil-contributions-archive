@@ -36,3 +36,102 @@ todo list
 * make sure to read all tiff properties
 
 * add a log facility for all image formats
+
+* add Kenneth Riddile targa support, see email from 12/02/2010
+
+
+----------------------------------------------
+
+review related todo's
+
+* add some tests which read errorneous images to test error handling
+	- see Fabio Fracassi email from 12/06/2010
+	- esspecially test longjmp though different platform behavior can be tested
+
+* build and boostify the documentation
+
+Kenny review ( email from 12/06/2010 )
+* rename read_intXX to read_uintXX, see io_device.hpp
+
+Edd review ( email from 12/06/2010 )
+* Is there support for obtaining the real-world dimensions of a loaded
+  raster in millimetres, say? I work on CAD/graphics applications which
+  need this functionality in order to generate reasonable texture coordinates.
+  
+  * In the case of libjpeg, the information is exposed/advertised in the jpeg_decompress_struct and jpeg_compress_struct structures. 
+    You can see how I use them here:
+    http://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/read.cpp#cl-62
+    http://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/write.cpp#cl-75
+
+  * use the image under EddDawson/ in test_images folder
+	
+  * In libpng, have a look in the docs for e.g. png_get_x_pixels_per_meter.
+
+* Add something similar to JPEGXX_C_LIB_COMPILED_AS_CPLUSPLUS and JPEGXX_CAN_THROW_EXCEPTIONS_ to io_new
+    * see above links and download jpegxx
+
+* Allow to open file with unicode filenames. See wfopen.
+
+* Exception safty
+   * They might not have a chance when an exception is thrown from a function that is called from C (one of the callbacks 
+     installed in jpeg_decompress_struct, for example). All (portable) bets are off in this situation, as far as I know. 
+	 This is where the boost::current_exception() suggestion comes from. You can catch and store the exception inside the 
+	 callback (as best as possible) and then rethrow it when you're safely back in C++ land.
+   * I don't actually use boost::current_exception in my code (it doesn't depend on boost at all, currently), but I do 
+     something very similar. Here, for instance:
+     http://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/read.cpp#cl-166
+
+     The exact type and behaviour of the ex_store_ object there depends on the preprocessor definitions that are present 
+	 when the library is built. See:
+     http://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/best_exception_store.hpp
+
+     And for the various exception_store implementations:
+     http://bitbucket.org/edd/imagexx/src/5c44e8ad57e7/include/imagexx/exceptions/
+
+
+  
+Lubomir review ( email from  ):
+* Support for reading images whose file format is unknown at compile time. That 
+  involves the ability to register file formats / backends, associate them with 
+  given extensions and then call the appropriate reader based on the extension 
+  of the filename.
+
+* Support for efficient reading/writing of parts of images that are too large to 
+  fit in memory. There are two ways to proceed: one is to have an input/output iterator 
+  that enforces sequential access, and another is to allow for user-driven access at the 
+  cost of sometimes severe performance. I'd like to hear the opinion of people who would 
+  use this more advanced options.
+
+* Support for efficient reading/writing of parts of images that are too large to fit 
+  in memory. There are two ways to proceed: one is to have an input/output iterator 
+  that enforces sequential access, and another is to allow for user-driven access at 
+  the cost of sometimes severe performance. I'd like to hear the opinion of people who 
+  would use this more advanced options.
+
+* Optional: I would like to have a GIL virtual image view associated with a given file. That would allow 
+  reading/writing to simply be copy_pixels, and reading into a different format to be copy_and_convert_pixels.
+  Reading a given ROI could simply be done by creating a subimage_view. The cool thing about this is one 
+  could in theory make changes to images without even loading them in memory. The caviat is that doing 
+  this right and efficiently is very hard, requires clever caching, plus a wrong access pattern 
+  can result in horribly bad performance.
+  
+Roland review ( email from 12/11/2010 )
+
+* There seem to be broken links:
+  * "section Extending GIL::IO with new Formats" links to index.html
+  * "Please see section Supported Image Formats." links to index.html
+  * "sections _Supported_Formats_ for more details." links to /
+
+* It would be good to have code samples for read_and_convert_image, read_view
+  and read_and_convert_view in the tutorial. The "Using IO" section seems to
+  assume that they are already documented: "As the Tutorial demonstrated there
+  are a few ways to read images."
+
+* Additionally, it would be great to have a reference section. :-)
+
+* I stumbled over a few typos and grammatically unusual sentences (IMHO):
+  * s/supoorted/supported/
+  * "Before we can read or write image one thing." I know what that means in German, but does this make sense in English?
+  * "If the user doesn't know what he is dealing with it can use read_and_convert_image()." s/it/he/  
+
+  
