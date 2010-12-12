@@ -350,7 +350,7 @@ integer values or floating point values. For a complete set of options please co
 The author of this extension is not claiming all tiff formats are supported. This extension is
 likely to be a moving target adding new features with each new milestone. Here is an incomplete lists:
 
-	* Multipage tiffs - read only
+	* Multi-page tiffs - read only
 	* Strip tiffs - read and write support
 	* Tiled tiffs - read and write support with user defined tiled sizes
 	* bit images tiffs - fully supported, like gray1_image_t ( minisblack )
@@ -359,7 +359,7 @@ likely to be a moving target adding new features with each new milestone. Here i
 	* palette tiffs - supported but no indexed image type is available as of now
 
 This gil extension uses two different test image suites to test read and write capabilities. See test_image folder.
-It's advisble to use ImageMagick's test viewer to display images.
+It's advisable to use ImageMagick's test viewer to display images.
 	
 [h2 Extending GIL::IO with new Formats]
 Extending the gil::io with new formats is meant to be simple and straightforward. Before adding I would
