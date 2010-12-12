@@ -131,7 +131,7 @@ Roland review ( email from 12/11/2010 )
 
 * I stumbled over a few typos and grammatically unusual sentences (IMHO):
   * s/supoorted/supported/
-  * "Before we can read or write image one thing." I know what that means in German, but does this make sense in English?
-  * "If the user doesn't know what he is dealing with it can use read_and_convert_image()." s/it/he/  
+  * FIXED: "Before we can read or write image one thing." I know what that means in German, but does this make sense in English?
+  * FIXED: "If the user doesn't know what he is dealing with it can use read_and_convert_image()." s/it/he/  
 
   
