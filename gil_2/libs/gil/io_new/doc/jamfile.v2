@@ -22,4 +22,12 @@ path-constant images_location : html ;
 boostbook standalone
     :
         io
+	:
+        <xsl:param>boost.root=../../../../..
+        <xsl:param>boost.max.id.length=1024
+        <xsl:param>toc.max.depth=4
+        <xsl:param>toc.section.depth=4
+        <xsl:param>chunk.section.depth=2
+        <format>pdf:<xsl:param>img.src.path=$(images_location)/
+        <format>pdf:<xsl:param>boost.url.prefix=http://www.boost.org/doc/libs/release/doc/html
     ;
