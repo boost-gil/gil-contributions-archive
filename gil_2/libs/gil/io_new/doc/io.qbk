@@ -10,9 +10,7 @@
     [license
         Distributed under the Boost Software License, Version 1.0.
         (See accompanying file LICENSE_1_0.txt or copy at
-        <ulink url="http://www.boost.org/LICENSE_1_0.txt">
-            http://www.boost.org/LICENSE_1_0.txt
-        </ulink>)
+        [@http://www.boost.org/LICENSE_1_0.txt])
     ]
 ]
 
@@ -33,23 +31,23 @@ This extension to boost::gil provides an easy to use interface for reading and w
 various image formats. It also includes a framework for adding new formats.
 
 Please see section 3.3 for all supported image formats. A basic tutorial is provided 
-in section [link _Tutorial_ Tutorial]. Also, this extension requires Boost version 1.42 and up.
+in section [link gil.io.tutorial Tutorial]. Also, this extension requires Boost version 1.42 and up.
 
-For adding new image formats please refer to section [link _extenting_io_ Extending GIL::IO with new Formats].
+For adding new image formats please refer to section [link gil.io.using_io.extending_gil__io_with_new_formats Extending GIL::IO with new Formats].
 [h2 Supported Platforms]
 All platforms supported by boost which have a decent C++ compiler. Depending on the  
 image format one or more of the following image libraries might be needed:
 
-    * libtiff
-    * libjpeg
-    * libpng
+* libtiff
+* libjpeg
+* libpng
 
 The library is designed to support as many formats as required by the user.
 For instance, if the user only needs bmp support none of the above mentioned 
 dependencies are required.
 
 There are more details available in this documentation on the image format dependencies. 
-Please see section [link _Supported_Formats_ Supported Image Formats].
+Please see section [link gil.io.using_io.supported_image_formats Supported Image Formats].
 [endsect]
 
 [section Tutorial]
@@ -65,9 +63,9 @@ The header files to be included all have the same format. For instance, tiff_all
 allow to read and write. Whereas, tiff_read.hpp only allows for reading. If the user only 
 wants to write jpeg's include jpeg_write.hpp. All formats provide these three types of header files:
 
-    * xxx_all.hpp
-    * xxx_read.hpp
-    * xxx_write.hpp
+* xxx_all.hpp
+* xxx_read.hpp
+* xxx_write.hpp
 
 xxx stands for image format.
 
@@ -97,7 +95,7 @@ would look as follows:
 
 The image_read_settings class will provide the user with image format independent 
 reading setting but can also serves as a pointer for format dependent settings. Please
-see the specific image format sections [link _Supported_Formats_] for more details.
+see the specific image format sections [link gil.io.using_io.supported_image_formats Supported Image Formats] for more details.
 
 [h2 Writing An Image]
 Besides reading the information also writing is the second part of this boost::gil extension.
@@ -164,7 +162,7 @@ write, seek, close, etc. Interface.
 
 [endsect]
 
-[section Using IO]
+[section:using_io Using IO]
 [h2 Read Interface]
 As the Tutorial demonstrated there are a few ways to read images. Here is an enumeration of 
 all read functions with a short description:
@@ -322,51 +320,52 @@ TIFF images can virtually encode all kinds of channel sizes representing various
 planar images are possible. For instance, rbg323 or gray7. The channels also can have specific formats, like
 integer values or floating point values. For a complete set of options please consult the following websites:
 
-    * _TIFF_Base_Tags_
-    * _TIFF_Extension_Tags_
+* _TIFF_Base_Tags_
+* _TIFF_Extension_Tags_
 
 The author of this extension is not claiming all tiff formats are supported. This extension is
 likely to be a moving target adding new features with each new milestone. Here is an incomplete lists:
 
-	* Multi-page tiffs - read only
-	* Strip tiffs - read and write support
-	* Tiled tiffs - read and write support with user defined tiled sizes
-	* bit images tiffs - fully supported, like gray1_image_t ( minisblack )
-	* planar tiffs - fully supported
-	* floating point tiffs - fully supported
-	* palette tiffs - supported but no indexed image type is available as of now
+* Multi-page tiffs - read only
+* Strip tiffs - read and write support
+* Tiled tiffs - read and write support with user defined tiled sizes
+* bit images tiffs - fully supported, like gray1_image_t ( minisblack )
+* planar tiffs - fully supported
+* floating point tiffs - fully supported
+* palette tiffs - supported but no indexed image type is available as of now
 
 This gil extension uses two different test image suites to test read and write capabilities. See test_image folder.
 It's advisable to use ImageMagick's test viewer to display images.
-	
+
 [h2 Extending GIL::IO with new Formats]
 Extending the gil::io with new formats is meant to be simple and straightforward. Before adding I would
 recommend to have a look at existing implementations and then trying to follow a couple of guidelines:
 
-    * Create the following files for your new xxx format
-        * xxx_read.hpp // Only includes read code
-        * xxx_write.hpp // Only includes write code
-        * xxx_all.hpp // includes xxx_read.hpp and xxx_write.hpp
-    * Add the code to the boost::gil::detail namespace
-    * Create a tag type for the new format. Like this:
-
+* Create the following files for your new xxx format
+	* xxx_read.hpp // Only includes read code
+	* xxx_write.hpp // Only includes write code
+	* xxx_all.hpp // includes xxx_read.hpp and xxx_write.hpp
+* Add the code to the boost::gil::detail namespace
+* Create a tag type for the new format. Like this:
+  ``
 		struct xxx_tag : format_tag {};
+  ``
 
-    * Create the image_read_info for the new format. It contains all the information that are
-      necessary to read an image. It should be filled and returned by the get_info() member of
-      the reader class. See below.
-      
-      template<> struct image_read_info< xxx_tag > {};
-      
+* Create the image_read_info for the new format. It contains all the information that are
+  necessary to read an image. It should be filled and returned by the get_info() member of
+  the reader class. See below.
+  ``
+	  template<> struct image_read_info< xxx_tag > {};
+  ``
 
-    * Create the image_write_info for the new format. It contains all the information that are
-      necessary to write an image.
-      
-      template<> struct image_write_info< xxx_tag > {};
-      
+* Create the image_write_info for the new format. It contains all the information that are
+  necessary to write an image.
+  ``
+	  template<> struct image_write_info< xxx_tag > {};
+  ``
 
-    * Use the following reader skeleton as a start:
-    
+* Use the following reader skeleton as a start:
+  ``
     template< typename Device
             , typename ConversionPolicy
             >
@@ -408,10 +407,10 @@ recommend to have a look at existing implementations and then trying to follow a
             // your implementation here
         }
     };
-    
+  `` 
 
-    * The writer skeleton:
-    
+* The writer skeleton:
+  ``    
     template< typename Device >
     class writer< Device
                 , xxx_tag
@@ -436,6 +435,6 @@ recommend to have a look at existing implementations and then trying to follow a
             // your implementation here
         }
     };
-    
-[endsect]
+  ``
 
+[endsect]
