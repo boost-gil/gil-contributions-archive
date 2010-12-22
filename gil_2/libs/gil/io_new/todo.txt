@@ -39,6 +39,7 @@ todo list
 
 * add Kenneth Riddile targa support, see email from 12/02/2010
 
+* provide better documentation for adding new device types. 
 
 ----------------------------------------------
 
