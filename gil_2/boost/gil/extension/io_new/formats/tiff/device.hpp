@@ -150,7 +150,7 @@ public:
         {
             std::ostringstream oss;
             oss << "Read tile error (" << x << "," << y << "," << z << "," << plane << ").";
-            io_error(oss.str());
+            io_error(oss.str().c_str());
         }
     }
 
@@ -187,7 +187,7 @@ public:
            {
                std::ostringstream oss;
                oss << "Write tile error (" << x << "," << y << "," << z << "," << plane << ").";
-               io_error(oss.str());
+               io_error(oss.str().c_str());
            }
     }
 
