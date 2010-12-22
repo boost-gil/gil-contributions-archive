@@ -22,13 +22,13 @@
 namespace boost { namespace gil { namespace detail {
 
 inline 
-void io_error( const std::string& descr )
+void io_error( const char* descr )
 {
    throw std::ios_base::failure( descr );
 }
 
 inline 
-void io_error_if( bool expr, const std::string& descr )
+void io_error_if( bool expr, const char* descr )
 {
    if( expr ) 
       io_error( descr );
