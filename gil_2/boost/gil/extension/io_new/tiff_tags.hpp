@@ -31,9 +31,9 @@ namespace boost { namespace gil {
 /// Defines tiff tag.
 struct tiff_tag : format_tag {};
 
-/// For a description see: http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
-/// see http://www.remotesensing.org/libtiff/
-/// or http://www.libtiff.org/man/
+/// http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
+/// http://www.remotesensing.org/libtiff/
+
 
 /// TIFF property base class
 template< typename T, int Value >
