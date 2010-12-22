@@ -1,5 +1,6 @@
 #include <fstream>
 
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem/path.hpp>
 
 #include <boost/test/unit_test.hpp>

@@ -2,6 +2,8 @@
 #define BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 #include <boost/cstdint.hpp>
+
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/extension/io_new/png_all.hpp>
