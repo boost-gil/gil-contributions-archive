@@ -23,8 +23,10 @@
 #include <malloc.h>
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem/path.hpp>
 #endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+
 namespace boost{ namespace gil{ namespace detail{
 
 template<typename P> struct is_supported_path_spec       : mpl::false_ {};
