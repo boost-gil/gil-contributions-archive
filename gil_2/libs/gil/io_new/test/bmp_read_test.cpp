@@ -1,9 +1,9 @@
+//#define BOOST_TEST_MODULE bmp_read_test_module
+#include <boost/test/unit_test.hpp>
+#include <boost/type_traits/is_same.hpp>
+
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/bmp_all.hpp>
-
-#include <boost/test/unit_test.hpp>
-
-#include <boost/type_traits/is_same.hpp>
 
 #include "paths.hpp"
 

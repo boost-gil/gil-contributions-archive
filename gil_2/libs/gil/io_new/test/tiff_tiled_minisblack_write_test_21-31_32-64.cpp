@@ -4,7 +4,9 @@
  *
  *******************************************************/
 
+//#define BOOST_TEST_MODULE tiff_tiled_miniblack_write_test_21_31_32_64_module
 #include <boost/test/unit_test.hpp>
+
 #include "tiff_tiled_write_macros.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )

@@ -1,9 +1,9 @@
-#include <fstream>
-
+//#define BOOST_TEST_MODULE jpeg_test_module
+#include <boost/test/unit_test.hpp>
 #define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem/path.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <fstream>
 
 #include <boost/gil/gil_all.hpp>
 

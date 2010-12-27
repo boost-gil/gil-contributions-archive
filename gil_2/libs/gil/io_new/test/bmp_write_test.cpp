@@ -1,9 +1,10 @@
+//#define BOOST_TEST_MODULE bmp_write_test_module
+#include <boost/test/unit_test.hpp>
+
 #include <boost/gil/gil_all.hpp>
 
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 #include <boost/gil/extension/io_new/bmp_write.hpp>
-
-#include <boost/test/unit_test.hpp>
 
 #include "mandel_view.hpp"
 #include "paths.hpp"

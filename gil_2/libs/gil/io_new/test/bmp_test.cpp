@@ -1,3 +1,6 @@
+//#define BOOST_TEST_MODULE bmp_test_module
+#include <boost/test/unit_test.hpp>
+
 #define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 
 #include <fstream>
@@ -7,8 +10,6 @@
 
 #define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem/convenience.hpp>
-
-#include <boost/test/unit_test.hpp>
 
 #include "mandel_view.hpp"
 #include "paths.hpp"

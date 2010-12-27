@@ -1,3 +1,6 @@
+//#define BOOST_TEST_MODULE png_read_test_module
+#include <boost/test/unit_test.hpp>
+
 #define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #define BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
@@ -7,8 +10,6 @@
 #include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/extension/io_new/png_all.hpp>
-
-#include <boost/test/unit_test.hpp>
 
 #include <iostream>
 

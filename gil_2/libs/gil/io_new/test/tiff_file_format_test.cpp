@@ -4,10 +4,10 @@
  * tiff formats. 
  *
  **************************************************/
+//#define BOOST_TEST_MODULE tiff_file_format_test_module
+#include <boost/test/unit_test.hpp>
 
 #include <boost/gil/extension/io_new/tiff_all.hpp>
-
-#include <boost/test/unit_test.hpp>
 
 #include "paths.hpp"
 

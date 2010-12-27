@@ -4,7 +4,9 @@
  *
  *******************************************************/
 
+//#define BOOST_TEST_MODULE tiff_tiled_miniblack_test_21_31_32_64_module
 #include <boost/test/unit_test.hpp>
+
 #include <boost/cstdint.hpp>
 #include "tiff_tiled_read_macros.hpp"
 

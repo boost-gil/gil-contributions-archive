@@ -3,8 +3,9 @@
  * This test file will test RGB contig tiled tiff reading
  *
  *******************************************************/
-
+//#define BOOST_TEST_MODULE tiff_tiled_rgb_contig_test_11_20_module
 #include <boost/test/unit_test.hpp>
+
 #include "tiff_tiled_read_macros.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )

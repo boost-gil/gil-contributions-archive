@@ -4,10 +4,11 @@
  *
  *******************************************************/
 
+//#define BOOST_TEST_MODULE tiff_tiled_float_test_module
+#include <boost/test/unit_test.hpp>
+
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 #include "paths.hpp"
-
-#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace boost;

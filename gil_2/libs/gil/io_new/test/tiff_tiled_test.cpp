@@ -4,11 +4,11 @@
  * This test file will test tiled tiff reading
  *
  **************************************************/
+//#define BOOST_TEST_MODULE tiff_tiled_test_module
+#include <boost/test/unit_test.hpp>
 
 #include <boost/gil/extension/io_new/tiff_read.hpp>
 #include "paths.hpp"
-
-#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace boost;

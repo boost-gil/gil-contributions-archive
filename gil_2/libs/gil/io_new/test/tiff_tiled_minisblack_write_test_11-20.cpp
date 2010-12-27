@@ -3,8 +3,9 @@
  * This test file will test gray tiled tiff writing
  *
  *******************************************************/
-
+//#define BOOST_TEST_MODULE tiff_tiled_miniblack_write_test_11_20_module
 #include <boost/test/unit_test.hpp>
+
 #include "tiff_tiled_write_macros.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
