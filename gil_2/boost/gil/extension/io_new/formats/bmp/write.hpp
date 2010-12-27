@@ -105,24 +105,24 @@ private:
         std::size_t siz = ofs + spn * view.height();
 
         // write the BMP file header
-        _out.write_int16( bmp_signature );
-        _out.write_int32( (uint32_t) siz );
-        _out.write_int16( 0 );
-        _out.write_int16( 0 );
-        _out.write_int32( (uint32_t) ofs );
+        _out.write_uint16( bmp_signature );
+        _out.write_uint32( (uint32_t) siz );
+        _out.write_uint16( 0 );
+        _out.write_uint16( 0 );
+        _out.write_uint32( (uint32_t) ofs );
 
         // writes Windows information header
-        _out.write_int32( bmp_header_size::_win32_info_size );
-        _out.write_int32( static_cast< uint32_t >( view.width()  ));
-        _out.write_int32( static_cast< uint32_t >( view.height() ));
-        _out.write_int16( 1 );
-        _out.write_int16( static_cast< uint16_t >( bpp ));
-        _out.write_int32( bmp_compression::_rgb );
-        _out.write_int32( 0 );
-        _out.write_int32( 0 );
-        _out.write_int32( 0 );
-        _out.write_int32( entries );
-        _out.write_int32( 0 );
+        _out.write_uint32( bmp_header_size::_win32_info_size );
+        _out.write_uint32( static_cast< uint32_t >( view.width()  ));
+        _out.write_uint32( static_cast< uint32_t >( view.height() ));
+        _out.write_uint16( 1 );
+        _out.write_uint16( static_cast< uint16_t >( bpp ));
+        _out.write_uint32( bmp_compression::_rgb );
+        _out.write_uint32( 0 );
+        _out.write_uint32( 0 );
+        _out.write_uint32( 0 );
+        _out.write_uint32( entries );
+        _out.write_uint32( 0 );
 
         write_image< View
                    , typename get_bgr_cs< num_channels< View >::value >::type

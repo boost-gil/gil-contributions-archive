@@ -94,57 +94,57 @@ public:
 
         // the magic number used to identify the BMP file:
         // 0x42 0x4D (ASCII code points for B and M)
-        if( _io_dev.read_int16() == 0x424D )
+        if( _io_dev.read_uint16() == 0x424D )
         {
             io_error( "Wrong magic number for bmp file." );
         }
 
         // the size of the BMP file in bytes
-        _io_dev.read_int32();
+        _io_dev.read_uint32();
 
         // reserved; actual value depends on the application that creates the image
-        _io_dev.read_int16();
+        _io_dev.read_uint16();
         // reserved; actual value depends on the application that creates the image
-        _io_dev.read_int16();
+        _io_dev.read_uint16();
 
-        _info._offset = _io_dev.read_int32();
+        _info._offset = _io_dev.read_uint32();
 
 
         // bitmap information
 
         // the size of this header ( 40 bytes )
-        _info._header_size = _io_dev.read_int32();
+        _info._header_size = _io_dev.read_uint32();
 
         if( _info._header_size == bmp_header_size::_win32_info_size )
         {
-            _info._width  = _io_dev.read_int32();
-            _info._height = _io_dev.read_int32();
+            _info._width  = _io_dev.read_uint32();
+            _info._height = _io_dev.read_uint32();
 
             // the number of color planes being used. Must be set to 1.
-            _io_dev.read_int16();
+            _io_dev.read_uint16();
 
-            _info._bits_per_pixel = _io_dev.read_int16();
+            _info._bits_per_pixel = _io_dev.read_uint16();
 
-            _info._compression = _io_dev.read_int32();
+            _info._compression = _io_dev.read_uint32();
 
-            _info._image_size = _io_dev.read_int32();
+            _info._image_size = _io_dev.read_uint32();
 
-            _info._horizontal_resolution = _io_dev.read_int32();
-            _info._vertical_resolution   = _io_dev.read_int32();
+            _info._horizontal_resolution = _io_dev.read_uint32();
+            _info._vertical_resolution   = _io_dev.read_uint32();
 
-            _info._num_colors           = _io_dev.read_int32();
-            _info._num_important_colors = _io_dev.read_int32();
+            _info._num_colors           = _io_dev.read_uint32();
+            _info._num_important_colors = _io_dev.read_uint32();
 
         }
         else if( _info._header_size == bmp_header_size::_os2_info_size )
         {
-            _info._width  = static_cast< bmp_image_width::type  >( _io_dev.read_int16() );
-            _info._height = static_cast< bmp_image_height::type >( _io_dev.read_int16() );
+            _info._width  = static_cast< bmp_image_width::type  >( _io_dev.read_uint16() );
+            _info._height = static_cast< bmp_image_height::type >( _io_dev.read_uint16() );
 
             // the number of color planes being used. Must be set to 1.
-            _io_dev.read_int16();
+            _io_dev.read_uint16();
 
-            _info._bits_per_pixel = _io_dev.read_int16();
+            _info._bits_per_pixel = _io_dev.read_uint16();
 
             _info._compression = bmp_compression::_rgb;
 
@@ -357,15 +357,15 @@ private:
 
         for( int i = 0; i < entries; ++i )
         {
-            get_color( palette[i], blue_t()  ) = _io_dev.read_int8();
-            get_color( palette[i], green_t() ) = _io_dev.read_int8();
-            get_color( palette[i], red_t()   ) = _io_dev.read_int8();
+            get_color( palette[i], blue_t()  ) = _io_dev.read_uint8();
+            get_color( palette[i], green_t() ) = _io_dev.read_uint8();
+            get_color( palette[i], red_t()   ) = _io_dev.read_uint8();
 
             // there are 4 entries when windows header
             // but 3 for os2 header
             if( _info._header_size == bmp_header_size::_win32_info_size )
             {
-                _io_dev.read_int8();
+                _io_dev.read_uint8();
             }
 
         } // for
@@ -436,9 +436,9 @@ private:
         color_mask mask = { {0} };
         if( _info._compression == bmp_compression::_bitfield )
         {
-            mask.red.mask    = _io_dev.read_int32();
-            mask.green.mask  = _io_dev.read_int32();
-            mask.blue.mask   = _io_dev.read_int32();
+            mask.red.mask    = _io_dev.read_uint32();
+            mask.green.mask  = _io_dev.read_uint32();
+            mask.blue.mask   = _io_dev.read_uint32();
 
             mask.red.width   = count_ones( mask.red.mask   );
             mask.green.width = count_ones( mask.green.mask );
@@ -613,8 +613,8 @@ private:
 
         while ( !finished )
         {
-            std::ptrdiff_t count  = _io_dev.read_int8();
-            std::ptrdiff_t second = _io_dev.read_int8();
+            std::ptrdiff_t count  = _io_dev.read_uint8();
+            std::ptrdiff_t second = _io_dev.read_uint8();
             stream_pos += 2;
 
             if ( count )
@@ -676,8 +676,8 @@ private:
 
                     case 2:  // offset coordinates
                     {
-                        std::ptrdiff_t dx = _io_dev.read_int8();
-                        std::ptrdiff_t dy = _io_dev.read_int8() * yinc;
+                        std::ptrdiff_t dx = _io_dev.read_uint8();
+                        std::ptrdiff_t dy = _io_dev.read_uint8() * yinc;
                         stream_pos += 2;
 
                         if( dy )
@@ -719,7 +719,7 @@ private:
                         {
                             for( int i = 0; i < count; ++i )
                             {
-                                uint8_t packed_indices = _io_dev.read_int8();
+                                uint8_t packed_indices = _io_dev.read_uint8();
                                 ++stream_pos;
 
                                 *dst_it++ = pal[ packed_indices >> 4 ];
@@ -733,7 +733,7 @@ private:
                         {
                             for( int i = 0; i < count; ++i )
                             {
-                                uint8_t c = _io_dev.read_int8();
+                                uint8_t c = _io_dev.read_uint8();
                                 ++stream_pos;
                                 *dst_it++ = pal[ c ];
                              }
