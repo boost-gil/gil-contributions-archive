@@ -21,6 +21,9 @@
 
 #include <cstdlib>
 #include <malloc.h>
+#include <string>
+
+#include <boost/mpl/bool_fwd.hpp>
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #define BOOST_FILESYSTEM_VERSION 2
