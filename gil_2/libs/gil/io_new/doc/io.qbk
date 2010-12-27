@@ -21,6 +21,7 @@
 [def _PNG_Wiki_            [@http://en.wikipedia.org/wiki/Portable_Network_Graphics]]
 [def _PNG_Lib_             [@http://libpng.org/pub/png/libpng.html]]
 [def _PNM_Wiki_            [@http://en.wikipedia.org/wiki/Portable_anymap]]
+[def _TARGA_Wiki           [@http://en.wikipedia.org/wiki/Truevision_TGA]]
 [def _TIFF_Wiki_           [@http://en.wikipedia.org/wiki/Tagged_Image_File_Format]]
 [def _TIFF_Lib_            [@http://www.remotesensing.org/libtiff/]]
 [def _TIFF_Base_Tags_      [@http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html]]
@@ -307,6 +308,17 @@ Read: gray1, gray8, rgb8
 Write: gray1, gray8, rgb8
 
 When reading a mono text image the data is read as a gray8 image.
+
+[h3 TARGA]
+For a general overview of the BMP image file format go to the following _TARGA_Wiki_.
+
+Currently the code is able to read and write the following image types:
+
+Read: rgb8_image_t and rgba8_image_t
+Write: rgb8_image_t and rgba8_image_t
+
+The lack of having an indexed image type in gil restricts the current interface to only
+write out non-indexed images. This is subject to change soon.
 
 [h3 TIFF]
 For a general overview of the TIFF image file format go to the following _TIFF_Wiki_.
