@@ -6,6 +6,7 @@
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 #include <boost/gil/extension/io_new/pnm_all.hpp>
+#include <boost/gil/extension/io_new/targa_all.hpp>
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -42,6 +43,12 @@ BOOST_AUTO_TEST_CASE( non_bit_aligned_image_test )
         rgb8_image_t img;
         read_image( pnm_filename, img, pnm_tag() );
         write_view( pnm_out + "all_formats_test.pnm", view( img ), pnm_tag() );
+    }
+
+    {
+        rgb8_image_t img;
+        read_image( targa_filename, img, targa_tag() );
+        write_view( targa_out + "all_formats_test.tga", view( img ), targa_tag() );
     }
 
     {
