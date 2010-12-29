@@ -30,6 +30,40 @@ BOOST_AUTO_TEST_CASE( read_header_test )
     }
 }
 
+BOOST_AUTO_TEST_CASE( read_pixel_density_test )
+{
+    image_read_info< tag_t > info = read_image_info( jpeg_in + "EddDawson/36dpi.jpg"
+                                                   , tag_t()
+                                                   );
+
+    double pixel_width, pixel_height;
+    info.pixel_dimensions_mm( pixel_width, pixel_height );
+    
+    rgb8_image_t img;
+    read_image( jpeg_in + "EddDawson/36dpi.jpg", img, jpeg_tag() );
+
+    image_write_info< jpeg_tag > write_settings;
+    write_settings.set_pixel_dimensions( info._width, info._height, pixel_width, pixel_height );
+
+    stringstream in_memory( ios_base::in | ios_base::out | ios_base::binary );
+    write_view( in_memory, view( img ), write_settings );
+
+    image_read_info< tag_t > info2 = read_image_info( in_memory
+                                                    , tag_t()
+                                                    );
+
+    double pixel_width2, pixel_height2;
+    info2.pixel_dimensions_mm( pixel_width2, pixel_height2 );
+
+    // Because of rounding the two results differ slightly.
+    if(  std::abs( pixel_width  - pixel_width2  ) > 10.0
+      || std::abs( pixel_height - pixel_height2 ) > 10.0
+      )
+    {
+        BOOST_CHECK_EQUAL( 0, 1 );
+    }
+}
+
 BOOST_AUTO_TEST_CASE( read_reference_images_test )
 {
     {

@@ -53,6 +53,24 @@ struct jpeg_quality : property_base< int >
 /// Defines type for data precision property.
 struct jpeg_data_precision : property_base< int > {};
 
+/// JFIF code for pixel size units
+struct jpeg_density_unit : property_base< UINT8 >
+{
+    static const type default_value = 0;
+};
+
+/// Horizontal pixel density
+struct jpeg_x_density    : property_base< UINT16 >
+{
+    static const type default_value = 0;
+};
+
+/// Vertical pixel density
+struct jpeg_y_density    : property_base< UINT16 >
+{
+    static const type default_value = 0;
+};
+
 /// Defines type for dct ( discrete cosine transformation ) method property.
 struct jpeg_dct_method : property_base< J_DCT_METHOD >
 {
@@ -70,6 +88,21 @@ struct jpeg_dct_method : property_base< J_DCT_METHOD >
 template<>
 struct image_read_info< jpeg_tag >
 {
+    image_read_info()
+    : _width ( 0 )
+    , _height( 0 )
+
+    , _num_components( 0 )
+
+    , _color_space( J_COLOR_SPACE( 0 ))
+
+    , _data_precision( 0 )
+
+    , _density_unit ( 0 )
+    , _x_density    ( 0 )
+    , _y_density    ( 0 )
+    {}
+
     /// The image width.
     jpeg_image_width::type _width;
 
@@ -86,6 +119,32 @@ struct image_read_info< jpeg_tag >
     /// I believe this number is always 8 in the case libjpeg is built with 8.
     /// see: http://www.asmail.be/msg0055405033.html
     jpeg_data_precision::type _data_precision;
+
+    /// Density conversion unit.
+    jpeg_density_unit::type _density_unit;
+
+    /// Pixel density dimensions.
+    jpeg_x_density::type _x_density;
+    jpeg_y_density::type _y_density;
+
+    /// The width of a pixel in milimeters. 0.0 if unknown.
+    void pixel_dimensions_mm( double& pixel_width
+                            , double& pixel_height
+                            )
+    {
+        double units_conversion = 0.0;
+        if(_density_unit == 1 ) // dots per inch
+        {
+            units_conversion = 25.4; // millimeters in an inch
+        }
+        else if( _density_unit == 2 ) // dots per cm
+        {
+            units_conversion = 10.0; // millimeters in a centimeter
+        }
+
+        pixel_width  = _x_density ? ( _width  / double( _x_density )) * units_conversion : 0.0;
+        pixel_height = _y_density ? ( _height / double( _y_density )) * units_conversion : 0.0;
+    }
 };
 
 /// Read settings for jpeg images.
@@ -126,11 +185,18 @@ struct image_write_info< jpeg_tag >
 {
     /// Constructor
     /// \param quality Defines the jpeg quality.
-    image_write_info( const jpeg_quality::type    quality     = jpeg_quality::default_value
-                    , const jpeg_dct_method::type dct_method  = jpeg_dct_method::default_value
+    image_write_info( const jpeg_quality::type    quality        = jpeg_quality::default_value
+                    , const jpeg_dct_method::type dct_method     = jpeg_dct_method::default_value
+                    , const jpeg_density_unit::type density_unit = jpeg_density_unit::default_value
+                    , const jpeg_x_density::type x_density       = jpeg_x_density::default_value
+                    , const jpeg_y_density::type y_density       = jpeg_y_density::default_value
                     )
     : _quality   ( quality    )
     , _dct_method( dct_method )
+
+    , _density_unit( density_unit )
+    , _x_density   ( x_density    )
+    , _y_density   ( y_density    )
     {}
 
     /// The jpeg quality.
@@ -138,6 +204,34 @@ struct image_write_info< jpeg_tag >
 
     /// The dct ( discrete cosine transformation ) method. 
     jpeg_dct_method::type _dct_method;
+
+    /// Density conversion unit.
+    jpeg_density_unit::type _density_unit;
+
+    /// Pixel density dimensions.
+    jpeg_x_density::type _x_density;
+    jpeg_y_density::type _y_density;
+
+    /// Sets the pixel dimensions.
+    void set_pixel_dimensions( int    image_width   // in pixels
+                             , int    image_height  // in pixels
+                             , double pixel_width   // in mm
+                             , double pixel_height  // in mm
+                             )
+    {
+        _density_unit = 2; // dots per cm
+
+        _x_density = round( image_width  / ( pixel_width  / 10 ));
+        _y_density = round( image_height / ( pixel_height / 10 ));
+    }
+
+private:
+
+    UINT16 round(double d)
+    {
+        return static_cast<UINT16>(d + 0.5);
+    }
+
 };
 
 

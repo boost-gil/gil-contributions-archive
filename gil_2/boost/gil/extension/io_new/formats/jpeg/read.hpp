@@ -213,6 +213,10 @@ public:
         ret._color_space    = this->_cinfo.jpeg_color_space;
         ret._data_precision = this->_cinfo.data_precision;
 
+        ret._density_unit = this->_cinfo.density_unit;
+        ret._x_density    = this->_cinfo.X_density;
+        ret._y_density    = this->_cinfo.Y_density;
+
         return ret;
     }
 

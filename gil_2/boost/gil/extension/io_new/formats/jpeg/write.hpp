@@ -71,9 +71,10 @@ public:
     template<typename View>
     void apply( const View& view )
     {
+        image_write_info< jpeg_tag > info;
+
         write_rows( view
-                  , jpeg_quality::default_value
-                  , jpeg_dct_method::default_value
+                  , info
                   );
     }
 
@@ -82,17 +83,15 @@ public:
               , const image_write_info< jpeg_tag >& info )
     {
         write_rows( view
-                  , info._quality
-                  , info._dct_method
+                  , info
                   );
     }
 
 private:
 
     template<typename View>
-    void write_rows( const View&                 view
-                   , const jpeg_quality::type    quality
-                   , const jpeg_dct_method::type dct_method
+    void write_rows( const View&                         view
+                   , const image_write_info< jpeg_tag >& info
                    )
     {
         std::vector< typename View::value_type > row_buffer( view.width() );
@@ -113,14 +112,23 @@ private:
                                                             >::_color_space;
 
         jpeg_set_defaults( &_cinfo );
+
         jpeg_set_quality ( &_cinfo
-                         , quality
+                         , info._quality
                          , TRUE
                          );
 
         // Needs to be done after jpeg_set_defaults() since it's overridding this value back to slow.
-        _cinfo.dct_method = dct_method;
- 
+        _cinfo.dct_method = info._dct_method;
+
+
+        // set the pixel dimensions
+        _cinfo.density_unit = info._density_unit;
+        _cinfo.X_density    = info._x_density;
+        _cinfo.Y_density    = info._y_density;
+
+        // done reading header information
+
         jpeg_start_compress( &_cinfo
                            , TRUE
                            );
