@@ -89,6 +89,19 @@ BOOST_AUTO_TEST_CASE( read_header_test )
     }
 }
 
+BOOST_AUTO_TEST_CASE( read_pixel_per_meter )
+{
+    image_read_settings< png_tag > settings;
+    settings.set_read_members_true();
+
+    image_read_info< tag_t > info = read_image_info( png_base_in + "EddDawson/36dpi.png"
+                                                   , settings
+                                                   );
+
+    BOOST_CHECK_EQUAL( info._pixels_per_meter, 1417 );
+
+}
+
 BOOST_AUTO_TEST_CASE( BASIc_format_test )
 {
     // Basic format test files (non-interlaced)

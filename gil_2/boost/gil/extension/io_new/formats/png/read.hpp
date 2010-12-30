@@ -335,6 +335,15 @@ public:
                                                 );
         }
 
+        // get the image resolution in pixels per meter.
+        if( this->_settings._read_pixels_per_meter )
+        {
+            ret._pixels_per_meter = png_get_pixels_per_meter( _png_ptr
+                                                            , _info_ptr
+                                                            );
+        }
+
+
         // get number of significant bits for each color channel
         if( this->_settings._read_number_of_significant_bits )
         {
@@ -436,7 +445,10 @@ public:
                                                        , _info_ptr
                                                        , &mod_time
                                                        );
-            ret._mod_time = *mod_time;
+            if( mod_time )
+            {
+                ret._mod_time = *mod_time;
+            }
         }
 
         // get transparency data for images

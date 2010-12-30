@@ -88,6 +88,9 @@ struct png_num_channels : property_base< png_byte > {};
 
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
+/// Returns image resolution in pixels per meter, from pHYs chunk data.
+struct png_pixels_per_meter : property_base< png_uint_32 > {};
+
 /// Defines type for ICC profile name property.
 struct png_ICC_name             : property_base< std::string > {};
 /// Defines type for ICC profile property.
@@ -209,6 +212,8 @@ struct png_info_base
     , _valid_file_gamma( 0 )
     , _file_gamma      ( 1 )
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
+
+    , _pixels_per_meter( 0 )
 
     , _valid_icc_profile    ( 0                         )
     , _icc_name             (                           )
@@ -395,6 +400,9 @@ struct png_info_base
     /// The physical resolution unit.
     png_unit_type::type    _phy_unit_type;
 
+    /// The Image resolution in pixels per meter.
+    png_pixels_per_meter::type _pixels_per_meter;
+
     // Number of significant bits
     /// The return value when reading significant bits.
     png_return_value::type     _valid_significant_bits;
@@ -466,6 +474,7 @@ struct png_read_settings_base
         _read_screen_offsets             = false;
         _read_pixel_calibration          = false;
         _read_physical_resolution        = false;
+        _read_pixels_per_meter           = false;
         _read_number_of_significant_bits = false;
         _read_scale_factors              = false;
         _read_comments                   = false;
@@ -486,6 +495,7 @@ struct png_read_settings_base
         _read_screen_offsets             = true;
         _read_pixel_calibration          = true;
         _read_physical_resolution        = true;
+        _read_pixels_per_meter           = true;
         _read_number_of_significant_bits = true;
         _read_scale_factors              = true;
         _read_comments                   = true;
@@ -513,6 +523,8 @@ struct png_read_settings_base
     bool _read_pixel_calibration;
     /// Enable reading physical resolution.
     bool _read_physical_resolution;
+    /// Enable reading pixels per meter information.
+    bool _read_pixels_per_meter;
     /// Enable reading significant bits.
     bool _read_number_of_significant_bits;
     /// Enable reading scaling factors.

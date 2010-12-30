@@ -9,8 +9,9 @@ static const std::string bmp_out = base + "output/bmp/";
 static const std::string jpeg_in  = base + "test_images/jpg/";
 static const std::string jpeg_out = base + "output/jpeg/";
 
-static const std::string png_in  = base + "test_images/png/PngSuite/";
-static const std::string png_out = base + "output/png/";
+static const std::string png_base_in = base + "test_images/png/";
+static const std::string png_in      = png_base_in + "PngSuite/";
+static const std::string png_out     = base + "output/png/";
 
 static const std::string pnm_in  = base + "test_images/pnm/";
 static const std::string pnm_out = base + "output/pnm/";
