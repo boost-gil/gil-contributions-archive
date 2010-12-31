@@ -8,7 +8,7 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 
-#define BOOST_FILESYSTEM_VERSION 2
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/convenience.hpp>
 
 #include "mandel_view.hpp"

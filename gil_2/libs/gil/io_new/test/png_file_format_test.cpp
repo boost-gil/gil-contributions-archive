@@ -4,7 +4,7 @@
 #define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 #define BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
-#define BOOST_FILESYSTEM_VERSION 2
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/extension/io_new/png_all.hpp>
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( file_format_test )
             && ( fs::extension( dir_itr->path() ) == ".PNG" ))
          {
             rgb8_image_t img;
-            string filename = in + dir_itr->path().leaf();
+            string filename = in + dir_itr->path().leaf().string();
             read_and_convert_image( filename, img, tag_t() );
 
             write_view( png_out + fs::basename( dir_itr->path() ) + ".png"

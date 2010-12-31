@@ -10,6 +10,9 @@
 //#define BOOST_TEST_MODULE tiff_test_module
 #include <boost/test/unit_test.hpp>
 
+#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 
@@ -23,6 +26,7 @@
 using namespace std;
 using namespace boost;
 using namespace gil;
+namespace fs = boost::filesystem;
 
 typedef tiff_tag tag_t;
 
@@ -53,6 +57,15 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
         image_read_info< tag_t > info = read_image_info( file
                                                        , tag_t() );
         
+        BOOST_CHECK_EQUAL( info._width , 200u );
+        BOOST_CHECK_EQUAL( info._height, 133u );
+    }
+
+    {
+        fs::path my_path( tiff_filename );
+        image_read_info< tag_t > info = read_image_info( my_path
+                                                       , tag_t() );
+
         BOOST_CHECK_EQUAL( info._width , 200u );
         BOOST_CHECK_EQUAL( info._height, 133u );
     }

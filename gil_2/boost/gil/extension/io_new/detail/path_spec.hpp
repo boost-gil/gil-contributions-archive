@@ -26,7 +26,7 @@
 #include <boost/mpl/bool_fwd.hpp>
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-#define BOOST_FILESYSTEM_VERSION 2
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/path.hpp>
 #endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 
@@ -42,9 +42,7 @@ template<int i> struct is_supported_path_spec<const char [i]> : mpl::true_ {};
 template<int i> struct is_supported_path_spec<char [i]> : mpl::true_ {};
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-template<typename String, typename Traits>
-struct is_supported_path_spec<filesystem::basic_path<String,Traits> > : mpl::true_
-{};
+template<> struct is_supported_path_spec< filesystem::path > : mpl::true_ {};
 #endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 
 inline std::string convert_to_string( std::string const& obj)
@@ -72,8 +70,7 @@ inline std::string convert_to_string( char* str )
 }
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-template<typename String, typename T>
-inline std::string convert_to_string( filesystem::basic_path<String,T> const& path )
+inline std::string convert_to_string( const filesystem::path& path )
 {
     return convert_to_string( path.string() );
 }

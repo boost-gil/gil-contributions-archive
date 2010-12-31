@@ -1,6 +1,6 @@
 //#define BOOST_TEST_MODULE jpeg_test_module
 #include <boost/test/unit_test.hpp>
-#define BOOST_FILESYSTEM_VERSION 2
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/path.hpp>
 
 #include <fstream>
