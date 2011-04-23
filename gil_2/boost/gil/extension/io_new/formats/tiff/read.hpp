@@ -225,6 +225,7 @@ public:
                                 case  8: { read_data< row_buffer_helper_view< gray8_view_t  > >( dst_view, 0 );  break; }
                                 case 16: { read_data< row_buffer_helper_view< gray16_view_t > >( dst_view, 0 );  break; }
                                 case 32: { read_data< row_buffer_helper_view< gray32_view_t > >( dst_view, 0 );  break; }
+                                default: { io_error( "Image type is not supported." ); }
                             }
 
                             break;
@@ -232,16 +233,39 @@ public:
 
                         case PHOTOMETRIC_RGB:
                         {
-                            switch( this->_info._bits_per_sample )
+                            switch( this->_info._samples_per_pixel )
                             {
-                                case  8: { read_data< row_buffer_helper_view< rgb8_view_t  > >( dst_view, 0 );  break; }
-                                case 16: { read_data< row_buffer_helper_view< rgb16_view_t > >( dst_view, 0 );  break; }
-                                case 32: { read_data< row_buffer_helper_view< rgb32_view_t > >( dst_view, 0 );  break; }
+                                case 3:
+                                {
+                                    switch( this->_info._bits_per_sample )
+                                    {
+                                        case  8: { read_data< row_buffer_helper_view< rgb8_view_t  > >( dst_view, 0 );  break; }
+                                        case 16: { read_data< row_buffer_helper_view< rgb16_view_t > >( dst_view, 0 );  break; }
+                                        case 32: { read_data< row_buffer_helper_view< rgb32_view_t > >( dst_view, 0 );  break; }
+                                        default: { io_error( "Image type is not supported." ); }
+                                    }
+
+                                    break;
+                                }
+
+                                case 4:
+                                {
+                                    switch( this->_info._bits_per_sample )
+                                    {
+                                        case  8: { read_data< row_buffer_helper_view< rgba8_view_t  > >( dst_view, 0 );  break; }
+                                        case 16: { read_data< row_buffer_helper_view< rgba16_view_t > >( dst_view, 0 );  break; }
+                                        case 32: { read_data< row_buffer_helper_view< rgba32_view_t > >( dst_view, 0 );  break; }
+                                        default: { io_error( "Image type is not supported." ); }
+                                    }
+
+                                    break;
+                                }
+
+                                default: { io_error( "Image type is not supported." ); }
                             }
 
                             break;
                         }
-
                         case PHOTOMETRIC_SEPARATED: // CYMK
                         {
                             switch( this->_info._bits_per_sample )
@@ -254,7 +278,7 @@ public:
                             break;
                         }
 
-                        default: { io_error( "Not supported colorspace " ); }
+                        default: { io_error( "Image type is not supported." ); }
                     }
                 }
                 else
