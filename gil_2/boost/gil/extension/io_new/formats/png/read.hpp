@@ -164,6 +164,7 @@ public:
         // get the embedded ICC profile data for given image
         if( this->_settings._read_icc_profile )
         {
+#if PNG_LIBPNG_VER_MINOR >= 5
             png_charp icc_name = png_charp( NULL );
             png_bytep profile  = png_bytep( NULL );
 
@@ -174,6 +175,18 @@ public:
                                                  , &profile
                                                  , &ret._profile_length
                                                  );
+#else
+            png_charp icc_name = png_charp( NULL );
+            png_charp profile  = png_charp( NULL );
+
+            ret._valid_icc_profile = png_get_iCCP( _png_ptr
+                                                 , _info_ptr
+                                                 , &icc_name
+                                                 , &ret._iccp_compression_type
+                                                 , &profile
+                                                 , &ret._profile_length
+                                                 );
+#endif
             if( icc_name )
             {
                 ret._icc_name.append( icc_name

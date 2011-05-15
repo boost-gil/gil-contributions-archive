@@ -181,6 +181,7 @@ public:
 
         if( info._valid_icc_profile )
         {
+#if PNG_LIBPNG_VER_MINOR >= 5
             png_set_iCCP( _png_ptr
                         , _info_ptr
                         , const_cast< png_charp >( info._icc_name.c_str() )
@@ -188,6 +189,15 @@ public:
                         , reinterpret_cast< png_const_bytep >( info._profile.c_str() )
                         , info._profile_length
                         );
+#else
+            png_set_iCCP( _png_ptr
+                        , _info_ptr
+                        , const_cast< png_charp >( info._icc_name.c_str() )
+                        , info._iccp_compression_type
+                        , const_cast< png_charp >( info._profile.c_str() )
+                        , info._profile_length
+                        );
+#endif
         }
 
         if( info._valid_intent )
