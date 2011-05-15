@@ -588,6 +588,8 @@ struct image_read_settings< png_tag > : public image_read_settings_base
     image_read_settings< png_tag >()
     : image_read_settings_base()
     , png_read_settings_base()
+    , _apply_screen_gamma( false )
+    , _screen_gamma      ( 2     )
     {}
 
     image_read_settings( const point_t& top_left
