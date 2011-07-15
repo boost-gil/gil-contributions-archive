@@ -41,6 +41,12 @@ todo list
 
 * provide better documentation for adding new device types. 
 
+* throw boost::errinfo_file_name when file name is incorrect. Use compiler symbol for backward compatibility.
+
+* add file name to exception message
+
+* add a flag which would read an image in opposite direction. See Szymon email from 07/11/2011
+
 ----------------------------------------------
 
 review related todo's
