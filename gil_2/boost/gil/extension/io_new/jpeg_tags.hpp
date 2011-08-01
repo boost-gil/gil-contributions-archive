@@ -19,9 +19,25 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
+// taken from jpegxx - https://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/ijg_headers.hpp
+#ifndef BOOST_GIL_EXTENSION_IO_JPEG_C_LIB_COMPILED_AS_CPLUSPLUS
+    extern "C" {
+#else
+    // DONT_USE_EXTERN_C introduced in v7 of the IJG library.
+    // By default the v7 IJG headers check for __cplusplus being defined and
+    // wrap the content in an 'extern "C"' block if it's present.
+    // When DONT_USE_EXTERN_C is defined, this wrapping is not performed.
+    #ifndef DONT_USE_EXTERN_C
+        #define DONT_USE_EXTERN_C 1
+    #endif
+#endif
+
 #include <jpeglib.h>
-}
+#include <jerror.h>
+
+#ifndef BOOST_GIL_EXTENSION_IO_JPEG_C_LIB_COMPILED_AS_CPLUSPLUS
+    }
+#endif
 
 #include "detail/base.hpp"
 
@@ -59,14 +75,8 @@ struct jpeg_density_unit : property_base< UINT8 >
     static const type default_value = 0;
 };
 
-/// Horizontal pixel density
-struct jpeg_x_density    : property_base< UINT16 >
-{
-    static const type default_value = 0;
-};
-
-/// Vertical pixel density
-struct jpeg_y_density    : property_base< UINT16 >
+/// pixel density
+struct jpeg_pixel_density : property_base< UINT16 >
 {
     static const type default_value = 0;
 };
@@ -101,6 +111,9 @@ struct image_read_info< jpeg_tag >
     , _density_unit ( 0 )
     , _x_density    ( 0 )
     , _y_density    ( 0 )
+
+    , _pixel_width_mm ( 0.0 )
+    , _pixel_height_mm( 0.0 )
     {}
 
     /// The image width.
@@ -121,30 +134,13 @@ struct image_read_info< jpeg_tag >
     jpeg_data_precision::type _data_precision;
 
     /// Density conversion unit.
-    jpeg_density_unit::type _density_unit;
+    jpeg_density_unit::type  _density_unit;
+    jpeg_pixel_density::type _x_density;
+    jpeg_pixel_density::type _y_density;
 
-    /// Pixel density dimensions.
-    jpeg_x_density::type _x_density;
-    jpeg_y_density::type _y_density;
-
-    /// The width of a pixel in milimeters. 0.0 if unknown.
-    void pixel_dimensions_mm( double& pixel_width
-                            , double& pixel_height
-                            )
-    {
-        double units_conversion = 0.0;
-        if(_density_unit == 1 ) // dots per inch
-        {
-            units_conversion = 25.4; // millimeters in an inch
-        }
-        else if( _density_unit == 2 ) // dots per cm
-        {
-            units_conversion = 10.0; // millimeters in a centimeter
-        }
-
-        pixel_width  = _x_density ? ( _width  / double( _x_density )) * units_conversion : 0.0;
-        pixel_height = _y_density ? ( _height / double( _y_density )) * units_conversion : 0.0;
-    }
+    /// Real-world dimensions
+    double _pixel_width_mm;
+    double _pixel_height_mm;
 };
 
 /// Read settings for jpeg images.
@@ -188,8 +184,8 @@ struct image_write_info< jpeg_tag >
     image_write_info( const jpeg_quality::type    quality        = jpeg_quality::default_value
                     , const jpeg_dct_method::type dct_method     = jpeg_dct_method::default_value
                     , const jpeg_density_unit::type density_unit = jpeg_density_unit::default_value
-                    , const jpeg_x_density::type x_density       = jpeg_x_density::default_value
-                    , const jpeg_y_density::type y_density       = jpeg_y_density::default_value
+                    , const jpeg_pixel_density::type x_density   = jpeg_pixel_density::default_value
+                    , const jpeg_pixel_density::type y_density   = jpeg_pixel_density::default_value
                     )
     : _quality   ( quality    )
     , _dct_method( dct_method )
@@ -209,8 +205,8 @@ struct image_write_info< jpeg_tag >
     jpeg_density_unit::type _density_unit;
 
     /// Pixel density dimensions.
-    jpeg_x_density::type _x_density;
-    jpeg_y_density::type _y_density;
+    jpeg_pixel_density::type _x_density;
+    jpeg_pixel_density::type _y_density;
 
     /// Sets the pixel dimensions.
     void set_pixel_dimensions( int    image_width   // in pixels
@@ -227,9 +223,9 @@ struct image_write_info< jpeg_tag >
 
 private:
 
-    UINT16 round(double d)
+    UINT16 round( double d )
     {
-        return static_cast<UINT16>(d + 0.5);
+        return static_cast< UINT16 >( d + 0.5 );
     }
 
 };

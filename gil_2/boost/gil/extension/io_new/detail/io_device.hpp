@@ -212,7 +212,6 @@ private:
     file_stream_device( file_stream_device const& );
     file_stream_device& operator=( file_stream_device const& );
 
-    //@todo: why not fstream?
     FILE* file;
 
     bool _close;

@@ -10,6 +10,8 @@
 #ifndef BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP
 #define BOOST_GIL_EXTENSION_IO_PNM_TAGS_HPP
 
+#define BOOST_GIL_EXTENSION_IO_PNM_READ_ENABLED
+
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief 

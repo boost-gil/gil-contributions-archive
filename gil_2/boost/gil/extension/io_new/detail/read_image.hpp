@@ -240,6 +240,97 @@ void read_image( const String&    file_name
               );
 }
 
+/// \brief Reads an image without conversion. Image memory is allocated.
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \throw std::ios_base::failure
+template < typename String
+         , typename Image
+         >
+inline
+void read_image( const String&    file_name
+               , Image&           img
+               , typename enable_if< detail::is_supported_path_spec< String >
+                                   >::type* /* ptr */ = 0
+               )
+{
+    namespace fs = boost::filesystem;
+    namespace al = boost::algorithm;
+
+    fs::path in_path = fs::system_complete( fs::path( file_name, fs::native ));
+    
+#ifdef BOOST_GIL_EXTENSION_IO_BMP_READ_ENABLED
+
+    if( al::to_upper( fs::extension( in_path )) == ".BMP" )
+    {
+        read_image( file_name
+                  , img
+                  , bmp_tag()
+                  );
+
+        return;
+    }
+
+#endif // BOOST_GIL_EXTENSION_IO_BMP_READ_ENABLED
+
+
+#ifdef BOOST_GIL_EXTENSION_IO_JPEG_READ_ENABLED
+
+    if( fs::extension( in_path ) == ".JPG" )
+    {
+        read_image( file_name
+                  , img
+                  , jpeg_tag()
+                  );
+
+        return ;
+    }
+
+#endif // BOOST_GIL_EXTENSION_IO_JPEG_READ_ENABLED
+
+#ifdef BOOST_GIL_EXTENSION_IO_PNG_READ_ENABLED
+
+    if( fs::extension( in_path ) == ".PNG" )
+    {
+        read_image( file_name
+                  , img
+                  , png_tag()
+                  );
+
+        return ;
+    }
+
+#endif // BOOST_GIL_EXTENSION_IO_PNG_READ_ENABLED
+
+#ifdef BOOST_GIL_EXTENSION_IO_PNM_READ_ENABLED
+
+    if( fs::extension( in_path ) == ".PNM" )
+    {
+        read_image( file_name
+                  , img
+                  , pnm_tag()
+                  );
+
+        return ;
+    }
+
+#endif // BOOST_GIL_EXTENSION_IO_PNM_READ_ENABLED
+
+#ifdef BOOST_GIL_EXTENSION_IO_TIFF_READ_ENABLED
+
+    if( fs::extension( in_path ) == ".TIF" )
+    {
+        read_image( file_name
+                  , img
+                  , tiff_tag()
+                  );
+
+        return ;
+    }
+
+#endif // BOOST_GIL_EXTENSION_IO_JPEG_READ_ENABLED
+}
+
 ///////////////////////////// dynamic images
 
 /// \brief Reads an image without conversion. Image memory is allocated.

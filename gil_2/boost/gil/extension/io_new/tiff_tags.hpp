@@ -19,9 +19,24 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
-#include "tiff.h"
-}
+// taken from jpegxx - https://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/ijg_headers.hpp
+#ifndef BOOST_GIL_EXTENSION_IO_TIFF_C_LIB_COMPILED_AS_CPLUSPLUS
+    extern "C" {
+#else
+    // DONT_USE_EXTERN_C introduced in v7 of the IJG library.
+    // By default the v7 IJG headers check for __cplusplus being defined and
+    // wrap the content in an 'extern "C"' block if it's present.
+    // When DONT_USE_EXTERN_C is defined, this wrapping is not performed.
+    #ifndef DONT_USE_EXTERN_C
+        #define DONT_USE_EXTERN_C 1
+    #endif
+#endif
+
+#include <tiff.h>
+
+#ifndef BOOST_GIL_EXTENSION_IO_JPEG_C_LIB_COMPILED_AS_CPLUSPLUS
+    }
+#endif
 
 #include "detail/base.hpp"
 #include "formats/tiff/log.hpp"

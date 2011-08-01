@@ -47,6 +47,8 @@ todo list
 
 * add a flag which would read an image in opposite direction. See Szymon email from 07/11/2011
 
+* add Edd Dawson's test image from jpegxx
+
 ----------------------------------------------
 
 review related todo's
@@ -58,21 +60,21 @@ review related todo's
 * build and boostify the documentation
 
 Kenny review ( email from 12/06/2010 )
-* rename read_intXX to read_uintXX, see io_device.hpp
+* FIXED: rename read_intXX to read_uintXX, see io_device.hpp
 
 Edd review ( email from 12/06/2010 )
-* Is there support for obtaining the real-world dimensions of a loaded
+* FIXED: Is there support for obtaining the real-world dimensions of a loaded
   raster in millimetres, say? I work on CAD/graphics applications which
   need this functionality in order to generate reasonable texture coordinates.
   
-  * In the case of libjpeg, the information is exposed/advertised in the jpeg_decompress_struct and jpeg_compress_struct structures. 
+  * FIXED: In the case of libjpeg, the information is exposed/advertised in the jpeg_decompress_struct and jpeg_compress_struct structures. 
     You can see how I use them here:
     http://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/read.cpp#cl-62
     http://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/write.cpp#cl-75
 
-  * use the image under EddDawson/ in test_images folder
+  * FIXED: use the image under EddDawson/ in test_images folder
 	
-  * In libpng, have a look in the docs for e.g. png_get_x_pixels_per_meter.
+  * FIXED: In libpng, have a look in the docs for e.g. png_get_x_pixels_per_meter.
 
 * Add something similar to JPEGXX_C_LIB_COMPILED_AS_CPLUSPLUS and JPEGXX_CAN_THROW_EXCEPTIONS_ to io_new
     * see above links and download jpegxx

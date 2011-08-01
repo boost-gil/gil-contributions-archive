@@ -64,7 +64,8 @@ struct jpeg_decompress_mgr : public jpeg_io_base
         _cinfo.src = &_src._jsrc;
 
         jpeg_read_header( &_cinfo
-                        , TRUE    );
+                        , TRUE
+                        );
 
         io_error_if( _cinfo.data_precision != 8
                    , "Image file is not supported."
@@ -216,6 +217,23 @@ public:
         ret._density_unit = this->_cinfo.density_unit;
         ret._x_density    = this->_cinfo.X_density;
         ret._y_density    = this->_cinfo.Y_density;
+
+        // obtain real world dimensions
+        // taken from https://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/read.cpp#cl-62
+        jpeg_calc_output_dimensions( &this->_cinfo );
+
+        double units_conversion = 0;
+        if (this->_cinfo.density_unit == 1) // dots per inch
+        {
+            units_conversion = 25.4; // millimeters in an inch
+        }
+        else if (this->_cinfo.density_unit == 2) // dots per cm
+        {
+            units_conversion = 10; // millimeters in a centimeter
+        }
+
+        ret._pixel_width_mm  = this->_cinfo.X_density ? (this->_cinfo.output_width  / double(this->_cinfo.X_density)) * units_conversion : 0;
+        ret._pixel_height_mm = this->_cinfo.Y_density ? (this->_cinfo.output_height / double(this->_cinfo.Y_density)) * units_conversion : 0;
 
         return ret;
     }

@@ -36,14 +36,11 @@ BOOST_AUTO_TEST_CASE( read_pixel_density_test )
                                                    , tag_t()
                                                    );
 
-    double pixel_width, pixel_height;
-    info.pixel_dimensions_mm( pixel_width, pixel_height );
-    
     rgb8_image_t img;
     read_image( jpeg_in + "EddDawson/36dpi.jpg", img, jpeg_tag() );
 
     image_write_info< jpeg_tag > write_settings;
-    write_settings.set_pixel_dimensions( info._width, info._height, pixel_width, pixel_height );
+    write_settings.set_pixel_dimensions( info._width, info._height, info._pixel_width_mm, info._pixel_height_mm );
 
     stringstream in_memory( ios_base::in | ios_base::out | ios_base::binary );
     write_view( in_memory, view( img ), write_settings );
@@ -52,12 +49,9 @@ BOOST_AUTO_TEST_CASE( read_pixel_density_test )
                                                     , tag_t()
                                                     );
 
-    double pixel_width2, pixel_height2;
-    info2.pixel_dimensions_mm( pixel_width2, pixel_height2 );
-
     // Because of rounding the two results differ slightly.
-    if(  std::abs( pixel_width  - pixel_width2  ) > 10.0
-      || std::abs( pixel_height - pixel_height2 ) > 10.0
+    if(  std::abs( info._pixel_width_mm  - info2._pixel_width_mm  ) > 10.0
+      || std::abs( info._pixel_height_mm - info2._pixel_height_mm ) > 10.0
       )
     {
         BOOST_CHECK_EQUAL( 0, 1 );

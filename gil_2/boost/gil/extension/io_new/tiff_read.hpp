@@ -10,6 +10,8 @@
 #ifndef BOOST_GIL_EXTENSION_IO_TIFF_READ_HPP
 #define BOOST_GIL_EXTENSION_IO_TIFF_READ_HPP
 
+#define BOOST_GIL_EXTENSION_IO_TIFF_READ_ENABLED
+
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               
 /// \brief

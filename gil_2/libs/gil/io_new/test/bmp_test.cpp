@@ -93,6 +93,16 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         BOOST_CHECK_EQUAL( img.width() , 127 );
         BOOST_CHECK_EQUAL( img.height(), 64 );
     }
+
+    {
+        fs::path my_path( bmp_filename );
+
+        rgb8_image_t img;
+        read_image( my_path, img, tag_t() );
+
+        BOOST_CHECK_EQUAL( img.width() , 127 );
+        BOOST_CHECK_EQUAL( img.height(), 64 );
+    }
 }
 
 BOOST_AUTO_TEST_CASE( read_and_convert_image_test )

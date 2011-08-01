@@ -1,7 +1,7 @@
 [library Boost.GIL.IO
 	[quickbook 1.3]
     [authors [Henning, Christian] ]
-    [copyright 2010 Christian Henning]
+    [copyright 2011 Christian Henning]
     [purpose
         An generic, user-friendly interface for reading and writing different image formats.
     ]
@@ -281,6 +281,11 @@ Reading YCbCr or YCCK images is possible but might result in inaccuracies since 
 aren't available yet for gil. For now these color space are read as rgb images.
 This is subject to change soon.
 
+[h4 Compiler Symbols]
+BOOST_GIL_EXTENSION_IO_JPEG_C_LIB_COMPILED_AS_CPLUSPLUS
+This symbol can be used to let compiler know that libjpeg was compiled as a cpp project. By default this symbol is off. 
+
+
 [h3 PNG]
 For a general overview of the PNG image file format go to the following _PNG_Wiki_.
 
@@ -296,6 +301,10 @@ Write: gray1, gray2, gray4, gray8, gray16, gray_alpha_8, gray_alpha_16, rgb8, rg
 
 For reading gray_alpha images the user has to enable the ENABLE_GRAY_ALPHA compiler switch. This color
 space is defined in the toolbox by using gray_alpha.hpp.
+
+[h4 Compiler Symbols]
+BOOST_GIL_EXTENSION_IO_PNG_C_LIB_COMPILED_AS_CPLUSPLUS
+This symbol can be used to let compiler know that libjpeg was compiled as a cpp project. By default this symbol is off. 
 
 [h3 PNM]
 For a general overview of the PNM image file format go to the following _PNM_Wiki_.
@@ -348,6 +357,11 @@ likely to be a moving target adding new features with each new milestone. Here i
 
 This gil extension uses two different test image suites to test read and write capabilities. See test_image folder.
 It's advisable to use ImageMagick's test viewer to display images.
+
+[h4 Compiler Symbols]
+BOOST_GIL_EXTENSION_IO_TIFF_C_LIB_COMPILED_AS_CPLUSPLUS
+This symbol can be used to let compiler know that libjpeg was compiled as a cpp project. By default this symbol is off. 
+
 
 [h2 Extending GIL::IO with new Formats]
 Extending the gil::io with new formats is meant to be simple and straightforward. Before adding I would
