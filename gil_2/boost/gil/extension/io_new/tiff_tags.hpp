@@ -290,6 +290,8 @@ struct image_write_info< tiff_tag, Log >
     , _is_tiled                  ( false )
     , _tile_width                ( 0 )
     , _tile_length               ( 0 )
+    , _x_resolution              ( 0 )
+    , _y_resolution              ( 0 )
     {}
 
     /// The color space of the image data.
@@ -307,6 +309,10 @@ struct image_write_info< tiff_tag, Log >
     tiff_tile_width::type                 _tile_width;
     /// Tiles length
     tiff_tile_length::type                _tile_length;
+
+    /// x, y resolution
+    tiff_x_resolution::type               _x_resolution;
+    tiff_y_resolution::type               _y_resolution;
 
     /// A log to transcript error and warning messages issued by libtiff.
     Log                                   _log;

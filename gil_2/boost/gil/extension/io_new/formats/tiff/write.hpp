@@ -183,6 +183,11 @@ private:
         // write rows per strip
         _io_dev.template set_property<tiff_rows_per_strip>( _io_dev.get_default_strip_size() );
 
+        // x, y resolution
+        _io_dev.template set_property<tiff_x_resolution>( info._x_resolution );
+        _io_dev.template set_property<tiff_y_resolution>( info._y_resolution );
+
+
         if(!info._is_tiled)
         {
             write_data( src_view
