@@ -240,6 +240,8 @@ void read_image( const String&    file_name
               );
 }
 
+#ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+
 /// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
 /// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
@@ -330,6 +332,8 @@ void read_image( const String&    file_name
 
 #endif // BOOST_GIL_EXTENSION_IO_JPEG_READ_ENABLED
 }
+
+#endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
 
 ///////////////////////////// dynamic images
 
