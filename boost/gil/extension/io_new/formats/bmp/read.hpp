@@ -59,7 +59,8 @@ struct reader_backend< Device
     : _io_dev( device )
     {}
 
-    Device _io_dev;
+    Device                     _io_dev;
+    image_read_info< bmp_tag > _info;
 };
 
 
@@ -110,10 +111,8 @@ public:
     , reader_backend( device )
     {}
 
-    image_read_info< bmp_tag > get_info()
+    void read_header()
     {
-        // read file header
-
         // the magic number used to identify the BMP file:
         // 0x42 0x4D (ASCII code points for B and M)
         if( _io_dev.read_uint16() == 0x424D )
@@ -185,6 +184,21 @@ public:
         _info._valid = true;
 
         return _info;
+    }
+
+    template< typename View >
+    void check_destination_view( const View& dst_view )
+    {
+        typedef point_t::value_type int_t;
+
+        int_t width  = static_cast< int_t >( _info._width  );
+        int_t height = static_cast< int_t >( _info._height );
+
+        io_error_if( (  ( width  ) <= dst_view.width()
+                     || ( height ) <= dst_view.height()
+                     )
+                  , "User provided view has incorrect size." 
+                  );
     }
 
     template< typename View >

@@ -37,11 +37,8 @@ public:
     , _reader( &reader )
     , _view( &view )
     {
-        image_read_info< typename Reader::format_t > info = reader.get_info();
-
-        ///to some sanity checks
-        /// * view's y dimension greater than cannot be greater than source image
-        /// * 
+        reader.read_header();
+        reader.check_destination_view();
     }
 
     /// Constructor with preallocated image. Reading starts at pos scanline of source image.
@@ -55,6 +52,9 @@ public:
     , _reader( &reader )
     , _view( &view )
     {
+        reader.read_header();
+        reader.check_destination_view();
+
         for( std::size_t i = 0; i < pos; ++i )
         {
             skip();
@@ -103,7 +103,6 @@ private:
             _reader->skip( *_view );
         }
     }
-
 
 private:
 
