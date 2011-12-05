@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\detail">
+      <UniqueIdentifier>{4c2ac42d-7c5a-44c3-b6ca-db8fec0239a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\formats">
+      <UniqueIdentifier>{429e84f2-3706-4341-9bb7-a6e74cc448a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\formats\bmp">
+      <UniqueIdentifier>{2c5c06c6-247c-4b97-b6dc-89acaa78fe60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\formats\jpeg">
+      <UniqueIdentifier>{c3aca3b4-9232-466b-9720-6fb93e2075e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\formats\png">
+      <UniqueIdentifier>{e74a0122-8ccf-47d5-b680-259822271c41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\formats\pnm">
+      <UniqueIdentifier>{2f8d3d05-2fd6-4b3e-a082-a0fbee21fcd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\formats\tiff">
+      <UniqueIdentifier>{811c4028-1b38-4aaa-b20c-bdb30cc2649d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\base.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\bit_operations.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\conversion_policies.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\create_reader.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\dynamic_io_new.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\get_read_device.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\get_reader.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\get_write_device.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\get_writer.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\image_read_iterator.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\io.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\io_device.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\io_error.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\make_reader.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\make_writer.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\path_spec.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\read_and_convert_image.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\read_and_convert_view.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\read_image.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\read_image_info.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\read_view.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\reader_base.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\row_buffer_helper.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\typedefs.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\detail\write_view.hpp">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\is_allowed.hpp">
+      <Filter>Header Files\formats\bmp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\read.hpp">
+      <Filter>Header Files\formats\bmp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\supported_types.hpp">
+      <Filter>Header Files\formats\bmp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\write.hpp">
+      <Filter>Header Files\formats\bmp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libs\gil\io_new\test\iterator_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
