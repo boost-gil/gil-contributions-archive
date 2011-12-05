@@ -80,7 +80,154 @@ BOOST_AUTO_TEST_SUITE( iterator_test )
 
 BOOST_AUTO_TEST_CASE( iterator_test_cases )
 {
+    get_reader< char*
+              , bmp_tag
+              >::type bmp_reader = make_reader( "C:\\gil_contributions\\test_images\\bmp\\rgb.bmp"
+                                                , bmp_tag()
+                                                , read_and_no_convert()
+                                                );
 
+    rgb8_image_t scanline( 127, 1 );
+
+    image_read_iterator it( bmp_reader, view( scanline ));
+
+
+    //test_get_read_device< char*, bmp_tag, gil::detail::file_stream_device< bmp_tag > >();
+
+    //test_get_read_device< char*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    //test_get_read_device< string, png_tag, gil::detail::file_stream_device< png_tag > >();
+    //test_get_read_device< wstring, png_tag, gil::detail::file_stream_device< png_tag > >();
+
+    //test_get_read_device< FILE*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    //test_get_read_device< ifstream, png_tag, gil::detail::istream_device< png_tag  > >();
+    //test_get_read_device< TIFF*, tiff_tag, gil::detail::file_stream_device< tiff_tag > >();
+    //test_get_read_device< fs::path, png_tag, gil::detail::file_stream_device< png_tag > >();
+
+
+    //test_get_write_device< char*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    //test_get_write_device< string, png_tag, gil::detail::file_stream_device< png_tag > >();
+    //test_get_write_device< wstring, png_tag, gil::detail::file_stream_device< png_tag > >();
+
+    //test_get_write_device< FILE*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    //test_get_write_device< ofstream, png_tag, gil::detail::ostream_device< png_tag  > >();
+    //test_get_write_device< TIFF*, tiff_tag, gil::detail::file_stream_device< tiff_tag > >();
+    //test_get_write_device< fs::path, png_tag, gil::detail::file_stream_device< png_tag > >();
+
+    //test_get_reader( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png"
+    //               , png_tag()
+    //               , read_and_no_convert()
+    //               );
+
+    //test_get_reader( string( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png" )
+    //               , png_tag()
+    //               , read_and_no_convert()
+    //               );
+
+    //test_get_reader( L"C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png"
+    //               , png_tag()
+    //               , read_and_no_convert()
+    //               );
+
+    //test_get_reader( wstring( L"C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png" )
+    //               , png_tag()
+    //               , read_and_no_convert()
+    //               );
+
+    //test_get_reader( fs::path( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png" )
+    //               , png_tag()
+    //               , read_and_no_convert()
+    //               );
+
+    //test_get_reader( std::ifstream("C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png", std::ios::binary )
+    //                , png_tag()
+    //                , read_and_no_convert()
+    //                );
+
+    //FILE* file = fopen( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png", "rb" );
+    //test_get_reader( file
+    //                , png_tag()
+    //                , read_and_no_convert()
+    //                );
+
+    //test_get_writer( "C:\\gil_contributions\\output\\png\\test_get_writer.png"
+    //               , png_tag()
+    //               );
+
+    //test_get_writer( string( "C:\\gil_contributions\\output\\png\\test_get_writer.png" )
+    //               , png_tag()
+    //               );
+
+    //test_get_writer( wstring( L"C:\\gil_contributions\\output\\png\\test_get_writer.png" )
+    //               , png_tag()
+    //               );
+
+    //test_get_writer( fs::path( "C:\\gil_contributions\\output\\png\\test_get_writer.png" )
+    //               , png_tag()
+    //               );
+
+    //test_get_writer( std::ofstream( "C:\\gil_contributions\\output\\png\\test_get_writer.png", std::ios::binary )
+    //               , png_tag()
+    //               );
+
+    //file = fopen( "C:\\gil_contributions\\output\\png\\test_get_writer.png", "wb" );
+    //test_get_writer( file
+    //               , png_tag()
+    //               );
+
+
+    //// png reader
+    //get_reader< char*
+    //          , png_tag
+    //          >::type png_reader = make_reader( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png"
+    //                                            , png_tag()
+    //                                            , read_and_no_convert()
+    //                                            );
+
+    //boost::gil::reader_backend< get_read_device< char*
+    //                                           , png_tag
+    //                                           >::type
+    //                          , png_tag
+    //                          > png_reader_backend = png_reader;
+
+    //// bmp reader
+    //get_reader< char*
+    //          , bmp_tag
+    //          >::type bmp_reader = make_reader( "C:\\gil_contributions\\test_images\\bmp\\rgb.bmp"
+    //                                            , bmp_tag()
+    //                                            , read_and_no_convert()
+    //                                            );
+
+    //boost::gil::reader_backend< get_read_device< char*
+    //                                           , bmp_tag
+    //                                           >::type
+    //                          , bmp_tag
+    //                          > bmp_reader_backend = bmp_reader;
+
+    //// bmp writer
+    //get_writer< char*
+    //          , bmp_tag
+    //          >::type bmp_writer = make_writer( "C:\\gil_contributions\\output\\bmp\\test_get_writer.bmp"
+    //                                            , bmp_tag()
+    //                                            );
+
+    //boost::gil::writer_backend< get_write_device< char*
+    //                                            , bmp_tag
+    //                                            >::type
+    //                           , bmp_tag
+    //                           > bmp_writer_backend = bmp_writer;
+
+    //// png writer
+    //get_writer< char*
+    //          , png_tag
+    //          >::type png_writer = make_writer( "C:\\gil_contributions\\output\\png\\test_get_writer.png"
+    //                                            , png_tag()
+    //                                            );
+
+    //boost::gil::writer_backend< get_write_device< char*
+    //                                            , png_tag
+    //                                            >::type
+    //                           , png_tag
+    //                           > png_writer_backend = png_writer;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
