@@ -3,8 +3,6 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "base_types.hpp"
-
 using namespace boost::gil;
 
 BOOST_AUTO_TEST_SUITE( gil_test )
@@ -14,6 +12,9 @@ struct double_one  { static double apply() { return 1.0; } };
 
 BOOST_AUTO_TEST_CASE( channel_test )
 {
+    typedef uint64_t bits64;
+    typedef int64_t bits64s;
+
     typedef scoped_channel_value<double, double_zero, double_one> bits64f;
 
     bits8   c8_min   =  channel_traits<bits8  >::min_value();
@@ -63,6 +64,7 @@ BOOST_AUTO_TEST_CASE( channel_test )
     channel2=channel_traits<channel16_5_6_reference_t>::max_value();
     channel3=channel_traits<channel16_11_5_reference_t>::max_value();
     BOOST_CHECK_EQUAL( data, 65535 );
+    
 }
 
 BOOST_AUTO_TEST_SUITE_END()
