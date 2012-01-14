@@ -1,0 +1,23 @@
+# Copyright 2012 Mateusz Loskot <mateusz@loskot.net
+#  
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+# Jamfile for building the Boost.GIL test suite
+
+project libs/gil/gil_test ;
+
+import testing ;
+
+project  
+    : requirements 
+    <define>BOOST_GIL_NO_IO
+    <define>_SCL_SECURE_NO_WARNINGS
+    ;
+
+test-suite gil :
+    [ run pixel_tests.cpp ../../test/build//boost_test_exec_monitor ]
+    #TODO: Sort out BOOST_TEST_MAIN
+    #[ run channel_tests.cpp ../../test/build//boost_test_exec_monitor ]
+    ;
