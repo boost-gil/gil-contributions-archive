@@ -9,6 +9,11 @@ using namespace boost::gil;
 
 BOOST_AUTO_TEST_SUITE( gil_test )
 
+//
+// packed_channel_value<12> represents a 12 bit value type.
+//
+// These tests make sure that a value is represented correctly.
+//
 template< int K >
 void test_packed_channel()
 {
