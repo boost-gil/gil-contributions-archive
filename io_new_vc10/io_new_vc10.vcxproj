@@ -19,6 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_all.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_io_old.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_tags.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_write.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\detail\base.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\detail\bit_operations.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\detail\conversion_policies.hpp" />
@@ -48,6 +53,31 @@
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\read.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\supported_types.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_all.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_io_old.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_tags.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\png_all.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\png_io_old.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\png_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\png_tags.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\png_write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_all.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_io_old.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_tags.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_all.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_io_old.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_tags.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_all.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_io_old.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_tags.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_write.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libs\gil\io_new\test\iterator_test.cpp" />
@@ -115,7 +145,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\gil_contributions_svn\gil-contributions\sandbox;C:\chhenning\tiff-3.9.4\libtiff;C:\chhenning\lpng143;C:\chhenning\zlib-1.2.5;C:\chhenning\jpeg-8b</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\boost;C:\gil_contributions_svn\gil-contributions\sandbox;C:\chhenning\tiff-3.9.4\libtiff;C:\chhenning\lpng143;C:\chhenning\zlib-1.2.5;C:\chhenning\jpeg-8b</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>

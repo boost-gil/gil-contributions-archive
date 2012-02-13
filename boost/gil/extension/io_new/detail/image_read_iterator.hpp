@@ -30,15 +30,15 @@ public:
     /// Constructor with preallocated image. Reading starts at first scanline of source image.
     /// The supplied view ( y dimension ) defines how many scanlines will be read at each time.
     /// The supplied view ( x dimension ) how much of a scanline needs to be read.
-    image_read_iterator( Reader& reader
-                       , View&   view
+    image_read_iterator( Reader&     reader
+                       , const View& view
                        )
     : _pos( 0 )
     , _reader( &reader )
     , _view( &view )
     {
         reader.read_header();
-        reader.check_destination_view();
+        reader.check_destination_view( *_view );
     }
 
     /// Constructor with preallocated image. Reading starts at pos scanline of source image.
@@ -46,7 +46,7 @@ public:
     /// The supplied view ( x dimension ) how much of a scanline needs to be read.
     image_read_iterator( std::size_t pos
                        , Reader&     reader
-                       , View&       view
+                       , const View& view
                        )
     : _pos( pos )
     , _reader( &reader )
@@ -54,6 +54,7 @@ public:
     {
         reader.read_header();
         reader.check_destination_view();
+        reader.initialize();
 
         for( std::size_t i = 0; i < pos; ++i )
         {
@@ -109,7 +110,7 @@ private:
     std::size_t _pos;
 
     Reader* _reader;
-    View*   _view;
+    const View*   _view;
 };
 
 } // namespace gil

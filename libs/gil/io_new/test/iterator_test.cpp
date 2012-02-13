@@ -6,15 +6,15 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 
+#include <boost/gil/extension/io_new/detail/image_read_iterator.hpp>
+
 #include <boost/gil/extension/io_new/detail/get_read_device.hpp>
 #include <boost/gil/extension/io_new/detail/get_write_device.hpp>
 
 #include <boost/gil/extension/io_new/detail/make_reader.hpp>
 #include <boost/gil/extension/io_new/detail/make_writer.hpp>
 
-
 #include <boost/test/unit_test.hpp>
-
 
 namespace boost { namespace gil {
 
@@ -80,16 +80,25 @@ BOOST_AUTO_TEST_SUITE( iterator_test )
 
 BOOST_AUTO_TEST_CASE( iterator_test_cases )
 {
-    get_reader< char*
-              , bmp_tag
-              >::type bmp_reader = make_reader( "C:\\gil_contributions\\test_images\\bmp\\rgb.bmp"
-                                                , bmp_tag()
-                                                , read_and_no_convert()
-                                                );
+    typedef get_reader< char*
+                      , bmp_tag
+                      , read_and_no_convert
+                      , rgb8_image_t::view_t
+                      >::type reader_t;
+
+    reader_t bmp_reader = make_reader<char*
+                                     , bmp_tag
+                                     , read_and_no_convert
+                                     , rgb8_image_t::view_t
+                                     >
+                                     ( "C:\\gil_contributions\\test_images\\bmp\\rgb.bmp"
+                                     , bmp_tag()
+                                     , read_and_no_convert()
+                                     );
 
     rgb8_image_t scanline( 127, 1 );
 
-    image_read_iterator it( bmp_reader, view( scanline ));
+    image_read_iterator< reader_t, rgb8_image_t::view_t > it( bmp_reader, view( scanline ));
 
 
     //test_get_read_device< char*, bmp_tag, gil::detail::file_stream_device< bmp_tag > >();

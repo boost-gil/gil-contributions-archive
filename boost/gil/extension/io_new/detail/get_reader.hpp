@@ -9,15 +9,19 @@ namespace boost { namespace gil {
 ///
 template< typename T
         , typename FormatTag
-        , typename ConversionPolicy = read_and_no_convert
+        , typename ConversionPolicy
+        , typename View
         >
 struct get_reader
 {
-    typedef typename get_read_device< T, FormatTag >::type device_t;
+    typedef typename get_read_device< T
+                                    , FormatTag
+                                    >::type device_t;
 
     typedef reader< device_t
                   , FormatTag
                   , ConversionPolicy
+                  , View
                   > type;
 };
 

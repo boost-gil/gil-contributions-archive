@@ -123,6 +123,96 @@
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\write.hpp">
       <Filter>Header Files\formats\bmp</Filter>
     </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_all.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_io_old.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_read.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_tags.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\bmp_write.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_all.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_io_old.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_read.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_tags.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\jpeg_write.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\png_all.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\png_io_old.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\png_read.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\png_tags.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\png_write.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_all.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_io_old.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_read.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_tags.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\pnm_write.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_all.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_io_old.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_read.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_tags.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\targa_write.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_all.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_io_old.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_read.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_tags.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\tiff_write.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libs\gil\io_new\test\iterator_test.cpp">
