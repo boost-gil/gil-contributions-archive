@@ -53,6 +53,10 @@ struct color_mask
     bit_field blue;  // Blue bits
 };
 
+
+///
+/// BMP Backend
+///
 template< typename Device >
 struct reader_backend< Device
                      , bmp_tag
@@ -63,7 +67,14 @@ struct reader_backend< Device
                   )
     : _io_dev  ( device   )
     , _settings( settings )
+    , _info()
+    , _palette()
     {}
+
+    ~reader_backend()
+    {
+        _io_dev.set_close(true);
+    }
 
     Device                     _io_dev;
 
@@ -73,7 +84,9 @@ struct reader_backend< Device
     std::vector< rgba8_pixel_t > _palette;
 };
 
-
+///
+/// BMP Reader
+///
 template< typename Device
         , typename ConversionPolicy
         , typename View
@@ -83,10 +96,7 @@ class reader< Device
             , ConversionPolicy
             , View
             >
-    : /*public detail::reader_base< bmp_tag
-                                , ConversionPolicy
-                                >
-    , */public reader_backend< Device
+    : public reader_backend< Device
                            , bmp_tag
                            >
 {
@@ -104,16 +114,9 @@ public:
     reader( Device&                               device
           , const image_read_settings< bmp_tag >& settings
           )
-    : /*reader_base< bmp_tag
-                 , ConversionPolicy >( settings )
-
-    , */reader_backend( device, settings )
+    : reader_backend( device, settings )
 
     , _pitch( 0 )
-    , _offset( 0 )
-    , _ybeg( 0 )
-    , _yend( 0 )
-    , _yinc( 0 )
     {}
 
     //
@@ -123,17 +126,8 @@ public:
           , const cc_t&                           cc
           , const image_read_settings< bmp_tag >& settings
           )
-    : /*reader_base< bmp_tag
-                 , ConversionPolicy
-                 >( cc
-                  , settings
-                  )
-    ,*/ reader_backend( device, settings )
+    : reader_backend( device, settings )
     , _pitch( 0 )
-    , _offset( 0 )
-    , _ybeg( 0 )
-    , _yend( 0 )
-    , _yinc( 0 )
     {}
 
     void read_header()
@@ -213,14 +207,11 @@ public:
     {
         typedef point_t::value_type int_t;
 
-        int_t width  = static_cast< int_t >( _info._width  );
-        int_t height = static_cast< int_t >( _info._height );
+        const int_t width  = static_cast< const int_t >( _info._width  );
 
-        io_error_if( (  ( width  ) <= dst_view.width()
-                     || ( height ) <= dst_view.height()
-                     )
-                  , "User provided view has incorrect size." 
-                  );
+        io_error_if( ( ( width  ) > dst_view.width() )
+                   , "User provided view has incorrect size." 
+                   );
     }
 
     void initialize()
@@ -246,33 +237,6 @@ public:
         }
 
         _pitch = (_pitch + 3) & ~3;
-
-        //
-        _ybeg = 0;
-        _yend = this->_settings._dim.y;
-        _yinc = 1;
-
-        if( _info._height > 0 )
-        {
-            // the image is upside down
-            _ybeg = this->_settings._dim.y - 1;
-            _yend = -1;
-            _yinc = -1;
-
-            _offset = _info._offset
-                    + (   this->_info._height
-                        - this->_settings._top_left.y
-                        - this->_settings._dim.y
-                      ) * _pitch;
-
-
-        }
-        else
-        {
-            _offset = _info._offset
-                    + this->_settings._top_left.y * _pitch;
-        }
-
 
         switch( _info._bits_per_pixel )
         {
@@ -306,7 +270,14 @@ public:
 
             case 15: case 16: { _read_function = boost::mem_fn( &this_t::read_15_bits_image ); break; }
 
-            case 24: { _read_function = boost::mem_fn( &this_t::read_24_bits_image ); break; }
+            case 24:
+            {
+                _read_function = boost::mem_fn( &this_t::read_24_bits_image ); 
+                
+                break;
+            }
+
+
             case 32: { _read_function = boost::mem_fn( &this_t::read_32_bits_image ); break; }
 
             default: { io_error( "Unsupported bits per pixel." ); break; }
@@ -314,11 +285,28 @@ public:
     }
 
     /// Read part of image defined by View and return the data.
-    View read( View dst )
+    void read( View dst, int pos )
     {
-        _read_function(this, dst);
+        // jump to first scanline
+        long offset = 0;
 
-        return dst;
+        if( _info._height > 0 )
+        {
+            // the image is upside down
+            offset = _info._offset
+                   + ( this->_info._height - 1 - pos ) * _pitch;
+        }
+        else
+        {
+            offset = _info._offset
+                   + pos * _pitch;
+        }
+        
+        _io_dev.seek( static_cast< long >( offset ));
+
+
+        // read data
+        _read_function(this, dst);
     }
 
 private:
@@ -399,26 +387,19 @@ private:
     /// Read 24 bits image.
     void read_24_bits_image( View dst )
     {
-        typedef bgr24_image_t::view_t src_view_t;
+        _io_dev.read( &dst[0][0], _pitch );
     }
 
     /// Read 32 bits image.
     void read_32_bits_image( View dst )
     {
-        typedef bgra24_image_t::view_t src_view_t;
+        //typedef bgra24_image_t::view_t src_view_t;
     }
 
 private:
 
     // the row pitch must be multiple of 4 bytes
     int _pitch;
-
-    // offset to first scanline
-    std::ptrdiff_t _offset;
-
-    std::ptrdiff_t _ybeg;
-    std::ptrdiff_t _yend;
-    std::ptrdiff_t _yinc;
 
     boost::function< void ( this_t*, View ) > _read_function;
 };

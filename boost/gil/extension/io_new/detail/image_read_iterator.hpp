@@ -37,8 +37,13 @@ public:
     , _reader( &reader )
     , _view( &view )
     {
-        reader.read_header();
-        reader.check_destination_view( *_view );
+        if( _reader )
+        {
+            _reader->check_destination_view( *_view );
+
+            _reader->read_header();
+            _reader->initialize();
+        }
     }
 
     /// Constructor with preallocated image. Reading starts at pos scanline of source image.
@@ -52,9 +57,13 @@ public:
     , _reader( &reader )
     , _view( &view )
     {
-        reader.read_header();
-        reader.check_destination_view();
-        reader.initialize();
+
+        if( _reader )
+        {
+            _reader->read_header();
+            _reader->check_destination_view();
+            _reader->initialize();
+        }
 
         for( std::size_t i = 0; i < pos; ++i )
         {
@@ -69,7 +78,11 @@ public:
     {
         if( _reader && _view )
         {
-            return _reader->read( *_view );
+            _reader->read( *_view, _pos );
+
+            ++_pos;
+
+            return *_view;
         }
 
         throw std::runtime_error( "Reader cannot be null for this operation." );
@@ -86,7 +99,7 @@ public:
     {
         skip();
 
-        return (*this)
+        return (*this);
     }
 
     /// Compare passed iterator to this.
@@ -102,12 +115,14 @@ private:
         if( _reader && _view )
         {
             _reader->skip( *_view );
+
+            ++_pos;
         }
     }
 
 private:
 
-    std::size_t _pos;
+    mutable int _pos;
 
     Reader* _reader;
     const View*   _view;

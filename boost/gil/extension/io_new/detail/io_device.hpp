@@ -62,11 +62,12 @@ public:
     struct read_tag {};
     struct write_tag {};
 
-    file_stream_device( const std::string & file_name
-                      , read_tag
+    file_stream_device( const std::string& file_name
+                      , read_tag   = read_tag()
+                      , bool close = true
                       )
     : file( 0 )
-    , _close( true )
+    , _close( close )
     {
         io_error_if( ( file = fopen( file_name.c_str(), "rb" )) == NULL
                    , "file_stream_device: failed to open file"
@@ -74,10 +75,11 @@ public:
     }
 
     file_stream_device( const char* file_name
-                      , read_tag
+                      , read_tag   = read_tag()
+                      , bool close = true
                       )
         : file( 0 )
-        , _close( true )
+        , _close( close )
     {
         io_error_if( ( file = fopen( file_name, "rb" )) == NULL
                    , "file_stream_device: failed to open file"
@@ -240,6 +242,16 @@ public:
     void print_line( const std::string& line )
     {
         fwrite( line.c_str(), sizeof( char ), line.size(), file );
+    }
+
+    int error()
+    {
+        return ferror(file);
+    }
+
+    void set_close( bool close )
+    {
+        _close = close;
     }
 
 private:

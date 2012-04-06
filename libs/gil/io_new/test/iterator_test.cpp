@@ -1,6 +1,6 @@
 
-#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-#define BOOST_FILESYSTEM_VERSION 3
+//#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+//#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/gil_all.hpp>
@@ -83,22 +83,38 @@ BOOST_AUTO_TEST_CASE( iterator_test_cases )
     typedef get_reader< char*
                       , bmp_tag
                       , read_and_no_convert
-                      , rgb8_image_t::view_t
+                      , bgr8_image_t::view_t
                       >::type reader_t;
 
-    reader_t bmp_reader = make_reader<char*
+    reader_t bmp_reader = make_reader< char*
                                      , bmp_tag
                                      , read_and_no_convert
-                                     , rgb8_image_t::view_t
+                                     , bgr8_image_t::view_t
                                      >
                                      ( "C:\\gil_contributions\\test_images\\bmp\\rgb.bmp"
                                      , bmp_tag()
                                      , read_and_no_convert()
                                      );
 
-    rgb8_image_t scanline( 127, 1 );
+    bgr8_image_t scanline( 128, 1 );
+    fill_pixels(view(scanline), bgr8_pixel_t(0,0,0));
 
-    image_read_iterator< reader_t, rgb8_image_t::view_t > it( bmp_reader, view( scanline ));
+    rgb8_image_t dst( 127, 64 );
+
+    image_read_iterator< reader_t
+                       , bgr8_image_t::view_t
+                       > it( bmp_reader, view( scanline ));
+
+
+    for( int i = 0; i < 64; ++i )
+    {
+        copy_pixels( subimage_view(       *it, 0, 0, static_cast<int>(view(dst).width()), 1 )
+                   , subimage_view( view(dst), 0, i, static_cast<int>(view(dst).width()), 1 )
+                   );
+    }
+
+    write_view( "c:\\users\\chenning\\out.bmp", view(dst), bmp_tag() );
+
 
 
     //test_get_read_device< char*, bmp_tag, gil::detail::file_stream_device< bmp_tag > >();

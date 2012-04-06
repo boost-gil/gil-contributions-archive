@@ -30,6 +30,7 @@ make_reader( const String&    file_name
                    , FormatTag
                    >::type device( detail::convert_to_native_string( file_name )
                                  , typename detail::file_stream_device< FormatTag >::read_tag()
+                                 , false
                                  );
 
     return get_reader< String
@@ -37,7 +38,7 @@ make_reader( const String&    file_name
                      , ConversionPolicy
                      , View
                      >::type( device
-                            , image_read_settings< FormatTag >()
+                            , image_read_settings<FormatTag>()
                             );
 }
 

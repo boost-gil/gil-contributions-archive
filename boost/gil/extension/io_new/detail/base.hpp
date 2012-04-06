@@ -67,6 +67,17 @@ protected:
     , _dim     ( dim      )
     {}
 
+
+public:
+
+    void set( const point_t& top_left
+            , const point_t& dim
+            )
+    {
+        _top_left = top_left;
+        _dim      = dim;
+    }
+
 public:
 
     point_t _top_left;
