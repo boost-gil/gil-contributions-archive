@@ -82,6 +82,8 @@ struct reader_backend< Device
     image_read_info< bmp_tag >     _info;
 
     std::vector< rgba8_pixel_t > _palette;
+
+    color_mask _mask;
 };
 
 ///
@@ -108,6 +110,10 @@ private:
 
 public:
 
+    typedef reader_backend< Device, bmp_tag > backend_t;
+
+public:
+
     //
     // Constructor
     //
@@ -127,6 +133,7 @@ public:
           , const image_read_settings< bmp_tag >& settings
           )
     : reader_backend( device, settings )
+
     , _pitch( 0 )
     {}
 
@@ -203,15 +210,10 @@ public:
         _info._valid = true;
     }
 
+    /// For bmp the dst_view needs to have a width of pitch ( dividable by 4 ) bytes!
     void check_destination_view( const View& dst_view )
     {
-        typedef point_t::value_type int_t;
-
-        const int_t width  = static_cast< const int_t >( _info._width  );
-
-        io_error_if( ( ( width  ) > dst_view.width() )
-                   , "User provided view has incorrect size." 
-                   );
+        ///@todo
     }
 
     void initialize()
@@ -240,14 +242,38 @@ public:
 
         switch( _info._bits_per_pixel )
         {
-            case 1: { _read_function = boost::mem_fn( &this_t::read_1_bit_image ); break; }
+            case 1:
+            {
+                read_palette();
+                _buffer.resize( _pitch );
+
+                _read_function = boost::mem_fn( &this_t::read_1_bit_image ); 
+
+                break;
+            }
 
             case 4:
             {
 				switch( _info._compression )
 				{
-				    case bmp_compression::_rle4: { _read_function = boost::mem_fn( &this_t::read_rle_image );    break; }
-				    case bmp_compression::_rgb : { _read_function = boost::mem_fn( &this_t::read_4_bits_image ); break; }
+				    case bmp_compression::_rle4:
+                    {
+                        io_error( "Cannot read run-length encoded images in iterator mode. Try to read as whole image." );
+                        //read_palette();
+                        //_read_function = boost::mem_fn( &this_t::read_rle_image );
+
+                        break;
+                    }
+
+				    case bmp_compression::_rgb :
+                    {
+                        read_palette();
+                        _buffer.resize( _pitch );
+
+                        _read_function = boost::mem_fn( &this_t::read_4_bits_image );
+
+                        break;
+                    }
 
 				    default: { io_error( "Unsupported compression mode in BMP file." ); break; }
                 }
@@ -259,8 +285,23 @@ public:
             {
 				switch( _info._compression )
 				{
-				    case bmp_compression::_rle8: { _read_function = boost::mem_fn( &this_t::read_rle_image );    break; }
-				    case bmp_compression::_rgb:  { _read_function = boost::mem_fn( &this_t::read_8_bits_image ); break; }
+				    case bmp_compression::_rle8:
+                    {
+                        io_error( "Cannot read run-length encoded images in iterator mode. Try to read as whole image." );
+                        //read_palette();
+                        //_read_function = boost::mem_fn( &this_t::read_rle_image );
+
+                        break;
+                    }
+				    case bmp_compression::_rgb:
+                    {
+                        read_palette();
+                        _buffer.resize( _pitch );
+
+                        _read_function = boost::mem_fn( &this_t::read_8_bits_image ); 
+
+                        break;
+                    }
 
 				    default: { io_error( "Unsupported compression mode in BMP file." ); break; }
                 }
@@ -268,7 +309,59 @@ public:
                 break;
             }
 
-            case 15: case 16: { _read_function = boost::mem_fn( &this_t::read_15_bits_image ); break; }
+            case 15: case 16:
+            {
+                _buffer.resize( _pitch );
+
+                if( _info._compression == bmp_compression::_bitfield )
+                {
+                    _mask.red.mask    = _io_dev.read_uint32();
+                    _mask.green.mask  = _io_dev.read_uint32();
+                    _mask.blue.mask   = _io_dev.read_uint32();
+
+                    _mask.red.width   = detail::count_ones( _mask.red.mask   );
+                    _mask.green.width = detail::count_ones( _mask.green.mask );
+                    _mask.blue.width  = detail::count_ones( _mask.blue.mask  );
+
+                    _mask.red.shift   = detail::trailing_zeros( _mask.red.mask   );
+                    _mask.green.shift = detail::trailing_zeros( _mask.green.mask );
+                    _mask.blue.shift  = detail::trailing_zeros( _mask.blue.mask  );
+                }
+                else if( _info._compression == bmp_compression::_rgb )
+                {
+                    switch( _info._bits_per_pixel )
+                    {
+                        case 15:
+                        case 16:
+                        {
+                            _mask.red.mask   = 0x007C00; _mask.red.width   = 5; _mask.red.shift   = 10;
+                            _mask.green.mask = 0x0003E0; _mask.green.width = 5; _mask.green.shift =  5;
+                            _mask.blue.mask  = 0x00001F; _mask.blue.width  = 5; _mask.blue.shift  =  0;
+
+                            break;
+                        }
+
+                        case 24:
+                        case 32:
+                        {
+                            _mask.red.mask   = 0xFF0000; _mask.red.width   = 8; _mask.red.shift   = 16;
+                            _mask.green.mask = 0x00FF00; _mask.green.width = 8; _mask.green.shift =  8;
+                            _mask.blue.mask  = 0x0000FF; _mask.blue.width  = 8; _mask.blue.shift  =  0;
+
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    io_error( "bmp_reader::apply(): unsupported BMP compression" );
+                }
+
+
+                _read_function = boost::mem_fn( &this_t::read_15_bits_image ); 
+
+                break;
+            }
 
             case 24:
             {
@@ -278,16 +371,26 @@ public:
             }
 
 
-            case 32: { _read_function = boost::mem_fn( &this_t::read_32_bits_image ); break; }
+            case 32:
+            {
+                _read_function = boost::mem_fn( &this_t::read_32_bits_image ); 
+                
+                break;
+            }
 
             default: { io_error( "Unsupported bits per pixel." ); break; }
         }
     }
 
+    void clean_up()
+    {
+        ///@todo
+    }
+
     /// Read part of image defined by View and return the data.
     void read( View dst, int pos )
     {
-        // jump to first scanline
+        // jump to scanline
         long offset = 0;
 
         if( _info._height > 0 )
@@ -302,11 +405,17 @@ public:
                    + pos * _pitch;
         }
         
-        _io_dev.seek( static_cast< long >( offset ));
+        _io_dev.seek( offset );
 
 
         // read data
         _read_function(this, dst);
+    }
+
+    /// Return length of scanline in bytes.
+    int scanline_length()
+    {
+        return _pitch;
     }
 
 private:
@@ -348,8 +457,24 @@ private:
     void read_1_bit_image( View dst )
     {
         typedef gray1_image_t::view_t src_view_t;
+        
+        assert(_io_dev.read( &_buffer.front(), _pitch ));
+        _mirror_bites( _buffer );
 
-        read_palette();
+        src_view_t src = interleaved_view( this->_info._width
+                                         , 1
+                                         , (src_view_t::x_iterator) &_buffer.front()
+                                         , this->_pitch
+                                         );
+
+        typename src_view_t::x_iterator src_it = src.row_begin( 0 );
+        typename View::x_iterator       dst_it = dst.row_begin( 0 );
+
+        for( int i = 0; i < static_cast<int>(dst.width()); ++i, src_it++, dst_it++ )
+        {
+            unsigned char c = get_color( *src_it, gray_color_t() );
+            *dst_it = this->_palette[c];
+        }
     }
 
     // Read 4 bits image. The colors are encoded by an index.
@@ -357,31 +482,75 @@ private:
     {
         typedef gray4_image_t::view_t src_view_t;
 
-        read_palette();
-    }    
+        assert(_io_dev.read( &_buffer.front(), _pitch ));
+        _swap_half_bytes( _buffer );
+
+        src_view_t src = interleaved_view( this->_info._width
+                                         , 1
+                                         , (src_view_t::x_iterator) &_buffer.front()
+                                         , this->_pitch
+                                         );
+
+        typename src_view_t::x_iterator src_it = src.row_begin( 0 );
+        typename View::x_iterator       dst_it = dst.row_begin( 0 );
+
+        for( View::x_coord_t i = 0; i < dst.width(); ++i, src_it++, dst_it++ )
+        {
+            unsigned char c = get_color( *src_it, gray_color_t() );
+            *dst_it = this->_palette[c];
+        }        
+    }
 
     /// Read 8 bits image. The colors are encoded by an index.
     void read_8_bits_image( View dst )
     {
         typedef gray8_image_t::view_t src_view_t;
 
-        read_palette();
+        assert(_io_dev.read( &_buffer.front(), _pitch ));
+
+        src_view_t src = interleaved_view( this->_info._width
+                                         , 1
+                                         , (src_view_t::value_type*) &_buffer.front()
+                                         , this->_pitch
+                                         );
+
+        typename src_view_t::x_iterator src_it = src.row_begin( 0 );
+        typename View::x_iterator       dst_it = dst.row_begin( 0 );
+
+        for( View::x_coord_t i = 0; i < dst.width(); ++i, src_it++, dst_it++ )
+        {
+            unsigned char c = get_color( *src_it, gray_color_t() );
+            *dst_it = this->_palette[c];
+        }        
     }    
 
     /// Read image that's encoded using Run-length coding (RLE).
     void read_rle_image( View dst )
     {
-        assert(  _info._compression == bmp_compression::_rle4
-              || _info._compression == bmp_compression::_rle8
-              );
-
-        read_palette();
+        /// not supported
     }
 
     /// Read 15 or 16 bits image.
     void read_15_bits_image( View dst )
     {
-        
+        typedef rgb8_image_t image_t;
+        typedef image_t::view_t::x_iterator it_t;
+
+        byte_t* src = &_buffer.front();
+        _io_dev.read( src, _pitch );
+
+        for( int32_t i = 0 ; i < _info._width; ++i, src += 2 )
+        {
+            int p = ( src[1] << 8 ) | src[0];
+
+            int r = ((p & _mask.red.mask)   >> _mask.red.shift)   << (8 - _mask.red.width);
+            int g = ((p & _mask.green.mask) >> _mask.green.shift) << (8 - _mask.green.width);
+            int b = ((p & _mask.blue.mask)  >> _mask.blue.shift)  << (8 - _mask.blue.width);
+
+            get_color( dst[i], red_t()   ) = static_cast< byte_t >( r );
+            get_color( dst[i], green_t() ) = static_cast< byte_t >( g );
+            get_color( dst[i], blue_t()  ) = static_cast< byte_t >( b );
+        }
     }
 
     /// Read 24 bits image.
@@ -393,13 +562,17 @@ private:
     /// Read 32 bits image.
     void read_32_bits_image( View dst )
     {
-        //typedef bgra24_image_t::view_t src_view_t;
+        _io_dev.read( &dst[0][0], _pitch );
     }
 
 private:
 
     // the row pitch must be multiple of 4 bytes
     int _pitch;
+
+    std::vector< byte_t > _buffer;
+    detail::mirror_bits    < std::vector< byte_t >, mpl::true_ > _mirror_bites;
+    detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
 
     boost::function< void ( this_t*, View ) > _read_function;
 };

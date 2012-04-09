@@ -10,6 +10,8 @@ class image_read_iterator
 {
 public:
 
+    typedef typename Reader::backend_t backend_t;
+
     typedef std::input_iterator_tag iterator_category;
     typedef View value_type;
     typedef View const* pointer;
@@ -28,8 +30,6 @@ public:
     {}
 
     /// Constructor with preallocated image. Reading starts at first scanline of source image.
-    /// The supplied view ( y dimension ) defines how many scanlines will be read at each time.
-    /// The supplied view ( x dimension ) how much of a scanline needs to be read.
     image_read_iterator( Reader&     reader
                        , const View& view
                        )
@@ -37,18 +37,19 @@ public:
     , _reader( &reader )
     , _view( &view )
     {
-        if( _reader )
-        {
-            _reader->check_destination_view( *_view );
+        init();
+    }
 
-            _reader->read_header();
-            _reader->initialize();
-        }
+    /// Constructor with preallocated image. Reading starts at first scanline of source image.
+    image_read_iterator( Reader& reader )
+    : _pos( 0 )
+    , _reader( &reader )
+    , _view( 0 )
+    {
+        init();
     }
 
     /// Constructor with preallocated image. Reading starts at pos scanline of source image.
-    /// The supplied view ( y dimension ) defines how many scanlines will be read at each time.
-    /// The supplied view ( x dimension ) how much of a scanline needs to be read.
     image_read_iterator( std::size_t pos
                        , Reader&     reader
                        , const View& view
@@ -57,13 +58,7 @@ public:
     , _reader( &reader )
     , _view( &view )
     {
-
-        if( _reader )
-        {
-            _reader->read_header();
-            _reader->check_destination_view();
-            _reader->initialize();
-        }
+        init();
 
         for( std::size_t i = 0; i < pos; ++i )
         {
@@ -72,6 +67,31 @@ public:
     }
 
     ///@todo Add constructors that will allocate dst image memory.
+
+    /// Set reader. Do clean up before if necessary.
+    void set_reader(Reader& reader)
+    {
+        if( _reader )
+        {
+            _reader.clean_up();
+        }
+
+        _reader = &reader;
+
+        init();
+    }
+
+    /// Set reader. Do clean up before if necessary.
+    void set_view(const View& view)
+    {
+        _view = &view;
+
+        if( _reader && _view )
+        {
+            _reader->check_destination_view( *_view );
+        }
+    }
+
 
     /// Dereference Operator
     reference operator*() const
@@ -108,7 +128,41 @@ public:
         return (_reader == rhs._reader) && ( _view == rhs._view );
     }
 
+    /// Return backend.
+    typename const backend_t& backend()
+    {
+        if( _reader )
+        {
+            return *_reader;
+        }
+
+        throw std::runtime_error( "Reader cannot be null for this operation." );        
+    }
+
+    /// Return length of scanline in bytes.
+    int scanline_length()
+    {
+        if(_reader)
+        {
+            return _reader->scanline_length();
+        }
+    }
+
 private:
+
+    void init()
+    {
+        if( _reader )
+        {
+            _reader->read_header();
+            _reader->initialize();
+        }
+
+        if( _reader && _view )
+        {
+            _reader->check_destination_view( *_view );
+        }
+    }
 
     void skip()
     {
