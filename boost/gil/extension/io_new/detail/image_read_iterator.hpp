@@ -74,6 +74,8 @@ public:
         if( _reader )
         {
             _reader.clean_up();
+
+            _pos = 0;
         }
 
         _reader = &reader;

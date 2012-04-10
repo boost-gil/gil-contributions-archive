@@ -73,10 +73,10 @@ struct reader_backend< Device
 
     ~reader_backend()
     {
-        _io_dev.set_close(true);
+        _io_dev.set_close( true );
     }
 
-    Device                     _io_dev;
+    Device _io_dev;
 
     image_read_settings< bmp_tag > _settings;
     image_read_info< bmp_tag >     _info;
@@ -104,7 +104,11 @@ class reader< Device
 {
 private:
 
-    typedef reader< Device, bmp_tag, ConversionPolicy, View > this_t;
+    typedef reader< Device
+                  , bmp_tag
+                  , ConversionPolicy
+                  , View
+                  > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
 
@@ -275,7 +279,10 @@ public:
                         break;
                     }
 
-				    default: { io_error( "Unsupported compression mode in BMP file." ); break; }
+				    default:
+                    {
+                        io_error( "Unsupported compression mode in BMP file." );
+                    }
                 }
 
                 break;
@@ -378,7 +385,10 @@ public:
                 break;
             }
 
-            default: { io_error( "Unsupported bits per pixel." ); break; }
+            default:
+            {
+                io_error( "Unsupported bits per pixel." );
+            }
         }
     }
 

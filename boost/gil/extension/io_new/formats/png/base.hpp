@@ -26,7 +26,7 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil { 
 
 template< typename Device >
 class png_io_base
@@ -36,8 +36,12 @@ public:
     : _io_dev( io_dev )
     {}
 
+    ~png_io_base()
+    {
+        _io_dev.set_close( true );
+    }
+
 protected:
-    Device _io_dev;
 
     void check()
     {
@@ -90,9 +94,11 @@ protected:
         // @todo
     }
 
+protected:
+
+    Device _io_dev;
 };
 
-} // namespace detail
 } // namespace gil
 } // namespace boost
 
