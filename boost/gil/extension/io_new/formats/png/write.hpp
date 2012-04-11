@@ -64,7 +64,7 @@ struct writer_backend< Device
 template< typename Device >
 class writer< Device
             , png_tag
-            > : public detail::png_io_base< Device >
+            > : public png_io_base< Device >
               , public writer_backend< Device
                                      , png_tag
                                      >

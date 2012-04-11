@@ -44,8 +44,8 @@ struct reader_backend< Device
                      >
     : public png_io_base< Device >
 {
-    reader_backend( Device&                               device
-                  , const image_read_settings< bmp_tag >& settings
+    reader_backend( const Device&                         device
+                  , const image_read_settings< png_tag >& settings
                   )
     : png_io_base< Device >( device )
 
@@ -76,6 +76,7 @@ template< typename Device
 class reader< Device
             , png_tag
             , ConversionPolicy
+            , View
             >
     : public reader_backend< Device
                            , png_tag
@@ -84,7 +85,7 @@ class reader< Device
 private:
 
     typedef reader< Device
-                  , bmp_tag
+                  , png_tag
                   , ConversionPolicy
                   , View
                   > this_t;
@@ -93,7 +94,7 @@ private:
 
 public:
 
-    typedef reader_backend< Device, bmp_tag > backend_t;
+    typedef reader_backend< Device, png_tag > backend_t;
 
 public:
 
@@ -103,7 +104,11 @@ public:
     reader( const Device&                         io_dev
           , const image_read_settings< png_tag >& settings
           )
-    : reader_backend< Device >( io_dev, settings )
+    : reader_backend< Device
+                    , png_tag
+                    >( io_dev
+                     , settings
+                     )
     {}
 
     //
@@ -134,6 +139,9 @@ public:
 
     void read_header()
     {
+        // check the file's first few bytes
+        check();
+
         // Create and initialize the png_struct with the desired error handler
         // functions.  If you want to use the default stderr and longjump method,
         // you can supply NULL for the last three parameters.  We also supply the
@@ -789,8 +797,11 @@ public:
                 io_error( "png_reader_color_convert::read_data(): unknown color type" );
             }
         }
+    }
 
-        _buffer.resize( scanline_length );
+    void check_destination_view( const View& dst_view )
+    {
+        ///@todo
     }
 
     void clean_up()
@@ -891,42 +902,52 @@ public:
 
 private:
 
-    void read_row()
-    {
-        png_bytep row_ptr = static_cast<png_bytep>( &_buffer.front() );
-
-        png_read_rows( _png_ptr
-                     , &row_ptr
-                     , NULL
-                     , 1
-                     );
-    }
 
     void read_gray_1_bit( View dst )
     {
-        read_row();
-
-        //copy data into dst
     }
 
+    void read_gray_2_bits( View dst )
+    {
+    }
 
-    void read_gray_2_bits( View dst ){}
-    void read_gray_4_bits( View dst ){}
-    void read_gray_8_bits( View dst ){}
-    void read_gray_16_bits( View dst ){}
+    void read_gray_4_bits( View dst )
+    {
+    }
 
-    void read_ga_8_bits( View dst ){}
-    void read_ga_16_bits( View dst ){}
+    void read_gray_8_bits( View dst )
+    {
+    }
 
-    void read_rgb_8_bits( View dst ){}
-    void read_rgb_16_bits( View dst ){}
+    void read_gray_16_bits( View dst )
+    {
+    }
 
-    void read_rgba_8_bits( View dst ){}
-    void read_rgba_16_bits( View dst ){}
+    void read_ga_8_bits( View dst )
+    {
+    }
+
+    void read_ga_16_bits( View dst )
+    {
+    }
+
+    void read_rgb_8_bits( View dst )
+    {
+    }
+
+    void read_rgb_16_bits( View dst )
+    {
+    }
+
+    void read_rgba_8_bits( View dst )
+    {
+    }
+
+    void read_rgba_16_bits( View dst )
+    {
+    }
 
 private:
-
-    std::vector< byte_t > _buffer;
 
     boost::function< void ( this_t*, View ) > _read_function;
 };
@@ -967,18 +988,22 @@ struct png_read_is_supported
 };
 
 template< typename Device
+        , typename View
         >
 class dynamic_image_reader< Device
                           , png_tag
+                          , View
                           >
     : public reader< Device
                    , png_tag
                    , read_and_no_convert
+                   , View
                    >
 {
     typedef reader< Device
                   , png_tag
                   , read_and_no_convert
+                  , View
                   > parent_t;
 
 public:
