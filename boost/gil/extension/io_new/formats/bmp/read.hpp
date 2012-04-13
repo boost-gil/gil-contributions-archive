@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning \n
 ///
-/// \date 2008 \n
+/// \date 2008 - 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,28 +89,19 @@ struct reader_backend< Device
 ///
 /// BMP Reader
 ///
-template< typename Device
-        , typename ConversionPolicy
-        , typename View
-        >
-class reader< Device
-            , bmp_tag
-            , ConversionPolicy
-            , View
-            >
+template< typename Device >
+class scanline_reader< Device
+                     , bmp_tag
+                     >
     : public reader_backend< Device
                            , bmp_tag
                            >
 {
 private:
 
-    typedef reader< Device
-                  , bmp_tag
-                  , ConversionPolicy
-                  , View
-                  > this_t;
-
-    typedef typename ConversionPolicy::color_converter_type cc_t;
+    typedef scanline_reader< Device
+                           , bmp_tag
+                           > this_t;
 
 public:
 
@@ -121,21 +112,9 @@ public:
     //
     // Constructor
     //
-    reader( Device&                               device
-          , const image_read_settings< bmp_tag >& settings
-          )
-    : reader_backend( device, settings )
-
-    , _pitch( 0 )
-    {}
-
-    //
-    // Constructor
-    //
-    reader( Device&                               device
-          , const cc_t&                           cc
-          , const image_read_settings< bmp_tag >& settings
-          )
+    scanline_reader( Device&                               device
+                   , const image_read_settings< bmp_tag >& settings
+                   )
     : reader_backend( device, settings )
 
     , _pitch( 0 )
@@ -214,25 +193,8 @@ public:
         _info._valid = true;
     }
 
-    /// For bmp the dst_view needs to have a width of pitch ( dividable by 4 ) bytes!
-    void check_destination_view( const View& dst_view )
-    {
-        ///@todo
-    }
-
     void initialize()
     {
-        // make sure the dst view is compatible with bmp format
-        typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
-                                >::type is_read_and_convert_t;
-
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
-                   , "Image types aren't compatible."
-                   );
-
         if( _info._bits_per_pixel < 8 )
         {
             _pitch = (( this->_info._width * this->_info._bits_per_pixel ) + 7 ) >> 3;
@@ -398,7 +360,7 @@ public:
     }
 
     /// Read part of image defined by View and return the data.
-    void read( View dst, int pos )
+    void read( byte_t* dst, int pos )
     {
         // jump to scanline
         long offset = 0;
@@ -464,23 +426,34 @@ private:
     }
 
     // Read 1 bit image. The colors are encoded by an index.
-    void read_1_bit_image( View dst )
+    void read_1_bit_image( byte_t* dst )
     {
         typedef gray1_image_t::view_t src_view_t;
+        typedef rgba8_image_t::view_t dst_view_t;
         
         assert(_io_dev.read( &_buffer.front(), _pitch ));
         _mirror_bites( _buffer );
 
-        src_view_t src = interleaved_view( this->_info._width
-                                         , 1
-                                         , (src_view_t::x_iterator) &_buffer.front()
-                                         , this->_pitch
-                                         );
+        src_view_t src_view = interleaved_view( this->_info._width
+                                              , 1
+                                              , (src_view_t::x_iterator) &_buffer.front()
+                                              , this->_pitch
+                                              );
 
-        typename src_view_t::x_iterator src_it = src.row_begin( 0 );
-        typename View::x_iterator       dst_it = dst.row_begin( 0 );
+        dst_view_t dst_view = interleaved_view( this->_info._width
+                                              , 1
+                                              , (dst_view_t::value_type*) dst
+                                              , this->_pitch
+                                              );
+        
 
-        for( int i = 0; i < static_cast<int>(dst.width()); ++i, src_it++, dst_it++ )
+        src_view_t::x_iterator src_it = src_view.row_begin( 0 );
+        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
+
+        for( dst_view_t::x_coord_t i = 0
+           ; i < _info._width
+           ; ++i, src_it++, dst_it++
+           )
         {
             unsigned char c = get_color( *src_it, gray_color_t() );
             *dst_it = this->_palette[c];
@@ -488,23 +461,33 @@ private:
     }
 
     // Read 4 bits image. The colors are encoded by an index.
-    void read_4_bits_image( View dst )
+    void read_4_bits_image( byte_t* dst )
     {
         typedef gray4_image_t::view_t src_view_t;
+        typedef rgba8_image_t::view_t dst_view_t;
 
         assert(_io_dev.read( &_buffer.front(), _pitch ));
         _swap_half_bytes( _buffer );
 
-        src_view_t src = interleaved_view( this->_info._width
-                                         , 1
-                                         , (src_view_t::x_iterator) &_buffer.front()
-                                         , this->_pitch
-                                         );
+        src_view_t src_view = interleaved_view( this->_info._width
+                                              , 1
+                                              , (src_view_t::x_iterator) &_buffer.front()
+                                              , this->_pitch
+                                              );
 
-        typename src_view_t::x_iterator src_it = src.row_begin( 0 );
-        typename View::x_iterator       dst_it = dst.row_begin( 0 );
+        dst_view_t dst_view = interleaved_view( this->_info._width
+                                              , 1
+                                              , (dst_view_t::value_type*) dst
+                                              , this->_pitch
+                                              );
 
-        for( View::x_coord_t i = 0; i < dst.width(); ++i, src_it++, dst_it++ )
+        src_view_t::x_iterator src_it = src_view.row_begin( 0 );
+        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
+
+        for( dst_view_t::x_coord_t i = 0
+           ; i < _info._width
+           ; ++i, src_it++, dst_it++
+           )
         {
             unsigned char c = get_color( *src_it, gray_color_t() );
             *dst_it = this->_palette[c];
@@ -512,22 +495,32 @@ private:
     }
 
     /// Read 8 bits image. The colors are encoded by an index.
-    void read_8_bits_image( View dst )
+    void read_8_bits_image( byte_t* dst )
     {
         typedef gray8_image_t::view_t src_view_t;
+        typedef rgba8_image_t::view_t dst_view_t;
 
-        assert(_io_dev.read( &_buffer.front(), _pitch ));
+        assert( _io_dev.read( &_buffer.front(), _pitch ));
 
-        src_view_t src = interleaved_view( this->_info._width
-                                         , 1
-                                         , (src_view_t::value_type*) &_buffer.front()
-                                         , this->_pitch
-                                         );
+        src_view_t src_view = interleaved_view( this->_info._width
+                                              , 1
+                                              , (src_view_t::value_type*) &_buffer.front()
+                                              , this->_pitch
+                                              );
 
-        typename src_view_t::x_iterator src_it = src.row_begin( 0 );
-        typename View::x_iterator       dst_it = dst.row_begin( 0 );
+        dst_view_t dst_view = interleaved_view( this->_info._width
+                                              , 1
+                                              , (dst_view_t::value_type*) dst
+                                              , this->_pitch
+                                              );
 
-        for( View::x_coord_t i = 0; i < dst.width(); ++i, src_it++, dst_it++ )
+        src_view_t::x_iterator src_it = src_view.row_begin( 0 );
+        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
+
+        for( dst_view_t::x_coord_t i = 0
+           ; i < _info._width
+           ; ++i, src_it++, dst_it++
+           )
         {
             unsigned char c = get_color( *src_it, gray_color_t() );
             *dst_it = this->_palette[c];
@@ -535,21 +528,33 @@ private:
     }    
 
     /// Read image that's encoded using Run-length coding (RLE).
-    void read_rle_image( View dst )
+    void read_rle_image( byte_t* dst )
     {
         /// not supported
     }
 
     /// Read 15 or 16 bits image.
-    void read_15_bits_image( View dst )
+    void read_15_bits_image( byte_t* dst )
     {
-        typedef rgb8_image_t image_t;
-        typedef image_t::view_t::x_iterator it_t;
+        typedef rgb8_view_t dst_view_t;
+        typedef dst_view_t::x_iterator it_t;
 
+        dst_view_t dst_view = interleaved_view( this->_info._width
+                                              , 1
+                                              , (dst_view_t::value_type*) dst
+                                              , this->_pitch
+                                              );
+
+        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
+
+        //
         byte_t* src = &_buffer.front();
         _io_dev.read( src, _pitch );
 
-        for( int32_t i = 0 ; i < _info._width; ++i, src += 2 )
+        for( dst_view_t::x_coord_t i = 0
+           ; i < _info._width
+           ; ++i, src += 2
+           )
         {
             int p = ( src[1] << 8 ) | src[0];
 
@@ -557,22 +562,22 @@ private:
             int g = ((p & _mask.green.mask) >> _mask.green.shift) << (8 - _mask.green.width);
             int b = ((p & _mask.blue.mask)  >> _mask.blue.shift)  << (8 - _mask.blue.width);
 
-            get_color( dst[i], red_t()   ) = static_cast< byte_t >( r );
-            get_color( dst[i], green_t() ) = static_cast< byte_t >( g );
-            get_color( dst[i], blue_t()  ) = static_cast< byte_t >( b );
+            get_color( dst_it[i], red_t()   ) = static_cast< byte_t >( r );
+            get_color( dst_it[i], green_t() ) = static_cast< byte_t >( g );
+            get_color( dst_it[i], blue_t()  ) = static_cast< byte_t >( b );
         }
     }
 
     /// Read 24 bits image.
-    void read_24_bits_image( View dst )
+    void read_24_bits_image( byte_t* dst )
     {
-        _io_dev.read( &dst[0][0], _pitch );
+        _io_dev.read( dst, _pitch );
     }
 
     /// Read 32 bits image.
-    void read_32_bits_image( View dst )
+    void read_32_bits_image( byte_t* dst )
     {
-        _io_dev.read( &dst[0][0], _pitch );
+        _io_dev.read( dst, _pitch );
     }
 
 private:
@@ -584,7 +589,7 @@ private:
     detail::mirror_bits    < std::vector< byte_t >, mpl::true_ > _mirror_bites;
     detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
 
-    boost::function< void ( this_t*, View ) > _read_function;
+    boost::function< void ( this_t*, byte_t* ) > _read_function;
 };
 
 /////////////////////////////////// dynamic image

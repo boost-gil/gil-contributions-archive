@@ -539,7 +539,9 @@ template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,v
 
 } // namespace detail
 
+template< typename Device, typename FormatTag > class scanline_reader;
 template< typename Device, typename FormatTag, typename ConversionPolicy, typename View > class reader;
+
 template< typename Device, typename FormatTag, typename Log = no_log > class writer;
 
 template< typename Device, typename FormatTag, typename View > class dynamic_image_reader;

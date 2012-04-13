@@ -9,20 +9,16 @@ namespace boost { namespace gil {
 ///
 template< typename T
         , typename FormatTag
-        , typename ConversionPolicy
-        , typename View
         >
-struct get_reader
+struct get_scanline_reader
 {
     typedef typename get_read_device< T
                                     , FormatTag
                                     >::type device_t;
 
-    typedef reader< device_t
-                  , FormatTag
-                  , ConversionPolicy
-                  , View
-                  > type;
+    typedef scanline_reader< device_t
+                           , FormatTag
+                           > type;
 };
 
 } // namespace gil

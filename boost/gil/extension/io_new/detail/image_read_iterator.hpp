@@ -3,19 +3,17 @@
 namespace boost { namespace gil {
 
 /// Input iterator to read images.
-template< typename Reader
-        , typename View
-        >
-class image_read_iterator
+template< typename Reader >
+class scanline_read_iterator
 {
 public:
 
     typedef typename Reader::backend_t backend_t;
 
     typedef std::input_iterator_tag iterator_category;
-    typedef View value_type;
-    typedef View const* pointer;
-    typedef View const& reference;
+    typedef byte_t* value_type;
+    typedef value_type const* pointer;
+    typedef value_type const& reference;
     
     /// todo
     //typedef ptrdiff_t difference_type;
@@ -23,42 +21,47 @@ public:
 public:
 
     /// Default Constructor, usually used to create an end iterator.
-    image_read_iterator()
-    : _pos( 0 )
+    scanline_read_iterator()
+    : _pos( -1 )
     , _reader( NULL )
-    , _view( NULL )
+    , _buffer( NULL )
     {}
 
     /// Constructor with preallocated image. Reading starts at first scanline of source image.
-    image_read_iterator( Reader&     reader
-                       , const View& view
-                       )
+    scanline_read_iterator( Reader&       reader
+                          , const byte_t* buffer
+                          )
     : _pos( 0 )
     , _reader( &reader )
-    , _view( &view )
+    , _buffer( buffer  )
     {
         init();
     }
 
     /// Constructor with preallocated image. Reading starts at first scanline of source image.
-    image_read_iterator( Reader& reader )
+    scanline_read_iterator( Reader& reader )
     : _pos( 0 )
     , _reader( &reader )
-    , _view( 0 )
+    , _buffer( NULL )
     {
         init();
     }
 
     /// Constructor with preallocated image. Reading starts at pos scanline of source image.
-    image_read_iterator( std::size_t pos
-                       , Reader&     reader
-                       , const View& view
-                       )
+    scanline_read_iterator( std::size_t pos
+                          , Reader&     reader
+                          , byte_t*     buffer
+                          )
     : _pos( pos )
     , _reader( &reader )
-    , _view( &view )
+    , _buffer( buffer  )
     {
         init();
+
+        if( _pos >= _reader._info._height )
+        {
+            std::runtime_error( "Trying to read past image." );
+        }
 
         for( std::size_t i = 0; i < pos; ++i )
         {
@@ -66,10 +69,8 @@ public:
         }
     }
 
-    ///@todo Add constructors that will allocate dst image memory.
-
     /// Set reader. Do clean up before if necessary.
-    void set_reader(Reader& reader)
+    void set_reader( Reader& reader )
     {
         if( _reader )
         {
@@ -84,27 +85,22 @@ public:
     }
 
     /// Set reader. Do clean up before if necessary.
-    void set_view(const View& view)
+    void set_buffer( byte_t* buffer )
     {
-        _view = &view;
-
-        if( _reader && _view )
-        {
-            _reader->check_destination_view( *_view );
-        }
+        _buffer = buffer;
     }
 
 
     /// Dereference Operator
     reference operator*() const
     {
-        if( _reader && _view )
+        if( _reader && _buffer )
         {
-            _reader->read( *_view, _pos );
+            _reader->read( _buffer, _pos );
 
             ++_pos;
 
-            return *_view;
+            return _buffer;
         }
 
         throw std::runtime_error( "Reader cannot be null for this operation." );
@@ -117,7 +113,7 @@ public:
     }
 
     /// Pre-Increment Operator
-    image_read_iterator< Reader, View >& operator++()
+    scanline_read_iterator< Reader >& operator++()
     {
         skip();
 
@@ -125,9 +121,9 @@ public:
     }
 
     /// Compare passed iterator to this.
-    bool equal( const image_read_iterator< Reader, View >& rhs ) const
+    bool equal( const scanline_read_iterator< Reader >& rhs ) const
     {
-        return (_reader == rhs._reader) && ( _view == rhs._view );
+        return (_reader == rhs._reader) && ( _buffer == rhs._buffer );
     }
 
     /// Return backend.
@@ -159,18 +155,13 @@ private:
             _reader->read_header();
             _reader->initialize();
         }
-
-        if( _reader && _view )
-        {
-            _reader->check_destination_view( *_view );
-        }
     }
 
     void skip()
     {
-        if( _reader && _view )
+        if( _reader && _buffer )
         {
-            _reader->skip( *_view );
+            _reader->skip( _buffer );
 
             ++_pos;
         }
@@ -181,7 +172,7 @@ private:
     mutable int _pos;
 
     Reader* _reader;
-    const View*   _view;
+    byte_t* _buffer;
 };
 
 } // namespace gil

@@ -20,19 +20,16 @@ namespace boost { namespace gil {
 
 template< typename T
         , typename FormatTag
-        , typename ConversionPolicy
         >
-void test_get_reader( T&                      file
-                    , const FormatTag&        format_tag
-                    , const ConversionPolicy& conversion_policy
+void test_get_reader( T&               file
+                    , const FormatTag& format_tag
                     )
 {
     get_reader< T
               , FormatTag
-              >::type reader = make_reader( file
-                                          , format_tag
-                                          , conversion_policy
-                                          );
+              >::type reader = make_scanline_reader( file
+                                                   , format_tag
+                                                   );
 }
 
 template< typename T
