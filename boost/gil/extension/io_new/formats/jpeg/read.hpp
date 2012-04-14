@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny, Lubomir Bourdev
+    Copyright 2007-2012 Christian Henning, Andreas Pokorny, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,10 +35,21 @@
 namespace boost { namespace gil {
 
 template<typename Device>
-struct jpeg_decompress_mgr : public detail::jpeg_io_base
+struct reader_backend< Device
+                     , jpeg_tag
+                     >
+    : public detail::jpeg_io_base
 {
-    jpeg_decompress_mgr( Device& file )
-    : in(file)
+
+    //
+    // Constructor
+    //
+    reader_backend( Device&                               file
+                  , const image_read_settings< bmp_tag >& settings
+                  )
+    : _io_dev( file )
+    , _settings( settings )
+    , _info()
     {
         _cinfo.err         = jpeg_std_error( &_jerr );
         _cinfo.client_data = this;
@@ -72,7 +83,10 @@ struct jpeg_decompress_mgr : public detail::jpeg_io_base
                    );
     }
 
-    ~jpeg_decompress_mgr()
+    //
+    // Destructor
+    //
+    ~reader_backend()
     {
         jpeg_destroy_decompress( &_cinfo );
     }
@@ -155,17 +169,19 @@ private:
 
     static void close_device( jpeg_decompress_struct* ) {}
 
-protected:
+public:
     jpeg_decompress_struct _cinfo;
 
+    Device &_io_dev;
 
-private:
-    Device &in;
+    image_read_settings< jpeg_tag > _settings;
+    image_read_info< jpeg_tag >     _info;
+
 
     struct gil_jpeg_source_mgr
     {
-        jpeg_source_mgr      _jsrc;
-        jpeg_decompress_mgr* _this;
+        jpeg_source_mgr _jsrc;
+        reader_backend* _this;
     };
 
     gil_jpeg_source_mgr _src;
@@ -174,50 +190,35 @@ private:
     JOCTET buffer[4096];
 };
 
-template< typename Device
-        , typename ConversionPolicy
-        >
-class reader< Device
-            , jpeg_tag
-            , ConversionPolicy
-            >
-    : public jpeg_decompress_mgr< Device >
-    , public detail::reader_base< jpeg_tag
-                                , ConversionPolicy
-                                >
+template< typename Device >
+class scanline_reader< Device
+                     , jpeg_tag
+                     >
+    : public reader_backend< Device >
 {
 public:
-    reader( Device&                                device
-          , const image_read_settings< jpeg_tag >& settings
-          )
-    : jpeg_decompress_mgr<Device>( device )
-    , reader_base< jpeg_tag
-                 , ConversionPolicy >( settings )
-    {}
 
-    reader( Device&                                                device
-          , const typename ConversionPolicy::color_converter_type& cc
-          , const image_read_settings< jpeg_tag >&                 settings
-          )
-    : jpeg_decompress_mgr< Device >( device )
-    , reader_base< jpeg_tag
-                 , ConversionPolicy >( cc
-                                     , settings
-                                     )
-    {}
+    typedef reader_backend< Device, jpeg_tag > backend_t;
 
-    image_read_info< jpeg_tag > get_info()
+public:
+    scanline_reader( Device&                                device
+                   , const image_read_settings< jpeg_tag >& settings
+                   )
+    : scanline_reader< Device >( device
+                               , settings
+                               )
+
+    void read_header
     {
-        image_read_info<jpeg_tag> ret;
-        ret._width          = this->_cinfo.image_width;
-        ret._height         = this->_cinfo.image_height;
-        ret._num_components = this->_cinfo.num_components;
-        ret._color_space    = this->_cinfo.jpeg_color_space;
-        ret._data_precision = this->_cinfo.data_precision;
+        _info._width          = this->_cinfo.image_width;
+        _info._height         = this->_cinfo.image_height;
+        _info._num_components = this->_cinfo.num_components;
+        _info._color_space    = this->_cinfo.jpeg_color_space;
+        _info._data_precision = this->_cinfo.data_precision;
 
-        ret._density_unit = this->_cinfo.density_unit;
-        ret._x_density    = this->_cinfo.X_density;
-        ret._y_density    = this->_cinfo.Y_density;
+        _info._density_unit = this->_cinfo.density_unit;
+        _info._x_density    = this->_cinfo.X_density;
+        _info._y_density    = this->_cinfo.Y_density;
 
         // obtain real world dimensions
         // taken from https://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/read.cpp#cl-62
@@ -233,10 +234,8 @@ public:
             units_conversion = 10; // millimeters in a centimeter
         }
 
-        ret._pixel_width_mm  = this->_cinfo.X_density ? (this->_cinfo.output_width  / double(this->_cinfo.X_density)) * units_conversion : 0;
-        ret._pixel_height_mm = this->_cinfo.Y_density ? (this->_cinfo.output_height / double(this->_cinfo.Y_density)) * units_conversion : 0;
-
-        return ret;
+        _info._pixel_width_mm  = this->_cinfo.X_density ? (this->_cinfo.output_width  / double(this->_cinfo.X_density)) * units_conversion : 0;
+        _info._pixel_height_mm = this->_cinfo.Y_density ? (this->_cinfo.output_height / double(this->_cinfo.Y_density)) * units_conversion : 0;
     }
 
     template<typename View>

@@ -699,6 +699,7 @@ public:
         // png_read_image().  To see how to handle interlacing passes,
         // see the png_read_row() method below:
         _number_passes = png_set_interlace_handling( _png_ptr );
+        io_error_if( _number_passes != 1, "scanline_read_iterator cannot read interlaced png images." );
 
 
         // The above transformation might have changed the bit_depth and color type.
@@ -717,73 +718,16 @@ public:
         this->_info._color_type = png_get_color_type( _png_ptr
                                                     , _info_ptr
                                                     );
-        //switch( this->_info._color_type )
-        //{
-        //    case PNG_COLOR_TYPE_GRAY:
-        //    {
-        //        switch( this->_info._bit_depth )
-        //        {
-        //            case  1: _read_function = boost::mem_fn( &this_t::read_gray_1_bit   ); break;
-        //            case  2: _read_function = boost::mem_fn( &this_t::read_gray_2_bits  ); break;
-        //            case  4: _read_function = boost::mem_fn( &this_t::read_gray_4_bits  ); break;
-        //            case  8: _read_function = boost::mem_fn( &this_t::read_gray_8_bits  ); break;
-        //            case 16: _read_function = boost::mem_fn( &this_t::read_gray_16_bits ); break;
-        //            default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
-        //        }
-
-        //        break;
-        //    }
-        //    case PNG_COLOR_TYPE_GA:
-        //    {
-        //        #ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
-        //        switch( this->_info._bit_depth )
-        //        {
-        //            case  8: _read_function = boost::mem_fn( &this_t::read_ga_8_bits  ); break;
-        //            case 16: _read_function = boost::mem_fn( &this_t::read_ga_16_bits ); break;
-        //            default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
-        //        }
-        //        #else
-        //            io_error( "gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application." );
-        //        #endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
-
-
-        //        break;
-        //    }
-        //    case PNG_COLOR_TYPE_RGB:
-        //    {
-        //        switch( this->_info._bit_depth )
-        //        {
-        //            case 8:  _read_function = boost::mem_fn( &this_t::read_rgb_8_bits  ); break;
-        //            case 16: _read_function = boost::mem_fn( &this_t::read_rgb_16_bits ); break;
-        //            default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
-        //        }
-
-        //        break;
-        //    }
-        //    case PNG_COLOR_TYPE_RGBA:
-        //    {
-        //        switch( this->_info._bit_depth )
-        //        {
-        //            case  8: _read_function = boost::mem_fn( &this_t::read_rgba_8_bits  ); break;
-        //            case 16: _read_function = boost::mem_fn( &this_t::read_rgba_16_bits ); break;
-        //            default: io_error( "png_reader_color_convert::read_data(): unknown combination of color type and bit depth" );
-        //        }
-
-        //        break;
-        //    }
-        //    default:
-        //    {
-        //        io_error( "png_reader_color_convert::read_data(): unknown color type" );
-        //    }
-        //}
     }
 
     void clean_up()
     {
         // read rest of file, and get additional chunks in info_ptr
-        png_read_end( _png_ptr
-                    , NULL
-                    );
+
+        ///@todo
+        //png_read_end( _png_ptr
+        //            , NULL
+        //            );
     }
 
     /// Return length of scanline in bytes.
@@ -797,7 +741,6 @@ public:
     void read( byte_t* dst, int pos )
     {
         read_scanline(dst);
-        //_read_function(this, dst);
     }
 
 private:

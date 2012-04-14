@@ -69,12 +69,23 @@ public:
         }
     }
 
+    //
+    // Destructor
+    //
+    ~scanline_read_iterator()
+    {
+        if( _reader )
+        {
+            _reader->clean_up();
+        }
+    }
+
     /// Set reader. Do clean up before if necessary.
     void set_reader( Reader& reader )
     {
         if( _reader )
         {
-            _reader.clean_up();
+            _reader->clean_up();
 
             _pos = 0;
         }
