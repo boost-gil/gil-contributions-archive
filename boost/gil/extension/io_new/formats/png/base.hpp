@@ -43,17 +43,6 @@ public:
 
 protected:
 
-    void check()
-    {
-        byte_t buf[PNG_BYTES_TO_CHECK];
-
-        io_error_if(_io_dev.read(buf, PNG_BYTES_TO_CHECK) != PNG_BYTES_TO_CHECK,
-                "png_check_validity: failed to read image");
-
-        io_error_if(png_sig_cmp(png_bytep(buf), png_size_t(0), PNG_BYTES_TO_CHECK)!=0,
-                "png_check_validity: invalid png image");
-    }
-
     static void read_data( png_structp png_ptr
                          , png_bytep   data
                          , png_size_t length

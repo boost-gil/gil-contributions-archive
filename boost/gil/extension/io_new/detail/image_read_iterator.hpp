@@ -134,16 +134,18 @@ public:
             return *_reader;
         }
 
-        throw std::runtime_error( "Reader cannot be null for this operation." );        
+        throw std::runtime_error( "Reader cannot be null for this operation." );
     }
 
     /// Return length of scanline in bytes.
-    int scanline_length()
+    std::size_t scanline_length()
     {
         if(_reader)
         {
             return _reader->scanline_length();
         }
+
+        throw std::runtime_error( "Reader cannot be null for this operation." );
     }
 
 private:

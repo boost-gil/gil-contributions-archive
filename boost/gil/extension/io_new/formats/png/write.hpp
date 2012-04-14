@@ -73,7 +73,7 @@ class writer< Device
 public:
 
     writer( Device& io_dev )
-    : detail::png_io_base< Device >( io_dev )
+    : png_io_base< Device >( io_dev )
     , writer_backend()
     {
         // Create and initialize the png_struct with the desired error handler

@@ -69,28 +69,19 @@ struct reader_backend< Device
 ///
 /// PNG Reader
 ///
-template< typename Device
-        , typename ConversionPolicy
-        , typename View
-        >
-class reader< Device
-            , png_tag
-            , ConversionPolicy
-            , View
-            >
+template< typename Device >
+class scanline_reader< Device
+                     , png_tag
+                     >
     : public reader_backend< Device
                            , png_tag
                            >
 {
 private:
 
-    typedef reader< Device
-                  , png_tag
-                  , ConversionPolicy
-                  , View
-                  > this_t;
-
-    typedef typename ConversionPolicy::color_converter_type cc_t;
+    typedef scanline_reader< Device
+                           , png_tag
+                           > this_t;
 
 public:
 
@@ -101,9 +92,9 @@ public:
     //
     // Constructor
     //
-    reader( const Device&                         io_dev
-          , const image_read_settings< png_tag >& settings
-          )
+    scanline_reader( const Device&                         io_dev
+                   , const image_read_settings< png_tag >& settings
+                   )
     : reader_backend< Device
                     , png_tag
                     >( io_dev
@@ -112,23 +103,9 @@ public:
     {}
 
     //
-    // Constructor
-    //
-    reader( Device&                                                io_dev
-          , const typename ConversionPolicy::color_converter_type& cc
-          , const image_read_settings< png_tag >&                  settings
-          )
-    : png_io_base< Device >( io_dev )
-    , reader_base< png_tag
-                 , ConversionPolicy >( cc
-                                     , settings
-                                     )
-    {}
-
-    //
     // Destructor
     //
-    ~reader()
+    ~scanline_reader()
     {
         png_destroy_read_struct( &_png_ptr
                                , &_info_ptr
@@ -140,7 +117,20 @@ public:
     void read_header()
     {
         // check the file's first few bytes
-        check();
+        byte_t buf[PNG_BYTES_TO_CHECK];
+
+        io_error_if( _io_dev.read( buf
+                                , PNG_BYTES_TO_CHECK
+                                ) != PNG_BYTES_TO_CHECK
+                   , "png_check_validity: failed to read image"
+                   );
+
+        io_error_if( png_sig_cmp( png_bytep(buf)
+                                , png_size_t(0)
+                                , PNG_BYTES_TO_CHECK
+                                ) != 0
+                   , "png_check_validity: invalid png image"
+                   );
 
         // Create and initialize the png_struct with the desired error handler
         // functions.  If you want to use the default stderr and longjump method,
@@ -655,17 +645,6 @@ public:
 
     void initialize()
     {
-        typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
-                                >::type is_read_and_convert_t;
-
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
-                   , "Image types aren't compatible."
-                   );
-
-
         // The info structures are filled at this point.
 
         // Now it's time for some transformations.
@@ -738,70 +717,65 @@ public:
         this->_info._color_type = png_get_color_type( _png_ptr
                                                     , _info_ptr
                                                     );
-        switch( this->_info._color_type )
-        {
-            case PNG_COLOR_TYPE_GRAY:
-            {
-                switch( this->_info._bit_depth )
-                {
-                    case  1: _read_function = boost::mem_fn( &this_t::read_gray_1_bit   ); break;
-                    case  2: _read_function = boost::mem_fn( &this_t::read_gray_2_bits  ); break;
-                    case  4: _read_function = boost::mem_fn( &this_t::read_gray_4_bits  ); break;
-                    case  8: _read_function = boost::mem_fn( &this_t::read_gray_8_bits  ); break;
-                    case 16: _read_function = boost::mem_fn( &this_t::read_gray_16_bits ); break;
-                    default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
-                }
+        //switch( this->_info._color_type )
+        //{
+        //    case PNG_COLOR_TYPE_GRAY:
+        //    {
+        //        switch( this->_info._bit_depth )
+        //        {
+        //            case  1: _read_function = boost::mem_fn( &this_t::read_gray_1_bit   ); break;
+        //            case  2: _read_function = boost::mem_fn( &this_t::read_gray_2_bits  ); break;
+        //            case  4: _read_function = boost::mem_fn( &this_t::read_gray_4_bits  ); break;
+        //            case  8: _read_function = boost::mem_fn( &this_t::read_gray_8_bits  ); break;
+        //            case 16: _read_function = boost::mem_fn( &this_t::read_gray_16_bits ); break;
+        //            default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
+        //        }
 
-                break;
-            }
-            case PNG_COLOR_TYPE_GA:
-            {
-                #ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
-                switch( this->_info._bit_depth )
-                {
-                    case  8: _read_function = boost::mem_fn( &this_t::read_ga_8_bits  ); break;
-                    case 16: _read_function = boost::mem_fn( &this_t::read_ga_16_bits ); break;
-                    default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
-                }
-                #else
-                    io_error( "gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application." );
-                #endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
+        //        break;
+        //    }
+        //    case PNG_COLOR_TYPE_GA:
+        //    {
+        //        #ifdef BOOST_GIL_IO_ENABLE_GRAY_ALPHA
+        //        switch( this->_info._bit_depth )
+        //        {
+        //            case  8: _read_function = boost::mem_fn( &this_t::read_ga_8_bits  ); break;
+        //            case 16: _read_function = boost::mem_fn( &this_t::read_ga_16_bits ); break;
+        //            default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
+        //        }
+        //        #else
+        //            io_error( "gray_alpha isn't enabled. Use ENABLE_GRAY_ALPHA when building application." );
+        //        #endif // BOOST_GIL_IO_ENABLE_GRAY_ALPHA
 
 
-                break;
-            }
-            case PNG_COLOR_TYPE_RGB:
-            {
-                switch( this->_info._bit_depth )
-                {
-                    case 8:  _read_function = boost::mem_fn( &this_t::read_rgb_8_bits  ); break;
-                    case 16: _read_function = boost::mem_fn( &this_t::read_rgb_16_bits ); break;
-                    default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
-                }
+        //        break;
+        //    }
+        //    case PNG_COLOR_TYPE_RGB:
+        //    {
+        //        switch( this->_info._bit_depth )
+        //        {
+        //            case 8:  _read_function = boost::mem_fn( &this_t::read_rgb_8_bits  ); break;
+        //            case 16: _read_function = boost::mem_fn( &this_t::read_rgb_16_bits ); break;
+        //            default: io_error( "png_reader::read_data(): unknown combination of color type and bit depth" );
+        //        }
 
-                break;
-            }
-            case PNG_COLOR_TYPE_RGBA:
-            {
-                switch( this->_info._bit_depth )
-                {
-                    case  8: _read_function = boost::mem_fn( &this_t::read_rgba_8_bits  ); break;
-                    case 16: _read_function = boost::mem_fn( &this_t::read_rgba_16_bits ); break;
-                    default: io_error( "png_reader_color_convert::read_data(): unknown combination of color type and bit depth" );
-                }
+        //        break;
+        //    }
+        //    case PNG_COLOR_TYPE_RGBA:
+        //    {
+        //        switch( this->_info._bit_depth )
+        //        {
+        //            case  8: _read_function = boost::mem_fn( &this_t::read_rgba_8_bits  ); break;
+        //            case 16: _read_function = boost::mem_fn( &this_t::read_rgba_16_bits ); break;
+        //            default: io_error( "png_reader_color_convert::read_data(): unknown combination of color type and bit depth" );
+        //        }
 
-                break;
-            }
-            default:
-            {
-                io_error( "png_reader_color_convert::read_data(): unknown color type" );
-            }
-        }
-    }
-
-    void check_destination_view( const View& dst_view )
-    {
-        ///@todo
+        //        break;
+        //    }
+        //    default:
+        //    {
+        //        io_error( "png_reader_color_convert::read_data(): unknown color type" );
+        //    }
+        //}
     }
 
     void clean_up()
@@ -813,143 +787,34 @@ public:
     }
 
     /// Return length of scanline in bytes.
-    int scanline_length()
+    std::size_t scanline_length()
     {
         return png_get_rowbytes( _png_ptr
                                , _info_ptr
                                );
     }
 
-    void read( View dst, int pos )
+    void read( byte_t* dst, int pos )
     {
-        _read_function(this, dst);
-    }
-
-    template< typename ImagePixel
-            , typename View
-            >
-    void read_rows( const View& view )
-    {
-        png_bytep row_ptr = static_cast<png_bytep>( &_buffer.front() );
-
-        for( std::size_t pass = 0; pass < _number_passes; pass++ )
-        {
-            if( pass == _number_passes - 1 )
-            {
-                // skip lines if necessary
-                for( std::ptrdiff_t y = 0; y < this->_settings._top_left.y; ++y )
-                {
-                    // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
-                                 , &row_ptr
-                                 , NULL
-                                 , 1
-                                 );
-                }
-
-                for( std::ptrdiff_t y = 0
-                   ; y < this->_settings._dim.y
-                   ; ++y
-                   )
-                {
-                    // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
-                                 , &row_ptr
-                                 , NULL
-                                 , 1
-                                 );
-
-                    it_t first = buffer.begin() + this->_settings._top_left.x;
-                    it_t last  = first + this->_settings._dim.x; // one after last element
-
-                    this->_cc_policy.read( first
-                                         , last
-                                         , view.row_begin( y ));
-                }
-
-                // Read the rest of the image. libpng needs that.
-                std::ptrdiff_t remaining_rows = static_cast< std::ptrdiff_t >( this->_info._height )
-                                              - this->_settings._top_left.y
-                                              - this->_settings._dim.y;
-                for( std::ptrdiff_t y = 0
-                   ; y < remaining_rows
-                   ; ++y
-                   )
-                {
-                    // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
-                                 , &row_ptr
-                                 , NULL
-                                 , 1
-                                 );
-                }
-            }
-            else
-            {
-                for( int y = 0; y < view.height(); ++y )
-                {
-                    // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
-                                 , &row_ptr
-                                 , NULL
-                                 , 1
-                                 );
-                }
-            }
-        }
-
+        read_scanline(dst);
+        //_read_function(this, dst);
     }
 
 private:
 
-
-    void read_gray_1_bit( View dst )
+    void read_scanline( byte_t* dst )
     {
+        png_read_rows( _png_ptr
+                     , &dst
+                     , NULL
+                     , 1
+                     );
     }
 
-    void read_gray_2_bits( View dst )
-    {
-    }
-
-    void read_gray_4_bits( View dst )
-    {
-    }
-
-    void read_gray_8_bits( View dst )
-    {
-    }
-
-    void read_gray_16_bits( View dst )
-    {
-    }
-
-    void read_ga_8_bits( View dst )
-    {
-    }
-
-    void read_ga_16_bits( View dst )
-    {
-    }
-
-    void read_rgb_8_bits( View dst )
-    {
-    }
-
-    void read_rgb_16_bits( View dst )
-    {
-    }
-
-    void read_rgba_8_bits( View dst )
-    {
-    }
-
-    void read_rgba_16_bits( View dst )
-    {
-    }
 
 private:
 
-    boost::function< void ( this_t*, View ) > _read_function;
+    boost::function< void ( this_t*, byte_t* ) > _read_function;
 };
 
 struct png_type_format_checker
