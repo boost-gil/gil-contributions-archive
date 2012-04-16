@@ -45,7 +45,7 @@ struct reader_backend< Device
     // Constructor
     //
     reader_backend( Device&                               file
-                  , const image_read_settings< bmp_tag >& settings
+                  , const image_read_settings< jpeg_tag >& settings
                   )
     : _io_dev( file )
     , _settings( settings )
@@ -55,18 +55,18 @@ struct reader_backend< Device
         _cinfo.client_data = this;
 
         // Error exit handler: does not return to caller.
-        _jerr.error_exit = &jpeg_decompress_mgr::error_exit;
+        _jerr.error_exit = &reader_backend::error_exit;
 
         if( setjmp( _mark )) { raise_error(); }
 
         _src._jsrc.bytes_in_buffer   = 0;
         _src._jsrc.next_input_byte   = buffer;
-        _src._jsrc.init_source       = reinterpret_cast< void(*)   ( j_decompress_ptr )>( &jpeg_decompress_mgr< Device >::init_device );
-        _src._jsrc.fill_input_buffer = reinterpret_cast< boolean(*)( j_decompress_ptr )>( &jpeg_decompress_mgr< Device >::fill_buffer );
+        _src._jsrc.init_source       = reinterpret_cast< void(*)   ( j_decompress_ptr )>( &reader_backend< Device, jpeg_tag >::init_device );
+        _src._jsrc.fill_input_buffer = reinterpret_cast< boolean(*)( j_decompress_ptr )>( &reader_backend< Device, jpeg_tag >::fill_buffer );
         _src._jsrc.skip_input_data   = reinterpret_cast< void(*)   ( j_decompress_ptr
                                                                    , long num_bytes
-                                                                   ) >( &jpeg_decompress_mgr< Device >::skip_input_data );
-        _src._jsrc.term_source       = reinterpret_cast< void(*)   ( j_decompress_ptr ) >( &jpeg_decompress_mgr< Device >::close_device );
+                                                                   ) >( &reader_backend< Device, jpeg_tag >::skip_input_data );
+        _src._jsrc.term_source       = reinterpret_cast< void(*)   ( j_decompress_ptr ) >( &reader_backend< Device, jpeg_tag >::close_device );
         _src._jsrc.resync_to_restart = jpeg_resync_to_restart;
         _src._this = this;
 
@@ -108,7 +108,7 @@ protected:
      */
     static void error_exit( j_common_ptr cinfo )
     {
-        jpeg_decompress_mgr< Device >* mgr = reinterpret_cast< jpeg_decompress_mgr< Device >* >( cinfo->client_data );
+        reader_backend< Device, jpeg_tag >* mgr = reinterpret_cast< reader_backend< Device, jpeg_tag >* >( cinfo->client_data );
 
         longjmp( mgr->_mark, 1 );
     }
@@ -134,7 +134,7 @@ private:
     static boolean fill_buffer( jpeg_decompress_struct * cinfo )
     {
         gil_jpeg_source_mgr* src = reinterpret_cast< gil_jpeg_source_mgr* >( cinfo->src );
-        size_t count= src->_this->in.read(src->_this->buffer, sizeof(src->_this->buffer) );
+        size_t count = src->_this->_io_dev.read(src->_this->buffer, sizeof(src->_this->buffer) );
 
         if( count <= 0 )
         {
@@ -194,7 +194,9 @@ template< typename Device >
 class scanline_reader< Device
                      , jpeg_tag
                      >
-    : public reader_backend< Device >
+    : public reader_backend< Device
+                           , jpeg_tag
+                           >
 {
 public:
 
@@ -204,11 +206,14 @@ public:
     scanline_reader( Device&                                device
                    , const image_read_settings< jpeg_tag >& settings
                    )
-    : scanline_reader< Device >( device
-                               , settings
-                               )
+    : reader_backend< Device
+                    , jpeg_tag
+                     >( device
+                      , settings
+                      )
+    {}
 
-    void read_header
+    void read_header()
     {
         _info._width          = this->_cinfo.image_width;
         _info._height         = this->_cinfo.image_height;
@@ -238,198 +243,65 @@ public:
         _info._pixel_height_mm = this->_cinfo.Y_density ? (this->_cinfo.output_height / double(this->_cinfo.Y_density)) * units_conversion : 0;
     }
 
-    template<typename View>
-    void apply( const View& view )
+    void initialize()
+    {
+        jpeg_decompress_struct& cinfo = this->_cinfo;
+        cinfo.dct_method = this->_settings._dct_method;
+
+        io_error_if( jpeg_start_decompress( &this->_cinfo ) == false
+                    , "Cannot start decompression." );
+
+        //switch( this->_info._color_space )
+        //{
+        //    case JCS_GRAYSCALE: { read_rows< gray8_pixel_t >( view ); break; }
+        //    case JCS_RGB:       { read_rows< rgb8_pixel_t  >( view ); break; }
+
+        //    //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
+        //    case JCS_YCbCr:     { read_rows< rgb8_pixel_t  >( view ); break; }
+
+        //    case JCS_CMYK:      { read_rows< cmyk8_pixel_t >( view ); break; }
+
+        //    //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
+        //    case JCS_YCCK:
+        //    {
+        //        this->_cinfo.out_color_space = JCS_CMYK;
+        //        read_rows< cmyk8_pixel_t >( view );
+
+        //        break;
+        //    }
+        //    default: { io_error( "Unsupported jpeg color space." ); }
+        //}
+    }
+
+    void read( byte_t* dst, int pos )
     {
         // Fire exception in case of error.
         if( setjmp( this->_mark )) { this->raise_error(); }
 
-        jpeg_decompress_struct& cinfo = this->_cinfo;
-        cinfo.dct_method = this->_settings._dct_method;
+        // read data
+        read_scanline( dst );
+    }
 
-        typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
-                                >::type is_read_and_convert_t;
-
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
-                   , "Image types aren't compatible."
-                   );
-
-        if( jpeg_start_decompress( &this->_cinfo ) == false )
-        {
-            io_error( "Cannot start decompression." );
-        }
-
-        switch( this->_info._color_space )
-        {
-            case JCS_GRAYSCALE: { read_rows< gray8_pixel_t >( view ); break; }
-            case JCS_RGB:       { read_rows< rgb8_pixel_t  >( view ); break; }
-
-            //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
-            case JCS_YCbCr:     { read_rows< rgb8_pixel_t  >( view ); break; }
-
-            case JCS_CMYK:      { read_rows< cmyk8_pixel_t >( view ); break; }
-
-            //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
-            case JCS_YCCK:
-            {
-                this->_cinfo.out_color_space = JCS_CMYK;
-                read_rows< cmyk8_pixel_t >( view );
-
-                break;
-            }
-            default: { io_error( "Unsupported jpeg color space." ); }
-        }
-
-        jpeg_finish_decompress ( &this->_cinfo );
+    void clean_up()
+    {
+        ///@todo
+        //jpeg_finish_decompress ( &this->_cinfo );
     }
 
 private:
 
-    template< typename ImagePixel
-            , typename View
-            >
-    void read_rows( const View& view )
+    void read_scanline( byte_t* dst )
     {
-        typedef std::vector<ImagePixel> buffer_t;
-        buffer_t buffer( this->_info._width );
-
-        // In case of an error we'll jump back to here and fire an exception.
-        // @todo Is the buffer above cleaned up when the exception is thrown?
-        //       The strategy right now is to allocate necessary memory before
-        //       the setjmp.
-        if( setjmp( this->_mark )) { this->raise_error(); }
-
-
-        JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );
-
-        //Skip scanlines if necessary.
-        for( int y = 0; y <  this->_settings._top_left.y; ++y )
-        {
-            io_error_if( jpeg_read_scanlines( &this->_cinfo
-                                         , &row_adr
-                                         , 1
-                                         ) !=1
-                       , "jpeg_read_scanlines: fail to read JPEG file"
-                       );
-        }
+        JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( dst );
 
         // Read data.
-        for( int y = 0; y < view.height(); ++y )
-        {
-            io_error_if( jpeg_read_scanlines( &this->_cinfo
-                                         , &row_adr
-                                         , 1
-                                         ) !=1
-                       , "jpeg_read_scanlines: fail to read JPEG file"
-                       );
+        io_error_if( jpeg_read_scanlines( &this->_cinfo
+                                        , &row_adr
+                                        , 1
+                                        ) != 1
+                    , "jpeg_read_scanlines: fail to read JPEG file"
+                    );
 
-            typename buffer_t::iterator beg = buffer.begin() + this->_settings._top_left.x;
-            typename buffer_t::iterator end = beg + this->_settings._dim.x;
-
-            this->_cc_policy.read( beg
-                                 , end
-                                 , view.row_begin( y )
-                                 );
-        }
-
-        //@todo: There might be a better way to do that.
-        while( this->_cinfo.output_scanline <  this->_cinfo.image_height )
-        {
-            io_error_if( jpeg_read_scanlines( &this->_cinfo
-                                            , &row_adr
-                                            , 1
-                                            ) !=1
-                       , "jpeg_read_scanlines: fail to read JPEG file"
-                       );
-        }
-
-    }
-};
-
-struct jpeg_type_format_checker
-{
-    jpeg_type_format_checker( jpeg_color_space::type color_space )
-    : _color_space( color_space )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        return is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                , jpeg_tag
-                                >::_color_space == _color_space;
-    }
-
-private:
-
-    jpeg_color_space::type _color_space;
-};
-
-struct jpeg_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , jpeg_tag
-                                           >
-    {};
-};
-
-template< typename Device
-        >
-class dynamic_image_reader< Device
-                          , jpeg_tag
-                          >
-    : public reader< Device
-                   , jpeg_tag
-                   , read_and_no_convert
-                   >
-{
-    typedef reader< Device
-                  , jpeg_tag
-                  , read_and_no_convert
-                  > parent_t;
-
-public:
-
-    dynamic_image_reader( Device&                                device
-                        , const image_read_settings< jpeg_tag >& settings
-                        )
-    : parent_t( device
-              , settings
-              )
-    {}
-
-    template< typename Images >
-    void apply( any_image< Images >& images )
-    {
-        jpeg_type_format_checker format_checker( this->_info._color_space != JCS_YCbCr
-                                               ? this->_info._color_space
-                                               : JCS_RGB
-                                               );
-
-        if( !construct_matched( images
-                              , format_checker
-                              ))
-        {
-            io_error( "No matching image type between those of the given any_image and that of the file" );
-        }
-        else
-        {
-            init_image( images
-                      , this->_info
-                      );
-
-            detail::dynamic_io_fnobj< jpeg_read_is_supported
-                                    , parent_t
-                                    > op( this );
-
-            apply_operation( view( images )
-                           , op
-                           );
-        }
     }
 };
 

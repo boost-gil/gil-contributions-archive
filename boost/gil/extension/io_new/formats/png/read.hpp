@@ -720,6 +720,11 @@ public:
                                                     );
     }
 
+    void read( byte_t* dst, int pos )
+    {
+        read_scanline(dst);
+    }
+
     void clean_up()
     {
         // read rest of file, and get additional chunks in info_ptr
@@ -738,10 +743,7 @@ public:
                                );
     }
 
-    void read( byte_t* dst, int pos )
-    {
-        read_scanline(dst);
-    }
+
 
 private:
 

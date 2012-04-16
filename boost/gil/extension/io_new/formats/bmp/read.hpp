@@ -213,7 +213,7 @@ public:
                 read_palette();
                 _buffer.resize( _pitch );
 
-                _read_function = boost::mem_fn( &this_t::read_1_bit_image ); 
+                _read_function = boost::mem_fn( &this_t::read_1_bit_image );
 
                 break;
             }
