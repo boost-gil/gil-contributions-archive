@@ -9,6 +9,7 @@
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 #include <boost/gil/extension/io_new/png_all.hpp>
+#include <boost/gil/extension/io_new/tiff_all.hpp>
 
 #include <boost/gil/extension/io_new/detail/image_read_iterator.hpp>
 
@@ -25,7 +26,7 @@ using namespace boost;
 using namespace gil;
 //namespace fs = boost::filesystem;
 
-BOOST_AUTO_TEST_SUITE( bmp_test )
+BOOST_AUTO_TEST_SUITE( scanline_read_test )
 
 template< typename Scanline
         , typename Image
@@ -69,11 +70,6 @@ void bmp_test( char* in
 
 BOOST_AUTO_TEST_CASE( bmp_test_cases )
 {
-    typedef channel_type< get_pixel_type< gray1_image_t::view_t >::type >::type channel_t;
-
-    int num_colors = channel_traits< channel_t >::max_value();
-    float oo = 9;
-
     //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01bg.bmp", "c:\\chhenning\\1.bmp");
     //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01bw.bmp", "c:\\chhenning\\1_1.bmp");
     //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01p1.bmp", "c:\\chhenning\\1_2.bmp");
@@ -305,7 +301,54 @@ void jpeg_test( char* in
 
 BOOST_AUTO_TEST_CASE( jpeg_test_cases )
 {
-    jpeg_test< rgb8_image_t > ( "C:\\gil_contributions\\test_images\\jpg\\found online\\test.jpg", "c:\\chhenning\\1.jpeg");
+    //jpeg_test< rgb8_image_t > ( "C:\\gil_contributions\\test_images\\jpg\\found online\\test.jpg", "c:\\chhenning\\1.jpeg");
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+
+template< typename Image >
+void tiff_test( char* in
+              , const char* out
+              )
+{
+    typedef get_scanline_reader< char*
+                               , tiff_tag
+                               >::type reader_t;
+
+    reader_t tiff_reader = make_scanline_reader< char*
+                                               , tiff_tag
+                                               >
+                                               ( in
+                                               , tiff_tag()
+                                               );
+
+    scanline_read_iterator< reader_t > it( tiff_reader );
+    const reader_t::backend_t& backend = it.backend();
+
+    Image scanline(backend._info._width, 1 );
+
+    Image::view_t::x_iterator buffer_it = view(scanline).row_begin(0);
+    byte_t* data = (byte_t*) &gil::at_c<0>(*buffer_it);
+
+    it.set_buffer( data );
+
+    Image dst( backend._info._width, backend._info._height );
+
+    for( tiff_image_height::type i = 0; i < backend._info._height; ++i )
+    {
+        *it;
+
+        copy_pixels( subimage_view(  view( scanline ), 0, 0, static_cast<int>(view(dst).width()), 1 )
+                    , subimage_view(      view( dst ), 0, i, static_cast<int>(view(dst).width()), 1 )
+                    );
+    }
+
+    write_view( out, view(dst), tiff_tag() );
+}
+
+
+BOOST_AUTO_TEST_CASE( tiff_test_cases )
+{
+    tiff_test< rgb8_image_t > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-02.tif", "c:\\chhenning\\1.tif");
+}
+
+BOOST_AUTO_TEST_SUITE_END() // scanline_read_test

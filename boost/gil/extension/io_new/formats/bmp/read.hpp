@@ -432,6 +432,7 @@ private:
         typedef rgba8_image_t::view_t dst_view_t;
         
         assert(_io_dev.read( &_buffer.front(), _pitch ));
+
         _mirror_bites( _buffer );
 
         src_view_t src_view = interleaved_view( this->_info._width
@@ -443,7 +444,7 @@ private:
         dst_view_t dst_view = interleaved_view( this->_info._width
                                               , 1
                                               , (dst_view_t::value_type*) dst
-                                              , this->_pitch
+                                              , num_channels< dst_view_t > * this->_info._width
                                               );
         
 
@@ -478,7 +479,7 @@ private:
         dst_view_t dst_view = interleaved_view( this->_info._width
                                               , 1
                                               , (dst_view_t::value_type*) dst
-                                              , this->_pitch
+                                              , num_channels< dst_view_t > * this->_info._width
                                               );
 
         src_view_t::x_iterator src_it = src_view.row_begin( 0 );
@@ -511,7 +512,7 @@ private:
         dst_view_t dst_view = interleaved_view( this->_info._width
                                               , 1
                                               , (dst_view_t::value_type*) dst
-                                              , this->_pitch
+                                              , num_channels< dst_view_t > * this->_info._width
                                               );
 
         src_view_t::x_iterator src_it = src_view.row_begin( 0 );
