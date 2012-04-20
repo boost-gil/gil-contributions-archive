@@ -22,6 +22,7 @@ gil_2/libs/gil/opencv/rgb.bmp svn_mime_002dtype=application%2Foctet-stream
 gil_fix/tiled_tiff.png svn_mime_002dtype=application%2Foctet-stream
 /gil_test svnc_bugtraq_003anumber=true
 /numeric.zip svn_mime_002dtype=application%2Foctet-stream
+numeric/numeric.zip svn_mime_002dtype=application%2Foctet-stream
 test_images/bmp/Thumbs.db svn_mime_002dtype=application%2Foctet-stream
 test_images/bmp/g01bg.bmp svn_mime_002dtype=application%2Foctet-stream
 test_images/bmp/g01bw.bmp svn_mime_002dtype=application%2Foctet-stream
