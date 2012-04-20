@@ -110,6 +110,10 @@ public:
     rgb16_planar_view_t _palette;
 };
 
+///
+/// TIFF scanline reader
+///
+
 template< typename Device >
 class scanline_reader< Device
                      , tiff_tag
@@ -134,11 +138,9 @@ public:
     scanline_reader( Device&                                device
                    , const image_read_settings< tiff_tag >& settings
                    )
-    : reader_base< tiff_tag
-                 >( device
-                  , settings
-                  )
-    , 
+    : backend_t( device
+               , settings
+               )
     {}
 
    void read_header()
@@ -608,8 +610,7 @@ private:
 
         if( this->_io_dev.are_bytes_swapped() )
         {
-            ///@todo
-            //_mirror_bites( dst );
+            _mirror_bites( std::vector<byte_t>( dst, dst + scanline_length() ));
         }
     }
 

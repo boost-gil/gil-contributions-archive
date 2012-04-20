@@ -1,10 +1,13 @@
 
-//#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-//#define BOOST_FILESYSTEM_VERSION 3
+#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem/convenience.hpp>
 
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/bmp_all.hpp>
+#include <boost/gil/extension/io_new/jpeg_all.hpp>
+#include <boost/gil/extension/io_new/png_all.hpp>
+#include <boost/gil/extension/io_new/tiff_all.hpp>
 
 #include <boost/gil/extension/io_new/detail/image_read_iterator.hpp>
 
@@ -21,15 +24,15 @@ namespace boost { namespace gil {
 template< typename T
         , typename FormatTag
         >
-void test_get_reader( T&               file
-                    , const FormatTag& format_tag
-                    )
+void test_get_scanline_reader( T&               file
+                             , const FormatTag& format_tag
+                             )
 {
-    get_reader< T
-              , FormatTag
-              >::type reader = make_scanline_reader( file
-                                                   , format_tag
-                                                   );
+    get_scanline_reader< T
+                       , FormatTag
+                       >::type reader = make_scanline_reader( file
+                                                            , format_tag
+                                                            );
 }
 
 template< typename T
@@ -77,31 +80,35 @@ BOOST_AUTO_TEST_SUITE( device_test )
 
 BOOST_AUTO_TEST_CASE( device_test_cases )
 {
-    //test_get_read_device< char*, bmp_tag, gil::detail::file_stream_device< bmp_tag > >();
+    test_get_read_device< char*, bmp_tag, gil::detail::file_stream_device< bmp_tag > >();
 
-    //test_get_read_device< char*, png_tag, gil::detail::file_stream_device< png_tag > >();
-    //test_get_read_device< string, png_tag, gil::detail::file_stream_device< png_tag > >();
-    //test_get_read_device< wstring, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_read_device< char*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_read_device< string, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_read_device< wstring, png_tag, gil::detail::file_stream_device< png_tag > >();
 
-    //test_get_read_device< FILE*, png_tag, gil::detail::file_stream_device< png_tag > >();
-    //test_get_read_device< ifstream, png_tag, gil::detail::istream_device< png_tag  > >();
-    //test_get_read_device< TIFF*, tiff_tag, gil::detail::file_stream_device< tiff_tag > >();
-    //test_get_read_device< fs::path, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_read_device< FILE*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_read_device< ifstream, png_tag, gil::detail::istream_device< png_tag  > >();
+    test_get_read_device< TIFF*, tiff_tag, gil::detail::file_stream_device< tiff_tag > >();
+    test_get_read_device< fs::path, png_tag, gil::detail::file_stream_device< png_tag > >();
 
 
-    //test_get_write_device< char*, png_tag, gil::detail::file_stream_device< png_tag > >();
-    //test_get_write_device< string, png_tag, gil::detail::file_stream_device< png_tag > >();
-    //test_get_write_device< wstring, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_write_device< char*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_write_device< string, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_write_device< wstring, png_tag, gil::detail::file_stream_device< png_tag > >();
 
-    //test_get_write_device< FILE*, png_tag, gil::detail::file_stream_device< png_tag > >();
-    //test_get_write_device< ofstream, png_tag, gil::detail::ostream_device< png_tag  > >();
-    //test_get_write_device< TIFF*, tiff_tag, gil::detail::file_stream_device< tiff_tag > >();
-    //test_get_write_device< fs::path, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_write_device< FILE*, png_tag, gil::detail::file_stream_device< png_tag > >();
+    test_get_write_device< ofstream, png_tag, gil::detail::ostream_device< png_tag  > >();
+    test_get_write_device< TIFF*, tiff_tag, gil::detail::file_stream_device< tiff_tag > >();
+    test_get_write_device< fs::path, png_tag, gil::detail::file_stream_device< png_tag > >();
 
-    //test_get_reader( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png"
-    //               , png_tag()
-    //               , read_and_no_convert()
-    //               );
+    test_get_scanline_reader( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png"
+                            , png_tag()
+                            );
+
+    test_get_scanline_reader( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-02.tif"
+                            , tiff_tag()
+                            );
+
 
     //test_get_reader( string( "C:\\gil_contributions\\test_images\\png\\wikipedia\\test.png" )
     //               , png_tag()
