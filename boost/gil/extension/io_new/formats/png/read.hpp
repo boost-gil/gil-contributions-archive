@@ -19,6 +19,8 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/function.hpp>
+
 #include <boost/gil/extension/io_new/png_tags.hpp>
 
 #include <boost/gil/gil_all.hpp>

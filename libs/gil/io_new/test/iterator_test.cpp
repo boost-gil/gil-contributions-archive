@@ -350,15 +350,15 @@ void tiff_test( char* in
 
 BOOST_AUTO_TEST_CASE( tiff_test_cases )
 {
-    tiff_test< bit_aligned_image1_type< 2, gray_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-02.tif", "c:\\chhenning\\1.tif"  );
-    tiff_test< bit_aligned_image1_type< 4, gray_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-04.tif", "c:\\chhenning\\2.tif"  );
-    tiff_test< bit_aligned_image1_type< 6, gray_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-06.tif", "c:\\chhenning\\3.tif"  );
-    tiff_test< gray8_image_t                                      > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-08.tif", "c:\\chhenning\\4.tif"  );
-    tiff_test< bit_aligned_image1_type< 10, gray_layout_t >::type > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-10.tif", "c:\\chhenning\\5.tif"  );
-    tiff_test< bit_aligned_image1_type< 12, gray_layout_t >::type > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-12.tif", "c:\\chhenning\\6.tif"  );
-    tiff_test< bit_aligned_image1_type< 14, gray_layout_t >::type > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-14.tif", "c:\\chhenning\\7.tif"  );
+    tiff_test< gray2_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-02.tif", "c:\\chhenning\\1.tif"  );
+    tiff_test< gray4_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-04.tif", "c:\\chhenning\\2.tif"  );
+    tiff_test< gray6_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-06.tif", "c:\\chhenning\\3.tif"  );
+    tiff_test< gray8_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-08.tif", "c:\\chhenning\\4.tif"  );
+    tiff_test< gray10_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-10.tif", "c:\\chhenning\\5.tif"  );
+    tiff_test< gray12_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-12.tif", "c:\\chhenning\\6.tif"  );
+    tiff_test< gray14_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-14.tif", "c:\\chhenning\\7.tif"  );
     tiff_test< gray16_image_t                                     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-16.tif", "c:\\chhenning\\8.tif"  );
-    tiff_test< bit_aligned_image1_type< 24, gray_layout_t >::type > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-24.tif", "c:\\chhenning\\9.tif"  );
+    tiff_test< gray24_image_t > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-24.tif", "c:\\chhenning\\9.tif"  );
     tiff_test< gray32_image_t                                     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-32.tif", "c:\\chhenning\\10.tif" );
 
     tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-02.tif", "c:\\chhenning\\11.tif"  );
@@ -376,6 +376,8 @@ BOOST_AUTO_TEST_CASE( tiff_test_cases )
     tiff_test< bit_aligned_image3_type< 24, 24, 24, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-24.tif", "c:\\chhenning\\27.tif"  );
     tiff_test< rgb32_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-32.tif", "c:\\chhenning\\28.tif"  );
 
+    tiff_test< cmyk8_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-08.tif", "c:\\chhenning\\30.tif"  );
+    tiff_test< cmyk16_image_t                                             > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-16.tif", "c:\\chhenning\\31.tif"  );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // scanline_read_test

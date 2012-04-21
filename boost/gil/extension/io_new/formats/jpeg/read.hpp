@@ -21,6 +21,9 @@
 
 #include <csetjmp>
 #include <vector>
+
+#include <boost/function.hpp>
+
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>

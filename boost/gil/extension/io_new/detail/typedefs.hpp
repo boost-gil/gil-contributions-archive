@@ -56,9 +56,14 @@ namespace boost { namespace gil {
 
 ///@todo We should use boost::preprocessor here.
 
-typedef bit_aligned_image1_type< 1, gray_layout_t >::type gray1_image_t;
-typedef bit_aligned_image1_type< 2, gray_layout_t >::type gray2_image_t;
-typedef bit_aligned_image1_type< 4, gray_layout_t >::type gray4_image_t;
+typedef bit_aligned_image1_type<  1, gray_layout_t >::type gray1_image_t;
+typedef bit_aligned_image1_type<  2, gray_layout_t >::type gray2_image_t;
+typedef bit_aligned_image1_type<  4, gray_layout_t >::type gray4_image_t;
+typedef bit_aligned_image1_type<  6, gray_layout_t >::type gray6_image_t;
+typedef bit_aligned_image1_type< 10, gray_layout_t >::type gray10_image_t;
+typedef bit_aligned_image1_type< 12, gray_layout_t >::type gray12_image_t;
+typedef bit_aligned_image1_type< 14, gray_layout_t >::type gray14_image_t;
+typedef bit_aligned_image1_type< 24, gray_layout_t >::type gray24_image_t;
 
 typedef pixel< double, gray_layout_t       > gray64f_pixel_t;
 
