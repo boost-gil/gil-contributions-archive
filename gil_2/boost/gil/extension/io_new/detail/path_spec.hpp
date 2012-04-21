@@ -15,12 +15,15 @@
 /// \brief
 /// \author Andreas Pokorny, Christian Henning \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <cstdlib>
+#if !defined(__APPLE__)
 #include <malloc.h>
+#endif
+
+#include <cstdlib>
 #include <string>
 
 #include <boost/mpl/bool_fwd.hpp>
