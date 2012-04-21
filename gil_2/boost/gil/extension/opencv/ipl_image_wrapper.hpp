@@ -85,7 +85,7 @@ ipl_image_wrapper create_ipl_image( View view )
     }
 
     cvSetData( img
-             , &view.begin()[0]
+             , interleaved_view_get_raw_data( view )
              , num_channels<View>::value * view.width() * sizeof( channel_t ) );
 
     return ipl_image_wrapper( img );
