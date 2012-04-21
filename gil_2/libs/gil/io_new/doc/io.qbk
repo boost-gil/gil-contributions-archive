@@ -1,7 +1,7 @@
 [library Boost.GIL.IO
 	[quickbook 1.3]
     [authors [Henning, Christian] ]
-    [copyright 2011 Christian Henning]
+    [copyright 2012 Christian Henning]
     [purpose
         An generic, user-friendly interface for reading and writing different image formats.
     ]
@@ -75,7 +75,7 @@ Probably the most common case to read a tiff image can be done as follows:
 
     std::string filename( "image.tif" );
     rgb8_image_t img;
-    read_image( file, img, tiff_tag() );
+    read_image( filename, img, tiff_tag() );
 
 The code would be same for all other image formats. The only thing that needs to
 change is the tag type ( tiff_tag ) in the read_image call.
