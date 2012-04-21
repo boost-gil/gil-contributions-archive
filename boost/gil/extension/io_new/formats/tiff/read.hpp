@@ -184,15 +184,15 @@ public:
 
         if( this->_info._photometric_interpretation == PHOTOMETRIC_PALETTE )
         {
+            _io_dev.get_field_defaulted( this->_red
+                                        , this->_green
+                                        , this->_blue
+                                        );
+
+            _buffer = std::vector< byte_t >( _io_dev.get_scanline_size() );
+
             switch( this->_info._bits_per_sample )
             {
-                _io_dev.get_field_defaulted( this->_red
-                                           , this->_green
-                                           , this->_blue
-                                           );
-
-                _buffer = std::vector< byte_t >( _io_dev.get_scanline_size() );
-
                 case 1:
                 {
                     typedef channel_type< get_pixel_type< gray1_image_t::view_t >::type >::type channel_t;
@@ -310,9 +310,14 @@ public:
                         {
                             case  1: 
                             case  2: 
-                            case  4: 
+                            case  4:
+                            case  6: 
                             case  8: 
+                            case 10: 
+                            case 12: 
+                            case 14: 
                             case 16: 
+                            case 24: 
                             case 32: { _read_function = boost::mem_fn( &this_t::read_row ); break; }
                             default: { io_error( "Image type is not supported." ); }
                         }
@@ -328,8 +333,14 @@ public:
                             {
                                 switch( this->_info._bits_per_sample )
                                 {
+                                    case  2: 
+                                    case  4: 
                                     case  8: 
+                                    case 10: 
+                                    case 12: 
+                                    case 14: 
                                     case 16: 
+                                    case 24: 
                                     case 32: { _read_function = boost::mem_fn( &this_t::read_row );  break; }
                                     default: { io_error( "Image type is not supported." ); }
                                 }
@@ -608,10 +619,10 @@ private:
                                     , 0
                                     );
 
-        if( this->_io_dev.are_bytes_swapped() )
-        {
-            _mirror_bites( std::vector<byte_t>( dst, dst + scanline_length() ));
-        }
+        //if( this->_io_dev.are_bytes_swapped() )
+        //{
+        //    _mirror_bites( dst, scanline_length() );
+        //}
     }
 
 private:
