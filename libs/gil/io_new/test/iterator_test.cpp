@@ -9,6 +9,8 @@
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 #include <boost/gil/extension/io_new/png_all.hpp>
+#include <boost/gil/extension/io_new/pnm_all.hpp>
+#include <boost/gil/extension/io_new/targa_all.hpp>
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 
 #include <boost/gil/extension/io_new/detail/image_read_iterator.hpp>
@@ -350,34 +352,134 @@ void tiff_test( char* in
 
 BOOST_AUTO_TEST_CASE( tiff_test_cases )
 {
-    tiff_test< gray2_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-02.tif", "c:\\chhenning\\1.tif"  );
-    tiff_test< gray4_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-04.tif", "c:\\chhenning\\2.tif"  );
-    tiff_test< gray6_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-06.tif", "c:\\chhenning\\3.tif"  );
-    tiff_test< gray8_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-08.tif", "c:\\chhenning\\4.tif"  );
-    tiff_test< gray10_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-10.tif", "c:\\chhenning\\5.tif"  );
-    tiff_test< gray12_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-12.tif", "c:\\chhenning\\6.tif"  );
-    tiff_test< gray14_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-14.tif", "c:\\chhenning\\7.tif"  );
-    tiff_test< gray16_image_t                                     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-16.tif", "c:\\chhenning\\8.tif"  );
-    tiff_test< gray24_image_t > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-24.tif", "c:\\chhenning\\9.tif"  );
-    tiff_test< gray32_image_t                                     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-32.tif", "c:\\chhenning\\10.tif" );
+    //tiff_test< gray2_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-02.tif", "c:\\chhenning\\1.tif"  );
+    //tiff_test< gray4_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-04.tif", "c:\\chhenning\\2.tif"  );
+    //tiff_test< gray6_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-06.tif", "c:\\chhenning\\3.tif"  );
+    //tiff_test< gray8_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-08.tif", "c:\\chhenning\\4.tif"  );
+    //tiff_test< gray10_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-10.tif", "c:\\chhenning\\5.tif"  );
+    //tiff_test< gray12_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-12.tif", "c:\\chhenning\\6.tif"  );
+    //tiff_test< gray14_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-14.tif", "c:\\chhenning\\7.tif"  );
+    //tiff_test< gray16_image_t                                     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-16.tif", "c:\\chhenning\\8.tif"  );
+    //tiff_test< gray24_image_t > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-24.tif", "c:\\chhenning\\9.tif"  );
+    //tiff_test< gray32_image_t                                     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-minisblack-32.tif", "c:\\chhenning\\10.tif" );
 
-    tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-02.tif", "c:\\chhenning\\11.tif"  );
-    tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-04.tif", "c:\\chhenning\\12.tif"  );
-    tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-08.tif", "c:\\chhenning\\13.tif"  );
-    tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-16.tif", "c:\\chhenning\\14.tif"  );
+    //tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-02.tif", "c:\\chhenning\\11.tif"  );
+    //tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-04.tif", "c:\\chhenning\\12.tif"  );
+    //tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-08.tif", "c:\\chhenning\\13.tif"  );
+    //tiff_test< rgb16_image_t  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-palette-16.tif", "c:\\chhenning\\14.tif"  );
 
-    tiff_test< bit_aligned_image3_type< 2, 2, 2, rgb_layout_t >::type     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-02.tif", "c:\\chhenning\\20.tif"  );
-    tiff_test< bit_aligned_image3_type< 4, 4, 4, rgb_layout_t >::type     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-04.tif", "c:\\chhenning\\21.tif"  );
-    tiff_test< rgb8_image_t                                               > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-08.tif", "c:\\chhenning\\22.tif"  );
-    tiff_test< bit_aligned_image3_type< 10, 10, 10, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-10.tif", "c:\\chhenning\\23.tif"  );
-    tiff_test< bit_aligned_image3_type< 12, 12, 12, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-12.tif", "c:\\chhenning\\24.tif"  );
-    tiff_test< bit_aligned_image3_type< 14, 14, 14, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-14.tif", "c:\\chhenning\\25.tif"  );
-    tiff_test< rgb16_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-16.tif", "c:\\chhenning\\26.tif"  );
-    tiff_test< bit_aligned_image3_type< 24, 24, 24, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-24.tif", "c:\\chhenning\\27.tif"  );
-    tiff_test< rgb32_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-32.tif", "c:\\chhenning\\28.tif"  );
+    //tiff_test< bit_aligned_image3_type< 2, 2, 2, rgb_layout_t >::type     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-02.tif", "c:\\chhenning\\20.tif"  );
+    //tiff_test< bit_aligned_image3_type< 4, 4, 4, rgb_layout_t >::type     > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-04.tif", "c:\\chhenning\\21.tif"  );
+    //tiff_test< rgb8_image_t                                               > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-08.tif", "c:\\chhenning\\22.tif"  );
+    //tiff_test< bit_aligned_image3_type< 10, 10, 10, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-10.tif", "c:\\chhenning\\23.tif"  );
+    //tiff_test< bit_aligned_image3_type< 12, 12, 12, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-12.tif", "c:\\chhenning\\24.tif"  );
+    //tiff_test< bit_aligned_image3_type< 14, 14, 14, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-14.tif", "c:\\chhenning\\25.tif"  );
+    //tiff_test< rgb16_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-16.tif", "c:\\chhenning\\26.tif"  );
+    //tiff_test< bit_aligned_image3_type< 24, 24, 24, rgb_layout_t >::type  > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-24.tif", "c:\\chhenning\\27.tif"  );
+    //tiff_test< rgb32_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-rgb-contig-32.tif", "c:\\chhenning\\28.tif"  );
 
-    tiff_test< cmyk8_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-08.tif", "c:\\chhenning\\30.tif"  );
-    tiff_test< cmyk16_image_t                                             > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-16.tif", "c:\\chhenning\\31.tif"  );
+    //tiff_test< cmyk8_image_t                                              > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-08.tif", "c:\\chhenning\\30.tif"  );
+    //tiff_test< cmyk16_image_t                                             > ( "C:\\gil_contributions\\test_images\\tiff\\libtiffpic\\depth\\flower-separated-contig-16.tif", "c:\\chhenning\\31.tif"  );
 }
+
+template< typename Image >
+void targa_test( char* in
+               , const char* out
+               )
+{
+    typedef get_scanline_reader< char*
+                               , targa_tag
+                               >::type reader_t;
+
+    reader_t targa_reader = make_scanline_reader< char*
+                                                , targa_tag
+                                                >
+                                                ( in
+                                                , targa_tag()
+                                                );
+
+    scanline_read_iterator< reader_t > it( targa_reader );
+    const reader_t::backend_t& backend = it.backend();
+
+    Image scanline(backend._info._width, 1 );
+
+    Image::view_t::x_iterator buffer_it = view(scanline).row_begin(0);
+    byte_t* data = (byte_t*) &gil::at_c<0>(*buffer_it);
+
+    it.set_buffer( data );
+
+    Image dst( backend._info._width, backend._info._height );
+
+    for( targa_dimension::type i = 0; i < backend._info._height; ++i )
+    {
+        *it;
+
+        copy_pixels( subimage_view(  view( scanline ), 0, 0, static_cast<int>(view(dst).width()), 1 )
+                    , subimage_view(      view( dst ), 0, i, static_cast<int>(view(dst).width()), 1 )
+                    );
+    }
+
+    write_view( out, flipped_up_down_view( view( dst )), bmp_tag() );
+}
+
+
+BOOST_AUTO_TEST_CASE( targa_test_cases )
+{
+    //targa_test< bgr8_image_t  > ( "C:\\gil_contributions\\test_images\\targa\\fileformat.info\\marbles.tga", "c:\\chhenning\\1.tga.bmp"  );
+
+    //targa_test< bgr8_image_t  > ( "C:\\gil_contributions\\test_images\\targa\\24BPP_uncompressed.tga", "c:\\chhenning\\1.tga.bmp"  );
+    //targa_test< bgra8_image_t  > ( "C:\\gil_contributions\\test_images\\targa\\32BPP_uncompressed.tga", "c:\\chhenning\\2.tga.bmp"  );
+}
+
+template< typename Image >
+void pnm_test( char* in
+             , const char* out
+             )
+{
+    typedef get_scanline_reader< char*
+                               , pnm_tag
+                               >::type reader_t;
+
+    reader_t pnm_reader = make_scanline_reader< char*
+                                              , pnm_tag
+                                              >
+                                              ( in
+                                              , pnm_tag()
+                                              );
+
+    scanline_read_iterator< reader_t > it( pnm_reader );
+    const reader_t::backend_t& backend = it.backend();
+
+    Image scanline( backend._info._width, 1 );
+
+    Image::view_t::x_iterator buffer_it = view(scanline).row_begin(0);
+    byte_t* data = (byte_t*) &gil::at_c<0>(*buffer_it);
+
+    it.set_buffer( data );
+
+    Image dst( backend._info._width, backend._info._height );
+
+    for( pnm_image_height::type i = 0; i < backend._info._height; ++i )
+    {
+        *it;
+
+        copy_pixels( subimage_view(  view( scanline ), 0, 0, static_cast<int>(view(dst).width()), 1 )
+                    , subimage_view(      view( dst ), 0, i, static_cast<int>(view(dst).width()), 1 )
+                    );
+    }
+
+    write_view( out, color_converted_view< gray8_pixel_t >( view( dst )), png_tag() );
+}
+
+BOOST_AUTO_TEST_CASE( pnm_test_cases )
+{
+    pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p1.pnm", "c:\\chhenning\\1.pnm.png"  );
+    pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p2.pnm", "c:\\chhenning\\2.pnm.png"  );
+    pnm_test< rgb8_image_t  > ( "C:\\gil_contributions\\test_images\\pnm\\p3.pnm", "c:\\chhenning\\3.pnm.png"  );
+    pnm_test< gray1_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p4.pnm", "c:\\chhenning\\4.pnm.png"  );
+    pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p5.pnm", "c:\\chhenning\\5.pnm.png"  );
+    pnm_test< rgb8_image_t  > ( "C:\\gil_contributions\\test_images\\pnm\\p6.pnm", "c:\\chhenning\\6.pnm.png"  );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END() // scanline_read_test

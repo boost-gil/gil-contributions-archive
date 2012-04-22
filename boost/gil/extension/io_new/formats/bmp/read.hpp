@@ -225,8 +225,6 @@ public:
 				    case bmp_compression::_rle4:
                     {
                         io_error( "Cannot read run-length encoded images in iterator mode. Try to read as whole image." );
-                        //read_palette();
-                        //_read_function = boost::mem_fn( &this_t::read_rle_image );
 
                         break;
                     }
@@ -257,8 +255,6 @@ public:
 				    case bmp_compression::_rle8:
                     {
                         io_error( "Cannot read run-length encoded images in iterator mode. Try to read as whole image." );
-                        //read_palette();
-                        //_read_function = boost::mem_fn( &this_t::read_rle_image );
 
                         break;
                     }
@@ -385,7 +381,7 @@ public:
     }
 
     /// Return length of scanline in bytes.
-    int scanline_length()
+    std::size_t scanline_length()
     {
         return _pitch;
     }
@@ -433,7 +429,7 @@ private:
         
         assert(_io_dev.read( &_buffer.front(), _pitch ));
 
-        _mirror_bites( _buffer );
+        _mirror_bits( _buffer );
 
         src_view_t src_view = interleaved_view( this->_info._width
                                               , 1
@@ -587,7 +583,7 @@ private:
     int _pitch;
 
     std::vector< byte_t > _buffer;
-    detail::mirror_bits    < std::vector< byte_t >, mpl::true_ > _mirror_bites;
+    detail::mirror_bits    < std::vector< byte_t >, mpl::true_ > _mirror_bits;
     detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
 
     boost::function< void ( this_t*, byte_t* ) > _read_function;

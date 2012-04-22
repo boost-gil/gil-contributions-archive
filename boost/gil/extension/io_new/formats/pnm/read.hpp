@@ -1,5 +1,5 @@
 /*
-    Copyright 2008 Christian Henning
+    Copyright 2012 Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,12 +15,14 @@
 /// \brief
 /// \author Christian Henning \n
 ///
-/// \date 2008 \n
+/// \date 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
+
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/pnm_tags.hpp>
 
@@ -36,160 +38,185 @@
 
 namespace boost { namespace gil {
 
-template< typename View, typename T >
-struct calc_pitch {};
-
-template< typename View >
-struct calc_pitch< View, mpl::false_ >
+///
+/// PNM Backend
+///
+template< typename Device >
+struct reader_backend< Device
+                     , pnm_tag
+                     >
 {
-    static uint32_t do_it( uint32_t width ) { return width * num_channels< View >::value; }
+    reader_backend( Device&                                 device
+                  , const image_read_settings< pnm_tag >& settings
+                  )
+    : _io_dev  ( device   )
+    , _settings( settings )
+    , _info()
+    , _pitch( 0 )
+    {}
+
+    ~reader_backend()
+    {
+        _io_dev.set_close( true );
+    }
+
+    Device _io_dev;
+
+    image_read_settings< pnm_tag > _settings;
+    image_read_info< pnm_tag >     _info;
+
+    std::size_t _pitch;
 };
 
-template< typename View >
-struct calc_pitch< View, mpl::true_ >
-{
-    static uint32_t do_it( uint32_t width ) {  return ( width + 7 ) >> 3; }
-};
-
-
-template< typename Device
-        , typename ConversionPolicy
-        >
-class reader< Device
-            , pnm_tag
-            , ConversionPolicy
-            >
-    : public detail::reader_base< pnm_tag
-                                , ConversionPolicy
-                                >
+///
+/// PNM Reader
+///
+template< typename Device >
+class scanline_reader< Device
+                     , pnm_tag
+                     >
+    : public reader_backend< Device
+                           , pnm_tag
+                           >
 {
 private:
 
-    typedef typename ConversionPolicy::color_converter_type cc_t;
+    typedef scanline_reader< Device
+                           , pnm_tag
+                           > this_t;
 
 public:
-    reader( Device&                                device
-          , const image_read_settings< pnm_tag >& settings
-          )
-    : reader_base< pnm_tag
-                 , ConversionPolicy >( settings )
-    , _io_dev( device )
+
+    typedef reader_backend< Device
+                          , pnm_tag
+                          > backend_t;
+
+
+public:
+    scanline_reader( Device&                                device
+                   , const image_read_settings< pnm_tag >& settings
+                   )
+    : reader_backend( device
+                    , settings
+                    )
     {}
 
-    reader( Device&                               device
-          , const cc_t&                           cc
-          , const image_read_settings< pnm_tag >& settings
-          )
-    : reader_base< pnm_tag
-                 , ConversionPolicy >( cc
-                                     , settings
-                                     )
-    , _io_dev( device )
-    {}
-
-    image_read_info<pnm_tag> get_info()
+    void read_header()
     {
-        image_read_info<pnm_tag> ret;
-
         // read signature
         io_error_if( read_char() != 'P', "Invalid PNM signature" );
 
-        ret._type = read_char() - '0';
+        this->_info._type = read_char() - '0';
 
-		io_error_if( ret._type < pnm_image_type::mono_asc_t::value || ret._type > pnm_image_type::color_bin_t::value
+		io_error_if( this->_info._type < pnm_image_type::mono_asc_t::value || this->_info._type > pnm_image_type::color_bin_t::value
 		           , "Invalid PNM file (supports P1 to P6)"
 		           );
 
-        ret._width  = read_int();
-        ret._height = read_int();
+        this->_info._width  = read_int();
+        this->_info._height = read_int();
 
-        if( ret._type == pnm_image_type::mono_asc_t::value || ret._type == pnm_image_type::mono_bin_t::value )
+        if( this->_info._type == pnm_image_type::mono_asc_t::value || this->_info._type == pnm_image_type::mono_bin_t::value )
         {
-            ret._max_value = 1;
+            this->_info._max_value = 1;
         }
         else
         {
-            ret._max_value = read_int();
+            this->_info._max_value = read_int();
 
-		    io_error_if( ret._max_value > 255
+		    io_error_if( this->_info._max_value > 255
 		               , "Unsupported PNM format (supports maximum value 255)"
 		               );
         }
-
-        return ret;
     }
 
-    template<typename View>
-    void apply( const View& view )
+    void initialize()
     {
-
-        typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
-                                >::type is_read_and_convert_t;
-
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
-                   , "Image types aren't compatible."
-                   );
-
         switch( this->_info._type )
 		{
             // reading mono text is reading grayscale but with only two values
-			case pnm_image_type::mono_asc_t::value:  { read_text_data< gray8_view_t >( view ); break; }
-			case pnm_image_type::gray_asc_t::value:  { read_text_data< gray8_view_t >( view ); break; }
-			case pnm_image_type::color_asc_t::value: { read_text_data< rgb8_view_t  >( view ); break; }
+			case pnm_image_type::mono_asc_t::value:  
+			case pnm_image_type::gray_asc_t::value:
+            {
+                this->_pitch = this->_info._width;
 
-			case pnm_image_type::mono_bin_t::value:  { read_bin_data< gray1_image_t::view_t >( view ); break; }
-			case pnm_image_type::gray_bin_t::value:  { read_bin_data< gray8_view_t          >( view ); break; }
-			case pnm_image_type::color_bin_t::value: { read_bin_data< rgb8_view_t           >( view ); break; }
+                _read_function = boost::mem_fn( &this_t::read_text_image ); 
+
+                break;
+                }
+
+			case pnm_image_type::color_asc_t::value:
+            {
+                this->_pitch = this->_info._width * num_channels< rgb8_view_t >::value;
+
+                _read_function = boost::mem_fn( &this_t::read_text_image  ); 
+
+                break;
+            }
+
+
+			case pnm_image_type::mono_bin_t::value:
+            {
+                //gray1_image_t::view_t
+
+                this->_pitch = ( this->_info._width + 7 ) >> 3;
+
+                _read_function = boost::mem_fn( &this_t::read_binary_bit_image ); 
+
+                break;
+            }
+
+			case pnm_image_type::gray_bin_t::value:
+            {
+                // gray8_view_t
+                this->_pitch = this->_info._width;
+
+                _read_function = boost::mem_fn( &this_t::read_binary_byte_image ); 
+
+                break;
+            }
+
+			case pnm_image_type::color_bin_t::value:
+            {
+                this->_pitch = this->_info._width * num_channels< rgb8_view_t >::value;
+
+                _read_function = boost::mem_fn( &this_t::read_binary_byte_image ); 
+
+                break;
+            }
+
+            default: { io_error( "Unsupported pnm file." ); break; }
 		}
     }
 
-private:
+    void clean_up() {}
 
-    template< typename View_Src
-            , typename View_Dst
-            >
-    void read_text_data( const View_Dst& dst )
+    /// Read part of image defined by View and return the data.
+    void read( byte_t* dst, int pos )
     {
-        typedef typename View_Dst::y_coord_t y_t;
-
-        uint32_t pitch = this->_info._width * num_channels< View_Src >::value;
-
-        byte_vector_t row( pitch );
-
-        //Skip scanlines if necessary.
-        for( int y = 0; y <  this->_settings._top_left.y; ++y )
-        {
-            read_text_row< View_Src >( dst, row, pitch, y, false );
-        }
-
-        for( y_t y = 0; y < dst.height(); ++y )
-        {
-            read_text_row< View_Src >( dst, row, pitch, y, true );
-        }
+        _read_function(this, dst);
     }
 
-    template< typename View_Src
-            , typename View_Dst
-            >
-    void read_text_row( const View_Dst&              dst
-                      , byte_vector_t&               row
-                      , uint32_t                     pitch
-                      , typename View_Dst::y_coord_t y
-                      , bool                         process
+    /// Return length of scanline in bytes.
+    std::size_t scanline_length()
+    {
+        return _pitch;
+    }
+
+
+private:
+
+    void read_text_image( byte_t* dst )
+    {
+        read_text_row( dst, true );
+    }
+
+    void read_text_row( byte_t* row
+                      , bool    process
                       )
     {
         static char buf[16];
 
-        View_Src src = interleaved_view( this->_info._width
-                                       , 1
-                                       , (typename View_Src::value_type*) &row.front()
-                                       , pitch
-                                       );
-
-        for( uint32_t x = 0; x < pitch; ++x )
+        for( uint32_t x = 0; x < this->_pitch; ++x )
         {
             for( uint32_t k = 0; ; )
             {
@@ -216,12 +243,10 @@ private:
 
                 if( this->_info._max_value == 1 )
                 {
-                    typedef typename channel_type< typename get_pixel_type< View_Dst >::type >::type channel_t;
-
                     // for pnm format 0 is white
                     row[x] = ( value != 0 )
-                             ? typename channel_traits< channel_t >::value_type( 0 )
-                             : channel_traits< channel_t >::max_value();
+                             ? 0
+                             : 255;
                 }
                 else
                 {
@@ -229,122 +254,25 @@ private:
                 }
             }
         }
-
-        if( process )
-        {
-            // We are reading a gray1_image like a gray8_image but the two pixel_t
-            // aren't compatible. Though, read_and_no_convert::read(...) wont work.
-            copy_data< View_Dst
-                     , View_Src >( dst
-                                 , src
-                                 , y
-                                 , typename is_same< View_Dst
-                                                   , gray1_image_t::view_t
-                                                   >::type()
-                                 );
-        }
     }
 
-    template< typename View_Dst
-            , typename View_Src
-            >
-    void copy_data( const View_Dst&              dst
-                  , const View_Src&              src
-                  , typename View_Dst::y_coord_t y
-                  , mpl::true_ // is gray1_view
-                  )
+    void read_binary_bit_image( byte_t* dst )
     {
-        if(  this->_info._max_value == 1 )
-        {
-            typename View_Dst::x_iterator it = dst.row_begin( y );
+        _io_dev.read( dst
+                    , this->_pitch
+                    );
 
-            for( typename View_Dst::x_coord_t x = 0
-               ; x < dst.width()
-               ; ++x
-               )
-            {
-                it[x] = src[x];
-            }
-        }
-        else
-        {
-            copy_data( dst
-                     , src
-                     , y
-                     , mpl::false_()
-                     );
-        }
+        _negate_bits    ( dst, scanline_length() );
+        _swap_half_bytes( dst, scanline_length() );
     }
 
-    template< typename View_Dst
-            , typename View_Src
-            >
-    void copy_data( const View_Dst&              view
-                  , const View_Src&              src
-                  , typename View_Dst::y_coord_t y
-                  , mpl::false_ // is gray1_view
-                  )
+    void read_binary_byte_image( byte_t* dst )
     {
-        typename View_Src::x_iterator beg = src.row_begin( 0 ) + this->_settings._top_left.x;
-        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
-
-        this->_cc_policy.read( beg
-                             , end
-                             , view.row_begin( y )
-                             );
+        _io_dev.read( dst
+                    , this->_pitch
+                    );
     }
 
-
-    template< typename View_Src
-            , typename View_Dst
-            >
-    void read_bin_data( const View_Dst& view )
-    {
-        typedef typename View_Dst::y_coord_t y_t;
-        typedef typename is_bit_aligned<
-                    typename View_Src::value_type >::type is_bit_aligned_t;
-
-        uint32_t pitch = calc_pitch< View_Src, is_bit_aligned_t >::do_it( this->_info._width );
-
-        typedef detail::row_buffer_helper_view< View_Src > rh_t;
-        rh_t rh( pitch, true );
-
-        typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
-        typename rh_t::iterator_t end = beg + this->_settings._dim.x;
-
-        // For bit_aligned images we need to negate all bytes in the row_buffer
-        // to make sure that 0 is black and 255 is white.
-        detail::negate_bits< typename rh_t::buffer_t
-                           , is_bit_aligned_t
-                           > neg;
-
-        detail::swap_half_bytes< typename rh_t::buffer_t
-                               , is_bit_aligned_t
-                               > swhb;
-
-        //Skip scanlines if necessary.
-        for( y_t y = 0; y < this->_settings._top_left.y; ++y )
-        {
-            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
-                        , pitch
-                        );
-        }
-
-        for( y_t y = 0; y < view.height(); ++y )
-        {
-            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
-                        , pitch
-                        );
-
-            neg( rh.buffer() );
-            swhb( rh.buffer() );
-
-            this->_cc_policy.read( beg
-                                 , end
-                                 , view.row_begin( y )
-                                 );
-        }
-    }
 
 private:
 
@@ -404,92 +332,14 @@ private:
 
 private:
 
-    Device& _io_dev;
+    // For bit_aligned images we need to negate all bytes in the row_buffer
+    // to make sure that 0 is black and 255 is white.
+    detail::negate_bits    < std::vector< byte_t >, mpl::true_ > _negate_bits;
+    detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
+
+    boost::function< void ( this_t*, byte_t* ) > _read_function;
 };
 
-struct pnm_type_format_checker
-{
-    pnm_type_format_checker( pnm_image_type::type type )
-    : _type( type )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                 , pnm_tag
-                                 > is_supported_t;
-
-        return is_supported_t::_asc_type == _type
-            || is_supported_t::_bin_type == _type;
-    }
-
-private:
-
-    pnm_image_type::type _type;
-};
-
-struct pnm_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , pnm_tag
-                                           >
-    {};
-};
-
-template< typename Device
-        >
-class dynamic_image_reader< Device
-                          , pnm_tag
-                          >
-    : public reader< Device
-                   , pnm_tag
-                   , read_and_no_convert
-                   >
-{
-    typedef reader< Device
-                  , pnm_tag
-                  , read_and_no_convert
-                  > parent_t;
-
-public:
-
-    dynamic_image_reader( Device&                               device
-                        , const image_read_settings< pnm_tag >& settings
-                        )
-    : parent_t( device
-              , settings
-              )
-    {}
-
-    template< typename Images >
-    void apply( any_image< Images >& images )
-    {
-        pnm_type_format_checker format_checker( this->_info._type );
-
-        if( !construct_matched( images
-                              , format_checker
-                              ))
-        {
-            io_error( "No matching image type between those of the given any_image and that of the file" );
-        }
-        else
-        {
-            init_image( images
-                      , this->_info
-                      );
-
-            detail::dynamic_io_fnobj< pnm_read_is_supported
-                                    , parent_t
-                                    > op( this );
-
-            apply_operation( view( images )
-                           , op
-                           );
-        }
-    }
-};
 
 } // namespace gil
 } // namespace boost

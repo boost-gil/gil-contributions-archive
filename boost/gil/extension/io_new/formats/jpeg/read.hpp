@@ -248,32 +248,30 @@ public:
 
     void initialize()
     {
-        jpeg_decompress_struct& cinfo = this->_cinfo;
-        cinfo.dct_method = this->_settings._dct_method;
+        this->_cinfo.dct_method = this->_settings._dct_method;
 
         io_error_if( jpeg_start_decompress( &this->_cinfo ) == false
                     , "Cannot start decompression." );
 
-        //switch( this->_info._color_space )
-        //{
-        //    case JCS_GRAYSCALE: { read_rows< gray8_pixel_t >( view ); break; }
-        //    case JCS_RGB:       { read_rows< rgb8_pixel_t  >( view ); break; }
+        switch( this->_info._color_space )
+        {
+            case JCS_GRAYSCALE:
+            case JCS_RGB:
 
-        //    //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
-        //    case JCS_YCbCr:     { read_rows< rgb8_pixel_t  >( view ); break; }
+            //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
+            case JCS_YCbCr:
+            case JCS_CMYK: { break; }
 
-        //    case JCS_CMYK:      { read_rows< cmyk8_pixel_t >( view ); break; }
+            //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
+            case JCS_YCCK:
+            {
+                this->_cinfo.out_color_space = JCS_CMYK;
 
-        //    //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
-        //    case JCS_YCCK:
-        //    {
-        //        this->_cinfo.out_color_space = JCS_CMYK;
-        //        read_rows< cmyk8_pixel_t >( view );
+                break;
+            }
 
-        //        break;
-        //    }
-        //    default: { io_error( "Unsupported jpeg color space." ); }
-        //}
+            default: { io_error( "Unsupported jpeg color space." ); }
+        }
     }
 
     void read( byte_t* dst, int pos )
