@@ -139,16 +139,18 @@ public:
             {
                 this->_pitch = this->_info._width;
 
-                _read_function = boost::mem_fn( &this_t::read_text_image ); 
+                _read_function = boost::mem_fn( &this_t::read_text_row );
+                _skip_function = boost::mem_fn( &this_t::skip_text_row );
 
                 break;
-                }
+            }
 
 			case pnm_image_type::color_asc_t::value:
             {
                 this->_pitch = this->_info._width * num_channels< rgb8_view_t >::value;
 
-                _read_function = boost::mem_fn( &this_t::read_text_image  ); 
+                _read_function = boost::mem_fn( &this_t::read_text_row ); 
+                _skip_function = boost::mem_fn( &this_t::skip_text_row );
 
                 break;
             }
@@ -156,30 +158,34 @@ public:
 
 			case pnm_image_type::mono_bin_t::value:
             {
-                //gray1_image_t::view_t
+                //gray1_image_t
 
                 this->_pitch = ( this->_info._width + 7 ) >> 3;
 
-                _read_function = boost::mem_fn( &this_t::read_binary_bit_image ); 
+                _read_function = boost::mem_fn( &this_t::read_binary_bit_row );
+                _skip_function = boost::mem_fn( &this_t::skip_binary_row     );
 
                 break;
             }
 
 			case pnm_image_type::gray_bin_t::value:
             {
-                // gray8_view_t
+                // gray8_image_t
                 this->_pitch = this->_info._width;
 
-                _read_function = boost::mem_fn( &this_t::read_binary_byte_image ); 
+                _read_function = boost::mem_fn( &this_t::read_binary_byte_row ); 
+                _skip_function = boost::mem_fn( &this_t::skip_binary_row      ); 
 
                 break;
             }
 
 			case pnm_image_type::color_bin_t::value:
             {
+                // rgb8_image_t
                 this->_pitch = this->_info._width * num_channels< rgb8_view_t >::value;
 
-                _read_function = boost::mem_fn( &this_t::read_binary_byte_image ); 
+                _read_function = boost::mem_fn( &this_t::read_binary_byte_row ); 
+                _skip_function = boost::mem_fn( &this_t::skip_binary_row      );
 
                 break;
             }
@@ -193,7 +199,13 @@ public:
     /// Read part of image defined by View and return the data.
     void read( byte_t* dst, int pos )
     {
-        _read_function(this, dst);
+        _read_function( this, dst );
+    }
+
+    /// Skip over a scanline.
+    void skip()
+    {
+        _skip_function( this );
     }
 
     /// Return length of scanline in bytes.
@@ -205,18 +217,9 @@ public:
 
 private:
 
-    void read_text_image( byte_t* dst )
+    void read_text_row( byte_t* dst )
     {
-        read_text_row( dst, true );
-    }
-
-    void read_text_row( byte_t* row
-                      , bool    process
-                      )
-    {
-        static char buf[16];
-
-        for( uint32_t x = 0; x < this->_pitch; ++x )
+        for( std::size_t x = 0; x < scanline_length(); ++x )
         {
             for( uint32_t k = 0; ; )
             {
@@ -224,11 +227,11 @@ private:
 
 				if( isdigit( ch ))
 				{
-                    buf[ k++ ] = static_cast< char >( ch );
+                    _text_buffer[ k++ ] = static_cast< char >( ch );
 				}
 				else if( k )
 				{
-					buf[ k ] = 0;
+					_text_buffer[ k ] = 0;
 					break;
 				}
 				else if( ch == EOF || !isspace( ch ))
@@ -237,26 +240,48 @@ private:
 				}
             }
 
-            if( process )
-            {
-                int value = atoi( buf );
+            int value = atoi( _text_buffer );
 
-                if( this->_info._max_value == 1 )
-                {
-                    // for pnm format 0 is white
-                    row[x] = ( value != 0 )
-                             ? 0
-                             : 255;
-                }
-                else
-                {
-                    row[x] = static_cast< byte_t >( value );
-                }
+            if( this->_info._max_value == 1 )
+            {
+                // for pnm format 0 is white
+                dst[x] = ( value != 0 )
+                            ? 0
+                            : 255;
+            }
+            else
+            {
+                dst[x] = static_cast< byte_t >( value );
             }
         }
     }
 
-    void read_binary_bit_image( byte_t* dst )
+    void skip_text_row()
+    {
+        for( std::size_t x = 0; x < scanline_length(); ++x )
+        {
+            for( uint32_t k = 0; ; )
+            {
+				int ch = _io_dev.getc_unchecked();
+
+				if( isdigit( ch ))
+				{
+                    k++;
+				}
+				else if( k )
+				{
+					break;
+				}
+				else if( ch == EOF || !isspace( ch ))
+				{
+					return;
+				}
+            }
+        }
+    }
+
+
+    void read_binary_bit_row( byte_t* dst )
     {
         _io_dev.read( dst
                     , this->_pitch
@@ -264,15 +289,20 @@ private:
 
         _negate_bits    ( dst, scanline_length() );
         _swap_half_bytes( dst, scanline_length() );
+
     }
 
-    void read_binary_byte_image( byte_t* dst )
+    void read_binary_byte_row( byte_t* dst )
     {
         _io_dev.read( dst
                     , this->_pitch
                     );
     }
 
+    void skip_binary_row()
+    {
+        _io_dev.seek( static_cast<long>( this->_pitch ), SEEK_CUR );
+    }
 
 private:
 
@@ -332,12 +362,15 @@ private:
 
 private:
 
+    char _text_buffer[16];
+
     // For bit_aligned images we need to negate all bytes in the row_buffer
     // to make sure that 0 is black and 255 is white.
     detail::negate_bits    < std::vector< byte_t >, mpl::true_ > _negate_bits;
     detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
 
     boost::function< void ( this_t*, byte_t* ) > _read_function;
+    boost::function< void ( this_t* )          > _skip_function;
 };
 
 

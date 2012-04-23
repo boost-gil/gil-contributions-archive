@@ -118,6 +118,7 @@ public:
     : reader_backend( device, settings )
 
     , _pitch( 0 )
+    , _scanline_length( 0 )
     {}
 
     void read_header()
@@ -206,14 +207,18 @@ public:
 
         _pitch = (_pitch + 3) & ~3;
 
+        //
+
         switch( _info._bits_per_pixel )
         {
             case 1:
             {
+                _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+
                 read_palette();
                 _buffer.resize( _pitch );
 
-                _read_function = boost::mem_fn( &this_t::read_1_bit_image );
+                _read_function = boost::mem_fn( &this_t::read_1_bit_row );
 
                 break;
             }
@@ -231,10 +236,12 @@ public:
 
 				    case bmp_compression::_rgb :
                     {
+                        _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+
                         read_palette();
                         _buffer.resize( _pitch );
 
-                        _read_function = boost::mem_fn( &this_t::read_4_bits_image );
+                        _read_function = boost::mem_fn( &this_t::read_4_bits_row );
 
                         break;
                     }
@@ -260,10 +267,12 @@ public:
                     }
 				    case bmp_compression::_rgb:
                     {
+                        _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+
                         read_palette();
                         _buffer.resize( _pitch );
 
-                        _read_function = boost::mem_fn( &this_t::read_8_bits_image ); 
+                        _read_function = boost::mem_fn( &this_t::read_8_bits_row ); 
 
                         break;
                     }
@@ -274,8 +283,11 @@ public:
                 break;
             }
 
-            case 15: case 16:
+            case 15:
+            case 16:
             {
+                _scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
+
                 _buffer.resize( _pitch );
 
                 if( _info._compression == bmp_compression::_bitfield )
@@ -319,26 +331,27 @@ public:
                 }
                 else
                 {
-                    io_error( "bmp_reader::apply(): unsupported BMP compression" );
+                    io_error( "Unsupported BMP compression." );
                 }
 
 
-                _read_function = boost::mem_fn( &this_t::read_15_bits_image ); 
+                _read_function = boost::mem_fn( &this_t::read_15_bits_row ); 
 
                 break;
             }
 
             case 24:
             {
-                _read_function = boost::mem_fn( &this_t::read_24_bits_image ); 
-                
+                _scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
+                _read_function = boost::mem_fn( &this_t::read_row ); 
+
                 break;
             }
 
-
             case 32:
             {
-                _read_function = boost::mem_fn( &this_t::read_32_bits_image ); 
+                _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+                _read_function = boost::mem_fn( &this_t::read_row ); 
                 
                 break;
             }
@@ -350,10 +363,7 @@ public:
         }
     }
 
-    void clean_up()
-    {
-        ///@todo
-    }
+    void clean_up(){}
 
     /// Read part of image defined by View and return the data.
     void read( byte_t* dst, int pos )
@@ -365,7 +375,7 @@ public:
         {
             // the image is upside down
             offset = _info._offset
-                   + ( this->_info._height - 1 - pos ) * _pitch;
+                   + ( this->_info._height - 1 - pos ) * this->_pitch;
         }
         else
         {
@@ -380,10 +390,16 @@ public:
         _read_function(this, dst);
     }
 
+    /// Skip over a scanline.
+    void skip()
+    {
+        // nothing to do.
+    }
+
     /// Return length of scanline in bytes.
     std::size_t scanline_length()
     {
-        return _pitch;
+        return _scanline_length;
     }
 
 private:
@@ -396,7 +412,7 @@ private:
             return;
         }
 
-        int entries = _info._num_colors;
+        int entries = this->_info._num_colors;
 
         if( entries == 0 )
         {
@@ -421,16 +437,12 @@ private:
         } // for
     }
 
-    // Read 1 bit image. The colors are encoded by an index.
-    void read_1_bit_image( byte_t* dst )
+    template< typename View >
+    void read_bit_row( byte_t* dst )
     {
-        typedef gray1_image_t::view_t src_view_t;
+        typedef View src_view_t;
         typedef rgba8_image_t::view_t dst_view_t;
         
-        assert(_io_dev.read( &_buffer.front(), _pitch ));
-
-        _mirror_bits( _buffer );
-
         src_view_t src_view = interleaved_view( this->_info._width
                                               , 1
                                               , (src_view_t::x_iterator) &_buffer.front()
@@ -440,7 +452,7 @@ private:
         dst_view_t dst_view = interleaved_view( this->_info._width
                                               , 1
                                               , (dst_view_t::value_type*) dst
-                                              , num_channels< dst_view_t > * this->_info._width
+                                              , num_channels< dst_view_t >::value * this->_info._width
                                               );
         
 
@@ -457,81 +469,34 @@ private:
         }
     }
 
-    // Read 4 bits image. The colors are encoded by an index.
-    void read_4_bits_image( byte_t* dst )
+    // Read 1 bit image. The colors are encoded by an index.
+    void read_1_bit_row( byte_t* dst )
     {
-        typedef gray4_image_t::view_t src_view_t;
-        typedef rgba8_image_t::view_t dst_view_t;
+        assert( _io_dev.read( &_buffer.front(), _pitch ) );
+        _mirror_bits( _buffer );
 
-        assert(_io_dev.read( &_buffer.front(), _pitch ));
+        read_bit_row< gray1_image_t::view_t >( dst );
+    }
+
+    // Read 4 bits image. The colors are encoded by an index.
+    void read_4_bits_row( byte_t* dst )
+    {
+        assert( _io_dev.read( &_buffer.front(), _pitch ) );
         _swap_half_bytes( _buffer );
 
-        src_view_t src_view = interleaved_view( this->_info._width
-                                              , 1
-                                              , (src_view_t::x_iterator) &_buffer.front()
-                                              , this->_pitch
-                                              );
-
-        dst_view_t dst_view = interleaved_view( this->_info._width
-                                              , 1
-                                              , (dst_view_t::value_type*) dst
-                                              , num_channels< dst_view_t > * this->_info._width
-                                              );
-
-        src_view_t::x_iterator src_it = src_view.row_begin( 0 );
-        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
-
-        for( dst_view_t::x_coord_t i = 0
-           ; i < _info._width
-           ; ++i, src_it++, dst_it++
-           )
-        {
-            unsigned char c = get_color( *src_it, gray_color_t() );
-            *dst_it = this->_palette[c];
-        }        
+        read_bit_row< gray4_image_t::view_t >( dst );
     }
 
     /// Read 8 bits image. The colors are encoded by an index.
-    void read_8_bits_image( byte_t* dst )
+    void read_8_bits_row( byte_t* dst )
     {
-        typedef gray8_image_t::view_t src_view_t;
-        typedef rgba8_image_t::view_t dst_view_t;
+        assert( _io_dev.read( &_buffer.front(), _pitch ) );
 
-        assert( _io_dev.read( &_buffer.front(), _pitch ));
-
-        src_view_t src_view = interleaved_view( this->_info._width
-                                              , 1
-                                              , (src_view_t::value_type*) &_buffer.front()
-                                              , this->_pitch
-                                              );
-
-        dst_view_t dst_view = interleaved_view( this->_info._width
-                                              , 1
-                                              , (dst_view_t::value_type*) dst
-                                              , num_channels< dst_view_t > * this->_info._width
-                                              );
-
-        src_view_t::x_iterator src_it = src_view.row_begin( 0 );
-        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
-
-        for( dst_view_t::x_coord_t i = 0
-           ; i < _info._width
-           ; ++i, src_it++, dst_it++
-           )
-        {
-            unsigned char c = get_color( *src_it, gray_color_t() );
-            *dst_it = this->_palette[c];
-        }        
-    }    
-
-    /// Read image that's encoded using Run-length coding (RLE).
-    void read_rle_image( byte_t* dst )
-    {
-        /// not supported
+        read_bit_row< gray8_image_t::view_t >( dst );
     }
 
     /// Read 15 or 16 bits image.
-    void read_15_bits_image( byte_t* dst )
+    void read_15_bits_row( byte_t* dst )
     {
         typedef rgb8_view_t dst_view_t;
         typedef dst_view_t::x_iterator it_t;
@@ -565,16 +530,9 @@ private:
         }
     }
 
-    /// Read 24 bits image.
-    void read_24_bits_image( byte_t* dst )
+    void read_row( byte_t* dst )
     {
-        _io_dev.read( dst, _pitch );
-    }
-
-    /// Read 32 bits image.
-    void read_32_bits_image( byte_t* dst )
-    {
-        _io_dev.read( dst, _pitch );
+        assert( _io_dev.read( dst, _pitch ) );
     }
 
 private:
@@ -582,11 +540,14 @@ private:
     // the row pitch must be multiple of 4 bytes
     int _pitch;
 
+    int _scanline_length;
+
     std::vector< byte_t > _buffer;
     detail::mirror_bits    < std::vector< byte_t >, mpl::true_ > _mirror_bits;
     detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
 
     boost::function< void ( this_t*, byte_t* ) > _read_function;
+    boost::function< void ( this_t* )          > _skip_function;
 };
 
 } // namespace gil

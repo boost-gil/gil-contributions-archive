@@ -49,22 +49,34 @@ void bmp_test( char* in
                                               );
 
     scanline_read_iterator< reader_t > it( bmp_reader );
+    reader_t::backend_t backend = it.backend();
 
                 
-    Scanline scanline( 128, 1 );
+    std::vector< byte_t > buffer( it.scanline_length() );
+    it.set_buffer( &buffer.front() );
 
-    it.set_buffer( &view( scanline )[0][0]);
+    typename Scanline::view_t scanline = interleaved_view( backend._info._width
+                                                         , 1
+                                                         , (typename Scanline::view_t::x_iterator) &buffer.front()
+                                                         , it.scanline_length()
+                                                         );
 
-    reader_t::backend_t backend = it.backend();
     Image dst( backend._info._width, backend._info._height );
 
     for( int i = 0; i < static_cast<int>(view(dst).height()); ++i )
     {
-        *it;
+        if( i % 2 )
+        {
+            *it;
 
-        copy_pixels( subimage_view(  view( scanline ), 0, 0, static_cast<int>(view(dst).width()), 1 )
-                    , subimage_view(      view( dst ), 0, i, static_cast<int>(view(dst).width()), 1 )
-                    );
+            copy_pixels( subimage_view(    scanline, 0, 0, static_cast<int>(view(dst).width()), 1 )
+                       , subimage_view( view( dst ), 0, i, static_cast<int>(view(dst).width()), 1 )
+                        );
+        }
+        else
+        {
+            ++it;
+        }
     }
 
     write_view( out, view(dst), bmp_tag() );
@@ -72,38 +84,36 @@ void bmp_test( char* in
 
 BOOST_AUTO_TEST_CASE( bmp_test_cases )
 {
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01bg.bmp", "c:\\chhenning\\1.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01bw.bmp", "c:\\chhenning\\1_1.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01p1.bmp", "c:\\chhenning\\1_2.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01wb.bmp", "c:\\chhenning\\1_3.bmp");
+
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g04.bmp", "c:\\chhenning\\4.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g04p4.bmp", "c:\\chhenning\\4_2.bmp");
+
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08.bmp", "c:\\chhenning\\8.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08p256.bmp", "c:\\chhenning\\8_1.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08pi256.bmp", "c:\\chhenning\\8_2.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08pi64.bmp", "c:\\chhenning\\8_3.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08os2.bmp", "c:\\chhenning\\8_5.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08res22.bmp", "c:\\chhenning\\8_6.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08res11.bmp", "c:\\chhenning\\8_7.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08res21.bmp", "c:\\chhenning\\8_8.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08s0.bmp", "c:\\chhenning\\8_9.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08offs.bmp", "c:\\chhenning\\8_10.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08w126.bmp", "c:\\chhenning\\8_11.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08w125.bmp", "c:\\chhenning\\8_12.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08w124.bmp", "c:\\chhenning\\8_13.bmp");
+    bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08p64.bmp", "c:\\chhenning\\8_14.bmp");
+
+    bmp_test< rgb8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g16def555.bmp", "c:\\chhenning\\16.bmp");
+    bmp_test< rgb8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g16bf555.bmp", "c:\\chhenning\\16_1.bmp");
+    bmp_test< rgb8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g16bf565.bmp", "c:\\chhenning\\16_2.bmp");
     
-
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01bg.bmp", "c:\\chhenning\\1.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01bw.bmp", "c:\\chhenning\\1_1.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01p1.bmp", "c:\\chhenning\\1_2.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g01wb.bmp", "c:\\chhenning\\1_3.bmp");
-
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g04.bmp", "c:\\chhenning\\4.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g04p4.bmp", "c:\\chhenning\\4_2.bmp");
-
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08.bmp", "c:\\chhenning\\8.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08p256.bmp", "c:\\chhenning\\8_1.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08pi256.bmp", "c:\\chhenning\\8_2.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08pi64.bmp", "c:\\chhenning\\8_3.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08os2.bmp", "c:\\chhenning\\8_5.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08res22.bmp", "c:\\chhenning\\8_6.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08res11.bmp", "c:\\chhenning\\8_7.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08res21.bmp", "c:\\chhenning\\8_8.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08s0.bmp", "c:\\chhenning\\8_9.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08offs.bmp", "c:\\chhenning\\8_10.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08w126.bmp", "c:\\chhenning\\8_11.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08w125.bmp", "c:\\chhenning\\8_12.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08w124.bmp", "c:\\chhenning\\8_13.bmp");
-    //bmp_test< rgba8_image_t, rgba8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g08p64.bmp", "c:\\chhenning\\8_14.bmp");
-
-    //bmp_test< rgb8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g16def555.bmp", "c:\\chhenning\\16.bmp");
-    //bmp_test< rgb8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g16bf555.bmp", "c:\\chhenning\\16_1.bmp");
-    //bmp_test< rgb8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g16bf565.bmp", "c:\\chhenning\\16_2.bmp");
-    //
-    //bmp_test<  bgr8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g24.bmp", "c:\\chhenning\\24.bmp");
-    //bmp_test< bgra8_image_t, rgba8_image_t >("C:\\gil_contributions\\test_images\\bmp\\g32bf.bmp", "c:\\chhenning\\32.bmp");
-    //bmp_test< bgra8_image_t, rgba8_image_t >("C:\\gil_contributions\\test_images\\bmp\\g32def.bmp", "c:\\chhenning\\32_1.bmp");
+    bmp_test<  bgr8_image_t, rgb8_image_t  >("C:\\gil_contributions\\test_images\\bmp\\g24.bmp", "c:\\chhenning\\24.bmp");
+    bmp_test< bgra8_image_t, rgba8_image_t >("C:\\gil_contributions\\test_images\\bmp\\g32bf.bmp", "c:\\chhenning\\32.bmp");
+    bmp_test< bgra8_image_t, rgba8_image_t >("C:\\gil_contributions\\test_images\\bmp\\g32def.bmp", "c:\\chhenning\\32_1.bmp");
 }
 
 template< typename Image >
@@ -454,31 +464,41 @@ void pnm_test( char* in
 
     Image::view_t::x_iterator buffer_it = view(scanline).row_begin(0);
     byte_t* data = (byte_t*) &gil::at_c<0>(*buffer_it);
+    memset( data, 0, it.scanline_length() );
 
     it.set_buffer( data );
 
     Image dst( backend._info._width, backend._info._height );
+    byte_t* dst_data = (byte_t*) &gil::at_c<0>(*view( dst ).row_begin(0));
+    memset( dst_data, 0, it.scanline_length() * backend._info._height );
 
     for( pnm_image_height::type i = 0; i < backend._info._height; ++i )
     {
-        *it;
+        if( i % 2 )
+        {
+            *it;
 
-        copy_pixels( subimage_view(  view( scanline ), 0, 0, static_cast<int>(view(dst).width()), 1 )
-                    , subimage_view(      view( dst ), 0, i, static_cast<int>(view(dst).width()), 1 )
-                    );
+            copy_pixels( subimage_view(  view( scanline ), 0, 0, static_cast<int>(view(dst).width()), 1 )
+                        , subimage_view(      view( dst ), 0, i, static_cast<int>(view(dst).width()), 1 )
+                        );
+        }
+        else
+        {
+            ++it;
+        }
     }
 
-    write_view( out, color_converted_view< gray8_pixel_t >( view( dst )), png_tag() );
+    write_view( out, view( dst ), png_tag() );
 }
 
 BOOST_AUTO_TEST_CASE( pnm_test_cases )
 {
-    pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p1.pnm", "c:\\chhenning\\1.pnm.png"  );
-    pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p2.pnm", "c:\\chhenning\\2.pnm.png"  );
-    pnm_test< rgb8_image_t  > ( "C:\\gil_contributions\\test_images\\pnm\\p3.pnm", "c:\\chhenning\\3.pnm.png"  );
-    pnm_test< gray1_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p4.pnm", "c:\\chhenning\\4.pnm.png"  );
-    pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p5.pnm", "c:\\chhenning\\5.pnm.png"  );
-    pnm_test< rgb8_image_t  > ( "C:\\gil_contributions\\test_images\\pnm\\p6.pnm", "c:\\chhenning\\6.pnm.png"  );
+    //pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p1.pnm", "c:\\chhenning\\1.pnm.png"  );
+    //pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p2.pnm", "c:\\chhenning\\2.pnm.png"  );
+    //pnm_test< rgb8_image_t  > ( "C:\\gil_contributions\\test_images\\pnm\\p3.pnm", "c:\\chhenning\\3.pnm.png"  );
+    //pnm_test< gray1_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p4.pnm", "c:\\chhenning\\4.pnm.png"  );
+    //pnm_test< gray8_image_t > ( "C:\\gil_contributions\\test_images\\pnm\\p5.pnm", "c:\\chhenning\\5.pnm.png"  );
+    //pnm_test< rgb8_image_t  > ( "C:\\gil_contributions\\test_images\\pnm\\p6.pnm", "c:\\chhenning\\6.pnm.png"  );
 }
 
 

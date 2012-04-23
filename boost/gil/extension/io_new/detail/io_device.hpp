@@ -226,12 +226,23 @@ public:
 	    write( m );
     }
 
-
-    //!\todo replace with std::ios::seekdir?
     void seek( long count, int whence = SEEK_SET )
     {
-        fseek(file, count, whence );
+        io_error_if( fseek(file, count, whence ) != 0
+                   , "file read error"
+                   );
     }
+
+    long int tell()
+    {
+        long int pos = ftell( file );
+
+        io_error_if( pos == -1L
+                   , "file read error"
+                   );
+
+        return pos;
+    } 
 
     void flush()
     {

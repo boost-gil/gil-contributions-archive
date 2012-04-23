@@ -172,9 +172,9 @@ private:
 
     void skip()
     {
-        if( _reader && _buffer )
+        if( _reader )
         {
-            _reader->skip( _buffer );
+            _reader->skip();
 
             ++_pos;
         }
