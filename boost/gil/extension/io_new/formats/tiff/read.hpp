@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Lubomir Bourdev
+    Copyright 2007-2012 Christian Henning, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning, Lubomir Bourdev \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -74,6 +74,8 @@ struct reader_backend< Device
     , _settings( settings )
     , _info()
 
+    , _scanline_length( 0 )
+
     , _red  ( NULL )
     , _green( NULL )
     , _blue ( NULL )
@@ -103,6 +105,8 @@ public:
 
     image_read_settings< tiff_tag > _settings;
     image_read_info< tiff_tag >     _info;
+
+    std::size_t _scanline_length;
 
     // palette
     tiff_color_map::red_t   _red;
@@ -186,6 +190,11 @@ public:
 
         if( this->_info._photometric_interpretation == PHOTOMETRIC_PALETTE )
         {
+
+            this->_scanline_length = this->_info._width 
+                                   * num_channels< rgb16_view_t >::value 
+                                   * sizeof( channel_type<rgb16_view_t>::type );
+
             _io_dev.get_field_defaulted( this->_red
                                         , this->_green
                                         , this->_blue
@@ -337,6 +346,8 @@ public:
             }
             else if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
             {
+                this->_scanline_length = _io_dev.get_scanline_size();
+
                 // the read_data function needs to know what gil type the source image is
                 // to have the default color converter function correctly
 
@@ -443,13 +454,19 @@ public:
     /// Read part of image defined by View and return the data.
     void read( byte_t* dst, int pos )
     {
-        _read_function(this, dst, pos);
+        _read_function( this, dst, pos );
     }    
 
-   std::size_t scanline_length()
-   {
-      return _io_dev.get_scanline_size();
-   }
+    /// Skip over a scanline.
+    void skip( byte_t* dst, int pos )
+    {
+        this->_read_function( this, dst, pos );
+    }
+
+    std::size_t scanline_length()
+    {
+        return _scanline_length;
+    }
 
     void clean_up()
     {

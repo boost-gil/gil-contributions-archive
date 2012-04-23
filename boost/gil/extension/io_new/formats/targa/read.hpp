@@ -201,6 +201,12 @@ public:
         read_row( dst );
     }
 
+    /// Skip over a scanline.
+    void skip( byte_t*, int )
+    {
+        _io_dev.seek( static_cast<long>( scanline_length() ), SEEK_CUR );
+    }
+
     /// Return length of scanline in bytes.
     std::size_t scanline_length()
     {

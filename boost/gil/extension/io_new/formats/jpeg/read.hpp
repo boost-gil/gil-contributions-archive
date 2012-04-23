@@ -53,6 +53,8 @@ struct reader_backend< Device
     : _io_dev( file )
     , _settings( settings )
     , _info()
+
+    , _scanline_length( 0 )
     {
         _cinfo.err         = jpeg_std_error( &_jerr );
         _cinfo.client_data = this;
@@ -180,6 +182,7 @@ public:
     image_read_settings< jpeg_tag > _settings;
     image_read_info< jpeg_tag >     _info;
 
+    std::size_t _scanline_length;
 
     struct gil_jpeg_source_mgr
     {
@@ -256,16 +259,28 @@ public:
         switch( this->_info._color_space )
         {
             case JCS_GRAYSCALE:
-            case JCS_RGB:
+            {
+                this->_scanline_length = this->_info._width;
 
+                break;
+            }
+
+            case JCS_RGB:
             //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
             case JCS_YCbCr:
-            case JCS_CMYK: { break; }
+            {
+                this->_scanline_length = this->_info._width * num_channels< rgb8_view_t >::value;
 
+                break;
+            }
+
+
+            case JCS_CMYK:
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             case JCS_YCCK:
             {
                 this->_cinfo.out_color_space = JCS_CMYK;
+                this->_scanline_length = this->_info._width * num_channels< cmyk8_view_t >::value;
 
                 break;
             }
@@ -281,6 +296,21 @@ public:
 
         // read data
         read_scanline( dst );
+    }
+
+    /// Skip over a scanline.
+    void skip( byte_t* dst, int )
+    {
+        // Fire exception in case of error.
+        if( setjmp( this->_mark )) { this->raise_error(); }
+
+        // read data
+        read_scanline( dst );
+    }
+
+    std::size_t scanline_length()
+    {
+        return this->_scanline_length;
     }
 
     void clean_up()

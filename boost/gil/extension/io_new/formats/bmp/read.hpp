@@ -391,7 +391,7 @@ public:
     }
 
     /// Skip over a scanline.
-    void skip()
+    void skip( byte_t*, int )
     {
         // nothing to do.
     }

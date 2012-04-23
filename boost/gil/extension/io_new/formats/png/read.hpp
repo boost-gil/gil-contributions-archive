@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny, Lubomir Bourdev
+    Copyright 2007-2012 Christian Henning, Andreas Pokorny, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -724,7 +724,13 @@ public:
 
     void read( byte_t* dst, int pos )
     {
-        read_scanline(dst);
+        read_scanline( dst );
+    }
+
+    /// Skip over a scanline.
+    void skip( byte_t* dst, int )
+    {
+        read_scanline( dst );
     }
 
     void clean_up()

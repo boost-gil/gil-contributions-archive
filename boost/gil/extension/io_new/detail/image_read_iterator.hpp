@@ -63,9 +63,14 @@ public:
             std::runtime_error( "Trying to read past image." );
         }
 
+        if( pos > 0 && _buffer == null )
+        {
+            std::runtime_error( "Cannot proceed without initializing read buffer." );
+        }
+
         for( std::size_t i = 0; i < pos; ++i )
         {
-            skip();
+            _skip();
         }
     }
 
@@ -126,7 +131,12 @@ public:
     /// Pre-Increment Operator
     scanline_read_iterator< Reader >& operator++()
     {
-        skip();
+        if( _buffer == NULL )
+        {
+            throw std::runtime_error( "Cannot proceed without initializing read buffer." );
+        }
+
+        _skip();
 
         return (*this);
     }
@@ -170,11 +180,11 @@ private:
         }
     }
 
-    void skip()
+    void _skip()
     {
         if( _reader )
         {
-            _reader->skip();
+            _reader->skip( _buffer, _pos );
 
             ++_pos;
         }

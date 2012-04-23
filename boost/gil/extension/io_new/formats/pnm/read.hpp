@@ -203,7 +203,7 @@ public:
     }
 
     /// Skip over a scanline.
-    void skip()
+    void skip( byte_t*, int )
     {
         _skip_function( this );
     }
