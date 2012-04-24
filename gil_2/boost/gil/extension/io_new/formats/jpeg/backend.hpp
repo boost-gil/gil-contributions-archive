@@ -26,7 +26,7 @@ namespace boost { namespace gil {
 ///
 /// JPEG Backend
 ///
-template<typename Device>
+template< typename Device >
 struct reader_backend< Device
                      , jpeg_tag
                      >
@@ -85,6 +85,7 @@ struct reader_backend< Device
         jpeg_destroy_decompress( &_cinfo );
     }
 
+    /// Read image header.
     void read_header()
     {
         _info._width          = _cinfo.image_width;
@@ -113,6 +114,18 @@ struct reader_backend< Device
 
         _info._pixel_width_mm  = _cinfo.X_density ? (_cinfo.output_width  / double(_cinfo.X_density)) * units_conversion : 0;
         _info._pixel_height_mm = _cinfo.Y_density ? (_cinfo.output_height / double(_cinfo.Y_density)) * units_conversion : 0;
+    }
+
+    /// Return image read settings.
+    const image_read_settings< bmp_tag >& get_settings()
+    {
+        return _settings();
+    }
+    
+    /// Return image header info.
+    const image_read_info< bmp_tag >& get_info()
+    {
+        return _info();
     }
 
 protected:

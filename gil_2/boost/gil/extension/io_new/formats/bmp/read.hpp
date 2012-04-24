@@ -1,5 +1,5 @@
 /*
-    Copyright 2008 Christian Henning
+    Copyright 2012 Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,12 +15,11 @@
 /// \brief
 /// \author Christian Henning \n
 ///
-/// \date 2008 \n
+/// \date 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
-#include <boost/gil/extension/io_new/bmp_tags.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/bit_operations.hpp>
@@ -30,27 +29,14 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
+#include "backend.hpp"
 #include "is_allowed.hpp"
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil {
 
-/// Color channel mask
-struct bit_field
-{
-    unsigned int mask;  // Bit mask at corresponding position
-    unsigned int width; // Bit width of the mask
-    unsigned int shift; // Bit position from right to left
-};
-
-/// BMP color masks
-struct color_mask
-{
-    bit_field red;   // Red bits
-    bit_field green; // Green bits
-    bit_field blue;  // Blue bits
-};
-
-
+///
+/// BMP Reader
+///
 template< typename Device
         , typename ConversionPolicy
         >
@@ -61,21 +47,41 @@ class reader< Device
     : public reader_base< bmp_tag
                         , ConversionPolicy
                         >
+    , public reader_backend< Device
+                           , bmp_tag
+                           >
 {
 private:
+
+    typedef reader< Device
+                  , bmp_tag
+                  > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
 
 public:
 
+    typedef reader_backend< Device, bmp_tag > backend_t;
+
+public:
+
+    //
+    // Constructor
+    //
     reader( Device&                               device
           , const image_read_settings< bmp_tag >& settings
           )
     : reader_base< bmp_tag
-                 , ConversionPolicy >( settings )
-    , _io_dev( device )
+                 , ConversionPolicy
+                 >( settings )
+    , backend_t( device
+               , settings
+               )
     {}
 
+    //
+    // Constructor
+    //
     reader( Device&                               device
           , const cc_t&                           cc
           , const image_read_settings< bmp_tag >& settings
@@ -85,93 +91,21 @@ public:
                  >( cc
                   , settings
                   )
-      , _io_dev( device )
+    , backend_t( device
+               , settings
+               )
     {}
 
-    image_read_info< bmp_tag > get_info()
-    {
-        // read file header
 
-        // the magic number used to identify the BMP file:
-        // 0x42 0x4D (ASCII code points for B and M)
-        if( _io_dev.read_uint16() == 0x424D )
-        {
-            io_error( "Wrong magic number for bmp file." );
-        }
-
-        // the size of the BMP file in bytes
-        _io_dev.read_uint32();
-
-        // reserved; actual value depends on the application that creates the image
-        _io_dev.read_uint16();
-        // reserved; actual value depends on the application that creates the image
-        _io_dev.read_uint16();
-
-        _info._offset = _io_dev.read_uint32();
-
-
-        // bitmap information
-
-        // the size of this header ( 40 bytes )
-        _info._header_size = _io_dev.read_uint32();
-
-        if( _info._header_size == bmp_header_size::_win32_info_size )
-        {
-            _info._width  = _io_dev.read_uint32();
-            _info._height = _io_dev.read_uint32();
-
-            // the number of color planes being used. Must be set to 1.
-            _io_dev.read_uint16();
-
-            _info._bits_per_pixel = _io_dev.read_uint16();
-
-            _info._compression = _io_dev.read_uint32();
-
-            _info._image_size = _io_dev.read_uint32();
-
-            _info._horizontal_resolution = _io_dev.read_uint32();
-            _info._vertical_resolution   = _io_dev.read_uint32();
-
-            _info._num_colors           = _io_dev.read_uint32();
-            _info._num_important_colors = _io_dev.read_uint32();
-
-        }
-        else if( _info._header_size == bmp_header_size::_os2_info_size )
-        {
-            _info._width  = static_cast< bmp_image_width::type  >( _io_dev.read_uint16() );
-            _info._height = static_cast< bmp_image_height::type >( _io_dev.read_uint16() );
-
-            // the number of color planes being used. Must be set to 1.
-            _io_dev.read_uint16();
-
-            _info._bits_per_pixel = _io_dev.read_uint16();
-
-            _info._compression = bmp_compression::_rgb;
-
-            // not used
-            _info._image_size            = 0;
-            _info._horizontal_resolution = 0;
-            _info._vertical_resolution   = 0;
-            _info._num_colors            = 0;
-            _info._num_important_colors  = 0;
-        }
-        else
-        {
-            io_error( "Invalid BMP info header." );
-        }
-
-        _info._valid = true;
-
-        return _info;
-    }
-
+    /// Read image.
     template< typename View >
     void apply( const View& dst_view )
     {
-        if( !_info._valid )
+        if( this->_info._valid == false )
         {
-            get_info();
+            io_error( "Image header was not read." );
         }
+
 
         typedef typename is_same< ConversionPolicy
                                 , read_and_no_convert
@@ -230,6 +164,8 @@ public:
         {
             case 1:
             {
+                this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+
                 read_palette_image< gray1_image_t::view_t
                                   , mirror_bits< byte_vector_t
                                                , mpl::true_
@@ -250,6 +186,9 @@ public:
 				{
 				    case bmp_compression::_rle4:
 				    {
+                        ///@todo How can we determine that?
+                        this->_scanline_length = 0;
+
 					    read_palette_image_rle( dst_view
 					                          , ybeg
 					                          , yend
@@ -262,6 +201,8 @@ public:
 
 				    case bmp_compression::_rgb:
 				    {
+                        this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+
 					    read_palette_image< gray4_image_t::view_t
 									      , swap_half_bytes< byte_vector_t
 									                       , mpl::true_
@@ -291,7 +232,10 @@ public:
 				{
 				    case bmp_compression::_rle8:
 				    {
-					    read_palette_image_rle( dst_view
+                        ///@todo How can we determine that?
+                        this->_scanline_length = 0;
+                        
+                        read_palette_image_rle( dst_view
 					                          , ybeg
 					                          , yend
 					                          , yinc
@@ -302,6 +246,8 @@ public:
 
 				    case bmp_compression::_rgb:
 				    {
+                        this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+
 					    read_palette_image< gray8_image_t::view_t
 									      , do_nothing< std::vector< gray8_pixel_t > >
 									      > ( dst_view
@@ -326,6 +272,8 @@ public:
 
             case 15: case 16:
             {
+                this->_scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
+
                 read_data_15( dst_view
                             , pitch
                             , ybeg
@@ -337,39 +285,27 @@ public:
                 break;
             }
 
-            case 24: {  read_data< bgr8_view_t  >( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
-            case 32: {  read_data< bgra8_view_t >( dst_view, pitch, ybeg, yend, yinc, offset  ); break; }
+            case 24:
+            {
+                _scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
+
+                read_data< bgr8_view_t  >( dst_view, pitch, ybeg, yend, yinc, offset  ); 
+
+                break;
+            }
+
+            case 32:
+            {
+                _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+
+                read_data< bgra8_view_t >( dst_view, pitch, ybeg, yend, yinc, offset  ); 
+
+                break;
+            }
         }
     }
 
 private:
-
-    void read_palette( std::vector< rgba8_pixel_t >& palette )
-    {
-        int entries = _info._num_colors;
-
-        if( entries == 0 )
-        {
-            entries = 1 << _info._bits_per_pixel;
-        }
-
-        palette.resize( entries );
-
-        for( int i = 0; i < entries; ++i )
-        {
-            get_color( palette[i], blue_t()  ) = _io_dev.read_uint8();
-            get_color( palette[i], green_t() ) = _io_dev.read_uint8();
-            get_color( palette[i], red_t()   ) = _io_dev.read_uint8();
-
-            // there are 4 entries when windows header
-            // but 3 for os2 header
-            if( _info._header_size == bmp_header_size::_win32_info_size )
-            {
-                _io_dev.read_uint8();
-            }
-
-        } // for
-    }
 
     template< typename View_Src
             , typename Byte_Manipulator
@@ -383,9 +319,6 @@ private:
                            , std::ptrdiff_t  offset
                            )
     {
-        std::vector< rgba8_pixel_t > pal;
-        read_palette( pal );
-
         // jump to first scanline
         _io_dev.seek( static_cast< long >( offset ));
 
@@ -416,7 +349,7 @@ private:
             for( ; it != end; ++it, ++dst_it )
             {
                 unsigned char c = get_color( *it, gray_color_t() );
-                *dst_it = pal[ c ];
+                *dst_it = this->_palette[ c ];
             }
         }
     }
@@ -752,54 +685,11 @@ private:
             }
         }
 	}
-
-protected:
-
-    Device& _io_dev;
-    image_read_info< bmp_tag > _info;
 };
 
-/////////////////////////////////// dynamic image
-
-class bmp_type_format_checker
-{
-public:
-
-    bmp_type_format_checker( const bmp_bits_per_pixel::type& bpp )
-    : _bpp( bpp )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        if( _bpp < 32 )
-        {
-            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-        else
-        {
-            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-    }
-
-private:
-
-    const bmp_bits_per_pixel::type& _bpp;
-};
-
-struct bmp_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , bmp_tag
-                                           >
-    {};
-};
-
+///
+/// BMP Dynamic Reader
+///
 template< typename Device
         >
 class dynamic_image_reader< Device
@@ -858,7 +748,49 @@ public:
     }
 };
 
+namespace detail {
+
+class bmp_type_format_checker
+{
+public:
+
+    bmp_type_format_checker( const bmp_bits_per_pixel::type& bpp )
+    : _bpp( bpp )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        if( _bpp < 32 )
+        {
+            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+        else
+        {
+            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+    }
+
+private:
+
+    const bmp_bits_per_pixel::type& _bpp;
+};
+
+struct bmp_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , bmp_tag
+                                           >
+    {};
+};
+
 } // detail
+
 } // gil
 } // boost
 

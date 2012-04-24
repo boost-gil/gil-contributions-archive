@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny, Lubomir Bourdev
+    Copyright 2007-2012 Christian Henning, Andreas Pokorny, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -32,148 +32,11 @@
 #include "base.hpp"
 #include "is_allowed.hpp"
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil {
 
-template<typename Device>
-struct jpeg_decompress_mgr : public jpeg_io_base
-{
-    jpeg_decompress_mgr( Device& file )
-    : in(file)
-    {
-        _cinfo.err         = jpeg_std_error( &_jerr );
-        _cinfo.client_data = this;
-
-        // Error exit handler: does not return to caller.
-        _jerr.error_exit = &jpeg_decompress_mgr::error_exit;
-
-        if( setjmp( _mark )) { raise_error(); }
-
-        _src._jsrc.bytes_in_buffer   = 0;
-        _src._jsrc.next_input_byte   = buffer;
-        _src._jsrc.init_source       = reinterpret_cast< void(*)   ( j_decompress_ptr )>( &jpeg_decompress_mgr< Device >::init_device );
-        _src._jsrc.fill_input_buffer = reinterpret_cast< boolean(*)( j_decompress_ptr )>( &jpeg_decompress_mgr< Device >::fill_buffer );
-        _src._jsrc.skip_input_data   = reinterpret_cast< void(*)   ( j_decompress_ptr
-                                                                   , long num_bytes
-                                                                   ) >( &jpeg_decompress_mgr< Device >::skip_input_data );
-        _src._jsrc.term_source       = reinterpret_cast< void(*)   ( j_decompress_ptr ) >( &jpeg_decompress_mgr< Device >::close_device );
-        _src._jsrc.resync_to_restart = jpeg_resync_to_restart;
-        _src._this = this;
-
-        jpeg_create_decompress( &_cinfo );
-
-        _cinfo.src = &_src._jsrc;
-
-        jpeg_read_header( &_cinfo
-                        , TRUE
-                        );
-
-        io_error_if( _cinfo.data_precision != 8
-                   , "Image file is not supported."
-                   );
-    }
-
-    ~jpeg_decompress_mgr()
-    {
-        jpeg_destroy_decompress( &_cinfo );
-    }
-
-protected:
-
-    // Taken from jerror.c
-    /*
-     * Error exit handler: must not return to caller.
-     *
-     * Applications may override this if they want to get control back after
-     * an error.  Typically one would longjmp somewhere instead of exiting.
-     * The setjmp buffer can be made a private field within an expanded error
-     * handler object.  Note that the info needed to generate an error message
-     * is stored in the error object, so you can generate the message now or
-     * later, at your convenience.
-     * You should make sure that the JPEG object is cleaned up (with jpeg_abort
-     * or jpeg_destroy) at some point.
-     */
-    static void error_exit( j_common_ptr cinfo )
-    {
-        jpeg_decompress_mgr< Device >* mgr = reinterpret_cast< jpeg_decompress_mgr< Device >* >( cinfo->client_data );
-
-        longjmp( mgr->_mark, 1 );
-    }
-
-    void raise_error()
-    {
-        // we clean up in the destructor
-
-        io_error( "jpeg is invalid." );
-    }
-
-private:
-
-    // See jdatasrc.c for default implementation for the following static member functions.
-
-    static void init_device( jpeg_decompress_struct * cinfo )
-    {
-        gil_jpeg_source_mgr* src = reinterpret_cast< gil_jpeg_source_mgr* >( cinfo->src );
-        src->_jsrc.bytes_in_buffer = 0;
-        src->_jsrc.next_input_byte = src->_this->buffer;
-    }
-
-    static boolean fill_buffer( jpeg_decompress_struct * cinfo )
-    {
-        gil_jpeg_source_mgr* src = reinterpret_cast< gil_jpeg_source_mgr* >( cinfo->src );
-        size_t count= src->_this->in.read(src->_this->buffer, sizeof(src->_this->buffer) );
-
-        if( count <= 0 )
-        {
-            // libjpeg does that: adding an EOF marker
-            src->_this->buffer[0] = (JOCTET) 0xFF;
-            src->_this->buffer[1] = (JOCTET) JPEG_EOI;
-            count = 2;
-        }
-
-        src->_jsrc.next_input_byte = src->_this->buffer;
-        src->_jsrc.bytes_in_buffer = count;
-
-        return TRUE;
-    }
-
-    static void skip_input_data( jpeg_decompress_struct * cinfo, long num_bytes  )
-    {
-        gil_jpeg_source_mgr* src = reinterpret_cast< gil_jpeg_source_mgr* >( cinfo->src );
-
-        if( num_bytes > 0 )
-        {
-            while( num_bytes > long( src->_jsrc.bytes_in_buffer ))
-            {
-                num_bytes -= (long) src->_jsrc.bytes_in_buffer;
-                fill_buffer( cinfo );
-            }
-
-            src->_jsrc.next_input_byte += num_bytes;
-            src->_jsrc.bytes_in_buffer -= num_bytes;
-        }
-    }
-
-    static void close_device( jpeg_decompress_struct* ) {}
-
-protected:
-    jpeg_decompress_struct _cinfo;
-
-
-private:
-    Device &in;
-
-    struct gil_jpeg_source_mgr
-    {
-        jpeg_source_mgr      _jsrc;
-        jpeg_decompress_mgr* _this;
-    };
-
-    gil_jpeg_source_mgr _src;
-
-    // libjpeg default is 4096 - see jdatasrc.c
-    JOCTET buffer[4096];
-};
-
+///
+/// JPEG Reader
+///
 template< typename Device
         , typename ConversionPolicy
         >
@@ -181,28 +44,55 @@ class reader< Device
             , jpeg_tag
             , ConversionPolicy
             >
-    : public jpeg_decompress_mgr< Device >
-    , public reader_base< jpeg_tag
-                        , ConversionPolicy >
+    : public reader_base< jpeg_tag
+                        , ConversionPolicy
+                        >
+    , public reader_backend< Device
+                           , jpeg_tag
+                           >
 {
+private:
+
+    typedef reader< Device
+                  , bmp_tag
+                  > this_t;
+
+    typedef typename ConversionPolicy::color_converter_type cc_t;
+
 public:
+
+    typedef reader_backend< Device, bmp_tag > backend_t;
+
+public:
+
+    //
+    // Constructor
+    //
     reader( Device&                                device
           , const image_read_settings< jpeg_tag >& settings
           )
-    : jpeg_decompress_mgr<Device>( device )
-    , reader_base< jpeg_tag
+    : reader_base< jpeg_tag
                  , ConversionPolicy >( settings )
+
+    , backend_t( device
+               , settings
+               )
     {}
 
+    //
+    // Constructor
+    //
     reader( Device&                                                device
           , const typename ConversionPolicy::color_converter_type& cc
           , const image_read_settings< jpeg_tag >&                 settings
           )
-    : jpeg_decompress_mgr< Device >( device )
-    , reader_base< jpeg_tag
+    : reader_base< jpeg_tag
                  , ConversionPolicy >( cc
                                      , settings
                                      )
+    , backend_t( device
+               , settings
+               )
     {}
 
     image_read_info< jpeg_tag > get_info()
@@ -349,36 +239,10 @@ private:
     }
 };
 
-struct jpeg_type_format_checker
-{
-    jpeg_type_format_checker( jpeg_color_space::type color_space )
-    : _color_space( color_space )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        return is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                , jpeg_tag
-                                >::_color_space == _color_space;
-    }
-
-private:
-
-    jpeg_color_space::type _color_space;
-};
-
-struct jpeg_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , jpeg_tag
-                                           >
-    {};
-};
-
-template< typename Device
-        >
+///
+/// JPEG Dynamic Reader
+///
+template< typename Device >
 class dynamic_image_reader< Device
                           , jpeg_tag
                           >
@@ -433,7 +297,38 @@ public:
     }
 };
 
+namespace detail { 
+
+struct jpeg_type_format_checker
+{
+    jpeg_type_format_checker( jpeg_color_space::type color_space )
+    : _color_space( color_space )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        return is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                , jpeg_tag
+                                >::_color_space == _color_space;
+    }
+
+private:
+
+    jpeg_color_space::type _color_space;
+};
+
+struct jpeg_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , jpeg_tag
+                                           >
+    {};
+};
+
 } // detail
+
 } // gil
 } // boost
 

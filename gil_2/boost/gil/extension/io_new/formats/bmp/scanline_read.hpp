@@ -37,7 +37,7 @@
 namespace boost { namespace gil {
 
 ///
-/// BMP Reader
+/// BMP Scanline Reader
 ///
 template< typename Device >
 class scanline_reader< Device
@@ -89,7 +89,7 @@ public:
         {
             case 1:
             {
-                _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+                this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
                 read_palette();
                 _buffer.resize( _pitch );
@@ -112,7 +112,7 @@ public:
 
 				    case bmp_compression::_rgb :
                     {
-                        _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+                        this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
                         read_palette();
                         _buffer.resize( _pitch );
@@ -143,7 +143,7 @@ public:
                     }
 				    case bmp_compression::_rgb:
                     {
-                        _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+                        this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
                         read_palette();
                         _buffer.resize( _pitch );
@@ -162,7 +162,7 @@ public:
             case 15:
             case 16:
             {
-                _scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
+                this->_scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
 
                 _buffer.resize( _pitch );
 

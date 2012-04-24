@@ -136,6 +136,33 @@ struct reader_backend< Device
         _info._valid = true;
     }
 
+    void read_palette()
+    {
+        int entries = this->_info._num_colors;
+
+        if( entries == 0 )
+        {
+            entries = 1 << this->_info._bits_per_pixel;
+        }
+
+        palette.resize( entries );
+
+        for( int i = 0; i < entries; ++i )
+        {
+            get_color( palette[i], blue_t()  ) = _io_dev.read_uint8();
+            get_color( palette[i], green_t() ) = _io_dev.read_uint8();
+            get_color( palette[i], red_t()   ) = _io_dev.read_uint8();
+
+            // there are 4 entries when windows header
+            // but 3 for os2 header
+            if( _info._header_size == bmp_header_size::_win32_info_size )
+            {
+                _io_dev.read_uint8();
+            }
+
+        } // for
+    }
+
 public:
 
     Device _io_dev;
@@ -145,6 +172,7 @@ public:
 
     std::size_t _scanline_length;
 
+    ///@todo make it an image.
     std::vector< rgba8_pixel_t > _palette;
 
     color_mask _mask;

@@ -70,14 +70,11 @@ public:
 
 protected:
 
-    reader_base( const image_read_settings< FormatTag >& settings )
-    : _settings( settings )
+    reader_base()
     {}
-    reader_base( const typename ConversionPolicy::color_converter_type& cc
-               , const image_read_settings< FormatTag >&                settings
-               )
-    : _settings( settings )
-    , _cc_policy( cc )
+
+    reader_base( const image_read_settings< FormatTag >& settings )
+    : _cc_policy( cc )
     {}
 
 private:
@@ -126,9 +123,6 @@ private:
     }
 
 protected:
-
-    image_read_settings< FormatTag > _settings;
-    image_read_info< FormatTag >     _info;
 
     ///@todo Do we need this somewhere?
     ConversionPolicy _cc_policy;
