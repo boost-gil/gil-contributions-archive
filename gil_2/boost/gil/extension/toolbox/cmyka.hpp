@@ -23,18 +23,31 @@ GIL_DEFINE_ALL_TYPEDEFS(32 ,cmyka)
 GIL_DEFINE_ALL_TYPEDEFS(32s,cmyka)
 GIL_DEFINE_ALL_TYPEDEFS(32f,cmyka)
 
-/// \ingroup ColorConvert
-/// \brief Converting CMYKA to any pixel type. Note: Supports homogeneous pixels only.
-template <typename C2>
-struct default_color_converter_impl<cmyka_t,C2> {
+///// \ingroup ColorConvert
+///// \brief Converting CMYKA to any pixel type. Note: Supports homogeneous pixels only.
+//template <typename C2>
+//struct default_color_converter_impl<cmyka_t,C2> {
+//    template <typename P1, typename P2>
+//    void operator()(const P1& src, P2& dst) const {
+//        typedef typename channel_type<P1>::type T1;
+//        default_color_converter_impl<cmyk_t,C2>()(
+//            pixel<T1,cmyk_layout_t>(channel_multiply(get_color(src,cyan_t()),  get_color(src,alpha_t())), 
+//                                    channel_multiply(get_color(src,magenta_t()),get_color(src,alpha_t())), 
+//                                    channel_multiply(get_color(src,yellow_t()), get_color(src,alpha_t())),
+//									channel_multiply(get_color(src,black_t()), get_color(src,alpha_t())))
+//            ,dst);
+//    }
+//};
+template <>
+struct default_color_converter_impl<cmyka_t,rgba_t> {
     template <typename P1, typename P2>
     void operator()(const P1& src, P2& dst) const {
         typedef typename channel_type<P1>::type T1;
-        default_color_converter_impl<cmyk_t,C2>()(
-            pixel<T1,cmyk_layout_t>(channel_multiply(get_color(src,cyan_t()),  get_color(src,alpha_t())), 
-                                    channel_multiply(get_color(src,magenta_t()),get_color(src,alpha_t())), 
-                                    channel_multiply(get_color(src,yellow_t()), get_color(src,alpha_t())),
-									channel_multiply(get_color(src,black_t()), get_color(src,alpha_t())))
+        default_color_converter_impl<cmyk_t,rgba_t>()(
+            pixel<T1,cmyk_layout_t>(get_color(src,cyan_t()), 
+                                    get_color(src,magenta_t()), 
+                                    get_color(src,yellow_t()),
+									get_color(src,black_t()))
             ,dst);
     }
 };
