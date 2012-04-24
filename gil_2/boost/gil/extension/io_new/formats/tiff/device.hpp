@@ -147,6 +147,19 @@ public:
                    );
     }
 
+    void read_scanline( byte_t*        buffer
+                      , std::ptrdiff_t row
+                      , tsample_t      plane
+                      )
+    {
+        io_error_if( TIFFReadScanline( _tiff_file.get()
+                                     , reinterpret_cast< tdata_t >( buffer )
+                                     , (uint32) row
+                                     , plane           ) == -1
+                   , "Read error."
+                   );
+    }
+
     template< typename Buffer >
     void read_tile( Buffer&        buffer
                   , std::ptrdiff_t x
@@ -262,7 +275,7 @@ public:
     struct read_tag {};
     struct write_tag {};
 
-    file_stream_device( std::string const& file_name, read_tag )
+    file_stream_device( std::string const& file_name, read_tag, bool )
     {
         TIFF* tiff;
 

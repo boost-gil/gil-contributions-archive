@@ -130,6 +130,7 @@ protected:
     image_read_settings< FormatTag > _settings;
     image_read_info< FormatTag >     _info;
 
+    ///@todo Do we need this somewhere?
     ConversionPolicy _cc_policy;
 };
 

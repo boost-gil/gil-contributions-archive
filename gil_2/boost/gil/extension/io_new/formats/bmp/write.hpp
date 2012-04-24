@@ -33,21 +33,31 @@ template <> struct get_bgr_cs< 1 > { typedef gray8_view_t type; };
 template <> struct get_bgr_cs< 3 > { typedef bgr8_view_t type; };
 template <> struct get_bgr_cs< 4 > { typedef bgra8_view_t type; };
 
+
+template< typename Device >
+struct writer_backend< Device
+                     , bmp_tag
+                     >
+{
+    writer_backend( Device& device )
+    : _out( device )
+    {}
+
+    Device& _out;
+};
+
 template< typename Device >
 class writer< Device
             , bmp_tag
-            >
+            > : public writer_backend< Device
+                                     , bmp_tag
+                                     >
 {
 public:
 
     writer( Device& file )
-    : _out( file )
-    {
-    }
-
-    ~writer()
-    {
-    }
+    : writer_backend( file )
+    {}
 
     template<typename View>
     void apply( const View& view )
@@ -162,10 +172,6 @@ private:
         }
 
     }
-
-private:
-
-    Device& _out;
 };
 
 

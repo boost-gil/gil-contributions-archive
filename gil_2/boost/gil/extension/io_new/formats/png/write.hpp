@@ -47,18 +47,34 @@
 
 namespace boost { namespace gil { namespace detail {
 
-template<typename Device>
+template< typename Device >
+struct writer_backend< Device
+                     , png_tag
+                     >
+{
+    writer_backend()
+    : _png_ptr( NULL )
+    , _info_ptr( NULL )
+    {}
+
+    png_structp _png_ptr;
+    png_infop _info_ptr;
+};
+
+template< typename Device >
 class writer< Device
             , png_tag
-            > : png_io_base< Device >
+            > : public png_io_base< Device >
+              , public writer_backend< Device
+                                     , png_tag
+                                     >
 {
 
 public:
 
     writer( Device& io_dev )
     : png_io_base< Device >( io_dev )
-    , _png_ptr ( NULL )
-    , _info_ptr( NULL )
+    , writer_backend()
     {
         // Create and initialize the png_struct with the desired error handler
         // functions.  If you want to use the default stderr and longjump method,

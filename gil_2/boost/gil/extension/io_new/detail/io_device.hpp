@@ -54,35 +54,72 @@ class file_stream_device
 {
 public:
 
-   typedef FormatTag _tag_t;
+   typedef FormatTag format_tag_t;
 
 public:
+
+    /// Used to overload the constructor.
     struct read_tag {};
     struct write_tag {};
 
-    file_stream_device( std::string const& file_name, read_tag )
-        : file(0),_close(true)
+    file_stream_device( const std::string& file_name
+                      , read_tag   = read_tag()
+                      , bool close = true
+                      )
+    : file( 0 )
+    , _close( close )
     {
         io_error_if( ( file = fopen( file_name.c_str(), "rb" )) == NULL
-                , "file_stream_device: failed to open file" );
+                   , "file_stream_device: failed to open file"
+                   );
     }
 
-    file_stream_device( std::string const& file_name, write_tag )
-        : file(0),_close(true)
+    file_stream_device( const char* file_name
+                      , read_tag   = read_tag()
+                      , bool close = true
+                      )
+        : file( 0 )
+        , _close( close )
+    {
+        io_error_if( ( file = fopen( file_name, "rb" )) == NULL
+                   , "file_stream_device: failed to open file"
+                   );
+    }
+
+
+    file_stream_device( const std::string& file_name
+                      , write_tag
+                      )
+    : file( 0 )
+    , _close( true )
     {
         io_error_if( ( file = fopen( file_name.c_str(), "wb" )) == NULL
-                , "file_stream_device: failed to open file" );
+                   , "file_stream_device: failed to open file"
+                   );
     }
 
-    file_stream_device( FILE * filep)
-        : file(filep),_close(false)
+    file_stream_device( const char* file_name
+                      , write_tag
+                      )
+    : file( 0 )
+    , _close( true )
     {
+        io_error_if( ( file = fopen( file_name, "wb" )) == NULL
+                   , "file_stream_device: failed to open file"
+                   );
     }
+
+    file_stream_device( FILE* filep )
+    : file( filep )
+    , _close( false )
+    {}
 
     ~file_stream_device()
     {
-        if(_close)
-            fclose(file);
+        if( _close )
+        {
+            fclose( file );
+        }
     }
 
     int getc_unchecked()
@@ -189,12 +226,23 @@ public:
 	    write( m );
     }
 
-
-    //!\todo replace with std::ios::seekdir?
     void seek( long count, int whence = SEEK_SET )
     {
-        fseek(file, count, whence );
+        io_error_if( fseek(file, count, whence ) != 0
+                   , "file read error"
+                   );
     }
+
+    long int tell()
+    {
+        long int pos = ftell( file );
+
+        io_error_if( pos == -1L
+                   , "file read error"
+                   );
+
+        return pos;
+    } 
 
     void flush()
     {
@@ -207,15 +255,21 @@ public:
         fwrite( line.c_str(), sizeof( char ), line.size(), file );
     }
 
-private:
+    int error()
+    {
+        return ferror(file);
+    }
 
-    file_stream_device( file_stream_device const& );
-    file_stream_device& operator=( file_stream_device const& );
+    void set_close( bool close )
+    {
+        _close = close;
+    }
+
+private:
 
     FILE* file;
 
     bool _close;
-
 };
 
 
@@ -494,12 +548,16 @@ template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,v
     typedef file_stream_device< FormatTag > device_type;
 };
 
-template< typename Device, typename FormatTag, typename ConversionPolicy > class reader;
+} // namespace detail
+
+template< typename Device, typename FormatTag > class scanline_reader;
+template< typename Device, typename FormatTag, typename ConversionPolicy, typename View > class reader;
+
 template< typename Device, typename FormatTag, typename Log = no_log > class writer;
 
-template< typename Device, typename FormatTag > class dynamic_image_reader;
+template< typename Device, typename FormatTag, typename View > class dynamic_image_reader;
 template< typename Device, typename FormatTag, typename Log = no_log > class dynamic_image_writer;
-} // namespace detail
+
 } // namespace gil
 } // namespace boost
 

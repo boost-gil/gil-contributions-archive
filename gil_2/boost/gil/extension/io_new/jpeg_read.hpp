@@ -24,6 +24,7 @@
 #include "jpeg_tags.hpp"
 #include "formats/jpeg/supported_types.hpp"
 #include "formats/jpeg/read.hpp"
+#include "formats/jpeg/scanline_read.hpp"
 
 #include "detail/read_image.hpp"
 #include "detail/read_view.hpp"

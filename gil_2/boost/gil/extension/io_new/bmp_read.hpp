@@ -24,6 +24,7 @@
 #include "bmp_tags.hpp"
 #include "formats/bmp/supported_types.hpp"
 #include "formats/bmp/read.hpp"
+#include "formats/bmp/scanline_read.hpp"
 
 #include "detail/read_image.hpp"
 #include "detail/read_view.hpp"

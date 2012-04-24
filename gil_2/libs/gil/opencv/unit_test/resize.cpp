@@ -12,7 +12,7 @@ using namespace boost::gil::opencv;
 BOOST_AUTO_TEST_CASE( test_resize_nn )
 {
     rgb8_image_t src;
-    read_image( "..\\in\\in.png", src, png_tag() ); 
+//    read_image( "..\\in\\in.png", src, png_tag() ); 
 
     rgb8_image_t dst( 640, 480 );
 
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE( test_resize_nn )
 BOOST_AUTO_TEST_CASE( test_resize_linear )
 {
     rgb8_image_t src;
-    read_image( "..\\in\\in.png", src, png_tag() ); 
+//    read_image( "..\\in\\in.png", src, png_tag() ); 
 
     rgb8_image_t dst( 640, 480 );
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( test_resize_linear )
 BOOST_AUTO_TEST_CASE( test_resize_area )
 {
     rgb8_image_t src;
-    read_image( "..\\in\\in.png", src, png_tag() ); 
+//    read_image( "..\\in\\in.png", src, png_tag() ); 
 
     rgb8_image_t dst( 640, 480 );
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( test_resize_area )
 BOOST_AUTO_TEST_CASE( test_resize_bicubic )
 {
     rgb8_image_t src;
-    read_image( "..\\in\\in.png", src, png_tag() ); 
+//    read_image( "..\\in\\in.png", src, png_tag() ); 
 
     rgb8_image_t dst( 640, 480 );
 
