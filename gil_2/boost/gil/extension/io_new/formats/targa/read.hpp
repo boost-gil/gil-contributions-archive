@@ -134,7 +134,7 @@ public:
         io_error_if( !is_allowed< View >( _info, is_read_and_convert_t() ),
                      "Image types aren't compatible." );
         
-        std::ptrdiff_t yend = _settings._dim.y;
+        std::ptrdiff_t yend = this->_settings._dim.y;
         
         switch( _info._image_type )
         {
@@ -229,17 +229,17 @@ private:
                                        reinterpret_cast<typename View_Src::value_type*>( &row.front() ),
                                        _info._width * num_channels< View_Src >::value );
 
-        typename View_Src::x_iterator beg = v.row_begin( 0 ) + _settings._top_left.x;
-        typename View_Src::x_iterator end = beg + _settings._dim.x;
+        typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
+        typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
         // read bottom up since targa origin is bottom left
-        for( std::ptrdiff_t y = _settings._dim.y - 1; y > -1; --y )
+        for( std::ptrdiff_t y = this->_settings._dim.y - 1; y > -1; --y )
         {
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
             // only the bytes which are necessary.
             _io_dev.read( &row.front(), row.size() );
-            _cc_policy.read( beg, end, view.row_begin(y) );
+            this->_cc_policy.read( beg, end, view.row_begin(y) );
         }
     }
 
@@ -289,11 +289,11 @@ private:
                                                              reinterpret_cast<typename View_Src::value_type*>( &image_data.front() ),
                                                              _info._width * num_channels< View_Src >::value ) );
 
-        for( std::ptrdiff_t y = 0; y != _settings._dim.y; ++y )
+        for( std::ptrdiff_t y = 0; y != this->_settings._dim.y; ++y )
         {
-            typename View_Src::x_iterator beg = v.row_begin( y ) + _settings._top_left.x;
-            typename View_Src::x_iterator end = beg + _settings._dim.x;
-            _cc_policy.read( beg, end, view.row_begin(y) );
+            typename View_Src::x_iterator beg = v.row_begin( y ) + this->_settings._top_left.x;
+            typename View_Src::x_iterator end = beg + this->_settings._dim.x;
+            this->_cc_policy.read( beg, end, view.row_begin(y) );
         }
     }
 
@@ -372,12 +372,12 @@ public:
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        if( !_info._valid )
+        if( !this->_info._valid )
         {
             parent_t::get_info();
         }
 
-        targa_type_format_checker format_checker( _info._bits_per_pixel );
+        targa_type_format_checker format_checker( this->_info._bits_per_pixel );
 
         if( !construct_matched( images
                               , format_checker
@@ -387,7 +387,7 @@ public:
         }
         else
         {
-            init_image( images, _info );
+            init_image( images, this->_info );
 
             dynamic_io_fnobj< targa_read_is_supported
                             , parent_t
