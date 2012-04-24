@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_TIFF_IO_READ_HPP
-#define BOOST_GIL_EXTENSION_IO_TIFF_IO_READ_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_TIFF_IO_SCANLINE_READ_HPP
+#define BOOST_GIL_EXTENSION_IO_TIFF_IO_SCANLINE_READ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -463,11 +463,6 @@ public:
         this->_read_function( this, dst, pos );
     }
 
-    std::size_t scanline_length()
-    {
-        return _scanline_length;
-    }
-
     void clean_up()
     {
         ///@todo
@@ -493,7 +488,7 @@ private:
         Src_View src_view = interleaved_view( this->_info._width
                                             , 1
                                             , (typename Src_View::x_iterator) &_buffer.front()
-                                            , scanline_length()
+                                            , this->_scanline_length
                                             );
 
         dst_view_t dst_view = interleaved_view( this->_info._width
@@ -560,7 +555,7 @@ private:
 
         if( this->_io_dev.are_bytes_swapped() )
         {
-            _mirror_bites( dst, scanline_length() );
+            _mirror_bites( dst, this->_scanline_length );
         }
     }
 
@@ -576,4 +571,4 @@ private:
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_TIFF_IO_READ_HPP
+#endif // BOOST_GIL_EXTENSION_IO_TIFF_IO_SCANLINE_READ_HPP

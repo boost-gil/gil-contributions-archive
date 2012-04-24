@@ -52,13 +52,13 @@ void bmp_test( char* in
     reader_t::backend_t backend = it.backend();
 
                 
-    std::vector< byte_t > buffer( it.scanline_length() );
+    std::vector< byte_t > buffer( backend._scanline_length );
     it.set_buffer( &buffer.front() );
 
     typename Scanline::view_t scanline = interleaved_view( backend._info._width
                                                          , 1
                                                          , (typename Scanline::view_t::x_iterator) &buffer.front()
-                                                         , it.scanline_length()
+                                                         , backend._scanline_length
                                                          );
 
     Image dst( backend._info._width, backend._info._height );
@@ -135,13 +135,13 @@ void png_test( char* in
     scanline_read_iterator< reader_t > it( png_reader );
     reader_t::backend_t backend = it.backend();
 
-    std::vector< byte_t > buffer( it.scanline_length() );
+    std::vector< byte_t > buffer( backend._scanline_length );
     it.set_buffer( &buffer.front() );
 
     typename Image::view_t scanline = interleaved_view( backend._info._width
                                                          , 1
                                                          , (typename Image::view_t::x_iterator) &buffer.front()
-                                                         , it.scanline_length()
+                                                         , backend._scanline_length
                                                          );
 
     Image dst( backend._info._width, backend._info._height );
@@ -300,13 +300,13 @@ void jpeg_test( char* in
     scanline_read_iterator< reader_t > it( jpeg_reader );
     const reader_t::backend_t& backend = it.backend();
 
-    std::vector< byte_t > buffer( it.scanline_length() );
+    std::vector< byte_t > buffer( backend._scanline_length );
     it.set_buffer( &buffer.front() );
 
     typename Image::view_t scanline = interleaved_view( backend._info._width
                                                          , 1
                                                          , (typename Image::view_t::x_iterator) &buffer.front()
-                                                         , it.scanline_length()
+                                                         , backend._scanline_length
                                                          );
 
     Image dst( backend._info._width, backend._info._height );
@@ -356,13 +356,13 @@ void tiff_test( char* in
     scanline_read_iterator< reader_t > it( tiff_reader );
     const reader_t::backend_t& backend = it.backend();
 
-    std::vector< byte_t > buffer( it.scanline_length() );
+    std::vector< byte_t > buffer( backend._scanline_length );
     it.set_buffer( &buffer.front() );
 
     typename Image::view_t scanline = interleaved_view( backend._info._width
                                                          , 1
                                                          , (typename Image::view_t::x_iterator) &buffer.front()
-                                                         , it.scanline_length()
+                                                         , backend._scanline_length
                                                          );
 
     Image dst( backend._info._width, backend._info._height );
@@ -438,13 +438,13 @@ void targa_test( char* in
     scanline_read_iterator< reader_t > it( targa_reader );
     const reader_t::backend_t& backend = it.backend();
 
-    std::vector< byte_t > buffer( it.scanline_length() );
+    std::vector< byte_t > buffer( backend._scanline_length );
     it.set_buffer( &buffer.front() );
 
     typename Image::view_t scanline = interleaved_view( backend._info._width
                                                          , 1
                                                          , (typename Image::view_t::x_iterator) &buffer.front()
-                                                         , it.scanline_length()
+                                                         , backend._scanline_length
                                                          );
 
     Image dst( backend._info._width, backend._info._height );
@@ -500,13 +500,13 @@ void pnm_test( char* in
 
     Image::view_t::x_iterator buffer_it = view(scanline).row_begin(0);
     byte_t* data = (byte_t*) &gil::at_c<0>(*buffer_it);
-    memset( data, 0, it.scanline_length() );
+    memset( data, 0, backend._scanline_length );
 
     it.set_buffer( data );
 
     Image dst( backend._info._width, backend._info._height );
     byte_t* dst_data = (byte_t*) &gil::at_c<0>(*view( dst ).row_begin(0));
-    memset( dst_data, 0, it.scanline_length() * backend._info._height );
+    memset( dst_data, 0, backend._scanline_length * backend._info._height );
 
     for( pnm_image_height::type i = 0; i < backend._info._height; ++i )
     {

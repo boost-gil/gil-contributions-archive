@@ -34,6 +34,9 @@
     <Filter Include="Header Files\formats\tiff">
       <UniqueIdentifier>{811c4028-1b38-4aaa-b20c-bdb30cc2649d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\formats\targa">
+      <UniqueIdentifier>{2da9c5f1-f164-4379-8f2e-62211f45c896}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\boost\gil\extension\io_new\detail\base.hpp">
@@ -112,9 +115,6 @@
       <Filter>Header Files\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\is_allowed.hpp">
-      <Filter>Header Files\formats\bmp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\read.hpp">
       <Filter>Header Files\formats\bmp</Filter>
     </ClInclude>
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\supported_types.hpp">
@@ -213,9 +213,90 @@
     <ClInclude Include="..\boost\gil\extension\io_new\tiff_write.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\base.hpp">
+      <Filter>Header Files\formats\png</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\is_allowed.hpp">
+      <Filter>Header Files\formats\png</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\supported_types.hpp">
+      <Filter>Header Files\formats\png</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\write.hpp">
+      <Filter>Header Files\formats\png</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\base.hpp">
+      <Filter>Header Files\formats\jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\is_allowed.hpp">
+      <Filter>Header Files\formats\jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\supported_types.hpp">
+      <Filter>Header Files\formats\jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\write.hpp">
+      <Filter>Header Files\formats\jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\device.hpp">
+      <Filter>Header Files\formats\tiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\is_allowed.hpp">
+      <Filter>Header Files\formats\tiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\log.hpp">
+      <Filter>Header Files\formats\tiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\supported_types.hpp">
+      <Filter>Header Files\formats\tiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\write.hpp">
+      <Filter>Header Files\formats\tiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\is_allowed.hpp">
+      <Filter>Header Files\formats\targa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\supported_types.hpp">
+      <Filter>Header Files\formats\targa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\write.hpp">
+      <Filter>Header Files\formats\targa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\is_allowed.hpp">
+      <Filter>Header Files\formats\pnm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\supported_types.hpp">
+      <Filter>Header Files\formats\pnm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\write.hpp">
+      <Filter>Header Files\formats\pnm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\scanline_read.hpp">
+      <Filter>Header Files\formats\png</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\scanline_read.hpp">
+      <Filter>Header Files\formats\pnm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\scanline_read.hpp">
+      <Filter>Header Files\formats\targa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\scanline_read.hpp">
+      <Filter>Header Files\formats\tiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\scanline_read.hpp">
+      <Filter>Header Files\formats\jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\scanline_read.hpp">
+      <Filter>Header Files\formats\bmp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libs\gil\io_new\test\iterator_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\gil\io_new\test\test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\gil\io_new\test\device_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

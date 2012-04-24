@@ -50,9 +50,33 @@
     <ClInclude Include="..\boost\gil\extension\io_new\detail\typedefs.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\detail\write_view.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\is_allowed.hpp" />
-    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\scanline_read.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\supported_types.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\formats\bmp\write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\base.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\is_allowed.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\scanline_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\supported_types.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\jpeg\write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\base.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\is_allowed.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\scanline_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\supported_types.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\png\write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\is_allowed.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\scanline_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\supported_types.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\pnm\write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\is_allowed.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\scanline_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\supported_types.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\targa\write.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\device.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\is_allowed.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\log.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\scanline_read.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\supported_types.hpp" />
+    <ClInclude Include="..\boost\gil\extension\io_new\formats\tiff\write.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\jpeg_all.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\jpeg_io_old.hpp" />
     <ClInclude Include="..\boost\gil\extension\io_new\jpeg_read.hpp" />
@@ -80,7 +104,11 @@
     <ClInclude Include="..\boost\gil\extension\io_new\tiff_write.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\libs\gil\io_new\test\iterator_test.cpp" />
+    <ClCompile Include="..\libs\gil\io_new\test\device_test.cpp" />
+    <ClCompile Include="..\libs\gil\io_new\test\iterator_test.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
+    </ClCompile>
+    <ClCompile Include="..\libs\gil\io_new\test\test.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F6A5EA74-3408-4295-B485-07CA3A2288C1}</ProjectGuid>
@@ -96,7 +124,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -153,7 +181,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\chhenning\lib\debug\64bit</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jpeg.lib;libtiff.lib;libpng.lib;zlibwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -163,16 +191,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>c:\boost;C:\gil_contributions\gil_2\;C:\chhenning\tiff-3.9.4\libtiff;C:\chhenning\zlib-1.2.5;C:\chhenning\lpng143;C:\chhenning\jpeg-8b;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj /MP4 %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>c:\boost;C:\gil_contributions_svn\gil-contributions\sandbox;C:\chhenning\opencv\include\opencv;C:\gil_contributions\gil_2\;C:\chhenning\tiff\tiff-3.9.5\libtiff;C:\chhenning\zlib-1.2.5;C:\chhenning\png\lpng154;C:\chhenning\jpeg\jpeg-8c;C:\chhenning\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\boost\stage\lib\64bit;C:\chhenning\lib\debug\64bit</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jpeg.lib;libpng.lib;libtiff.lib;zlibwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\boost\stage\lib\x64;C:\chhenning\lib\x64\debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libtiff_3.9.5.lib;libjpeg_8c.lib;libpng_1.5.4.lib;zlib_1.2.5.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

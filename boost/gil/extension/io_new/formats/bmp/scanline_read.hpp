@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_BMP_IO_READ_HPP
-#define BOOST_GIL_EXTENSION_IO_BMP_IO_READ_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_BMP_IO_SCANLINE_READ_HPP
+#define BOOST_GIL_EXTENSION_IO_BMP_IO_SCANLINE_READ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -68,6 +68,7 @@ struct reader_backend< Device
     : _io_dev  ( device   )
     , _settings( settings )
     , _info()
+    , _scanline_length( 0 )
     , _palette()
     {}
 
@@ -80,6 +81,8 @@ struct reader_backend< Device
 
     image_read_settings< bmp_tag > _settings;
     image_read_info< bmp_tag >     _info;
+
+    std::size_t _scanline_length;
 
     std::vector< rgba8_pixel_t > _palette;
 
@@ -118,7 +121,6 @@ public:
     : reader_backend( device, settings )
 
     , _pitch( 0 )
-    , _scanline_length( 0 )
     {}
 
     void read_header()
@@ -396,12 +398,6 @@ public:
         // nothing to do.
     }
 
-    /// Return length of scanline in bytes.
-    std::size_t scanline_length()
-    {
-        return _scanline_length;
-    }
-
 private:
 
     void read_palette()
@@ -540,8 +536,6 @@ private:
     // the row pitch must be multiple of 4 bytes
     int _pitch;
 
-    int _scanline_length;
-
     std::vector< byte_t > _buffer;
     detail::mirror_bits    < std::vector< byte_t >, mpl::true_ > _mirror_bits;
     detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
@@ -553,4 +547,4 @@ private:
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_BMP_IO_READ_HPP
+#endif // BOOST_GIL_EXTENSION_IO_BMP_IO_SCANLINE_READ_HPP

@@ -23,7 +23,7 @@
 
 #include "png_tags.hpp"
 #include "formats/png/supported_types.hpp"
-#include "formats/png/read.hpp"
+#include "formats/png/scanline_read.hpp"
 
 #include "detail/read_image.hpp"
 #include "detail/read_view.hpp"

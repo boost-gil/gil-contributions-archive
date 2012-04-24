@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_PNM_IO_READ_HPP
-#define BOOST_GIL_EXTENSION_IO_PNM_IO_READ_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_PNM_IO_SCANLINE_READ_HPP
+#define BOOST_GIL_EXTENSION_IO_PNM_IO_SCANLINE_READ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -52,7 +52,8 @@ struct reader_backend< Device
     : _io_dev  ( device   )
     , _settings( settings )
     , _info()
-    , _pitch( 0 )
+
+    , _scanline_length( 0 )
     {}
 
     ~reader_backend()
@@ -65,7 +66,7 @@ struct reader_backend< Device
     image_read_settings< pnm_tag > _settings;
     image_read_info< pnm_tag >     _info;
 
-    std::size_t _pitch;
+    std::size_t _scanline_length;
 };
 
 ///
@@ -137,7 +138,7 @@ public:
 			case pnm_image_type::mono_asc_t::value:  
 			case pnm_image_type::gray_asc_t::value:
             {
-                this->_pitch = this->_info._width;
+                this->_scanline_length = this->_info._width;
 
                 _read_function = boost::mem_fn( &this_t::read_text_row );
                 _skip_function = boost::mem_fn( &this_t::skip_text_row );
@@ -147,7 +148,7 @@ public:
 
 			case pnm_image_type::color_asc_t::value:
             {
-                this->_pitch = this->_info._width * num_channels< rgb8_view_t >::value;
+                this->_scanline_length = this->_info._width * num_channels< rgb8_view_t >::value;
 
                 _read_function = boost::mem_fn( &this_t::read_text_row ); 
                 _skip_function = boost::mem_fn( &this_t::skip_text_row );
@@ -160,7 +161,7 @@ public:
             {
                 //gray1_image_t
 
-                this->_pitch = ( this->_info._width + 7 ) >> 3;
+                this->_scanline_length = ( this->_info._width + 7 ) >> 3;
 
                 _read_function = boost::mem_fn( &this_t::read_binary_bit_row );
                 _skip_function = boost::mem_fn( &this_t::skip_binary_row     );
@@ -171,7 +172,7 @@ public:
 			case pnm_image_type::gray_bin_t::value:
             {
                 // gray8_image_t
-                this->_pitch = this->_info._width;
+                this->_scanline_length = this->_info._width;
 
                 _read_function = boost::mem_fn( &this_t::read_binary_byte_row ); 
                 _skip_function = boost::mem_fn( &this_t::skip_binary_row      ); 
@@ -182,7 +183,7 @@ public:
 			case pnm_image_type::color_bin_t::value:
             {
                 // rgb8_image_t
-                this->_pitch = this->_info._width * num_channels< rgb8_view_t >::value;
+                this->_scanline_length = this->_info._width * num_channels< rgb8_view_t >::value;
 
                 _read_function = boost::mem_fn( &this_t::read_binary_byte_row ); 
                 _skip_function = boost::mem_fn( &this_t::skip_binary_row      );
@@ -208,18 +209,11 @@ public:
         _skip_function( this );
     }
 
-    /// Return length of scanline in bytes.
-    std::size_t scanline_length()
-    {
-        return _pitch;
-    }
-
-
 private:
 
     void read_text_row( byte_t* dst )
     {
-        for( std::size_t x = 0; x < scanline_length(); ++x )
+        for( std::size_t x = 0; x < backend._scanline_length; ++x )
         {
             for( uint32_t k = 0; ; )
             {
@@ -258,7 +252,7 @@ private:
 
     void skip_text_row()
     {
-        for( std::size_t x = 0; x < scanline_length(); ++x )
+        for( std::size_t x = 0; x < backend._scanline_length; ++x )
         {
             for( uint32_t k = 0; ; )
             {
@@ -284,24 +278,24 @@ private:
     void read_binary_bit_row( byte_t* dst )
     {
         _io_dev.read( dst
-                    , this->_pitch
+                    , this->_scanline_length
                     );
 
-        _negate_bits    ( dst, scanline_length() );
-        _swap_half_bytes( dst, scanline_length() );
+        _negate_bits    ( dst, backend._scanline_length );
+        _swap_half_bytes( dst, backend._scanline_length );
 
     }
 
     void read_binary_byte_row( byte_t* dst )
     {
         _io_dev.read( dst
-                    , this->_pitch
+                    , this->_scanline_length
                     );
     }
 
     void skip_binary_row()
     {
-        _io_dev.seek( static_cast<long>( this->_pitch ), SEEK_CUR );
+        _io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
     }
 
 private:
@@ -377,4 +371,4 @@ private:
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_PNM_IO_READ_HPP
+#endif // BOOST_GIL_EXTENSION_IO_PNM_IO_SCANLINE_READ_HPP

@@ -21,7 +21,7 @@
 
 #include "targa_tags.hpp"
 #include "formats/targa/supported_types.hpp"
-#include "formats/targa/read.hpp"
+#include "formats/targa/scanline_read.hpp"
 
 #include "detail/read_image.hpp"
 #include "detail/read_view.hpp"

@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_JPEG_IO_READ_HPP
-#define BOOST_GIL_EXTENSION_IO_JPEG_IO_READ_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_JPEG_IO_SCANLINE_READ_HPP
+#define BOOST_GIL_EXTENSION_IO_JPEG_IO_SCANLINE_READ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -308,11 +308,6 @@ public:
         read_scanline( dst );
     }
 
-    std::size_t scanline_length()
-    {
-        return this->_scanline_length;
-    }
-
     void clean_up()
     {
         ///@todo
@@ -339,4 +334,4 @@ private:
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_JPEG_IO_READ_HPP
+#endif // BOOST_GIL_EXTENSION_IO_JPEG_IO_SCANLINE_READ_HPP

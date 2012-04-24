@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_READ_HPP
-#define BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_READ_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_SCANLINE_READ_HPP
+#define BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_SCANLINE_READ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -53,6 +53,7 @@ struct reader_backend< Device
 
     , _settings( settings )
     , _info()
+    , _scanline_length( 0 )
 
     , _png_ptr ( NULL )
     , _info_ptr( NULL )
@@ -61,6 +62,8 @@ struct reader_backend< Device
 
     image_read_settings< png_tag > _settings;
     image_read_info    < png_tag > _info;
+
+    std::size_t _scanline_length;
 
     png_structp _png_ptr;
     png_infop   _info_ptr;
@@ -647,8 +650,6 @@ public:
 
     void initialize()
     {
-        // The info structures are filled at this point.
-
         // Now it's time for some transformations.
 
         if( little_endian() )
@@ -720,6 +721,10 @@ public:
         this->_info._color_type = png_get_color_type( _png_ptr
                                                     , _info_ptr
                                                     );
+
+        _scanline_length = png_get_rowbytes( _png_ptr
+                                           , _info_ptr
+                                           );
     }
 
     void read( byte_t* dst, int pos )
@@ -743,16 +748,6 @@ public:
         //            );
     }
 
-    /// Return length of scanline in bytes.
-    std::size_t scanline_length()
-    {
-        return png_get_rowbytes( _png_ptr
-                               , _info_ptr
-                               );
-    }
-
-
-
 private:
 
     void read_scanline( byte_t* dst )
@@ -770,103 +765,7 @@ private:
     boost::function< void ( this_t*, byte_t* ) > _read_function;
 };
 
-struct png_type_format_checker
-{
-    png_type_format_checker( png_bitdepth::type   bit_depth
-                           , png_color_type::type color_type
-                           )
-    : _bit_depth ( bit_depth  )
-    , _color_type( color_type )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                 , png_tag
-                                 > is_supported_t;
-
-        return is_supported_t::_bit_depth  == _bit_depth
-            && is_supported_t::_color_type == _color_type;
-    }
-
-private:
-
-    png_bitdepth::type   _bit_depth;
-    png_color_type::type _color_type;
-};
-
-struct png_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , png_tag
-                                           >
-    {};
-};
-
-template< typename Device
-        , typename View
-        >
-class dynamic_image_reader< Device
-                          , png_tag
-                          , View
-                          >
-    : public reader< Device
-                   , png_tag
-                   , read_and_no_convert
-                   , View
-                   >
-{
-    typedef reader< Device
-                  , png_tag
-                  , read_and_no_convert
-                  , View
-                  > parent_t;
-
-public:
-
-    dynamic_image_reader( Device&                               device
-                        , const image_read_settings< png_tag >& settings
-                        )
-    : parent_t( device
-              , settings
-              )
-    {}
-
-    template< typename Images >
-    void apply( any_image< Images >& images )
-    {
-        png_type_format_checker format_checker( this->_info._bit_depth
-                                              , this->_info._color_type
-                                              );
-
-        if( !construct_matched( images
-                              , format_checker
-                              ))
-        {
-            io_error( "No matching image type between those of the given any_image and that of the file" );
-        }
-        else
-        {
-            init_image( images
-                      , this->_info
-                      );
-
-            detail::dynamic_io_fnobj< png_read_is_supported
-                                    , parent_t
-                                    > op( this );
-
-            apply_operation( view( images )
-                           , op
-                           );
-        }
-    }
-};
-
 } // namespace gil
 } // namespace boost
 
-
-
-#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_READ_HPP
+#endif // BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_SCANLINE_READ_HPP

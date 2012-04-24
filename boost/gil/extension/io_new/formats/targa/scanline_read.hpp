@@ -7,8 +7,8 @@
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_IO_TARGA_IO_READ_HPP
-#define BOOST_GIL_EXTENSION_IO_TARGA_IO_READ_HPP
+#ifndef BOOST_GIL_EXTENSION_IO_TARGA_IO_SCANLINE_READ_HPP
+#define BOOST_GIL_EXTENSION_IO_TARGA_IO_SCANLINE_READ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
@@ -49,6 +49,7 @@ struct reader_backend< Device
     : _io_dev  ( device   )
     , _settings( settings )
     , _info()
+    , _scanline_length(0)
     {}
 
     ~reader_backend()
@@ -57,6 +58,8 @@ struct reader_backend< Device
     }
 
     Device _io_dev;
+
+    std::size_t _scanline_length;
 
     image_read_settings< targa_tag > _settings;
     image_read_info< targa_tag >     _info;
@@ -171,6 +174,8 @@ public:
                     case 24:
                     case 32:
                     {
+                        this->_scanline_length = this->_info._width * ( this->_info._bits_per_pixel / 8 );
+
                         // jump to first scanline
                         this->_io_dev.seek( static_cast<long>(_info._offset) );
 
@@ -204,24 +209,18 @@ public:
     /// Skip over a scanline.
     void skip( byte_t*, int )
     {
-        _io_dev.seek( static_cast<long>( scanline_length() ), SEEK_CUR );
-    }
-
-    /// Return length of scanline in bytes.
-    std::size_t scanline_length()
-    {
-        return this->_info._width * ( this->_info._bits_per_pixel / 8 );
+        _io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
     }
 
 private:
 
     void read_row( byte_t* dst )
     {
-        _io_dev.read( dst, scanline_length() );
+        _io_dev.read( dst, this->_scanline_length );
     }
 };
 
 } // namespace gil
 } // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_IO_TARGA_IO_READ_HPP
+#endif // BOOST_GIL_EXTENSION_IO_TARGA_IO_SCANLINE_READ_HPP

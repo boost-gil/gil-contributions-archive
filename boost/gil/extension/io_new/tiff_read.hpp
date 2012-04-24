@@ -23,7 +23,7 @@
 
 #include "tiff_tags.hpp"
 #include "formats/tiff/supported_types.hpp"
-#include "formats/tiff/read.hpp"
+#include "formats/tiff/scanline_read.hpp"
 
 #include "detail/read_view.hpp"
 #include "detail/read_image.hpp"
