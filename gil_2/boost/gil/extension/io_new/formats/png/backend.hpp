@@ -23,6 +23,18 @@
 
 namespace boost { namespace gil {
 
+template<typename Device>
+class png_io_base
+{
+public:
+    png_io_base( Device & io_dev )
+        : _io_dev(io_dev)
+    {}
+
+
+};
+
+
 ///
 /// PNG Backend
 ///
@@ -30,12 +42,11 @@ template<typename Device >
 struct reader_backend< Device
                      , png_tag
                      >
-    : public png_io_base< Device >
 {
-    reader_backend( const Device&                         device
+    reader_backend( Device&                               device
                   , const image_read_settings< png_tag >& settings
                   )
-    : png_io_base< Device >( device )
+    : _io_dev( device )
 
     , _settings( settings )
     , _info()
@@ -44,7 +55,9 @@ struct reader_backend< Device
     , _png_ptr ( NULL )
     , _info_ptr( NULL )
     , _number_passes( 0 )
-    {}
+    {
+        init_reader();
+    }
 
     void read_header()
     {
@@ -575,7 +588,152 @@ struct reader_backend< Device
 */
     }
 
+protected:
+
+    static void read_data( png_structp png_ptr
+                         , png_bytep   data
+                         , png_size_t length
+                         )
+    {
+        static_cast<Device*>(png_get_io_ptr(png_ptr) )->read( data
+                                                            , length );
+    }
+
+    static void write_data( png_structp png_ptr
+                          , png_bytep   data
+                          , png_size_t  length
+                          )
+    {
+        static_cast<Device*>( png_get_io_ptr( png_ptr ))->write( data
+                                                               , length );
+    }
+
+    static void flush( png_structp png_ptr )
+    {
+        static_cast<Device*>(png_get_io_ptr(png_ptr) )->flush();
+    }
+
+
+    static int read_user_chunk_callback( png_struct*        /* png_ptr */
+                                       , png_unknown_chunkp /* chunk */
+                                       )
+    {
+        // @todo
+        return 0;
+    }
+
+    static void read_row_callback( png_structp /* png_ptr    */
+                                 , png_uint_32 /* row_number */
+                                 , int         /* pass       */
+                                 )
+    {
+        // @todo
+    }
+private:
+
+    void init_reader()
+    {
+        byte_t buf[PNG_BYTES_TO_CHECK];
+
+        io_error_if(_io_dev.read(buf, PNG_BYTES_TO_CHECK) != PNG_BYTES_TO_CHECK,
+                "png_check_validity: failed to read image");
+
+        io_error_if(png_sig_cmp(png_bytep(buf), png_size_t(0), PNG_BYTES_TO_CHECK)!=0,
+                "png_check_validity: invalid png image");
+
+        // Create and initialize the png_struct with the desired error handler
+        // functions.  If you want to use the default stderr and longjump method,
+        // you can supply NULL for the last three parameters.  We also supply the
+        // the compiler header file version, so that we know if the application
+        // was compiled with a compatible version of the library.  REQUIRED
+        _png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING
+                                         , NULL  // user_error_ptr
+                                         , NULL  // user_error_fn
+                                         , NULL  // user_warning_fn
+                                         );
+
+        io_error_if( _png_ptr == NULL
+                   , "png_reader: fail to call png_create_write_struct()"
+                   );
+
+        png_uint_32 user_chunk_data[4];
+        user_chunk_data[0] = 0;
+        user_chunk_data[1] = 0;
+        user_chunk_data[2] = 0;
+        user_chunk_data[3] = 0;
+        png_set_read_user_chunk_fn( _png_ptr
+                                  , user_chunk_data
+                                  , png_io_base< Device >::read_user_chunk_callback
+                                  );
+
+        // Allocate/initialize the memory for image information.  REQUIRED.
+        _info_ptr = png_create_info_struct( _png_ptr );
+
+        if( _info_ptr == NULL )
+        {
+            png_destroy_read_struct( &_png_ptr
+                                   , NULL
+                                   , NULL
+                                   );
+
+            io_error( "png_reader: fail to call png_create_info_struct()" );
+        }
+
+        // Set error handling if you are using the setjmp/longjmp method (this is
+        // the normal method of doing things with libpng).  REQUIRED unless you
+        // set up your own error handlers in the png_create_read_struct() earlier.
+        if( setjmp( png_jmpbuf( _png_ptr )))
+        {
+            //free all of the memory associated with the png_ptr and info_ptr
+            png_destroy_read_struct( &_png_ptr
+                                   , &_info_ptr
+                                   , NULL
+                                   );
+
+            io_error( "png is invalid" );
+        }
+
+        png_set_read_fn( _png_ptr
+                       , static_cast< png_voidp >( &this->_io_dev )
+                       , png_io_base< Device >::read_data
+                       );
+
+        // Set up a callback function that will be
+        // called after each row has been read, which you can use to control
+        // a progress meter or the like.
+        png_set_read_status_fn( _png_ptr
+                              , png_io_base< Device >::read_row_callback
+                              );
+
+        // Set up a callback which implements user defined transformation.
+        // @todo
+        png_set_read_user_transform_fn( _png_ptr
+                                      , png_user_transform_ptr( NULL )
+                                      );
+
+        png_set_keep_unknown_chunks( _png_ptr
+                                   , PNG_HANDLE_CHUNK_ALWAYS
+                                   , NULL
+                                   , 0
+                                   );
+
+
+        // Make sure we read the signature.
+        // @todo make it an option
+        png_set_sig_bytes( _png_ptr
+                         , PNG_BYTES_TO_CHECK
+                         );
+
+        // The call to png_read_info() gives us all of the information from the
+        // PNG file before the first IDAT (image data chunk).  REQUIRED
+        png_read_info( _png_ptr
+                     , _info_ptr
+                     );
+    }
+
 public:
+
+    Device& _io_dev;
 
     image_read_settings< png_tag > _settings;
     image_read_info    < png_tag > _info;

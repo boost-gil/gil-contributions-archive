@@ -1,5 +1,5 @@
 /*
-    Copyright 2010 Kenneth Riddile
+    Copyright 2012 Kenneth Riddile, Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -13,9 +13,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
 /// \brief
-/// \author Kenneth Riddile \n
+/// \author Kenneth Riddile, Christian Henning \n
 ///
-/// \date 2010 \n
+/// \date 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -30,6 +30,7 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
+#include "backend.hpp"
 #include "is_allowed.hpp"
 
 namespace boost { namespace gil { namespace detail {
@@ -296,54 +297,12 @@ private:
             this->_cc_policy.read( beg, end, view.row_begin(y) );
         }
     }
-
-protected:
-
-    Device& _io_dev;
-    image_read_info< targa_tag > _info;
 };
 
-/////////////////////////////////// dynamic image
 
-class targa_type_format_checker
-{
-public:
-
-    targa_type_format_checker( const targa_depth::type& bpp )
-    : _bpp( bpp )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        if( _bpp < 32 )
-        {
-            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-        else
-        {
-            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-    }
-
-private:
-
-    const targa_depth::type& _bpp;
-};
-
-struct targa_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , targa_tag
-                                           >
-    {};
-};
-
+///
+/// Targa Dynamic Image Reader
+///
 template< typename Device
         >
 class dynamic_image_reader< Device
@@ -400,7 +359,49 @@ public:
     }
 };
 
+namespace detail { 
+
+class targa_type_format_checker
+{
+public:
+
+    targa_type_format_checker( const targa_depth::type& bpp )
+    : _bpp( bpp )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        if( _bpp < 32 )
+        {
+            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+        else
+        {
+            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+    }
+
+private:
+
+    const targa_depth::type& _bpp;
+};
+
+struct targa_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , targa_tag
+                                           >
+    {};
+};
+
 } // detail
+
 } // gil
 } // boost
 

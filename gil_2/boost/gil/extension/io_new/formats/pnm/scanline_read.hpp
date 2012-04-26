@@ -101,7 +101,6 @@ public:
 			case pnm_image_type::mono_bin_t::value:
             {
                 //gray1_image_t
-
                 this->_scanline_length = ( this->_info._width + 7 ) >> 3;
 
                 _read_function = boost::mem_fn( &this_t::read_binary_bit_row );
@@ -154,7 +153,7 @@ private:
 
     void read_text_row( byte_t* dst )
     {
-        for( std::size_t x = 0; x < backend._scanline_length; ++x )
+        for( std::size_t x = 0; x < this->_scanline_length; ++x )
         {
             for( uint32_t k = 0; ; )
             {
@@ -193,7 +192,7 @@ private:
 
     void skip_text_row()
     {
-        for( std::size_t x = 0; x < backend._scanline_length; ++x )
+        for( std::size_t x = 0; x < this->_scanline_length; ++x )
         {
             for( uint32_t k = 0; ; )
             {
@@ -222,8 +221,8 @@ private:
                     , this->_scanline_length
                     );
 
-        _negate_bits    ( dst, backend._scanline_length );
-        _swap_half_bytes( dst, backend._scanline_length );
+        _negate_bits    ( dst, this->_scanline_length );
+        _swap_half_bytes( dst, this->_scanline_length );
 
     }
 

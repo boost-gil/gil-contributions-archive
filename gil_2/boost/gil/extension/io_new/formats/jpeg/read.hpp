@@ -28,7 +28,7 @@
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
-
+    
 #include "base.hpp"
 #include "is_allowed.hpp"
 
@@ -61,7 +61,7 @@ private:
 
 public:
 
-    typedef reader_backend< Device, bmp_tag > backend_t;
+    typedef reader_backend< Device, jpeg_tag > backend_t;
 
 public:
 
@@ -95,39 +95,6 @@ public:
                )
     {}
 
-    image_read_info< jpeg_tag > get_info()
-    {
-        image_read_info<jpeg_tag> ret;
-        ret._width          = this->_cinfo.image_width;
-        ret._height         = this->_cinfo.image_height;
-        ret._num_components = this->_cinfo.num_components;
-        ret._color_space    = this->_cinfo.jpeg_color_space;
-        ret._data_precision = this->_cinfo.data_precision;
-
-        ret._density_unit = this->_cinfo.density_unit;
-        ret._x_density    = this->_cinfo.X_density;
-        ret._y_density    = this->_cinfo.Y_density;
-
-        // obtain real world dimensions
-        // taken from https://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/read.cpp#cl-62
-        jpeg_calc_output_dimensions( &this->_cinfo );
-
-        double units_conversion = 0;
-        if (this->_cinfo.density_unit == 1) // dots per inch
-        {
-            units_conversion = 25.4; // millimeters in an inch
-        }
-        else if (this->_cinfo.density_unit == 2) // dots per cm
-        {
-            units_conversion = 10; // millimeters in a centimeter
-        }
-
-        ret._pixel_width_mm  = this->_cinfo.X_density ? (this->_cinfo.output_width  / double(this->_cinfo.X_density)) * units_conversion : 0;
-        ret._pixel_height_mm = this->_cinfo.Y_density ? (this->_cinfo.output_height / double(this->_cinfo.Y_density)) * units_conversion : 0;
-
-        return ret;
-    }
-
     template<typename View>
     void apply( const View& view )
     {
@@ -154,18 +121,31 @@ public:
 
         switch( this->_info._color_space )
         {
-            case JCS_GRAYSCALE: { read_rows< gray8_pixel_t >( view ); break; }
-            case JCS_RGB:       { read_rows< rgb8_pixel_t  >( view ); break; }
+            case JCS_GRAYSCALE:
+            {
+                this->_scanline_length = this->_info._width;
+                read_rows< gray8_pixel_t >( view );
 
+                break;
+            }
+
+            case JCS_RGB:
             //!\todo add Y'CbCr? We loose image quality when reading JCS_YCbCr as JCS_RGB
-            case JCS_YCbCr:     { read_rows< rgb8_pixel_t  >( view ); break; }
+            case JCS_YCbCr:
+            {
+                this->_scanline_length = this->_info._width * num_channels< rgb8_view_t >::value;
 
-            case JCS_CMYK:      { read_rows< cmyk8_pixel_t >( view ); break; }
+                read_rows< rgb8_pixel_t  >( view ); 
+                break;
+            }
 
+            case JCS_CMYK:
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             case JCS_YCCK:
             {
                 this->_cinfo.out_color_space = JCS_CMYK;
+                this->_scanline_length = this->_info._width * num_channels< cmyk8_view_t >::value;
+
                 read_rows< cmyk8_pixel_t >( view );
 
                 break;

@@ -210,7 +210,7 @@ public:
 
     jpeg_decompress_struct _cinfo;
 
-    Device &_io_dev;
+    Device& _io_dev;
 
     image_read_settings< jpeg_tag > _settings;
     image_read_info< jpeg_tag >     _info;
