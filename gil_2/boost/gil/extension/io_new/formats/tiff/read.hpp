@@ -119,14 +119,15 @@ class reader< Device
 private:
 
     typedef reader< Device
-                  , targa_tag
+                  , tiff_tag
+                  , ConversionPolicy
                   > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
 
 public:
 
-    typedef reader_backend< Device, targa_tag > backend_t;
+    typedef reader_backend< Device, tiff_tag > backend_t;
 
 public:
 
@@ -135,8 +136,10 @@ public:
           )
     : reader_base< tiff_tag
                  , ConversionPolicy
-                 >( settings )
-    , backend_t( device )
+                 >()
+    , backend_t( device
+               , settings
+               )
     {}
 
     reader( Device&                                                device
@@ -145,10 +148,10 @@ public:
           )
     : reader_base< tiff_tag
                  , ConversionPolicy
-                 >( cc
-                  , settings
-                  )
-    , backend_t( device )
+                 >( cc )
+    , backend_t( device
+               , settings
+               )
     {}
 
     // only works for homogeneous image types
@@ -454,9 +457,9 @@ private:
 
        row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
 
-       mirror_bits< buffer_t
-                  , typename is_bit_aligned< typename View::value_type >::type
-                  > mirror_bits( _io_dev.are_bytes_swapped() );
+       detail::mirror_bits< buffer_t
+                          , typename is_bit_aligned< typename View::value_type >::type
+                          > mirror_bits( _io_dev.are_bytes_swapped() );
 
        for( unsigned int y = 0; y < image_height; y += tile_height )
        {
@@ -578,9 +581,9 @@ private:
 
        row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
 
-       mirror_bits< buffer_t
-                  , typename is_bit_aligned< typename View::value_type >::type
-                  > mirror_bits( _io_dev.are_bytes_swapped() );
+       detail::mirror_bits< buffer_t
+                          , typename is_bit_aligned< typename View::value_type >::type
+                          > mirror_bits( _io_dev.are_bytes_swapped() );
 
        for( unsigned int y = 0; y < image_height; y += tile_height )
        {
@@ -653,9 +656,9 @@ private:
                     , plane
                     );
 
-      mirror_bits< buffer_t
-                 , typename is_bit_aligned< View >::type
-                 > mirror_bits( _io_dev.are_bytes_swapped() );
+      detail::mirror_bits< buffer_t
+                         , typename is_bit_aligned< View >::type
+                         > mirror_bits( _io_dev.are_bytes_swapped() );
 
       std::ptrdiff_t row     = this->_settings._top_left.y;
       std::ptrdiff_t row_end = row + this->_settings._dim.y;

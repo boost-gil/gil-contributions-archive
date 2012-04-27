@@ -23,18 +23,6 @@
 
 namespace boost { namespace gil {
 
-template<typename Device>
-class png_io_base
-{
-public:
-    png_io_base( Device & io_dev )
-        : _io_dev(io_dev)
-    {}
-
-
-};
-
-
 ///
 /// PNG Backend
 ///
@@ -43,6 +31,15 @@ struct reader_backend< Device
                      , png_tag
                      >
 {
+public:
+
+    typedef reader_backend< Device
+                          , png_tag
+                          > this_t;
+
+
+public:
+
     reader_backend( Device&                               device
                   , const image_read_settings< png_tag >& settings
                   )
@@ -99,7 +96,7 @@ struct reader_backend< Device
         user_chunk_data[3] = 0;
         png_set_read_user_chunk_fn( _png_ptr
                                   , user_chunk_data
-                                  , png_io_base< Device >::read_user_chunk_callback
+                                  , this_t::read_user_chunk_callback
                                   );
 
         // Allocate/initialize the memory for image information.  REQUIRED.
@@ -131,14 +128,14 @@ struct reader_backend< Device
 
         png_set_read_fn( _png_ptr
                        , static_cast< png_voidp >( &this->_io_dev )
-                       , png_io_base< Device >::read_data
+                       , this_t::read_data
                        );
 
         // Set up a callback function that will be
         // called after each row has been read, which you can use to control
         // a progress meter or the like.
         png_set_read_status_fn( _png_ptr
-                              , png_io_base< Device >::read_row_callback
+                              , this_t::read_row_callback
                               );
 
         // Set up a callback which implements user defined transformation.
@@ -633,12 +630,12 @@ private:
 
     void init_reader()
     {
-        byte_t buf[PNG_BYTES_TO_CHECK];
+        byte_t buf[detail::PNG_BYTES_TO_CHECK];
 
-        io_error_if(_io_dev.read(buf, PNG_BYTES_TO_CHECK) != PNG_BYTES_TO_CHECK,
+        io_error_if(_io_dev.read(buf, detail::PNG_BYTES_TO_CHECK) != detail::PNG_BYTES_TO_CHECK,
                 "png_check_validity: failed to read image");
 
-        io_error_if(png_sig_cmp(png_bytep(buf), png_size_t(0), PNG_BYTES_TO_CHECK)!=0,
+        io_error_if(png_sig_cmp(png_bytep(buf), png_size_t(0), detail::PNG_BYTES_TO_CHECK)!=0,
                 "png_check_validity: invalid png image");
 
         // Create and initialize the png_struct with the desired error handler
@@ -663,7 +660,7 @@ private:
         user_chunk_data[3] = 0;
         png_set_read_user_chunk_fn( _png_ptr
                                   , user_chunk_data
-                                  , png_io_base< Device >::read_user_chunk_callback
+                                  , this_t::read_user_chunk_callback
                                   );
 
         // Allocate/initialize the memory for image information.  REQUIRED.
@@ -695,14 +692,14 @@ private:
 
         png_set_read_fn( _png_ptr
                        , static_cast< png_voidp >( &this->_io_dev )
-                       , png_io_base< Device >::read_data
+                       , this_t::read_data
                        );
 
         // Set up a callback function that will be
         // called after each row has been read, which you can use to control
         // a progress meter or the like.
         png_set_read_status_fn( _png_ptr
-                              , png_io_base< Device >::read_row_callback
+                              , this_t::read_row_callback
                               );
 
         // Set up a callback which implements user defined transformation.
@@ -721,7 +718,7 @@ private:
         // Make sure we read the signature.
         // @todo make it an option
         png_set_sig_bytes( _png_ptr
-                         , PNG_BYTES_TO_CHECK
+                         , detail::PNG_BYTES_TO_CHECK
                          );
 
         // The call to png_read_info() gives us all of the information from the

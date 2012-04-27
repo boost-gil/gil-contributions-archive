@@ -54,7 +54,8 @@ class reader< Device
 private:
 
     typedef reader< Device
-                  , bmp_tag
+                  , jpeg_tag
+                  , ConversionPolicy
                   > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
@@ -72,7 +73,8 @@ public:
           , const image_read_settings< jpeg_tag >& settings
           )
     : reader_base< jpeg_tag
-                 , ConversionPolicy >( settings )
+                 , ConversionPolicy
+                 >()
 
     , backend_t( device
                , settings
@@ -87,9 +89,8 @@ public:
           , const image_read_settings< jpeg_tag >&                 settings
           )
     : reader_base< jpeg_tag
-                 , ConversionPolicy >( cc
-                                     , settings
-                                     )
+                 , ConversionPolicy
+                 >( cc )
     , backend_t( device
                , settings
                )

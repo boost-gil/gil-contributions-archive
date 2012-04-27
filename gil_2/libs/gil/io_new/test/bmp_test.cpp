@@ -273,8 +273,8 @@ BOOST_AUTO_TEST_CASE( stream_test_2 )
 BOOST_AUTO_TEST_CASE( subimage_test )
 {
     run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
-                                            , point_t(  0,  0 )
-                                            , point_t( 50, 50 )
+                                            , point_t(   0, 0 )
+                                            , point_t( 127, 1 )
                                             );
 
     run_subimage_test< rgb8_image_t, tag_t >( bmp_filename

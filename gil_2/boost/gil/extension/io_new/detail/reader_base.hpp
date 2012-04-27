@@ -38,6 +38,20 @@ struct reader_base
 {
 public:
 
+    ///
+    /// Default Constructor
+    ///
+    reader_base()
+    :_cc_policy()
+    {}
+
+    ///
+    /// Constructor
+    ///
+    reader_base( const ConversionPolicy& cc )
+    :_cc_policy( cc )
+    {}
+
     /// Initializes an image. But also does some check ups.
     ///
     /// @tparam Image Image which implements boost::gil's ImageConcept.
@@ -57,7 +71,9 @@ public:
     }
 
     template< typename View >
-    void init_view( const View& view )
+    void init_view( const View& view
+                  , image_read_settings< FormatTag > settings
+                  )
     {
         setup( view.dimensions() );
     }

@@ -57,6 +57,7 @@ private:
 
     typedef reader< Device
                   , targa_tag
+                  , ConversionPolicy
                   > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
@@ -72,8 +73,10 @@ public:
           )
     : reader_base< targa_tag
                  , ConversionPolicy
-                 >( settings )
-    , backend_t( device )
+                 >()
+    , backend_t( device
+               , settings 
+               )
     {}
 
     reader( Device&                               device
@@ -82,10 +85,10 @@ public:
           )
     : reader_base< targa_tag
                  , ConversionPolicy
-                 >( cc
-                  , settings
-                  )
-    , backend_t( device )
+                 >( cc )
+    , backend_t( device
+               , settings
+               )
     {}
 
     template< typename View >

@@ -117,13 +117,13 @@ struct reader_backend< Device
     }
 
     /// Return image read settings.
-    const image_read_settings< bmp_tag >& get_settings()
+    const image_read_settings< jpeg_tag >& get_settings()
     {
         return _settings();
     }
     
     /// Return image header info.
-    const image_read_info< bmp_tag >& get_info()
+    const image_read_info< jpeg_tag >& get_info()
     {
         return _info();
     }

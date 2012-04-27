@@ -35,7 +35,8 @@
 #include "backend.hpp"
 #include "is_allowed.hpp"
 
-namespace boost { namespace gil { namespace detail {
+
+namespace boost { namespace gil {
 
 ///
 /// PNM Reader
@@ -51,13 +52,15 @@ class reader< Device
                         , ConversionPolicy
                         >
     , public reader_backend< Device
-                           , png_tag
+                           , pnm_tag
                            >
 {
+
 private:
 
     typedef reader< Device
                   , pnm_tag
+                  , ConversionPolicy
                   > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
@@ -73,8 +76,10 @@ public:
           )
     : reader_base< pnm_tag
                  , ConversionPolicy
-                 >( settings )
-    , backend_t( device )
+                 >()
+    , backend_t( device
+               , settings
+               )
     {}
 
     reader( Device&                               device
@@ -83,20 +88,15 @@ public:
           )
     : reader_base< pnm_tag
                  , ConversionPolicy
-                 >( cc
-                  , settings
-                  )
-    , backend_t( device )
+                 >( cc )
+    , backend_t( device
+               , settings
+               )
     {}
 
     template<typename View>
     void apply( const View& view )
     {
-        if( !this->_info._valid )
-        {
-            read_header();
-        }
-        
         typedef typename is_same< ConversionPolicy
                                 , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
@@ -169,7 +169,7 @@ private:
     {
         typedef typename View_Dst::y_coord_t y_t;
 
-        byte_vector_t row( this->scanline_length );
+        byte_vector_t row( this->_scanline_length );
 
         //Skip scanlines if necessary.
         for( int y = 0; y <  this->_settings._top_left.y; ++y )
@@ -195,7 +195,7 @@ private:
         View_Src src = interleaved_view( this->_info._width
                                        , 1
                                        , (typename View_Src::value_type*) &row.front()
-                                       , this->scanline_length
+                                       , this->_scanline_length
                                        );
 
         for( uint32_t x = 0; x < this->_scanline_length; ++x )
@@ -314,33 +314,33 @@ private:
                     typename View_Src::value_type >::type is_bit_aligned_t;
 
         typedef detail::row_buffer_helper_view< View_Src > rh_t;
-        rh_t rh( this->scanline_length, true );
+        rh_t rh( this->_scanline_length, true );
 
         typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;
         typename rh_t::iterator_t end = beg + this->_settings._dim.x;
 
         // For bit_aligned images we need to negate all bytes in the row_buffer
         // to make sure that 0 is black and 255 is white.
-        negate_bits< typename rh_t::buffer_t
-                   , is_bit_aligned_t
-                   > neg;
+        detail::negate_bits< typename rh_t::buffer_t
+                           , is_bit_aligned_t
+                           > neg;
 
-        swap_half_bytes< typename rh_t::buffer_t
-                       , is_bit_aligned_t
-                       > swhb;
+        detail::swap_half_bytes< typename rh_t::buffer_t
+                               , is_bit_aligned_t
+                               > swhb;
 
         //Skip scanlines if necessary.
         for( y_t y = 0; y < this->_settings._top_left.y; ++y )
         {
             _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
-                        , this->scanline_length
+                        , this->_scanline_length
                         );
         }
 
         for( y_t y = 0; y < view.height(); ++y )
         {
             _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
-                        , this->scanline_length
+                        , this->_scanline_length
                         );
 
             neg( rh.buffer() );
@@ -412,6 +412,7 @@ private:
 private:
 
     char buf[16];
+
 };
 
 

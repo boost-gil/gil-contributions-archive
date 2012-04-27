@@ -31,7 +31,6 @@
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
 #include "backend.hpp"
-#include "base.hpp"
 #include "is_allowed.hpp"
 
 namespace boost { namespace gil { 

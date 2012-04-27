@@ -61,7 +61,7 @@ void read_view( Device&                                 file
                   );
 
     reader.init_view( view
-                    , reader.get_info()
+                    , reader._settings
                     );
 
     reader.apply( view );
@@ -105,7 +105,7 @@ void read_view( Device&                                 file
                   );
 
     reader.init_view( view
-                    , reader.get_info()
+                    , reader._settings
                     );
 
     reader.apply( view );

@@ -86,9 +86,7 @@ public:
           )
     : reader_base< bmp_tag
                  , ConversionPolicy
-                 >( cc
-                  , settings
-                  )
+                 >( cc )
     , backend_t( device
                , settings
                )

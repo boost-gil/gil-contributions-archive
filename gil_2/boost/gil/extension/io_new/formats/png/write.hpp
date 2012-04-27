@@ -42,7 +42,6 @@
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
-#include "base.hpp"
 #include "supported_types.hpp"
 
 namespace boost { namespace gil { namespace detail {
@@ -52,10 +51,13 @@ struct writer_backend< Device
                      , png_tag
                      >
 {
-    writer_backend()
-    : _png_ptr( NULL )
+    writer_backend( Device& io_dev )
+    : _io_dev( io_dev )
+    , _png_ptr( NULL )
     , _info_ptr( NULL )
     {}
+
+    Device& _io_dev;
 
     png_structp _png_ptr;
     png_infop _info_ptr;
@@ -64,8 +66,7 @@ struct writer_backend< Device
 template< typename Device >
 class writer< Device
             , png_tag
-            > : public png_io_base< Device >
-              , public writer_backend< Device
+            > : public writer_backend< Device
                                      , png_tag
                                      >
 {
@@ -73,8 +74,7 @@ class writer< Device
 public:
 
     writer( Device& io_dev )
-    : png_io_base< Device >( io_dev )
-    , writer_backend()
+    : writer_backend( io_dev )
     {
         // Create and initialize the png_struct with the desired error handler
         // functions.  If you want to use the default stderr and longjump method,
