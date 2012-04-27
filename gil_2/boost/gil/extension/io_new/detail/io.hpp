@@ -33,7 +33,7 @@
  *  - An image reader must be specialized:
  *    \code
  *      template<typename IODevice, typename ConversionPolicy>
- *      struct boost::gil::detail::reader<IODevice,FormatTag,ConversionPolicy>
+ *      struct boost::gil::reader<IODevice,FormatTag,ConversionPolicy>
  *      {
  *        reader( IODevice & device )
  *        reader( IODevice & device, typename ConversionPolicy::color_converter_type const& cc )

@@ -105,12 +105,12 @@ public:
         cinfo.dct_method = this->_settings._dct_method;
 
         typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
+                                , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
 
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
+        io_error_if( !detail::is_allowed< View >( this->_info
+                                                , is_read_and_convert_t()
+                                                )
                    , "Image types aren't compatible."
                    );
 

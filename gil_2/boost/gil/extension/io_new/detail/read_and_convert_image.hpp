@@ -56,13 +56,13 @@ void read_and_convert_image( Device&                                 file
 {
     typedef detail::read_and_convert< ColorConverter > reader_color_convert;
 
-    detail::reader< Device
-                  , FormatTag
-                  , reader_color_convert
-                  > reader( file
-                          , cc
-                          , settings
-                          );
+    reader< Device
+          , FormatTag
+          , reader_color_convert
+          > reader( file
+                  , cc
+                  , settings
+                  );
 
     reader.init_image( img
                      , reader.get_info()

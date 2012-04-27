@@ -54,7 +54,6 @@ class reader< Device
                            , png_tag
                            >
 {
-
 private:
 
     typedef reader< Device
@@ -93,14 +92,18 @@ public:
     template<typename View>
     void apply( const View& view )
     {
-
+        if( !this->_info._valid )
+        {
+            read_header();
+        }
+        
         typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
+                                , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
 
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
+        io_error_if( !detail::is_allowed< View >( this->_info
+                                                , is_read_and_convert_t()
+                                                )
                    , "Image types aren't compatible."
                    );
 
@@ -310,7 +313,7 @@ private:
         typedef typename is_bit_aligned<
                     typename View_Src::value_type >::type is_bit_aligned_t;
 
-        typedef row_buffer_helper_view< View_Src > rh_t;
+        typedef detail::row_buffer_helper_view< View_Src > rh_t;
         rh_t rh( this->scanline_length, true );
 
         typename rh_t::iterator_t beg = rh.begin() + this->_settings._top_left.x;

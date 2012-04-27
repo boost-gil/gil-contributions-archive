@@ -145,13 +145,13 @@ struct reader_backend< Device
             entries = 1 << this->_info._bits_per_pixel;
         }
 
-        palette.resize( entries );
+        _palette.resize( entries );
 
         for( int i = 0; i < entries; ++i )
         {
-            get_color( palette[i], blue_t()  ) = _io_dev.read_uint8();
-            get_color( palette[i], green_t() ) = _io_dev.read_uint8();
-            get_color( palette[i], red_t()   ) = _io_dev.read_uint8();
+            get_color( _palette[i], blue_t()  ) = _io_dev.read_uint8();
+            get_color( _palette[i], green_t() ) = _io_dev.read_uint8();
+            get_color( _palette[i], red_t()   ) = _io_dev.read_uint8();
 
             // there are 4 entries when windows header
             // but 3 for os2 header

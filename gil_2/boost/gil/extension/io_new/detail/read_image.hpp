@@ -57,15 +57,15 @@ void read_image( Device&                                 file
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::reader< Device
-                  , FormatTag
-                  , detail::read_and_no_convert
-                  > reader( file
-                          , settings
-                          );
-
+    reader< Device
+          , FormatTag
+          , detail::read_and_no_convert
+          > reader( file
+                  , settings
+                  );
+     
     reader.init_image( img
-                     , reader.get_info()
+                     , reader._settings
                      );
 
     reader.apply( view( img ));
@@ -100,15 +100,15 @@ void read_image( Device&                                 file
                                                       >::device_type device_type;
 
     device_type dev(file);
-    detail::reader< device_type
-                  , FormatTag
-                  , detail::read_and_no_convert
-                  > reader( dev
-                          , settings
-                          );
+    reader< device_type
+          , FormatTag
+          , detail::read_and_no_convert
+          > reader( dev
+                  , settings
+                  );
 
     reader.init_image( img
-                     , reader.get_info()
+                     , reader._settings
                      );
 
     reader.apply( view( img ));
@@ -362,9 +362,9 @@ void read_image( Device&                                 file
                                             , settings
                                             );
 
-    dyn_reader.init_image( images
-                         , dyn_reader.get_info()
-                         );
+    reader.init_image( images
+                     , reader._settings
+                     );
 
     dyn_reader.apply( images );
 }
@@ -396,15 +396,15 @@ void read_image( Device&                                 file
                                                       >::device_type device_type;
     device_type dev( file );
 
-    detail::reader< device_type
-                  , FormatTag
-                  , detail::read_and_no_convert
-                  > reader( dev
-                          , settings
-                          );
+    reader< device_type
+          , FormatTag
+          , detail::read_and_no_convert
+          > reader( dev
+                  , settings
+                  );
 
     reader.init_image( images
-                     , reader.get_info
+                     , reader._settings
                      );
 
     reader.apply( view( images ));

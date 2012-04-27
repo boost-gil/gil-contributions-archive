@@ -40,21 +40,23 @@ template< typename Device
         , typename FormatTag
         >
 inline
-image_read_info< FormatTag >
-read_image_info( Device&                                 file
-               , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                              , detail::is_input_device< Device >
-                                              >
-                                   >::type* /* ptr */ = 0
+reader_backend< Device
+              , FormatTag
+              >
+read_backend( Device&                                 file
+            , const image_read_settings< FormatTag >& settings
+            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                           , detail::is_input_device< Device >
+                                           >
+                                 >::type* /* ptr */ = 0
                )
 {
-    return detail::reader< Device
-                         , FormatTag
-                         , detail::read_and_no_convert
-                         >( file
-                          , settings
-                          ).get_info();
+    return reader< Device
+                 , FormatTag
+                 , detail::read_and_no_convert
+                 >( file
+                  , settings
+                  );
 }
 
 /// \brief Returns the image info. Image info is file format specific.
@@ -66,18 +68,20 @@ template< typename Device
         , typename FormatTag
         >
 inline
-image_read_info< FormatTag >
-read_image_info( Device&          file
-               , const FormatTag&
-               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                              , detail::is_input_device< Device >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
+reader_backend< Device
+              , FormatTag
+              >
+read_backend( Device&          file
+            , const FormatTag&
+            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                           , detail::is_input_device< Device >
+                                           >
+                                >::type* /* ptr */ = 0
+            )
 {
-    return read_image_info( file
-                          , image_read_settings< FormatTag >()
-                          );
+    return read_backend( file
+                       , image_read_settings< FormatTag >()
+                       );
 }
 
 
@@ -90,16 +94,18 @@ template< typename Device
         , typename FormatTag
         >
 inline 
-image_read_info<FormatTag>
-read_image_info( Device&                                 file
-               , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                              , detail::is_adaptable_input_device< FormatTag
-                                                                                 , Device
-                                                                                 >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
+reader_backend< Device
+              , FormatTag
+              >
+read_backend( Device&                                 file
+            , const image_read_settings< FormatTag >& settings
+            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                           , detail::is_adaptable_input_device< FormatTag
+                                                                              , Device
+                                                                              >
+                                           >
+                                >::type* /* ptr */ = 0
+            )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
                                                       , Device
@@ -107,12 +113,12 @@ read_image_info( Device&                                 file
 
     device_type dev( file );
 
-    return detail::reader< device_type
-                         , FormatTag
-                         , detail::read_and_no_convert
-                         >( dev
-                          , settings
-                          ).get_info();
+    return reader< device_type
+                 , FormatTag
+                 , detail::read_and_no_convert
+                 >( dev
+                  , settings
+                  )();
 }
 
 /// \brief Returns the image info. Image info is file format specific.
@@ -124,16 +130,18 @@ template< typename Device
         , typename FormatTag
         >
 inline 
-image_read_info< FormatTag >
-read_image_info( Device&          file
-               , const FormatTag&
-               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                              , detail::is_adaptable_input_device< FormatTag
-                                                                                 , Device
-                                                                                 >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
+reader_backend< Device
+              , FormatTag
+              >
+read_backend( Device&          file
+            , const FormatTag&
+            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                           , detail::is_adaptable_input_device< FormatTag
+                                                                              , Device
+                                                                              >
+                                           >
+                                >::type* /* ptr */ = 0
+            )
 {
     typedef typename detail::is_adaptable_input_device< FormatTag
                                                       , Device
@@ -141,9 +149,9 @@ read_image_info( Device&          file
 
     device_type dev( file );
 
-    return read_image_info( dev
-                          , image_read_settings< FormatTag >()
-                          );
+    return read_backend( dev
+                       , image_read_settings< FormatTag >()
+                       );
 }
 
 /// \brief Returns the image info. Image info is file format specific.
@@ -155,22 +163,24 @@ template< typename String
         , typename FormatTag
         >
 inline 
-image_read_info< FormatTag >
-read_image_info( const String&                           file_name
-               , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                              , detail::is_supported_path_spec< String >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
+reader_backend< detail::file_stream_device< FormatTag >
+              , FormatTag
+              >
+read_backend( const String&                           file_name
+            , const image_read_settings< FormatTag >& settings
+            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                           , detail::is_supported_path_spec< String >
+                                           >
+                                >::type* /* ptr */ = 0
+            )
 {
     detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )
                                                   , typename detail::file_stream_device< FormatTag >::read_tag()
                                                   );
 
-    return read_image_info( reader
-                          , settings
-                          );
+    return read_backend( reader
+                       , settings
+                       );
 }
 
 /// \brief Returns the image info. Image info is file format specific.
@@ -182,22 +192,24 @@ template< typename String
         , typename FormatTag
         >
 inline 
-image_read_info< FormatTag >
-read_image_info( const String&    file_name
-               , const FormatTag&
-               , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                              , detail::is_supported_path_spec< String >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
+reader_backend< detail::file_stream_device< FormatTag >
+              , FormatTag
+              >
+read_backend( const String&    file_name
+            , const FormatTag&
+            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
+                                           , detail::is_supported_path_spec< String >
+                                           >
+                                >::type* /* ptr */ = 0
+            )
 {
     detail::file_stream_device< FormatTag > reader( detail::convert_to_string( file_name )
                                                   , typename detail::file_stream_device< FormatTag >::read_tag()
                                                   );
 
-    return read_image_info( reader
-                          , image_read_settings< FormatTag >()
-                          );
+    return read_backend( reader
+                       , image_read_settings< FormatTag >()
+                       );
 }
 
 } // namespace gil

@@ -20,6 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+
 #include <boost/gil/extension/io_new/targa_tags.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
@@ -33,8 +34,11 @@
 #include "backend.hpp"
 #include "is_allowed.hpp"
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil {
 
+///
+/// Targa Reader
+///
 template< typename Device
         , typename ConversionPolicy
         >
@@ -45,10 +49,21 @@ class reader< Device
     : public reader_base< targa_tag
                         , ConversionPolicy
                         >
+    , public reader_backend< Device
+                           , targa_tag
+                           >
 {
 private:
 
+    typedef reader< Device
+                  , targa_tag
+                  > this_t;
+
     typedef typename ConversionPolicy::color_converter_type cc_t;
+
+public:
+
+    typedef reader_backend< Device, targa_tag > backend_t;
 
 public:
 
@@ -56,8 +71,9 @@ public:
           , const image_read_settings< targa_tag >& settings
           )
     : reader_base< targa_tag
-                 , ConversionPolicy >( settings )
-    , _io_dev( device )
+                 , ConversionPolicy
+                 >( settings )
+    , backend_t( device )
     {}
 
     reader( Device&                               device
@@ -69,71 +85,24 @@ public:
                  >( cc
                   , settings
                   )
-      , _io_dev( device )
+    , backend_t( device )
     {}
-
-    image_read_info< targa_tag > get_info()
-    {
-        _info._header_size = targa_header_size::_size;
-        
-        _info._offset = _io_dev.read_uint8() + _info._header_size;
-        
-        _info._color_map_type = _io_dev.read_uint8();
-        if( _info._color_map_type != targa_color_map_type::_rgb )
-        {
-            io_error( "Indexed targa files are not supported" );
-        }
-        
-        _info._image_type = _io_dev.read_uint8();
-        if( _info._image_type != targa_image_type::_rgb &&
-            _info._image_type != targa_image_type::_rle_rgb )
-        {
-            io_error( "Unsupported image type for targa file" );
-        }
-        
-        _info._color_map_start = _io_dev.read_uint16();
-        _info._color_map_length = _io_dev.read_uint16();
-        _info._color_map_depth = _io_dev.read_uint8();
-        
-        _info._x_origin = _io_dev.read_uint16();
-        _info._y_origin = _io_dev.read_uint16();
-        
-        _info._width = _io_dev.read_uint16();
-        _info._height = _io_dev.read_uint16();
-        if( _info._width < 1 || _info._height < 1 )
-        {
-            io_error( "Invalid dimension for targa file" );
-        }
-        
-        _info._bits_per_pixel = _io_dev.read_uint8();
-        if( _info._bits_per_pixel != 24 && _info._bits_per_pixel != 32 )
-        {
-            io_error( "Unsupported bit depth for targa file" );
-        }
-        
-        _info._descriptor = _io_dev.read_uint8();
-        if( (_info._bits_per_pixel == 24 && _info._descriptor != 0) ||
-            (_info._bits_per_pixel == 32 && _info._descriptor != 8) )
-        {
-            io_error( "Unsupported descriptor for targa file" );
-        }
-        
-        _info._valid = true;
-        
-        return _info;
-    }
 
     template< typename View >
     void apply( const View& dst_view )
     {
-        if( !_info._valid )
+        if( !this->_info._valid )
         {
-            get_info();
+            read_header();
         }
 
-        typedef typename is_same< ConversionPolicy, read_and_no_convert >::type is_read_and_convert_t;
-        io_error_if( !is_allowed< View >( _info, is_read_and_convert_t() ),
-                     "Image types aren't compatible." );
+        typedef typename is_same< ConversionPolicy
+                                , detail::read_and_no_convert
+                                >::type is_read_and_convert_t;
+
+        io_error_if( !detail::is_allowed< View >( _info, is_read_and_convert_t() )
+                   , "Image types aren't compatible."
+                   );
         
         std::ptrdiff_t yend = this->_settings._dim.y;
         
@@ -155,12 +124,18 @@ public:
                 {
                     case 24:
                     {
+                        this->_scanline_length = this->_info._width * ( this->_info._bits_per_pixel / 8 );
+
                         read_data< bgr8_view_t >( dst_view );
+
                         break;
                     }
                     case 32:
                     {
+                        this->_scanline_length = this->_info._width * ( this->_info._bits_per_pixel / 8 );
+
                         read_data< bgra8_view_t >( dst_view );
+
                         break;
                     }
                     default:
@@ -303,8 +278,7 @@ private:
 ///
 /// Targa Dynamic Image Reader
 ///
-template< typename Device
-        >
+template< typename Device >
 class dynamic_image_reader< Device
                           , targa_tag
                           >
@@ -400,9 +374,9 @@ struct targa_read_is_supported
     {};
 };
 
-} // detail
+} // namespace detail
 
-} // gil
-} // boost
+} // namespace gil
+} // namespace boost
 
 #endif // BOOST_GIL_EXTENSION_IO_TARGA_IO_READ_HPP

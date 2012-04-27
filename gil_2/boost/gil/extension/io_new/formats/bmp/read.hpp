@@ -55,6 +55,7 @@ private:
 
     typedef reader< Device
                   , bmp_tag
+                  , ConversionPolicy
                   > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
@@ -71,10 +72,7 @@ public:
     reader( Device&                               device
           , const image_read_settings< bmp_tag >& settings
           )
-    : reader_base< bmp_tag
-                 , ConversionPolicy
-                 >( settings )
-    , backend_t( device
+    : backend_t( device
                , settings
                )
     {}
@@ -108,12 +106,12 @@ public:
 
 
         typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
+                                , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
 
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
+        io_error_if( !detail::is_allowed< View >( this->_info
+                                                , is_read_and_convert_t()
+                                                )
                    , "Image types aren't compatible."
                    );
 
@@ -167,9 +165,9 @@ public:
                 this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
                 read_palette_image< gray1_image_t::view_t
-                                  , mirror_bits< byte_vector_t
-                                               , mpl::true_
-                                               >
+                                  , detail::mirror_bits< byte_vector_t
+                                                       , mpl::true_
+                                                       >
                                   > ( dst_view
                                     , pitch
                                     , ybeg
@@ -204,9 +202,9 @@ public:
                         this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
 					    read_palette_image< gray4_image_t::view_t
-									      , swap_half_bytes< byte_vector_t
-									                       , mpl::true_
-									                       >
+									      , detail::swap_half_bytes< byte_vector_t
+									                               , mpl::true_
+									                               >
 									      > ( dst_view
 									        , pitch
 									        , ybeg
@@ -249,7 +247,7 @@ public:
                         this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
 					    read_palette_image< gray8_image_t::view_t
-									      , do_nothing< std::vector< gray8_pixel_t > >
+									      , detail::do_nothing< std::vector< gray8_pixel_t > >
 									      > ( dst_view
 									        , pitch
 									        , ybeg
@@ -322,7 +320,7 @@ private:
         // jump to first scanline
         _io_dev.seek( static_cast< long >( offset ));
 
-        typedef row_buffer_helper_view< View_Src > rh_t;
+        typedef detail::row_buffer_helper_view< View_Src > rh_t;
         typedef typename rh_t::iterator_t          it_t;
 
         rh_t rh( pitch, true );
@@ -369,17 +367,17 @@ private:
         color_mask mask = { {0} };
         if( _info._compression == bmp_compression::_bitfield )
         {
-            mask.red.mask    = _io_dev.read_uint32();
-            mask.green.mask  = _io_dev.read_uint32();
-            mask.blue.mask   = _io_dev.read_uint32();
+            this->_mask.red.mask    = this->_io_dev.read_uint32();
+            this->_mask.green.mask  = this->_io_dev.read_uint32();
+            this->_mask.blue.mask   = this->_io_dev.read_uint32();
 
-            mask.red.width   = count_ones( mask.red.mask   );
-            mask.green.width = count_ones( mask.green.mask );
-            mask.blue.width  = count_ones( mask.blue.mask  );
+            this->_mask.red.width   = detail::count_ones( this->_mask.red.mask   );
+            this->_mask.green.width = detail::count_ones( this->_mask.green.mask );
+            this->_mask.blue.width  = detail::count_ones( this->_mask.blue.mask  );
 
-            mask.red.shift   = trailing_zeros( mask.red.mask   );
-            mask.green.shift = trailing_zeros( mask.green.mask );
-            mask.blue.shift  = trailing_zeros( mask.blue.mask  );
+            this->_mask.red.shift   = detail::trailing_zeros( this->_mask.red.mask   );
+            this->_mask.green.shift = detail::trailing_zeros( this->_mask.green.mask );
+            this->_mask.blue.shift  = detail::trailing_zeros( this->_mask.blue.mask  );
         }
         else if( _info._compression == bmp_compression::_rgb )
         {
@@ -388,18 +386,20 @@ private:
                 case 15:
                 case 16:
                 {
-                    mask.red.mask   = 0x007C00; mask.red.width   = 5; mask.red.shift   = 10;
-                    mask.green.mask = 0x0003E0; mask.green.width = 5; mask.green.shift =  5;
-                    mask.blue.mask  = 0x00001F; mask.blue.width  = 5; mask.blue.shift  =  0;
+                    _mask.red.mask   = 0x007C00; _mask.red.width   = 5; _mask.red.shift   = 10;
+                    _mask.green.mask = 0x0003E0; _mask.green.width = 5; _mask.green.shift =  5;
+                    _mask.blue.mask  = 0x00001F; _mask.blue.width  = 5; _mask.blue.shift  =  0;
+
                     break;
                 }
 
                 case 24:
                 case 32:
                 {
-                    mask.red.mask   = 0xFF0000; mask.red.width   = 8; mask.red.shift   = 16;
-                    mask.green.mask = 0x00FF00; mask.green.width = 8; mask.green.shift =  8;
-                    mask.blue.mask  = 0x0000FF; mask.blue.width  = 8; mask.blue.shift  =  0;
+                    _mask.red.mask   = 0xFF0000; _mask.red.width   = 8; _mask.red.shift   = 16;
+                    _mask.green.mask = 0x00FF00; _mask.green.width = 8; _mask.green.shift =  8;
+                    _mask.blue.mask  = 0x0000FF; _mask.blue.width  = 8; _mask.blue.shift  =  0;
+
                     break;
                 }
             }
@@ -434,9 +434,9 @@ private:
             {
                 int p = ( src[1] << 8 ) | src[0];
 
-                int r = ((p & mask.red.mask)   >> mask.red.shift)   << (8 - mask.red.width);
-                int g = ((p & mask.green.mask) >> mask.green.shift) << (8 - mask.green.width);
-                int b = ((p & mask.blue.mask)  >> mask.blue.shift)  << (8 - mask.blue.width);
+                int r = ((p & _mask.red.mask)   >> _mask.red.shift)   << (8 - _mask.red.width);
+                int g = ((p & _mask.green.mask) >> _mask.green.shift) << (8 - _mask.green.width);
+                int b = ((p & _mask.blue.mask)  >> _mask.blue.shift)  << (8 - _mask.blue.width);
 
                 get_color( it[i], red_t()   ) = static_cast< byte_t >( r );
                 get_color( it[i], green_t() ) = static_cast< byte_t >( g );
@@ -527,8 +527,7 @@ private:
               || _info._compression == bmp_compression::_rle8
               );
 
-        std::vector< rgba8_pixel_t > pal;
-        read_palette( pal );
+        read_palette();
 
         // jump to start of rle4 data
         _io_dev.seek( static_cast< long >( offset ));
@@ -566,14 +565,14 @@ private:
 
                     for( int i = 0; i < count; ++i )
                     {
-                        *dst_it++ = pal[ cs[i & 1] ];
+                        *dst_it++ = this->_palette[ cs[i & 1] ];
                     }
                 }
                 else
                 {
                     for( int i = 0; i < count; ++i )
                     {
-                        *dst_it++ = pal[ second ];
+                        *dst_it++ = this->_palette[ second ];
                     }
                 }
             }
@@ -655,11 +654,11 @@ private:
                                 uint8_t packed_indices = _io_dev.read_uint8();
                                 ++stream_pos;
 
-                                *dst_it++ = pal[ packed_indices >> 4 ];
+                                *dst_it++ = this->_palette[ packed_indices >> 4 ];
                                 if( ++i == second )
                                     break;
 
-                                *dst_it++ = pal[ packed_indices & 0x0f ];
+                                *dst_it++ = this->_palette[ packed_indices & 0x0f ];
                             }
                         }
                         else
@@ -668,7 +667,7 @@ private:
                             {
                                 uint8_t c = _io_dev.read_uint8();
                                 ++stream_pos;
-                                *dst_it++ = pal[ c ];
+                                *dst_it++ = this->_palette[ c ];
                              }
                         }
 
@@ -690,8 +689,7 @@ private:
 ///
 /// BMP Dynamic Reader
 ///
-template< typename Device
-        >
+template< typename Device >
 class dynamic_image_reader< Device
                           , bmp_tag
                           >

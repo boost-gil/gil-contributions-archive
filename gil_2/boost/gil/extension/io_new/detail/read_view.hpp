@@ -53,12 +53,12 @@ void read_view( Device&                                 file
                                   >::type* /* ptr */ = 0
               )
 {
-    detail::reader< Device
-                  , FormatTag
-                  , detail::read_and_no_convert
-                  > reader( file
-                          , settings
-                          );
+    reader< Device
+          , FormatTag
+          , detail::read_and_no_convert
+          > reader( file
+                  , settings
+                  );
 
     reader.init_view( view
                     , reader.get_info()
@@ -97,12 +97,12 @@ void read_view( Device&                                 file
 
     device_type dev( file );
 
-    detail::reader< device_type
-                  , FormatTag
-                  , detail::read_and_no_convert
-                  > reader( dev
-                          , settings
-                          );
+    reader< device_type
+          , FormatTag
+          , detail::read_and_no_convert
+          > reader( dev
+                  , settings
+                  );
 
     reader.init_view( view
                     , reader.get_info()

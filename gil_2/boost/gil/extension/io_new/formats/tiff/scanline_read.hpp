@@ -250,13 +250,14 @@ public:
         }
         else
         {
+            this->_scanline_length = _io_dev.get_scanline_size();
+
             if( this->_info._planar_configuration == PLANARCONFIG_SEPARATE )
             {
                 io_error( "scanline_reader doesn't support planar tiff images." );
             }
             else if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
             {
-                this->_scanline_length = _io_dev.get_scanline_size();
 
                 // the read_data function needs to know what gil type the source image is
                 // to have the default color converter function correctly

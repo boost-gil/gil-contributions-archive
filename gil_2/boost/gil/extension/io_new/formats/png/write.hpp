@@ -431,9 +431,9 @@ private:
             }
         }
 
-        row_buffer_helper_view< View > row_buffer( view.width()
-                                                 , false
-                                                 );
+        detail::row_buffer_helper_view< View > row_buffer( view.width()
+                                                         , false
+                                                         );
 
         for( int y = 0; y != view.height(); ++ y)
         {
@@ -476,9 +476,9 @@ private:
             }
         }
 
-        row_buffer_helper_view< View > row_buffer( view.width()
-                                                 , false
-                                                 );
+        detail::row_buffer_helper_view< View > row_buffer( view.width()
+                                                         , false
+                                                         );
 
         for( int y = 0; y != view.height(); ++y )
         {

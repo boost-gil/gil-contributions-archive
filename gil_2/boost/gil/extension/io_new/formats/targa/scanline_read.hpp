@@ -35,7 +35,7 @@
 namespace boost { namespace gil {
 
 ///
-/// Targa Reader
+/// Targa Scanline Reader
 ///
 template< typename Device >
 class scanline_reader< Device

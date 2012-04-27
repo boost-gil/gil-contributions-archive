@@ -245,18 +245,18 @@ private:
             >
     void read_rows( const View& view )
     {
-        typedef row_buffer_helper_view< ImagePixel > row_buffer_helper_t;
+        typedef detail::row_buffer_helper_view< ImagePixel > row_buffer_helper_t;
 
         typedef typename row_buffer_helper_t::buffer_t   buffer_t;
         typedef typename row_buffer_helper_t::iterator_t it_t;
 
         typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
+                                , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
 
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
+        io_error_if( !detail::is_allowed< View >( this->_info
+                                                , is_read_and_convert_t()
+                                                )
                    , "Image types aren't compatible."
                    );
 
