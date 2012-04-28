@@ -87,19 +87,19 @@ public:
 
         std::string str( "P" );
         str += lexical_cast< std::string >( type ) + std::string( " " );
-        _out.print_line( str );
+        this->_io_dev.print_line( str );
 
         str.clear();
         str += lexical_cast< std::string >( width ) + std::string( " " );
-        _out.print_line( str );
+        this->_io_dev.print_line( str );
 
         str.clear();
         str += lexical_cast< std::string >( height ) + std::string( " " );
-        _out.print_line( str );
+        this->_io_dev.print_line( str );
 
         if( type != pnm_image_type::mono_bin_t::value )
         {
-            _out.print_line( "255 ");
+            this->_io_dev.print_line( "255 ");
         }
 
         // write data
@@ -206,7 +206,7 @@ class dynamic_image_writer< Device
 public:
 
     dynamic_image_writer( Device&                            io_dev
-                        , const image_write_info< bmp_tag >& info
+                        , const image_write_info< pnm_tag >& info
                         )
     : parent_t( io_dev
               , info

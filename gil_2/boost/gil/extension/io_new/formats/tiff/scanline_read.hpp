@@ -53,7 +53,7 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
 
-#include "backend.hpp"
+#include "reader_backend.hpp"
 #include "device.hpp"
 #include "is_allowed.hpp"
 

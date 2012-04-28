@@ -38,12 +38,9 @@
     }
 #endif
 
-#include <boost/gil/extension/io_new/detail/typedefs.hpp>
-#include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
 #include "writer_backend.hpp"
-#include "supported_types.hpp"
 
 namespace boost { namespace gil {
 
@@ -62,7 +59,7 @@ class writer< Device
 public:
 
     writer( Device&                            io_dev
-          , const image_write_info< bmp_tag >& info
+          , const image_write_info< png_tag >& info
           )
     : writer_backend( io_dev
                     , info
@@ -73,23 +70,11 @@ public:
     template< typename View >
     void apply( const View& view )
     {
-        apply( view, image_write_info< png_tag >() );
-    }
-
-    template <typename View>
-    void apply( const View&                        view
-              , const image_write_info< png_tag >& info
-              )
-    {
-        typedef detail::png_write_support< typename channel_type< typename get_pixel_type< View >::type >::type
-                                         , typename color_space_type< View >::type
-                                         > png_rw_info_t;
-
         io_error_if( view.width() == 0 && view.height() == 0
                    , "png format cannot handle empty views."
                    );
 
-        write_header();
+        write_header( view );
 
         write_view( view
                   , typename is_bit_aligned< View >::type()
@@ -105,9 +90,9 @@ private:
     {
         typedef typename get_pixel_type< View >::type pixel_t;
 
-        typedef png_write_support< typename channel_type    < pixel_t >::type
-                                 , typename color_space_type< pixel_t >::type
-                                 > png_rw_info;
+        typedef detail::png_write_support< typename channel_type    < pixel_t >::type
+                                         , typename color_space_type< pixel_t >::type
+                                         > png_rw_info;
 
         if( little_endian() )
         {

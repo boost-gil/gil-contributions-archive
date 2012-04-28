@@ -30,7 +30,7 @@
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
-#include "backend.hpp"
+#include "reader_backend.hpp"
 #include "is_allowed.hpp"
 
 namespace boost { namespace gil {

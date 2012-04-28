@@ -26,7 +26,6 @@
 
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
-#include "base.hpp"
 #include "supported_types.hpp"
 #include "writer_backend.hpp"
 
@@ -95,7 +94,7 @@ private:
                          );
 
         // Needs to be done after jpeg_set_defaults() since it's overridding this value back to slow.
-        _cinfo.dct_method = this->info._dct_method;
+        this->_cinfo.dct_method = this->_info._dct_method;
 
 
         // set the pixel dimensions

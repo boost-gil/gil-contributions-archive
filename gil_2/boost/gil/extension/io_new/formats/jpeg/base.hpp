@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil { 
 
 class jpeg_io_base
 {
@@ -31,8 +31,6 @@ protected:
     jmp_buf        _mark;
 };
 
-
-} // namespace detail
 } // namespace gil
 } // namespace boost
 

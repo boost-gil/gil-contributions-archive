@@ -21,6 +21,8 @@
 
 #include <boost/gil/extension/io_new/jpeg_tags.hpp>
 
+#include "base.hpp"
+
 namespace boost { namespace gil {
 
 ///
@@ -32,10 +34,10 @@ struct writer_backend< Device
                      >
     : public jpeg_io_base
 {
-    writer_backend( Device& device
+    writer_backend( Device&                             io_dev
                   , const image_write_info< jpeg_tag >& info
                   )
-    : _out( device )
+    : _io_dev( io_dev )
     , _info( info )
     {
         _cinfo.err         = jpeg_std_error( &_jerr );
@@ -86,9 +88,9 @@ protected:
     {
         gil_jpeg_destination_mgr* dest = reinterpret_cast< gil_jpeg_destination_mgr* >( cinfo->dest );
 
-        dest->_this->out.write( dest->_this->buffer
-                              , buffer_size
-                              );
+        dest->_this->_io_dev.write( dest->_this->buffer
+                                  , buffer_size
+                                  );
 
         writer<Device,jpeg_tag>::init_device( cinfo );
         return 1;
@@ -98,11 +100,11 @@ protected:
     {
         writer_backend< Device
                       , jpeg_tag
-                      >::empty_buffer( _cinfo );
+                      >::empty_buffer( cinfo );
 
-        gil_jpeg_destination_mgr* dest = reinterpret_cast< gil_jpeg_destination_mgr* >( _cinfo->dest );
+        gil_jpeg_destination_mgr* dest = reinterpret_cast< gil_jpeg_destination_mgr* >( cinfo->dest );
 
-        dest->_this->out.flush();
+        dest->_this->_io_dev.flush();
     }
 
     void raise_error()
@@ -112,14 +114,14 @@ protected:
 
     static void error_exit( j_common_ptr cinfo )
     {
-        writer< Device, jpeg_tag >* mgr = reinterpret_cast< writer< Device, jpeg_tag >* >( this->_cinfo->client_data );
+        writer< Device, jpeg_tag >* mgr = reinterpret_cast< writer< Device, jpeg_tag >* >( cinfo->client_data );
 
         longjmp( mgr->_mark, 1 );
     }
 
 public:
 
-    Device& out;
+    Device& _io_dev;
 
     image_write_info< jpeg_tag > _info;
 

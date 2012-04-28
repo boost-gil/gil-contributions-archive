@@ -19,7 +19,12 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/gil/extension/io_new/detail/typedefs.hpp>
+#include <boost/gil/extension/io_new/detail/base.hpp>
+
 #include <boost/gil/extension/io_new/png_tags.hpp>
+
+#include "supported_types.hpp"
 
 namespace boost { namespace gil {
 
@@ -31,6 +36,15 @@ struct writer_backend< Device
                      , png_tag
                      >
 {
+
+private:
+
+    typedef writer_backend< Device
+                          , png_tag
+                          > this_t;
+
+public:
+
     writer_backend( Device& io_dev
                   , const image_write_info< png_tag >& info
                   )
@@ -90,8 +104,13 @@ struct writer_backend< Device
 
 protected:
 
-    void write_header()
+    template< typename View >
+    void write_header( const View& view )
     {
+        typedef detail::png_write_support< typename channel_type< typename get_pixel_type< View >::type >::type
+                                         , typename color_space_type< View >::type
+                                         > png_rw_info_t;
+
         // Set the image information here.  Width and height are up to 2^31,
         // bit_depth is one of 1, 2, 4, 8, or 16, but valid values also depend on
         // the color_type selected. color_type is one of PNG_COLOR_TYPE_GRAY,
@@ -105,9 +124,9 @@ protected:
                     , static_cast< png_image_height::type >( view.height() )
                     , static_cast< png_bitdepth::type     >( png_rw_info_t::_bit_depth )
                     , static_cast< png_color_type::type   >( png_rw_info_t::_color_type )
-                    , info._interlace_method
-                    , info._compression_method
-                    , info._filter_method
+                    , _info._interlace_method
+                    , _info._compression_method
+                    , _info._filter_method
                     );
 
 #ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
@@ -349,14 +368,30 @@ protected:
                       );
     }
 
+protected:
+
+    static void write_data( png_structp png_ptr
+                          , png_bytep   data
+                          , png_size_t  length
+                          )
+    {
+        static_cast< Device* >( png_get_io_ptr( png_ptr ))->write( data
+                                                                 , length );
+    }
+
+    static void flush( png_structp png_ptr )
+    {
+        static_cast< Device* >(png_get_io_ptr(png_ptr) )->flush();
+    }
+
 private:
 
     void init_io( png_structp png_ptr )
     {
         png_set_write_fn( png_ptr
-                        , static_cast< void* >        ( &this->_io_dev                   )
-                        , static_cast< png_rw_ptr >   ( &png_io_base<Device>::write_data )
-                        , static_cast< png_flush_ptr >( &png_io_base<Device>::flush      )
+                        , static_cast< void* >        ( &this->_io_dev      )
+                        , static_cast< png_rw_ptr >   ( &this_t::write_data )
+                        , static_cast< png_flush_ptr >( &this_t::flush      )
                         );
     }
 
@@ -364,7 +399,7 @@ public:
 
     Device& _io_dev;
 
-    image_write_info< bmp_tag > _info;
+    image_write_info< png_tag > _info;
 
     png_structp _png_ptr;
     png_infop _info_ptr;

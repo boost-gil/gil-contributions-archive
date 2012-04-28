@@ -31,13 +31,24 @@ struct writer_backend< Device
                      , tiff_tag
                      >
 {
-    writer_backend( Device& device
+    writer_backend( Device&                             io_dev
                   , const image_write_info< tiff_tag >& info
                   )
-    : _out( device )
+    : _io_dev( io_dev )
     , _info( info )
+    {}
+
+protected:
+
+    template< typename View >
+    void write_header( const View& view )
     {
-        if( _photometric_interpretation_user_defined )
+        typedef typename View::value_type pixel_t;
+
+        // get the type of the first channel (heterogeneous pixels might be broken for now!)
+        typedef typename channel_traits< typename element_type< pixel_t >::type >::value_type channel_t;
+
+        if( this->_info._photometric_interpretation_user_defined )
         {
             typedef typename color_space_type< View >::type color_space_t;
 
@@ -46,67 +57,57 @@ struct writer_backend< Device
             // a image is PHOTOMETRIC_MINISWHITE or PHOTOMETRIC_MINISBLACK. This writer
             // will assume PHOTOMETRIC_MINISBLACK for gray_t images and PHOTOMETRIC_RGB
             // for rgb_t images.
-            info._photometric_interpretation = detail::photometric_interpretation< color_space_t >::value;
+            _info._photometric_interpretation = detail::photometric_interpretation< color_space_t >::value;
         }
-    }
-
-protected:
-
-    void write_header
-    {
-        typedef typename View::value_type pixel_t;
-
-        // get the type of the first channel (heterogeneous pixels might be broken for now!)
-        typedef typename channel_traits< typename element_type< pixel_t >::type >::value_type channel_t;
 
         // write dimensions
-        tiff_image_width::type  width  = (tiff_image_width::type)  src_view.width();
-        tiff_image_height::type height = (tiff_image_height::type) src_view.height();
+        tiff_image_width::type  width  = (tiff_image_width::type)  view.width();
+        tiff_image_height::type height = (tiff_image_height::type) view.height();
 
-        this->_io_dev.template set_property< tiff_image_width  >( width  );
-        this->_io_dev.template set_property< tiff_image_height >( height );
+        _io_dev.template set_property< tiff_image_width  >( width  );
+        _io_dev.template set_property< tiff_image_height >( height );
 
         // write planar configuration
         if( is_bit_aligned< View >::value == false )
         {
-            this->_io_dev.template set_property<tiff_planar_configuration>( this->_info._planar_configuration );
+            _io_dev.template set_property<tiff_planar_configuration>( _info._planar_configuration );
         }
 
         // write samples per pixel
         tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
-        this->_io_dev.template set_property<tiff_samples_per_pixel>( samples_per_pixel );
+        _io_dev.template set_property<tiff_samples_per_pixel>( samples_per_pixel );
 
         // write bits per sample
         // @todo: Settings this value usually requires to write for each sample the bit
         // value seperately in case they are different, like rgb556.
-        tiff_bits_per_sample::type bits_per_sample = unsigned_integral_num_bits<channel_t>::value;
-        this->_io_dev.template set_property<tiff_bits_per_sample>( bits_per_sample );
+        tiff_bits_per_sample::type bits_per_sample = detail::unsigned_integral_num_bits< channel_t >::value;
+        _io_dev.template set_property<tiff_bits_per_sample>( bits_per_sample );
 
         // write sample format
         tiff_sample_format::type sampl_format = detail::sample_format< channel_t >::type::value;
-        this->_io_dev.template set_property<tiff_sample_format>( sampl_format );
+        _io_dev.template set_property<tiff_sample_format>( sampl_format );
 
         // write photometric format
-        this->_io_dev.template set_property<tiff_photometric_interpretation>( this->_info._photometric_interpretation );
+        _io_dev.template set_property<tiff_photometric_interpretation>( _info._photometric_interpretation );
 
         // write compression
-        this->_io_dev.template set_property<tiff_compression>( this->_info._compression );
+        _io_dev.template set_property<tiff_compression>( _info._compression );
 
         // write orientation
-        this->_io_dev.template set_property<tiff_orientation>( this->_info._orientation );
+        _io_dev.template set_property<tiff_orientation>( _info._orientation );
 
         // write rows per strip
-        this->_io_dev.template set_property<tiff_rows_per_strip>( this->_io_dev.get_default_strip_size() );
+        _io_dev.template set_property<tiff_rows_per_strip>( _io_dev.get_default_strip_size() );
 
         // x, y resolution
-        this->_io_dev.template set_property<tiff_x_resolution>( this->_info._x_resolution );
-        this->_io_dev.template set_property<tiff_y_resolution>( this->_info._y_resolution );
+        _io_dev.template set_property<tiff_x_resolution>( _info._x_resolution );
+        _io_dev.template set_property<tiff_y_resolution>( _info._y_resolution );
     }
 
 
 public:
 
-    Device& _out;
+    Device& _io_dev;
 
     image_write_info< tiff_tag > _info;
 };

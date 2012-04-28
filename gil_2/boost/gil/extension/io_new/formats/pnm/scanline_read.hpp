@@ -33,7 +33,7 @@
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
 
-#include "backend.hpp"
+#include "reader_backend.hpp"
 #include "is_allowed.hpp"
 
 namespace boost { namespace gil {

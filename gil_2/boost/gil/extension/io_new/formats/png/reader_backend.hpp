@@ -596,15 +596,6 @@ protected:
                                                             , length );
     }
 
-    static void write_data( png_structp png_ptr
-                          , png_bytep   data
-                          , png_size_t  length
-                          )
-    {
-        static_cast<Device*>( png_get_io_ptr( png_ptr ))->write( data
-                                                               , length );
-    }
-
     static void flush( png_structp png_ptr )
     {
         static_cast<Device*>(png_get_io_ptr(png_ptr) )->flush();

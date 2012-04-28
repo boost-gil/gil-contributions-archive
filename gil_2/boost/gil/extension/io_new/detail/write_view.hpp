@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny, Lubomir Bourdev
+    Copyright 2007-2012 Christian Henning, Andreas Pokorny, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -25,7 +25,7 @@
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -49,12 +49,15 @@ void write_view( Device&          device
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::writer< Device
-                  , FormatTag
-                  > writer( device );
+    image_write_info< FormatTag > info;
 
-    writer.apply( view
-                , 
+    writer< Device
+          , FormatTag
+          > writer( device
+                  , info
+                  );
+
+    writer.apply( view );
 }
 
 template< typename Device
@@ -109,9 +112,9 @@ void write_view( const String&    file_name
                                                 );
 
     write_view( device
-               , view
-               , tag
-               );
+              , view
+              , tag
+              );
 }
 
 /// \ingroup IO
@@ -133,12 +136,12 @@ void write_view( Device&                            device
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::writer< Device
-                  , FormatTag
-                  , Log
-                  > writer( device
-                          , info
-                          );
+    writer< Device
+          , FormatTag
+          , Log
+          > writer( device
+                  , info
+                  );
 
     writer.apply( view );
 }
@@ -219,9 +222,13 @@ void write_view( Device&                        device
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::dynamic_image_writer< Device
-                                , FormatTag
-                                > dyn_writer( device );
+    image_write_info< FormatTag > info;
+
+    dynamic_image_writer< Device
+                        , FormatTag
+                        > dyn_writer( device
+                                    , info
+                                    );
 
     dyn_writer.apply( view );
 }
@@ -296,12 +303,12 @@ void write_view( Device&                           device
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::dynamic_image_writer< Device
-                  , FormatTag
-                  , Log
-                  > dyn_writer( device
-                              , info
-                              );
+    dynamic_image_writer< Device
+                        , FormatTag
+                        , Log
+                        > dyn_writer( device
+                                    , info
+                                    );
 
     dyn_writer.apply( views );
 }

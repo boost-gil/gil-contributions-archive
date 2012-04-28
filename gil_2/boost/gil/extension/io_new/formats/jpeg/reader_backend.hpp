@@ -30,7 +30,7 @@ template< typename Device >
 struct reader_backend< Device
                      , jpeg_tag
                      >
-    : public detail::jpeg_io_base
+    : public jpeg_io_base
 {
 
     //

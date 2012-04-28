@@ -143,7 +143,8 @@ class dynamic_image_writer< Device
 public:
 
     dynamic_image_writer( Device&                            io_dev
-                        , const image_write_info< bmp_tag >& info
+                        , const image_write_info< targa_tag >& info
+                        )
     : parent_t( io_dev
               , info
               )

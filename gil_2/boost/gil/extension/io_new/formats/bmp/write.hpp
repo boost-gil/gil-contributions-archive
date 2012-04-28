@@ -48,7 +48,7 @@ public:
           )
     : writer_backend( file
                     , info
-                    );
+                    )
     {}
 
     template<typename View>

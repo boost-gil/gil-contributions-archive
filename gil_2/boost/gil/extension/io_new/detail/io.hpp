@@ -47,7 +47,7 @@
  *  - An image writer must be specialized:
  *    \code
  *      \template <typename IODevice>
- *      struct boost::gil::detail::writer<IODevice,FormatTag>
+ *      struct boost::gil::writer<IODevice,FormatTag>
  *      {
  *        writer( IODevice & device )
  *        template<typename View>
