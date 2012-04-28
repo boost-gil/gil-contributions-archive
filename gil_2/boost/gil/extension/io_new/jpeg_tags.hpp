@@ -183,7 +183,11 @@ template<>
 struct image_write_info< jpeg_tag >
 {
     /// Constructor
-    /// \param quality Defines the jpeg quality.
+    /// \param quality      Defines the jpeg quality.
+    /// \param dct_method   Defines the DCT method.
+    /// \param density_unit Defines the density unit.
+    /// \param x_density    Defines the x density.
+    /// \param y_density    Defines the y density.
     image_write_info( const jpeg_quality::type    quality        = jpeg_quality::default_value
                     , const jpeg_dct_method::type dct_method     = jpeg_dct_method::default_value
                     , const jpeg_density_unit::type density_unit = jpeg_density_unit::default_value

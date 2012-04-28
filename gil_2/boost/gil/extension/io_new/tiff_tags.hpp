@@ -283,7 +283,9 @@ struct image_write_info< tiff_tag, Log >
 {
     /// Default constructor
     image_write_info()
-    : _photometric_interpretation( PHOTOMETRIC_MINISBLACK )
+    : _photometric_interpretation             ( PHOTOMETRIC_MINISBLACK )
+    , _photometric_interpretation_user_defined( false                  )
+
     , _compression               ( COMPRESSION_NONE       )
     , _orientation               ( ORIENTATION_TOPLEFT    )
     , _planar_configuration      ( PLANARCONFIG_CONTIG    )
@@ -296,6 +298,8 @@ struct image_write_info< tiff_tag, Log >
 
     /// The color space of the image data.
     tiff_photometric_interpretation::type _photometric_interpretation;
+    bool                                  _photometric_interpretation_user_defined;
+
     /// Compression scheme used on the image data.
     tiff_compression::type                _compression;
     /// The orientation of the image with respect to the rows and columns.

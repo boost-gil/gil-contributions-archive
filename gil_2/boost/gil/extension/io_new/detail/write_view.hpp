@@ -53,7 +53,8 @@ void write_view( Device&          device
                   , FormatTag
                   > writer( device );
 
-    writer.apply( view );
+    writer.apply( view
+                , 
 }
 
 template< typename Device
@@ -135,10 +136,11 @@ void write_view( Device&                            device
     detail::writer< Device
                   , FormatTag
                   , Log
-                  > writer( device );
+                  > writer( device
+                          , info
+                          );
 
-    writer.apply( view
-                , info );
+    writer.apply( view );
 }
 
 template< typename Device
@@ -297,11 +299,11 @@ void write_view( Device&                           device
     detail::dynamic_image_writer< Device
                   , FormatTag
                   , Log
-                  > dyn_writer( device );
+                  > dyn_writer( device
+                              , info
+                              );
 
-    dyn_writer.apply( views
-                    , info
-                    );
+    dyn_writer.apply( views );
 }
 
 template< typename Device

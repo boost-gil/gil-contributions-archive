@@ -1,5 +1,5 @@
 /*
-    Copyright 2008 Christian Henning
+    Copyright 2012 Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning \n
 ///
-/// \date 2008 \n
+/// \date 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -28,39 +28,33 @@
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 
-namespace boost { namespace gil { namespace detail {
+#include "writer_backend.hpp"
 
+namespace boost { namespace gil { 
+
+///
+/// PNM Writer
+///
 template< typename Device >
 class writer< Device
             , pnm_tag
             >
+    : public writer_backend< Device
+                           , pnm_tag
+                           >
 {
-    typedef image_write_info< pnm_tag > info_t;
-
 public:
 
-    writer( Device & file )
-        : _out( file )
-    {
-    }
+    writer( Device&                            io_dev
+          , const image_write_info< pnm_tag >& info
+          )
+    : writer_backend( io_dev
+                    , info
+                    )
+    {}
 
-    ~writer()
-    {
-    }
-
-    template<typename View>
+    template< typename View >
     void apply( const View& view )
-    {
-        info_t info;
-
-        apply( view
-             , info );
-    }
-
-    template<typename View>
-    void apply( const View&   view
-              , const info_t& /* info */
-              )
     {
         typedef typename get_pixel_type< View >::type pixel_t;
 
@@ -115,6 +109,8 @@ public:
                   );
     }
 
+private:
+
     template< typename View >
     void write_data( const View&   src
                    , std::size_t   pitch
@@ -150,9 +146,9 @@ public:
             mirror( row );
             neg   ( row );
 
-            _out.write( &row.front()
-                      , pitch / 8
-                      );
+            this->_io_dev.write( &row.front()
+                               , pitch / 8
+                               );
         }
     }
 
@@ -187,25 +183,14 @@ public:
                        , row
                        );
 
-            _out.write( &buf.front(), pitch );
+            this->_io_dev.write( &buf.front(), pitch );
 		}
     }
-
-private:
-
-    Device& _out;
 };
 
-struct pnm_write_is_supported
-{
-    template< typename View >
-    struct apply 
-        : public is_write_supported< typename get_pixel_type< View >::type
-                                   , pnm_tag
-                                   >
-    {};
-};
-
+///
+/// PNM Writer
+///
 template< typename Device >
 class dynamic_image_writer< Device
                           , pnm_tag
@@ -220,14 +205,18 @@ class dynamic_image_writer< Device
 
 public:
 
-    dynamic_image_writer( Device& file )
-    : parent_t( file )
+    dynamic_image_writer( Device&                            io_dev
+                        , const image_write_info< bmp_tag >& info
+                        )
+    : parent_t( io_dev
+              , info
+              )
     {}
 
     template< typename Views >
     void apply( const any_image_view< Views >& views )
     {
-        dynamic_io_fnobj< pnm_write_is_supported
+        dynamic_io_fnobj< detail::pnm_write_is_supported
                         , parent_t
                         > op( this );
 
@@ -235,7 +224,20 @@ public:
     }
 };
 
-} // detail
+namespace detail {
+
+struct pnm_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , pnm_tag
+                                   >
+    {};
+};
+
+} // namespace detail
+
 } // gil
 } // boost
 

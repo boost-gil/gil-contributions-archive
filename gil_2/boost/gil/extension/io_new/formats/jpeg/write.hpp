@@ -28,71 +28,47 @@
 
 #include "base.hpp"
 #include "supported_types.hpp"
+#include "writer_backend.hpp"
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil {
 
+///
+/// JPEG Writer
+///
 template< typename Device >
 class writer< Device
             , jpeg_tag
-            > : public jpeg_io_base
+            >
+    : public writer_backend< Device
+                           , jpeg_tag
+                           >
 {
 public:
 
-    writer( Device& file )
-    : out( file )
-    {
-        _cinfo.err         = jpeg_std_error( &_jerr );
-        _cinfo.client_data = this;
+    typedef writer_backend< Device
+                          , jpeg_tag
+                          > backend_t;
 
-        // Error exit handler: does not return to caller.
-        _jerr.error_exit = &writer< Device, jpeg_tag >::error_exit;
+public:
 
-        // Fire exception in case of error.
-        if( setjmp( _mark )) { raise_error(); }
-
-        _dest._jdest.free_in_buffer      = sizeof( buffer );
-        _dest._jdest.next_output_byte    = buffer;
-        _dest._jdest.init_destination    = reinterpret_cast< void(*)   ( j_compress_ptr ) >( &writer< Device, jpeg_tag >::init_device  );
-        _dest._jdest.empty_output_buffer = reinterpret_cast< boolean(*)( j_compress_ptr ) >( &writer< Device, jpeg_tag >::empty_buffer );
-        _dest._jdest.term_destination    = reinterpret_cast< void(*)   ( j_compress_ptr ) >( &writer< Device, jpeg_tag >::close_device );
-        _dest._this = this;
-
-        jpeg_create_compress( &_cinfo  );
-        _cinfo.dest = &_dest._jdest;
-
-    }
-
-    ~writer()
-    {
-        jpeg_finish_compress ( &_cinfo );
-        jpeg_destroy_compress( &_cinfo );
-    }
+    writer( Device& io_dev
+          , const image_write_info< jpeg_tag >& info
+          )
+    : backend_t( io_dev
+               , info
+               )
+    {}
 
     template<typename View>
     void apply( const View& view )
     {
-        image_write_info< jpeg_tag > info;
-
-        write_rows( view
-                  , info
-                  );
-    }
-
-    template< typename View >
-    void apply( const View&                         view
-              , const image_write_info< jpeg_tag >& info )
-    {
-        write_rows( view
-                  , info
-                  );
+        write_rows( view );
     }
 
 private:
 
     template<typename View>
-    void write_rows( const View&                         view
-                   , const image_write_info< jpeg_tag >& info
-                   )
+    void write_rows( const View& view )
     {
         std::vector< typename View::value_type > row_buffer( view.width() );
 
@@ -104,32 +80,32 @@ private:
 
         typedef typename channel_type< typename View::value_type >::type channel_t;
 
-        _cinfo.image_width      = JDIMENSION( view.width()  );
-        _cinfo.image_height     = JDIMENSION( view.height() );
-        _cinfo.input_components = num_channels<View>::value;
-        _cinfo.in_color_space   = detail::jpeg_write_support< channel_t
-                                                            , typename color_space_type< View >::type
-                                                            >::_color_space;
+        this->_cinfo.image_width      = JDIMENSION( view.width()  );
+        this->_cinfo.image_height     = JDIMENSION( view.height() );
+        this->_cinfo.input_components = num_channels<View>::value;
+        this->_cinfo.in_color_space   = detail::jpeg_write_support< channel_t
+                                                                  , typename color_space_type< View >::type
+                                                                  >::_color_space;
 
-        jpeg_set_defaults( &_cinfo );
+        jpeg_set_defaults( &this->_cinfo );
 
-        jpeg_set_quality ( &_cinfo
-                         , info._quality
+        jpeg_set_quality ( &this->_cinfo
+                         , this->_info._quality
                          , TRUE
                          );
 
         // Needs to be done after jpeg_set_defaults() since it's overridding this value back to slow.
-        _cinfo.dct_method = info._dct_method;
+        _cinfo.dct_method = this->info._dct_method;
 
 
         // set the pixel dimensions
-        _cinfo.density_unit = info._density_unit;
-        _cinfo.X_density    = info._x_density;
-        _cinfo.Y_density    = info._y_density;
+        this->_cinfo.density_unit = this->_info._density_unit;
+        this->_cinfo.X_density    = this->_info._x_density;
+        this->_cinfo.Y_density    = this->_info._y_density;
 
         // done reading header information
 
-        jpeg_start_compress( &_cinfo
+        jpeg_start_compress( &this->_cinfo
                            , TRUE
                            );
 
@@ -148,65 +124,57 @@ private:
                                 );
         }
     }
-
-    struct gil_jpeg_destination_mgr
-    {
-        jpeg_destination_mgr _jdest;
-        writer<Device,jpeg_tag> * _this;
-    };
-
-    static void init_device( jpeg_compress_struct* cinfo )
-    {
-        gil_jpeg_destination_mgr* dest = reinterpret_cast< gil_jpeg_destination_mgr* >( cinfo->dest );
-
-        dest->_jdest.free_in_buffer   = sizeof( dest->_this->buffer );
-        dest->_jdest.next_output_byte = dest->_this->buffer;
-    }
-
-    static boolean empty_buffer( jpeg_compress_struct* cinfo )
-    {
-        gil_jpeg_destination_mgr* dest = reinterpret_cast< gil_jpeg_destination_mgr* >( cinfo->dest );
-
-        dest->_this->out.write( dest->_this->buffer
-                              , buffer_size
-                              );
-
-        writer<Device,jpeg_tag>::init_device( cinfo );
-        return 1;
-    }
-
-    static void close_device( jpeg_compress_struct* cinfo )
-    {
-        writer<Device,jpeg_tag>::empty_buffer( cinfo );
-
-        gil_jpeg_destination_mgr* dest = reinterpret_cast< gil_jpeg_destination_mgr* >( cinfo->dest );
-
-        dest->_this->out.flush();
-    }
-
-    void raise_error()
-    {
-        io_error( "Cannot write jpeg file." );
-    }
-
-    static void error_exit( j_common_ptr cinfo )
-    {
-        writer< Device, jpeg_tag >* mgr = reinterpret_cast< writer< Device, jpeg_tag >* >( cinfo->client_data );
-
-        longjmp( mgr->_mark, 1 );
-    }
-
-private:
-
-    Device &out;
-
-    jpeg_compress_struct _cinfo;
-
-    gil_jpeg_destination_mgr _dest;
-
-    static const unsigned int buffer_size = 1024;
-    JOCTET buffer[buffer_size];
 };
+
+///
+/// JPEG Dyamic Image Writer
+///
+template< typename Device >
+class dynamic_image_writer< Device
+                          , jpeg_tag
+                          >
+    : public writer< Device
+                   , jpeg_tag
+                   >
+{
+    typedef writer< Device
+                  , jpeg_tag
+                  > parent_t;
+
+public:
+
+    dynamic_image_writer( Device&                             io_dev
+                        , const image_write_info< jpeg_tag >& info
+                        )
+    : parent_t( io_dev
+              , info
+              )
+    {}
+
+    template< typename Views >
+    void apply( const any_image_view< Views >& views )
+    {
+        dynamic_io_fnobj< detail::jpeg_write_is_supported
+                        , parent_t
+                        > op( this );
+
+        detail::apply_operation( views, op );
+    }
+
+    template< typename Views >
+    void apply( const any_image_view  < Views    >& views
+              , const image_write_info< jpeg_tag >& info
+              )
+    {
+        dynamic_io_fnobj< detail::jpeg_write_is_supported
+                        , parent_t
+                        > op( this );
+
+        detail::apply_operation( views, info, op );
+    }
+};
+
+namespace detail { 
 
 struct jpeg_write_is_supported
 {
@@ -277,48 +245,8 @@ typename BinaryOp::result_type apply_operation( const variant< Types1 >& arg1
                                 );
 }
 
-template< typename Device >
-class dynamic_image_writer< Device
-                          , jpeg_tag
-                          >
-    : public writer< Device
-                   , jpeg_tag
-                   >
-{
-    typedef writer< Device
-                  , jpeg_tag
-                  > parent_t;
-
-public:
-
-    dynamic_image_writer( Device& file )
-    : parent_t( file )
-    {}
-
-    template< typename Views >
-    void apply( const any_image_view< Views >& views )
-    {
-        dynamic_io_fnobj< jpeg_write_is_supported
-                        , parent_t
-                        > op( this );
-
-        apply_operation( views, op );
-    }
-
-    template< typename Views >
-    void apply( const any_image_view  < Views    >& views
-              , const image_write_info< jpeg_tag >& info
-              )
-    {
-        dynamic_io_fnobj< jpeg_write_is_supported
-                        , parent_t
-                        > op( this );
-
-        apply_operation( views, info, op );
-    }
-};
-
 } // detail
+
 } // gil
 } // boost
 

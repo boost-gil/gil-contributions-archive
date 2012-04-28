@@ -1,5 +1,5 @@
 /*
-    Copyright 2008 Christian Henning
+    Copyright 2012 Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning \n
 ///
-/// \date 2008 \n
+/// \date 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,52 +26,34 @@
 
 #include <boost/gil/extension/io_new/bmp_tags.hpp>
 
-namespace boost { namespace gil { namespace detail {
+#include "writer_backend.hpp"
 
-template < int N > struct get_bgr_cs {};
-template <> struct get_bgr_cs< 1 > { typedef gray8_view_t type; };
-template <> struct get_bgr_cs< 3 > { typedef bgr8_view_t type; };
-template <> struct get_bgr_cs< 4 > { typedef bgra8_view_t type; };
+namespace boost { namespace gil {
 
-
-template< typename Device >
-struct writer_backend< Device
-                     , bmp_tag
-                     >
-{
-    writer_backend( Device& device )
-    : _out( device )
-    {}
-
-    Device& _out;
-};
-
+///
+/// BMP Writer
+///
 template< typename Device >
 class writer< Device
             , bmp_tag
-            > : public writer_backend< Device
-                                     , bmp_tag
-                                     >
+            >
+    : public writer_backend< Device
+                           , bmp_tag
+                           >
 {
 public:
 
-    writer( Device& file )
-    : writer_backend( file )
+    writer( Device& file
+          , const image_write_info< bmp_tag >& info 
+          )
+    : writer_backend( file
+                    , info
+                    );
     {}
 
     template<typename View>
     void apply( const View& view )
     {
-        write( view );
-    }
-
-    template<typename View>
-    void apply( const View&                           view
-              , const image_write_info< bmp_tag >& /* info */
-              )
-    {
-        // Add code here, once image_write_info< bmp_tag > isn't empty anymore.
-
         write( view );
     }
 
@@ -135,7 +117,7 @@ private:
         _out.write_uint32( 0 );
 
         write_image< View
-                   , typename get_bgr_cs< num_channels< View >::value >::type
+                   , typename detail::get_bgr_cs< num_channels< View >::value >::type
                    >( view, spn );
     }
 
@@ -185,6 +167,10 @@ struct bmp_write_is_supported
     {};
 };
 
+
+///
+/// BMP Dynamic Image Writer
+///
 template< typename Device >
 class dynamic_image_writer< Device
                           , bmp_tag
@@ -199,8 +185,12 @@ class dynamic_image_writer< Device
 
 public:
 
-    dynamic_image_writer( Device& file )
-    : parent_t( file )
+    dynamic_image_writer( Device& file
+                        , const image_write_info< bmp_tag >& info
+                        )
+    : parent_t( file
+              , info
+              )
     {}
 
     template< typename Views >
@@ -214,7 +204,16 @@ public:
     }
 };
 
-} // detail
+namespace detail {
+
+template < int N > struct get_bgr_cs {};
+template <> struct get_bgr_cs< 1 > { typedef gray8_view_t type; };
+template <> struct get_bgr_cs< 3 > { typedef bgr8_view_t type;  };
+template <> struct get_bgr_cs< 4 > { typedef bgra8_view_t type; };
+
+} // namespace detail
+
+
 } // gil
 } // boost
 
