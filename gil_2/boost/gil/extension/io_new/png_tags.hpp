@@ -228,8 +228,6 @@ struct png_info_base
     , _file_gamma      ( 1 )
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
-    , _pixels_per_meter( 0 )
-
     , _valid_icc_profile    ( 0                         )
     , _icc_name             (                           )
     , _iccp_compression_type( PNG_COMPRESSION_TYPE_BASE )
@@ -267,6 +265,8 @@ struct png_info_base
     , _res_x           ( 0                      )
     , _res_y           ( 0                      )
     , _phy_unit_type   ( PNG_RESOLUTION_UNKNOWN )
+
+    , _pixels_per_meter( 0 )
 
     , _valid_significant_bits( 0 )
     , _sig_bits              (   )

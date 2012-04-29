@@ -356,15 +356,15 @@ void read_image( Device&                                 file
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::dynamic_image_reader< Device
-                                , FormatTag
-                                > dyn_reader( file
-                                            , settings
-                                            );
+    dynamic_image_reader< Device
+                        , FormatTag
+                        > dyn_reader( file
+                                    , settings
+                                    );
 
-    reader.init_image( images
-                     , reader._settings
-                     );
+    dyn_reader.init_image( images
+                         , dyn_reader._settings
+                         );
 
     dyn_reader.apply( images );
 }

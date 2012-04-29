@@ -76,8 +76,8 @@ public:
     //
     ~scanline_reader()
     {
-        png_destroy_read_struct( &_png_ptr
-                               , &_info_ptr
+        png_destroy_read_struct( &this->_png_ptr
+                               , &this->_info_ptr
                                , NULL
                                );
     }
@@ -91,24 +91,24 @@ public:
             if( this->_info._bit_depth == 16 )
             {
                 // Swap bytes of 16 bit files to least significant byte first.
-                png_set_swap( _png_ptr );
+                png_set_swap( this->_png_ptr );
             }
 
             if( this->_info._bit_depth < 8 )
             {
                 // swap bits of 1, 2, 4 bit packed pixel formats
-                png_set_packswap( _png_ptr );
+                png_set_packswap( this->_png_ptr );
             }
         }
 
         if( this->_info._color_type == PNG_COLOR_TYPE_PALETTE )
         {
-            png_set_palette_to_rgb( _png_ptr );
+            png_set_palette_to_rgb( this->_png_ptr );
         }
 
         if( this->_info._num_trans > 0 )
         {
-            png_set_tRNS_to_alpha( _png_ptr );
+            png_set_tRNS_to_alpha( this->_png_ptr );
         }
 
         // Tell libpng to handle the gamma conversion for you.  The final call
@@ -125,7 +125,7 @@ public:
                      , this->_info._file_gamma
                      );
 #else
-        png_set_gamma( _png_ptr
+        png_set_gamma( this->_png_ptr
                      , this->_settings._screen_gamma
                      , this->_info._file_gamma
                      );
@@ -135,30 +135,30 @@ public:
         // Turn on interlace handling.  REQUIRED if you are not using
         // png_read_image().  To see how to handle interlacing passes,
         // see the png_read_row() method below:
-        _number_passes = png_set_interlace_handling( _png_ptr );
-        io_error_if( _number_passes != 1, "scanline_read_iterator cannot read interlaced png images." );
+        this->_number_passes = png_set_interlace_handling( this->_png_ptr );
+        io_error_if( this->_number_passes != 1, "scanline_read_iterator cannot read interlaced png images." );
 
 
         // The above transformation might have changed the bit_depth and color type.
-        png_read_update_info( _png_ptr
-                            , _info_ptr
+        png_read_update_info( this->_png_ptr
+                            , this->_info_ptr
                             );
 
-        this->_info._bit_depth = png_get_bit_depth( _png_ptr
-                                                  , _info_ptr
+        this->_info._bit_depth = png_get_bit_depth( this->_png_ptr
+                                                  , this->_info_ptr
                                                   );
 
-        this->_info._num_channels = png_get_channels( _png_ptr
-                                                    , _info_ptr
+        this->_info._num_channels = png_get_channels( this->_png_ptr
+                                                    , this->_info_ptr
                                                     );
 
-        this->_info._color_type = png_get_color_type( _png_ptr
-                                                    , _info_ptr
+        this->_info._color_type = png_get_color_type( this->_png_ptr
+                                                    , this->_info_ptr
                                                     );
 
-        _scanline_length = png_get_rowbytes( _png_ptr
-                                           , _info_ptr
-                                           );
+        this->_scanline_length = png_get_rowbytes( this->_png_ptr
+                                                 , this->_info_ptr
+                                                 );
     }
 
     void read( byte_t* dst, int pos )
@@ -186,7 +186,7 @@ private:
 
     void read_scanline( byte_t* dst )
     {
-        png_read_rows( _png_ptr
+        png_read_rows( this->_png_ptr
                      , &dst
                      , NULL
                      , 1

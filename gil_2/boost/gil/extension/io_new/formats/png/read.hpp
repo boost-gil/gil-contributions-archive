@@ -35,6 +35,45 @@
 
 namespace boost { namespace gil {
 
+namespace detail {
+
+struct png_type_format_checker
+{
+    png_type_format_checker( png_bitdepth::type   bit_depth
+                           , png_color_type::type color_type
+                           )
+    : _bit_depth ( bit_depth  )
+    , _color_type( color_type )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                 , png_tag
+                                 > is_supported_t;
+
+        return is_supported_t::_bit_depth  == _bit_depth
+            && is_supported_t::_color_type == _color_type;
+    }
+
+private:
+
+    png_bitdepth::type   _bit_depth;
+    png_color_type::type _color_type;
+};
+
+struct png_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , png_tag
+                                           >
+    {};
+};
+
+} // namespace detail
+
 ///
 /// PNG Reader
 ///
@@ -91,8 +130,8 @@ public:
 
     ~reader()
     {
-        png_destroy_read_struct( &_png_ptr
-                               , &_info_ptr
+        png_destroy_read_struct( &this->_png_ptr
+                               , &this->_info_ptr
                                , NULL
                                );
     }
@@ -110,24 +149,24 @@ public:
             if( this->_info._bit_depth == 16 )
             {
                 // Swap bytes of 16 bit files to least significant byte first.
-                png_set_swap( _png_ptr );
+                png_set_swap( this->_png_ptr );
             }
 
             if( this->_info._bit_depth < 8 )
             {
                 // swap bits of 1, 2, 4 bit packed pixel formats
-                png_set_packswap( _png_ptr );
+                png_set_packswap( this->_png_ptr );
             }
         }
 
         if( this->_info._color_type == PNG_COLOR_TYPE_PALETTE )
         {
-            png_set_palette_to_rgb( _png_ptr );
+            png_set_palette_to_rgb( this->_png_ptr );
         }
 
         if( this->_info._num_trans > 0 )
         {
-            png_set_tRNS_to_alpha( _png_ptr );
+            png_set_tRNS_to_alpha( this->_png_ptr );
         }
 
         // Tell libpng to handle the gamma conversion for you.  The final call
@@ -144,7 +183,7 @@ public:
                      , this->_info._file_gamma
                      );
 #else
-        png_set_gamma( _png_ptr
+        png_set_gamma( this->_png_ptr
                      , this->_settings._screen_gamma
                      , this->_info._file_gamma
                      );
@@ -154,28 +193,28 @@ public:
         // Turn on interlace handling.  REQUIRED if you are not using
         // png_read_image().  To see how to handle interlacing passes,
         // see the png_read_row() method below:
-        _number_passes = png_set_interlace_handling( _png_ptr );
+        this->_number_passes = png_set_interlace_handling( this->_png_ptr );
 
 
         // The above transformation might have changed the bit_depth and color type.
-        png_read_update_info( _png_ptr
-                            , _info_ptr
+        png_read_update_info( this->_png_ptr
+                            , this->_info_ptr
                             );
 
-        this->_info._bit_depth = png_get_bit_depth( _png_ptr
-                                                  , _info_ptr
+        this->_info._bit_depth = png_get_bit_depth( this->_png_ptr
+                                                  , this->_info_ptr
                                                   );
 
-        this->_info._num_channels = png_get_channels( _png_ptr
-                                                    , _info_ptr
+        this->_info._num_channels = png_get_channels( this->_png_ptr
+                                                    , this->_info_ptr
                                                     );
 
-        this->_info._color_type = png_get_color_type( _png_ptr
-                                                    , _info_ptr
+        this->_info._color_type = png_get_color_type( this->_png_ptr
+                                                    , this->_info_ptr
                                                     );
 
-        this->_scanline_length = png_get_rowbytes( _png_ptr
-                                                 , _info_ptr
+        this->_scanline_length = png_get_rowbytes( this->_png_ptr
+                                                 , this->_info_ptr
                                                  );
 
         switch( this->_info._color_type )
@@ -236,7 +275,7 @@ public:
         }
 
         // read rest of file, and get additional chunks in info_ptr
-        png_read_end( _png_ptr
+        png_read_end( this->_png_ptr
                     , NULL
                     );
     }
@@ -247,7 +286,7 @@ private:
             , typename View
             >
     void read_rows( const View& view )
-    {
+    {		
         typedef detail::row_buffer_helper_view< ImagePixel > row_buffer_helper_t;
 
         typedef typename row_buffer_helper_t::buffer_t   buffer_t;
@@ -263,8 +302,8 @@ private:
                    , "Image types aren't compatible."
                    );
 
-        std::size_t rowbytes = png_get_rowbytes( _png_ptr
-                                               , _info_ptr
+        std::size_t rowbytes = png_get_rowbytes( this->_png_ptr
+                                               , this->_info_ptr
                                                );
 
         row_buffer_helper_t buffer( rowbytes
@@ -273,15 +312,15 @@ private:
 
         png_bytep row_ptr = (png_bytep)( &( buffer.data()[0]));
 
-        for( std::size_t pass = 0; pass < _number_passes; pass++ )
+        for( std::size_t pass = 0; pass < this->_number_passes; pass++ )
         {
-            if( pass == _number_passes - 1 )
+            if( pass == this->_number_passes - 1 )
             {
                 // skip lines if necessary
                 for( std::ptrdiff_t y = 0; y < this->_settings._top_left.y; ++y )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
+                    png_read_rows( this->_png_ptr
                                  , &row_ptr
                                  , NULL
                                  , 1
@@ -294,7 +333,7 @@ private:
                    )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
+                    png_read_rows( this->_png_ptr
                                  , &row_ptr
                                  , NULL
                                  , 1
@@ -318,7 +357,7 @@ private:
                    )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
+                    png_read_rows( this->_png_ptr
                                  , &row_ptr
                                  , NULL
                                  , 1
@@ -330,7 +369,7 @@ private:
                 for( int y = 0; y < view.height(); ++y )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( _png_ptr
+                    png_read_rows( this->_png_ptr
                                  , &row_ptr
                                  , NULL
                                  , 1
@@ -389,9 +428,9 @@ public:
                       , this->_info
                       );
 
-            dynamic_io_fnobj< png_read_is_supported
-                            , parent_t
-                            > op( this );
+            boost::gil::detail::dynamic_io_fnobj< boost::gil::detail::png_read_is_supported
+							                    , parent_t
+                                                > op( this );
 
             apply_operation( view( images )
                            , op
@@ -399,45 +438,6 @@ public:
         }
     }
 };
-
-namespace detail {
-
-struct png_type_format_checker
-{
-    png_type_format_checker( png_bitdepth::type   bit_depth
-                           , png_color_type::type color_type
-                           )
-    : _bit_depth ( bit_depth  )
-    , _color_type( color_type )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                 , png_tag
-                                 > is_supported_t;
-
-        return is_supported_t::_bit_depth  == _bit_depth
-            && is_supported_t::_color_type == _color_type;
-    }
-
-private:
-
-    png_bitdepth::type   _bit_depth;
-    png_color_type::type _color_type;
-};
-
-struct png_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , png_tag
-                                           >
-    {};
-};
-
-} // namespace detail
 
 } // namespace gil
 } // namespace boost

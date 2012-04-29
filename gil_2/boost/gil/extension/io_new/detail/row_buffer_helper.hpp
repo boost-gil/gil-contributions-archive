@@ -113,7 +113,7 @@ private:
 
 template<typename Pixel >
 struct row_buffer_helper< Pixel
-                        , typename enable_if< typename mpl::and_< typename is_bit_aligned< Pixel >::type
+                        , typename boost::enable_if< typename mpl::and_< typename is_bit_aligned< Pixel >::type
                                                                 , typename is_homogeneous< Pixel >::type
                                                                 >::type
                                             >

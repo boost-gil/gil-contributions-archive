@@ -117,7 +117,7 @@ template< typename Device, typename FormatTag > struct writer_backend;
 
 template< typename FormatTag > struct image_read_info;
 template< typename FormatTag > struct image_read_settings;
-template< typename FormatTag, typename Log = typename no_log > struct image_write_info;
+template< typename FormatTag, typename Log = no_log > struct image_write_info;
 
 } // namespace gil
 } // namespace boost

@@ -44,6 +44,20 @@
 
 namespace boost { namespace gil {
 
+namespace detail {
+
+struct png_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , png_tag
+                                   >
+    {};
+};
+
+} // namespace detail
+
 ///
 /// PNG Writer
 ///
@@ -58,12 +72,14 @@ class writer< Device
 
 public:
 
+    typedef writer_backend< Device , png_tag > backend_t;
+
     writer( Device&                            io_dev
           , const image_write_info< png_tag >& info
           )
-    : writer_backend( io_dev
-                    , info
-                    )
+    : backend_t( io_dev
+               , info
+               )
     {}
 
 
@@ -98,12 +114,12 @@ private:
         {
             if( png_rw_info::_bit_depth == 16 )
             {
-                png_set_swap( _png_ptr );
+                png_set_swap( this->_png_ptr );
             }
 
             if( png_rw_info::_bit_depth < 8 )
             {
-                png_set_packswap( _png_ptr );
+                png_set_packswap( this->_png_ptr );
             }
         }
 
@@ -118,13 +134,13 @@ private:
                      , row_buffer.begin()
                      );
 
-            png_write_row( _png_ptr
+            png_write_row( this->_png_ptr
                          , reinterpret_cast< png_bytep >( row_buffer.data() )
                          );
         }
 
-        png_write_end( _png_ptr
-                     , _info_ptr
+        png_write_end( this->_png_ptr
+                     , this->_info_ptr
                      );
     }
 
@@ -133,22 +149,22 @@ private:
                    , mpl::true_         // is bit aligned
                    )
     {
-        typedef png_write_support< typename kth_semantic_element_type< typename View::value_type
-                                                                     , 0
-                                                                     >::type
-                                 , typename color_space_type<View>::type
-                                 > png_rw_info;
+        typedef detail::png_write_support< typename kth_semantic_element_type< typename View::value_type
+                                                                             , 0
+                                                                             >::type
+                                         , typename color_space_type<View>::type
+                                         > png_rw_info;
 
         if (little_endian() )
         {
             if( png_rw_info::_bit_depth == 16 )
             {
-                png_set_swap( _png_ptr );
+                png_set_swap( this->_png_ptr );
             }
 
             if( png_rw_info::_bit_depth < 8 )
             {
-                png_set_packswap( _png_ptr );
+                png_set_packswap( this->_png_ptr );
             }
         }
 
@@ -163,19 +179,19 @@ private:
                      , row_buffer.begin()
                      );
 
-            png_write_row( _png_ptr
+            png_write_row( this->_png_ptr
                          , reinterpret_cast< png_bytep >( row_buffer.data() )
                          );
         }
 
-        png_free_data( _png_ptr
-                     , _info_ptr
+        png_free_data( this->_png_ptr
+                     , this->_info_ptr
                      , PNG_FREE_UNKN
                      , -1
                      );
 
-        png_write_end( _png_ptr
-                     , _info_ptr
+        png_write_end( this->_png_ptr
+                     , this->_info_ptr
                      );
     }
 };
@@ -204,27 +220,13 @@ public:
     template< typename Views >
     void apply( const any_image_view< Views >& views )
     {
-        dynamic_io_fnobj< detail::png_write_is_supported
-                        , parent_t
-                        > op( this );
+        detail::dynamic_io_fnobj< detail::png_write_is_supported
+                                , parent_t
+                                > op( this );
 
         apply_operation( views, op );
     }
 };
-
-namespace detail {
-
-struct png_write_is_supported
-{
-    template< typename View >
-    struct apply 
-        : public is_write_supported< typename get_pixel_type< View >::type
-                                   , png_tag
-                                   >
-    {};
-};
-
-} // namespace detail
 
 } // namespace gil
 } // namespace boost
