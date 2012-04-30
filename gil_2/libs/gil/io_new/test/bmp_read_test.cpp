@@ -28,22 +28,26 @@ void write( Image&        img
 BOOST_AUTO_TEST_CASE( read_header_test )
 {
     {
-        image_read_info< tag_t > info = read_image_info( bmp_filename
-                                                       , tag_t()
-                                                       );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._offset               ,    54u );
-        BOOST_CHECK_EQUAL( info._header_size          ,    40u );
-        BOOST_CHECK_EQUAL( info._width                ,   127  );
-        BOOST_CHECK_EQUAL( info._height               ,    64  );
-        BOOST_CHECK_EQUAL( info._bits_per_pixel       ,    24  );
-        BOOST_CHECK_EQUAL( info._compression          ,     0u );
-        BOOST_CHECK_EQUAL( info._image_size           , 24576u );
-        BOOST_CHECK_EQUAL( info._horizontal_resolution,     0  );
-        BOOST_CHECK_EQUAL( info._vertical_resolution  ,     0  );
-        BOOST_CHECK_EQUAL( info._num_colors           ,     0u );
-        BOOST_CHECK_EQUAL( info._num_important_colors ,     0u );
-        BOOST_CHECK_EQUAL( info._valid                ,  true  );
+        backend_t backend = read_image_info( bmp_filename
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._offset               ,    54u );
+        BOOST_CHECK_EQUAL( backend._info._header_size          ,    40u );
+        BOOST_CHECK_EQUAL( backend._info._width                ,   127  );
+        BOOST_CHECK_EQUAL( backend._info._height               ,    64  );
+        BOOST_CHECK_EQUAL( backend._info._bits_per_pixel       ,    24  );
+        BOOST_CHECK_EQUAL( backend._info._compression          ,     0u );
+        BOOST_CHECK_EQUAL( backend._info._image_size           , 24576u );
+        BOOST_CHECK_EQUAL( backend._info._horizontal_resolution,     0  );
+        BOOST_CHECK_EQUAL( backend._info._vertical_resolution  ,     0  );
+        BOOST_CHECK_EQUAL( backend._info._num_colors           ,     0u );
+        BOOST_CHECK_EQUAL( backend._info._num_important_colors ,     0u );
+        BOOST_CHECK_EQUAL( backend._info._valid                ,  true  );
     }
 }
 

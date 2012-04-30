@@ -38,11 +38,8 @@ struct reader_backend< Device
     , _settings( settings )
     , _info()
     , _scanline_length(0)
-    {}
-
-    ~reader_backend()
     {
-        _io_dev.set_close( true );
+        read_header();    
     }
 
     void read_header()

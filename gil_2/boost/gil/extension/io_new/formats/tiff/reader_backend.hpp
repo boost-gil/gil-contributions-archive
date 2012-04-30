@@ -45,12 +45,8 @@ struct reader_backend< Device
     , _blue ( NULL )
     {
         init_multipage_read( settings );
-    }
 
-    ~reader_backend()
-    {
-        ///@todo
-        //_io_dev.set_close( true );
+        read_header();
     }
 
     void read_header()

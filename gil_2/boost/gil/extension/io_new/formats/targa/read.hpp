@@ -94,11 +94,6 @@ public:
     template< typename View >
     void apply( const View& dst_view )
     {
-        if( !this->_info._valid )
-        {
-            read_header();
-        }
-
         typedef typename is_same< ConversionPolicy
                                 , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;

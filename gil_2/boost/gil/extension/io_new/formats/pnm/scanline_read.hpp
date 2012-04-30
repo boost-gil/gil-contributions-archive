@@ -240,62 +240,6 @@ private:
 
 private:
 
-    // Read a character and skip a comment if necessary.
-    char read_char()
-    {
-        char ch;
-
-        if(( ch = _io_dev.getc() ) == '#' )
-        {
-            // skip comment to EOL
-            do
-            {
-                ch = _io_dev.getc();
-            }
-            while (ch != '\n' && ch != '\r');
-        }
-
-        return ch;
-    }
-
-	unsigned int read_int()
-	{
-		char ch;
-
-        // skip whitespaces, tabs, and new lines
-		do
-		{
-			ch = read_char();
-		}
-		while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
-
-		if( ch < '0' || ch > '9' )
-		{
-			io_error( "Unexpected characters reading decimal digits" );
-		}
-
-		unsigned val = 0;
-
-        do
-        {
-			unsigned dig = ch - '0';
-
-			if( val > INT_MAX / 10 - dig )
-			{
-				io_error( "Integer too large" );
-			}
-
-			val = val * 10 + dig;
-
-			ch = read_char();
-		}
-		while( '0' <= ch && ch <= '9' );
-
-		return val;
-	}
-
-private:
-
     char _text_buffer[16];
 
     // For bit_aligned images we need to negate all bytes in the row_buffer

@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Andreas Pokorny, Christian Henning
+    Copyright 2007-2012 Andreas Pokorny, Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Andreas Pokorny, Christian Henning \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,85 +62,118 @@ public:
     struct read_tag {};
     struct write_tag {};
 
+    ///
+    /// Constructor
+    ///
     file_stream_device( const std::string& file_name
                       , read_tag   = read_tag()
-                      , bool close = true
                       )
-    : file( 0 )
-    , _close( close )
     {
+        FILE* file = NULL;
+
         io_error_if( ( file = fopen( file_name.c_str(), "rb" )) == NULL
                    , "file_stream_device: failed to open file"
                    );
+
+        _file = file_ptr_t( file
+                          , file_deleter
+                          );
     }
 
+    ///
+    /// Constructor
+    ///
     file_stream_device( const char* file_name
                       , read_tag   = read_tag()
-                      , bool close = true
                       )
-        : file( 0 )
-        , _close( close )
     {
+        FILE* file = NULL;
+
         io_error_if( ( file = fopen( file_name, "rb" )) == NULL
                    , "file_stream_device: failed to open file"
                    );
+
+        _file = file_ptr_t( file
+                          , file_deleter
+                          );
     }
 
-
+    ///
+    /// Constructor
+    ///
     file_stream_device( const std::string& file_name
                       , write_tag
                       )
-    : file( 0 )
-    , _close( true )
     {
+        FILE* file = NULL;
+
         io_error_if( ( file = fopen( file_name.c_str(), "wb" )) == NULL
                    , "file_stream_device: failed to open file"
                    );
+
+        _file = file_ptr_t( file
+                          , file_deleter
+                          );
     }
 
+    ///
+    /// Constructor
+    ///
     file_stream_device( const char* file_name
                       , write_tag
                       )
-    : file( 0 )
-    , _close( true )
     {
+        FILE* file = NULL;
+
         io_error_if( ( file = fopen( file_name, "wb" )) == NULL
                    , "file_stream_device: failed to open file"
                    );
+
+        _file = file_ptr_t( file
+                          , file_deleter
+                          );
     }
 
-    file_stream_device( FILE* filep )
-    : file( filep )
-    , _close( false )
+    ///
+    /// Constructor
+    ///
+    file_stream_device( FILE* file )
+    : _file( file
+           , file_deleter
+           )
     {}
 
-    ~file_stream_device()
-    {
-        if( _close )
-        {
-            fclose( file );
-        }
-    }
+    FILE*       get()       { return _file.get(); }
+    const FILE* get() const { return _file.get(); }
 
     int getc_unchecked()
     {
-        return std::getc( file );
+        return std::getc( get() );
     }
 
     char getc()
     {
         int ch;
 
-        if(( ch = std::getc( file )) == EOF )
+        if(( ch = std::getc( get() )) == EOF )
             io_error( "file_stream_device: unexpected EOF" );
 
         return ( char ) ch;
     }
 
     std::size_t read( byte_t*     data
-                    , std::size_t count )
+                    , std::size_t count
+                    )
     {
-        return fread( data, 1, static_cast<int>( count ), file );
+        std::size_t num_elements = fread( data
+                                        , 1
+                                        , static_cast<int>( count )
+                                        , get()
+                                        );
+
+        assert( num_elements == count );
+
+        return num_elements;
     }
 
     /// Reads array
@@ -181,9 +214,20 @@ public:
 
     /// Writes number of elements from a buffer
     template < typename T >
-    size_t write(const T *buf, size_t cnt) throw()
+    size_t write( const T*    buf
+                , std::size_t count
+                )
+    throw()
     {
-        return fwrite( buf, buff_item<T>::size, cnt, file );
+        std::size_t num_elements = fwrite( buf
+                                         , buff_item<T>::size
+                                         , count
+                                         , get()
+                                         );
+
+        assert( num_elements == count );
+
+        return num_elements;
     }
 
     /// Writes array
@@ -228,14 +272,17 @@ public:
 
     void seek( long count, int whence = SEEK_SET )
     {
-        io_error_if( fseek(file, count, whence ) != 0
+        io_error_if( fseek( get()
+                          , count
+                          , whence
+                          ) != 0
                    , "file read error"
                    );
     }
 
     long int tell()
     {
-        long int pos = ftell( file );
+        long int pos = ftell( get() );
 
         io_error_if( pos == -1L
                    , "file read error"
@@ -246,30 +293,40 @@ public:
 
     void flush()
     {
-        fflush( file );
+        fflush( get() );
     }
 
     /// Prints formatted ASCII text
     void print_line( const std::string& line )
     {
-        fwrite( line.c_str(), sizeof( char ), line.size(), file );
+        std::size_t num_elements = fwrite( line.c_str()
+                                         , sizeof( char )
+                                         , line.size()
+                                         , get()
+                                         );
+
+        assert( num_elements == line.size() );
     }
 
     int error()
     {
-        return ferror(file);
-    }
-
-    void set_close( bool close )
-    {
-        _close = close;
+        return ferror( get() );
     }
 
 private:
 
-    FILE* file;
+    static void file_deleter( FILE* file )
+    {
+        if( file )
+        {
+            fclose( file );
+        }
+    }    
 
-    bool _close;
+private:
+
+    typedef boost::shared_ptr< FILE > file_ptr_t;
+    file_ptr_t _file;
 };
 
 

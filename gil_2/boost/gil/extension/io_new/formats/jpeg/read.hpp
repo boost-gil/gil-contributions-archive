@@ -102,8 +102,7 @@ public:
         // Fire exception in case of error.
         if( setjmp( this->_mark )) { this->raise_error(); }
 
-        jpeg_decompress_struct& cinfo = this->_cinfo;
-        cinfo.dct_method = this->_settings._dct_method;
+        this->get()->dct_method = this->_settings._dct_method;
 
         typedef typename is_same< ConversionPolicy
                                 , detail::read_and_no_convert
@@ -115,7 +114,7 @@ public:
                    , "Image types aren't compatible."
                    );
 
-        if( jpeg_start_decompress( &this->_cinfo ) == false )
+        if( jpeg_start_decompress( this->get() ) == false )
         {
             io_error( "Cannot start decompression." );
         }
@@ -144,7 +143,7 @@ public:
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             case JCS_YCCK:
             {
-                this->_cinfo.out_color_space = JCS_CMYK;
+                this->get()->out_color_space = JCS_CMYK;
                 this->_scanline_length = this->_info._width * num_channels< cmyk8_view_t >::value;
 
                 read_rows< cmyk8_pixel_t >( view );
@@ -154,7 +153,7 @@ public:
             default: { io_error( "Unsupported jpeg color space." ); }
         }
 
-        jpeg_finish_decompress ( &this->_cinfo );
+        jpeg_finish_decompress ( this->get() );
     }
 
 private:
@@ -179,10 +178,10 @@ private:
         //Skip scanlines if necessary.
         for( int y = 0; y <  this->_settings._top_left.y; ++y )
         {
-            io_error_if( jpeg_read_scanlines( &this->_cinfo
-                                         , &row_adr
-                                         , 1
-                                         ) !=1
+            io_error_if( jpeg_read_scanlines( this->get()
+                                            , &row_adr
+                                            , 1
+                                            ) !=1
                        , "jpeg_read_scanlines: fail to read JPEG file"
                        );
         }
@@ -190,10 +189,10 @@ private:
         // Read data.
         for( int y = 0; y < view.height(); ++y )
         {
-            io_error_if( jpeg_read_scanlines( &this->_cinfo
-                                         , &row_adr
-                                         , 1
-                                         ) !=1
+            io_error_if( jpeg_read_scanlines( this->get()
+                                            , &row_adr
+                                            , 1
+                                            ) != 1
                        , "jpeg_read_scanlines: fail to read JPEG file"
                        );
 
@@ -207,9 +206,9 @@ private:
         }
 
         //@todo: There might be a better way to do that.
-        while( this->_cinfo.output_scanline <  this->_cinfo.image_height )
+        while( this->get()->output_scanline < this->get()->image_height )
         {
-            io_error_if( jpeg_read_scanlines( &this->_cinfo
+            io_error_if( jpeg_read_scanlines( this->get()
                                             , &row_adr
                                             , 1
                                             ) !=1

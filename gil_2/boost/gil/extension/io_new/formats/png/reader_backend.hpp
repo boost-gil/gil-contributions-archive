@@ -21,6 +21,8 @@
 
 #include <boost/gil/extension/io_new/png_tags.hpp>
 
+#include "base.hpp"
+
 namespace boost { namespace gil {
 
 ///
@@ -30,6 +32,7 @@ template<typename Device >
 struct reader_backend< Device
                      , png_tag
                      >
+    : public detail::png_struct_info_wrapper
 {
 public:
 
@@ -49,11 +52,9 @@ public:
     , _info()
     , _scanline_length( 0 )
 
-    , _png_ptr ( NULL )
-    , _info_ptr( NULL )
     , _number_passes( 0 )
     {
-        init_reader();
+        read_header();
     }
 
     void read_header()
@@ -81,13 +82,13 @@ public:
         // you can supply NULL for the last three parameters.  We also supply the
         // the compiler header file version, so that we know if the application
         // was compiled with a compatible version of the library.  REQUIRED
-        _png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING
-                                         , NULL  // user_error_ptr
-                                         , NULL  // user_error_fn
-                                         , NULL  // user_warning_fn
-                                         );
+        get()->_struct = png_create_read_struct( PNG_LIBPNG_VER_STRING
+                                             , NULL  // user_error_ptr
+                                             , NULL  // user_error_fn
+                                             , NULL  // user_warning_fn
+                                             );
 
-        io_error_if( _png_ptr == NULL
+        io_error_if( get()->_struct == NULL
                    , "png_reader: fail to call png_create_write_struct()"
                    );
 
@@ -96,17 +97,17 @@ public:
         user_chunk_data[1] = 0;
         user_chunk_data[2] = 0;
         user_chunk_data[3] = 0;
-        png_set_read_user_chunk_fn( _png_ptr
+        png_set_read_user_chunk_fn( get_struct()
                                   , user_chunk_data
                                   , this_t::read_user_chunk_callback
                                   );
 
         // Allocate/initialize the memory for image information.  REQUIRED.
-        _info_ptr = png_create_info_struct( _png_ptr );
+        get()->_info = png_create_info_struct( get_struct() );
 
-        if( _info_ptr == NULL )
+        if( get_info() == NULL )
         {
-            png_destroy_read_struct( &_png_ptr
+            png_destroy_read_struct( &get()->_struct
                                    , NULL
                                    , NULL
                                    );
@@ -117,18 +118,18 @@ public:
         // Set error handling if you are using the setjmp/longjmp method (this is
         // the normal method of doing things with libpng).  REQUIRED unless you
         // set up your own error handlers in the png_create_read_struct() earlier.
-        if( setjmp( png_jmpbuf( _png_ptr )))
+        if( setjmp( png_jmpbuf( get_struct() )))
         {
             //free all of the memory associated with the png_ptr and info_ptr
-            png_destroy_read_struct( &_png_ptr
-                                   , &_info_ptr
+            png_destroy_read_struct( &get()->_struct
+                                   , &get()->_info
                                    , NULL
                                    );
 
             io_error( "png is invalid" );
         }
 
-        png_set_read_fn( _png_ptr
+        png_set_read_fn( get_struct()
                        , static_cast< png_voidp >( &this->_io_dev )
                        , this_t::read_data
                        );
@@ -136,17 +137,17 @@ public:
         // Set up a callback function that will be
         // called after each row has been read, which you can use to control
         // a progress meter or the like.
-        png_set_read_status_fn( _png_ptr
+        png_set_read_status_fn( get_struct()
                               , this_t::read_row_callback
                               );
 
         // Set up a callback which implements user defined transformation.
         // @todo
-        png_set_read_user_transform_fn( _png_ptr
+        png_set_read_user_transform_fn( get_struct()
                                       , png_user_transform_ptr( NULL )
                                       );
 
-        png_set_keep_unknown_chunks( _png_ptr
+        png_set_keep_unknown_chunks( get_struct()
                                    , PNG_HANDLE_CHUNK_ALWAYS
                                    , NULL
                                    , 0
@@ -155,14 +156,14 @@ public:
 
         // Make sure we read the signature.
         // @todo make it an option
-        png_set_sig_bytes( _png_ptr
+        png_set_sig_bytes( get_struct()
                          , PNG_BYTES_TO_CHECK
                          );
 
         // The call to png_read_info() gives us all of the information from the
         // PNG file before the first IDAT (image data chunk).  REQUIRED
-        png_read_info( _png_ptr
-                     , _info_ptr
+        png_read_info( get_struct()
+                     , get_info()
                      );
 
         ///
@@ -170,8 +171,8 @@ public:
         ///
 
         // get PNG_IHDR chunk information from png_info structure
-        png_get_IHDR( _png_ptr
-                    , _info_ptr
+        png_get_IHDR( get_struct()
+                    , get_info()
                     , &this->_info._width
                     , &this->_info._height
                     , &this->_info._bit_depth
@@ -182,8 +183,8 @@ public:
                     );
 
         // get number of color channels in image
-        this->_info._num_channels = png_get_channels( _png_ptr
-                                              , _info_ptr
+        this->_info._num_channels = png_get_channels( get_struct()
+                                              , get_info()
                                               );
 
 #ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
@@ -191,8 +192,8 @@ public:
         // Get CIE chromacities and referenced white point
         if( this->_settings._read_cie_chromacities )
         {
-            this->_info._valid_cie_colors = png_get_cHRM( _png_ptr
-                                                        , _info_ptr
+            this->_info._valid_cie_colors = png_get_cHRM( get_struct()
+                                                        , get_info()
                                                         , &this->_info._white_x, &this->_info._white_y
                                                         ,   &this->_info._red_x,   &this->_info._red_y
                                                         , &this->_info._green_x, &this->_info._green_y
@@ -203,8 +204,8 @@ public:
         // get the gamma value
         if( this->_settings._read_file_gamma )
         {
-            this->_info._valid_file_gamma = png_get_gAMA( _png_ptr
-                                                        , _info_ptr
+            this->_info._valid_file_gamma = png_get_gAMA( get_struct()
+                                                        , get_info()
                                                         , &this->_info._file_gamma
                                                         );
 
@@ -218,8 +219,8 @@ public:
         // Get CIE chromacities and referenced white point
         if( this->_settings._read_cie_chromacities )
         {
-            this->_info._valid_cie_colors = png_get_cHRM_fixed( _png_ptr
-                                                              , _info_ptr
+            this->_info._valid_cie_colors = png_get_cHRM_fixed( get_struct()
+                                                              , get_info()
                                                               , &this->_info._white_x, &this->_info._white_y
                                                               ,   &this->_info._red_x,   &this->_info._red_y
                                                               , &this->_info._green_x, &this->_info._green_y
@@ -230,8 +231,8 @@ public:
         // get the gamma value
         if( this->_settings._read_file_gamma )
         {
-            this->_info._valid_file_gamma = png_get_gAMA_fixed( _png_ptr
-                                                              , _info_ptr
+            this->_info._valid_file_gamma = png_get_gAMA_fixed( get_struct()
+                                                              , get_info()
                                                               , &this->_info._file_gamma
                                                               );
 
@@ -249,8 +250,8 @@ public:
             png_charp icc_name = png_charp( NULL );
             png_bytep profile  = png_bytep( NULL );
 
-            this->_info._valid_icc_profile = png_get_iCCP( _png_ptr
-                                                         , _info_ptr
+            this->_info._valid_icc_profile = png_get_iCCP( get_struct()
+                                                         , get_info()
                                                          , &icc_name
                                                          , &this->_info._iccp_compression_type
                                                          , &profile
@@ -260,8 +261,8 @@ public:
             png_charp icc_name = png_charp( NULL );
             png_charp profile  = png_charp( NULL );
 
-            this->_info._valid_icc_profile = png_get_iCCP( _png_ptr
-                                                         , _info_ptr
+            this->_info._valid_icc_profile = png_get_iCCP( get_struct()
+                                                         , get_info()
                                                          , &icc_name
                                                          , &this->_info._iccp_compression_type
                                                          , &profile
@@ -286,8 +287,8 @@ public:
         // get the rendering intent
         if( this->_settings._read_intent )
         {
-            this->_info._valid_intent = png_get_sRGB( _png_ptr
-                                                    , _info_ptr
+            this->_info._valid_intent = png_get_sRGB( get_struct()
+                                                    , get_info()
                                                     , &this->_info._intent
                                                     );
         }
@@ -297,8 +298,8 @@ public:
         {
             png_colorp palette = png_colorp( NULL );
 
-            this->_info._valid_palette = png_get_PLTE( _png_ptr
-                                                     , _info_ptr
+            this->_info._valid_palette = png_get_PLTE( get_struct()
+                                                     , get_info()
                                                      , &palette
                                                      , &this->_info._num_palette
                                                      );
@@ -318,8 +319,8 @@ public:
         {
             png_color_16p background = png_color_16p( NULL );
 
-            this->_info._valid_background = png_get_bKGD( _png_ptr
-                                                        , _info_ptr
+            this->_info._valid_background = png_get_bKGD( get_struct()
+                                                        , get_info()
                                                         , &background
                                                         );
             if( background )
@@ -333,8 +334,8 @@ public:
         {
             png_uint_16p histogram = png_uint_16p( NULL );
 
-            this->_info._valid_histogram = png_get_hIST( _png_ptr
-                                                       , _info_ptr
+            this->_info._valid_histogram = png_get_hIST( get_struct()
+                                                       , get_info()
                                                        , &histogram
                                                        );
 
@@ -345,8 +346,8 @@ public:
                 if( this->_settings._read_palette == false )
                 {
                     png_colorp palette = png_colorp( NULL );
-                    png_get_PLTE( _png_ptr
-                                , _info_ptr
+                    png_get_PLTE( get_struct()
+                                , get_info()
                                 , &palette
                                 , &this->_info._num_palette
                                 );
@@ -362,8 +363,8 @@ public:
         // get screen offsets for the given image
         if( this->_settings._read_screen_offsets )
         {
-            this->_info._valid_offset = png_get_oFFs( _png_ptr
-                                                    , _info_ptr
+            this->_info._valid_offset = png_get_oFFs( get_struct()
+                                                    , get_info()
                                                     , &this->_info._offset_x
                                                     , &this->_info._offset_y
                                                     , &this->_info._off_unit_type
@@ -378,8 +379,8 @@ public:
             png_charp units   = png_charp ( NULL );
             png_charpp params = png_charpp( NULL );
 
-            this->_info._valid_pixel_calibration = png_get_pCAL( _png_ptr
-                                                               , _info_ptr
+            this->_info._valid_pixel_calibration = png_get_pCAL( get_struct()
+                                                               , get_info()
                                                                , &purpose
                                                                , &this->_info._X0
                                                                , &this->_info._X1
@@ -421,8 +422,8 @@ public:
         // get the physical resolution
         if( this->_settings._read_physical_resolution )
         {
-            this->_info._valid_resolution = png_get_pHYs( _png_ptr
-                                                        , _info_ptr
+            this->_info._valid_resolution = png_get_pHYs( get_struct()
+                                                        , get_info()
                                                         , &this->_info._res_x
                                                         , &this->_info._res_y
                                                         , &this->_info._phy_unit_type
@@ -432,8 +433,8 @@ public:
         // get the image resolution in pixels per meter.
         if( this->_settings._read_pixels_per_meter )
         {
-            this->_info._pixels_per_meter = png_get_pixels_per_meter( _png_ptr
-                                                                    , _info_ptr
+            this->_info._pixels_per_meter = png_get_pixels_per_meter( get_struct()
+                                                                    , get_info()
                                                                     );
         }
 
@@ -443,8 +444,8 @@ public:
         {
             png_color_8p sig_bits = png_color_8p( NULL );
 
-            this->_info._valid_significant_bits = png_get_sBIT( _png_ptr
-                                                              , _info_ptr
+            this->_info._valid_significant_bits = png_get_sBIT( get_struct()
+                                                              , get_info()
                                                               , &sig_bits
                                                               );
 
@@ -460,8 +461,8 @@ public:
         // get physical scale settings
         if( this->_settings._read_scale_factors )
         {
-            this->_info._valid_scale_factors = png_get_sCAL( _png_ptr
-                                                           , _info_ptr
+            this->_info._valid_scale_factors = png_get_sCAL( get_struct()
+                                                           , get_info()
                                                            , &this->_info._scale_unit
                                                            , &this->_info._scale_width
                                                            , &this->_info._scale_height
@@ -473,8 +474,8 @@ public:
         {
             png_charp scale_width, scale_height;
 
-            if( this->_info._valid_scale_factors = png_get_sCAL_s( _png_ptr
-                                                                 , _info_ptr
+            if( this->_info._valid_scale_factors = png_get_sCAL_s( get_struct()
+                                                                 , get_info()
                                                                  , &this->_info._scale_unit
                                                                  , &scale_width
                                                                  , &scale_height
@@ -504,8 +505,8 @@ public:
         {
             png_textp text = png_textp( NULL );
 
-            this->_info._valid_text = png_get_text( _png_ptr
-                                                  , _info_ptr
+            this->_info._valid_text = png_get_text( get_struct()
+                                                  , get_info()
                                                   , &text
                                                   , &this->_info._num_text
                                                   );
@@ -535,8 +536,8 @@ public:
         if( this->_settings._read_last_modification_time )
         {
             png_timep mod_time = png_timep( NULL );
-            this->_info._valid_modification_time = png_get_tIME( _png_ptr
-                                                               , _info_ptr
+            this->_info._valid_modification_time = png_get_tIME( get_struct()
+                                                               , get_info()
                                                                , &mod_time
                                                                );
             if( mod_time )
@@ -551,8 +552,8 @@ public:
             png_bytep     trans        = png_bytep    ( NULL );
             png_color_16p trans_values = png_color_16p( NULL );
 
-            this->_info._valid_transparency_factors = png_get_tRNS( _png_ptr
-                                                                  , _info_ptr
+            this->_info._valid_transparency_factors = png_get_tRNS( get_struct()
+                                                                  , get_info()
                                                                   , &trans
                                                                   , &this->_info._num_trans
                                                                   , &trans_values
@@ -578,8 +579,8 @@ public:
         if( false )
         {
             png_unknown_chunkp unknowns = png_unknown_chunkp( NULL );
-            int num_unknowns = static_cast< int >( png_get_unknown_chunks( _png_ptr
-                                                                         , _info_ptr
+            int num_unknowns = static_cast< int >( png_get_unknown_chunks( get_struct()
+                                                                         , get_info()
                                                                          , &unknowns
                                                                          )
                                                  );
@@ -619,107 +620,6 @@ protected:
     {
         // @todo
     }
-private:
-
-    void init_reader()
-    {
-        byte_t buf[detail::PNG_BYTES_TO_CHECK];
-
-        io_error_if(_io_dev.read(buf, detail::PNG_BYTES_TO_CHECK) != detail::PNG_BYTES_TO_CHECK,
-                "png_check_validity: failed to read image");
-
-        io_error_if(png_sig_cmp(png_bytep(buf), png_size_t(0), detail::PNG_BYTES_TO_CHECK)!=0,
-                "png_check_validity: invalid png image");
-
-        // Create and initialize the png_struct with the desired error handler
-        // functions.  If you want to use the default stderr and longjump method,
-        // you can supply NULL for the last three parameters.  We also supply the
-        // the compiler header file version, so that we know if the application
-        // was compiled with a compatible version of the library.  REQUIRED
-        _png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING
-                                         , NULL  // user_error_ptr
-                                         , NULL  // user_error_fn
-                                         , NULL  // user_warning_fn
-                                         );
-
-        io_error_if( _png_ptr == NULL
-                   , "png_reader: fail to call png_create_write_struct()"
-                   );
-
-        png_uint_32 user_chunk_data[4];
-        user_chunk_data[0] = 0;
-        user_chunk_data[1] = 0;
-        user_chunk_data[2] = 0;
-        user_chunk_data[3] = 0;
-        png_set_read_user_chunk_fn( _png_ptr
-                                  , user_chunk_data
-                                  , this_t::read_user_chunk_callback
-                                  );
-
-        // Allocate/initialize the memory for image information.  REQUIRED.
-        _info_ptr = png_create_info_struct( _png_ptr );
-
-        if( _info_ptr == NULL )
-        {
-            png_destroy_read_struct( &_png_ptr
-                                   , NULL
-                                   , NULL
-                                   );
-
-            io_error( "png_reader: fail to call png_create_info_struct()" );
-        }
-
-        // Set error handling if you are using the setjmp/longjmp method (this is
-        // the normal method of doing things with libpng).  REQUIRED unless you
-        // set up your own error handlers in the png_create_read_struct() earlier.
-        if( setjmp( png_jmpbuf( _png_ptr )))
-        {
-            //free all of the memory associated with the png_ptr and info_ptr
-            png_destroy_read_struct( &_png_ptr
-                                   , &_info_ptr
-                                   , NULL
-                                   );
-
-            io_error( "png is invalid" );
-        }
-
-        png_set_read_fn( _png_ptr
-                       , static_cast< png_voidp >( &this->_io_dev )
-                       , this_t::read_data
-                       );
-
-        // Set up a callback function that will be
-        // called after each row has been read, which you can use to control
-        // a progress meter or the like.
-        png_set_read_status_fn( _png_ptr
-                              , this_t::read_row_callback
-                              );
-
-        // Set up a callback which implements user defined transformation.
-        // @todo
-        png_set_read_user_transform_fn( _png_ptr
-                                      , png_user_transform_ptr( NULL )
-                                      );
-
-        png_set_keep_unknown_chunks( _png_ptr
-                                   , PNG_HANDLE_CHUNK_ALWAYS
-                                   , NULL
-                                   , 0
-                                   );
-
-
-        // Make sure we read the signature.
-        // @todo make it an option
-        png_set_sig_bytes( _png_ptr
-                         , detail::PNG_BYTES_TO_CHECK
-                         );
-
-        // The call to png_read_info() gives us all of the information from the
-        // PNG file before the first IDAT (image data chunk).  REQUIRED
-        png_read_info( _png_ptr
-                     , _info_ptr
-                     );
-    }
 
 public:
 
@@ -729,9 +629,6 @@ public:
     image_read_info    < png_tag > _info;
 
     std::size_t _scanline_length;
-
-    png_structp _png_ptr;
-    png_infop   _info_ptr;
 
     std::size_t _number_passes;
 };

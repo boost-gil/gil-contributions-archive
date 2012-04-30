@@ -56,11 +56,8 @@ struct reader_backend< Device
     , _info()
     , _scanline_length( 0 )
     , _palette()
-    {}
-
-    ~reader_backend()
     {
-        _io_dev.set_close( true );
+        read_header();    
     }
 
     void read_header()

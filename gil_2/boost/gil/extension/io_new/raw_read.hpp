@@ -14,6 +14,9 @@
 #include "formats/raw/supported_types.hpp"
 #include "formats/raw/read.hpp"
 
+#include "detail/get_reader.hpp"
+#include "detail/make_reader.hpp"
+
 #include "detail/read_image_info.hpp"
 #include "detail/read_view.hpp"
 #include "detail/read_image.hpp"

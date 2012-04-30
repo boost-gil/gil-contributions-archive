@@ -714,12 +714,7 @@ public:
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        if( !this->_info._valid )
-        {
-            parent_t::get_info();
-        }
-
-        bmp_type_format_checker format_checker( this->_info._bits_per_pixel );
+        detail::bmp_type_format_checker format_checker( this->_info._bits_per_pixel );
 
         if( !construct_matched( images
                               , format_checker
@@ -730,12 +725,12 @@ public:
         else
         {
             init_image( images
-                      , this->_info
+                      , this->_settings
                       );
 
-            dynamic_io_fnobj< bmp_read_is_supported
-                            , parent_t
-                            > op( this );
+            detail::dynamic_io_fnobj< detail::bmp_read_is_supported
+                                    , parent_t
+                                    > op( this );
 
             apply_operation( view( images )
                            , op

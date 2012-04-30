@@ -128,15 +128,6 @@ public:
                )
     {}
 
-    ~reader()
-    {
-        png_destroy_read_struct( &this->_png_ptr
-                               , &this->_info_ptr
-                               , NULL
-                               );
-    }
-
-
     template< typename View >
     void apply( const View& view )
     {
@@ -149,24 +140,24 @@ public:
             if( this->_info._bit_depth == 16 )
             {
                 // Swap bytes of 16 bit files to least significant byte first.
-                png_set_swap( this->_png_ptr );
+                png_set_swap( this->get_struct() );
             }
 
             if( this->_info._bit_depth < 8 )
             {
                 // swap bits of 1, 2, 4 bit packed pixel formats
-                png_set_packswap( this->_png_ptr );
+                png_set_packswap( this->get_struct() );
             }
         }
 
         if( this->_info._color_type == PNG_COLOR_TYPE_PALETTE )
         {
-            png_set_palette_to_rgb( this->_png_ptr );
+            png_set_palette_to_rgb( this->get_struct() );
         }
 
         if( this->_info._num_trans > 0 )
         {
-            png_set_tRNS_to_alpha( this->_png_ptr );
+            png_set_tRNS_to_alpha( this->get_struct() );
         }
 
         // Tell libpng to handle the gamma conversion for you.  The final call
@@ -178,12 +169,12 @@ public:
             // png_set_gamma will change the image data!
 
 #ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
-        png_set_gamma( _png_ptr
+        png_set_gamma( this->get_struct()
                      , this->_settings._screen_gamma
                      , this->_info._file_gamma
                      );
 #else
-        png_set_gamma( this->_png_ptr
+        png_set_gamma( this->get_struct()
                      , this->_settings._screen_gamma
                      , this->_info._file_gamma
                      );
@@ -193,28 +184,28 @@ public:
         // Turn on interlace handling.  REQUIRED if you are not using
         // png_read_image().  To see how to handle interlacing passes,
         // see the png_read_row() method below:
-        this->_number_passes = png_set_interlace_handling( this->_png_ptr );
+        this->_number_passes = png_set_interlace_handling( this->get_struct() );
 
 
         // The above transformation might have changed the bit_depth and color type.
-        png_read_update_info( this->_png_ptr
-                            , this->_info_ptr
+        png_read_update_info( this->get_struct()
+                            , this->get_info()
                             );
 
-        this->_info._bit_depth = png_get_bit_depth( this->_png_ptr
-                                                  , this->_info_ptr
+        this->_info._bit_depth = png_get_bit_depth( this->get_struct()
+                                                  , this->get_info()
                                                   );
 
-        this->_info._num_channels = png_get_channels( this->_png_ptr
-                                                    , this->_info_ptr
+        this->_info._num_channels = png_get_channels( this->get_struct()
+                                                    , this->get_info()
                                                     );
 
-        this->_info._color_type = png_get_color_type( this->_png_ptr
-                                                    , this->_info_ptr
+        this->_info._color_type = png_get_color_type( this->get_struct()
+                                                    , this->get_info()
                                                     );
 
-        this->_scanline_length = png_get_rowbytes( this->_png_ptr
-                                                 , this->_info_ptr
+        this->_scanline_length = png_get_rowbytes( this->get_struct()
+                                                 , this->get_info()
                                                  );
 
         switch( this->_info._color_type )
@@ -275,7 +266,7 @@ public:
         }
 
         // read rest of file, and get additional chunks in info_ptr
-        png_read_end( this->_png_ptr
+        png_read_end( this->get_struct()
                     , NULL
                     );
     }
@@ -302,8 +293,8 @@ private:
                    , "Image types aren't compatible."
                    );
 
-        std::size_t rowbytes = png_get_rowbytes( this->_png_ptr
-                                               , this->_info_ptr
+        std::size_t rowbytes = png_get_rowbytes( this->get_struct()
+                                               , this->get_info()
                                                );
 
         row_buffer_helper_t buffer( rowbytes
@@ -320,7 +311,7 @@ private:
                 for( std::ptrdiff_t y = 0; y < this->_settings._top_left.y; ++y )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( this->_png_ptr
+                    png_read_rows( this->get_struct()
                                  , &row_ptr
                                  , NULL
                                  , 1
@@ -333,7 +324,7 @@ private:
                    )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( this->_png_ptr
+                    png_read_rows( this->get_struct()
                                  , &row_ptr
                                  , NULL
                                  , 1
@@ -357,7 +348,7 @@ private:
                    )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( this->_png_ptr
+                    png_read_rows( this->get_struct()
                                  , &row_ptr
                                  , NULL
                                  , 1
@@ -369,7 +360,7 @@ private:
                 for( int y = 0; y < view.height(); ++y )
                 {
                     // Read the image using the "sparkle" effect.
-                    png_read_rows( this->_png_ptr
+                    png_read_rows( this->get_struct()
                                  , &row_ptr
                                  , NULL
                                  , 1

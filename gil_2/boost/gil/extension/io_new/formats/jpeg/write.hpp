@@ -79,32 +79,32 @@ private:
 
         typedef typename channel_type< typename View::value_type >::type channel_t;
 
-        this->_cinfo.image_width      = JDIMENSION( view.width()  );
-        this->_cinfo.image_height     = JDIMENSION( view.height() );
-        this->_cinfo.input_components = num_channels<View>::value;
-        this->_cinfo.in_color_space   = detail::jpeg_write_support< channel_t
+        get()->image_width      = JDIMENSION( view.width()  );
+        get()->image_height     = JDIMENSION( view.height() );
+        get()->input_components = num_channels<View>::value;
+        get()->in_color_space   = detail::jpeg_write_support< channel_t
                                                                   , typename color_space_type< View >::type
                                                                   >::_color_space;
 
-        jpeg_set_defaults( &this->_cinfo );
+        jpeg_set_defaults( get() );
 
-        jpeg_set_quality ( &this->_cinfo
+        jpeg_set_quality ( get()
                          , this->_info._quality
                          , TRUE
                          );
 
         // Needs to be done after jpeg_set_defaults() since it's overridding this value back to slow.
-        this->_cinfo.dct_method = this->_info._dct_method;
+        get()->dct_method = this->_info._dct_method;
 
 
         // set the pixel dimensions
-        this->_cinfo.density_unit = this->_info._density_unit;
-        this->_cinfo.X_density    = this->_info._x_density;
-        this->_cinfo.Y_density    = this->_info._y_density;
+        get()->density_unit = this->_info._density_unit;
+        get()->X_density    = this->_info._x_density;
+        get()->Y_density    = this->_info._y_density;
 
         // done reading header information
 
-        jpeg_start_compress( &this->_cinfo
+        jpeg_start_compress( get()
                            , TRUE
                            );
 
@@ -117,7 +117,7 @@ private:
                      , row_buffer.begin()
                      );
 
-            jpeg_write_scanlines( &this->_cinfo
+            jpeg_write_scanlines( get()
                                 , &row_addr
                                 , 1
                                 );

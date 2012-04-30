@@ -2,7 +2,9 @@
 
 #include <boost/mpl/and.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/gil/extension/io_new/detail/io_device.hpp>
+
+#include "io_device.hpp"
+#include "path_spec.hpp"
 
 namespace boost { namespace gil {
 

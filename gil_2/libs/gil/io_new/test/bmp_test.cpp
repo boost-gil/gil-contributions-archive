@@ -28,30 +28,46 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
 
     {
-        image_read_info< tag_t > info = read_image_info( bmp_filename
-                                                       , tag_t() );
-        BOOST_CHECK_EQUAL( info._width , 127 );
-        BOOST_CHECK_EQUAL( info._height, 64 );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t backend = read_image_info( bmp_filename
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 127 );
+        BOOST_CHECK_EQUAL( backend._info._height, 64 );
     }
 
     {
         ifstream in( bmp_filename.c_str(), ios::binary );
 
-        image_read_info< tag_t > info = read_image_info( in
-                                                       , tag_t() );
+        typedef get_reader_backend< std::ifstream
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 127 );
-        BOOST_CHECK_EQUAL( info._height, 64 );
+        backend_t backend = read_image_info( in
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 127 );
+        BOOST_CHECK_EQUAL( backend._info._height, 64 );
     }
 
     {
         FILE* file = fopen( bmp_filename.c_str(), "rb" );
-        
-        image_read_info< tag_t > info = read_image_info( file
-                                                       , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 127 );
-        BOOST_CHECK_EQUAL( info._height, 64 );
+        typedef get_reader_backend< FILE*
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t backend = read_image_info( file
+                                           , tag_t()
+                                           );
+        
+        BOOST_CHECK_EQUAL( backend._info._width , 127 );
+        BOOST_CHECK_EQUAL( backend._info._height, 64 );
     }
 
     {

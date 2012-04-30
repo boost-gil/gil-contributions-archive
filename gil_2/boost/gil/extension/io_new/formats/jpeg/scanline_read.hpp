@@ -64,9 +64,9 @@ public:
 
     void initialize()
     {
-        this->_cinfo.dct_method = this->_settings._dct_method;
+        this->get().dct_method = this->_settings._dct_method;
 
-        io_error_if( jpeg_start_decompress( &this->_cinfo ) == false
+        io_error_if( jpeg_start_decompress( &this->get() ) == false
                     , "Cannot start decompression." );
 
         switch( this->_info._color_space )
@@ -92,7 +92,7 @@ public:
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             case JCS_YCCK:
             {
-                this->_cinfo.out_color_space = JCS_CMYK;
+                this->get().out_color_space = JCS_CMYK;
                 this->_scanline_length = this->_info._width * num_channels< cmyk8_view_t >::value;
 
                 break;
@@ -123,8 +123,6 @@ public:
 
     void clean_up()
     {
-        ///@todo
-        //jpeg_finish_decompress ( &this->_cinfo );
     }
 
 private:
@@ -134,7 +132,7 @@ private:
         JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( dst );
 
         // Read data.
-        io_error_if( jpeg_read_scanlines( &this->_cinfo
+        io_error_if( jpeg_read_scanlines( this->get()
                                         , &row_adr
                                         , 1
                                         ) != 1

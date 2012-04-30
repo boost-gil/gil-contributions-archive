@@ -71,17 +71,6 @@ public:
                      )
     {}
 
-    //
-    // Destructor
-    //
-    ~scanline_reader()
-    {
-        png_destroy_read_struct( &this->_png_ptr
-                               , &this->_info_ptr
-                               , NULL
-                               );
-    }
-
     void initialize()
     {
         // Now it's time for some transformations.

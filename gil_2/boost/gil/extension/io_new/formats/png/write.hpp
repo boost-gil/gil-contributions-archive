@@ -114,12 +114,12 @@ private:
         {
             if( png_rw_info::_bit_depth == 16 )
             {
-                png_set_swap( this->_png_ptr );
+                png_set_swap( this->get_struct() );
             }
 
             if( png_rw_info::_bit_depth < 8 )
             {
-                png_set_packswap( this->_png_ptr );
+                png_set_packswap( this->get_struct() );
             }
         }
 
@@ -134,13 +134,13 @@ private:
                      , row_buffer.begin()
                      );
 
-            png_write_row( this->_png_ptr
+            png_write_row( this->get_struct()
                          , reinterpret_cast< png_bytep >( row_buffer.data() )
                          );
         }
 
-        png_write_end( this->_png_ptr
-                     , this->_info_ptr
+        png_write_end( this->get_struct()
+                     , this->get_info()
                      );
     }
 
@@ -159,12 +159,12 @@ private:
         {
             if( png_rw_info::_bit_depth == 16 )
             {
-                png_set_swap( this->_png_ptr );
+                png_set_swap( this->get_struct() );
             }
 
             if( png_rw_info::_bit_depth < 8 )
             {
-                png_set_packswap( this->_png_ptr );
+                png_set_packswap( this->get_struct() );
             }
         }
 
@@ -179,19 +179,19 @@ private:
                      , row_buffer.begin()
                      );
 
-            png_write_row( this->_png_ptr
+            png_write_row( this->get_struct()
                          , reinterpret_cast< png_bytep >( row_buffer.data() )
                          );
         }
 
-        png_free_data( this->_png_ptr
-                     , this->_info_ptr
+        png_free_data( this->get_struct()
+                     , this->get_info()
                      , PNG_FREE_UNKN
                      , -1
                      );
 
-        png_write_end( this->_png_ptr
-                     , this->_info_ptr
+        png_write_end( this->get_struct()
+                     , this->get_info()
                      );
     }
 };

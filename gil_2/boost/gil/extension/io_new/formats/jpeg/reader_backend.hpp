@@ -23,6 +23,49 @@
 
 namespace boost { namespace gil {
 
+namespace detail { 
+
+///
+/// Wrapper for libjpeg's decompress object. Implements value semantics.
+///
+struct jpeg_decompress_wrapper
+{
+protected:
+
+    typedef boost::shared_ptr< jpeg_decompress_struct > jpeg_decompress_ptr_t;
+
+protected:
+
+    ///
+    /// Default Constructor
+    ///
+    jpeg_decompress_wrapper()
+    : _jpeg_decompress_ptr( new jpeg_decompress_struct()
+                          , jpeg_decompress_deleter
+                          )
+    {}
+
+    jpeg_decompress_struct*       get()       { return _jpeg_decompress_ptr.get(); }
+    const jpeg_decompress_struct* get() const { return _jpeg_decompress_ptr.get(); }
+
+private:
+
+    static void jpeg_decompress_deleter( jpeg_decompress_struct* jpeg_decompress_ptr )
+    {
+        if( jpeg_decompress_ptr )
+        {
+            jpeg_destroy_decompress( jpeg_decompress_ptr );
+        }
+    }
+
+private:
+
+   jpeg_decompress_ptr_t _jpeg_decompress_ptr;
+
+};
+
+} // namespace detail
+
 ///
 /// JPEG Backend
 ///
@@ -31,6 +74,7 @@ struct reader_backend< Device
                      , jpeg_tag
                      >
     : public jpeg_io_base
+    , public detail::jpeg_decompress_wrapper
 {
 
     //
@@ -45,8 +89,8 @@ struct reader_backend< Device
 
     , _scanline_length( 0 )
     {
-        _cinfo.err         = jpeg_std_error( &_jerr );
-        _cinfo.client_data = this;
+        get()->err         = jpeg_std_error( &_jerr );
+        get()->client_data = this;
 
         // Error exit handler: does not return to caller.
         _jerr.error_exit = &reader_backend::error_exit;
@@ -64,56 +108,52 @@ struct reader_backend< Device
         _src._jsrc.resync_to_restart = jpeg_resync_to_restart;
         _src._this = this;
 
-        jpeg_create_decompress( &_cinfo );
+        jpeg_create_decompress( get() );
 
-        _cinfo.src = &_src._jsrc;
+        get()->src = &_src._jsrc;
 
-        jpeg_read_header( &_cinfo
+        jpeg_read_header( get()
                         , TRUE
                         );
 
-        io_error_if( _cinfo.data_precision != 8
+        io_error_if( get()->data_precision != 8
                    , "Image file is not supported."
                    );
+
+        read_header();
     }
 
-    //
-    // Destructor
-    //
-    ~reader_backend()
-    {
-        jpeg_destroy_decompress( &_cinfo );
-    }
 
     /// Read image header.
     void read_header()
     {
-        _info._width          = _cinfo.image_width;
-        _info._height         = _cinfo.image_height;
-        _info._num_components = _cinfo.num_components;
-        _info._color_space    = _cinfo.jpeg_color_space;
-        _info._data_precision = _cinfo.data_precision;
+        _info._width          = get()->image_width;
+        _info._height         = get()->image_height;
+        _info._num_components = get()->num_components;
+        _info._color_space    = get()->jpeg_color_space;
+        _info._data_precision = get()->data_precision;
 
-        _info._density_unit = _cinfo.density_unit;
-        _info._x_density    = _cinfo.X_density;
-        _info._y_density    = _cinfo.Y_density;
+        _info._density_unit = get()->density_unit;
+        _info._x_density    = get()->X_density;
+        _info._y_density    = get()->Y_density;
 
         // obtain real world dimensions
         // taken from https://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/read.cpp#cl-62
-        jpeg_calc_output_dimensions( &this->_cinfo );
+
+        jpeg_calc_output_dimensions( get() );
 
         double units_conversion = 0;
-        if (_cinfo.density_unit == 1) // dots per inch
+        if (get()->density_unit == 1) // dots per inch
         {
             units_conversion = 25.4; // millimeters in an inch
         }
-        else if (_cinfo.density_unit == 2) // dots per cm
+        else if (get()->density_unit == 2) // dots per cm
         {
             units_conversion = 10; // millimeters in a centimeter
         }
 
-        _info._pixel_width_mm  = _cinfo.X_density ? (_cinfo.output_width  / double(_cinfo.X_density)) * units_conversion : 0;
-        _info._pixel_height_mm = _cinfo.Y_density ? (_cinfo.output_height / double(_cinfo.Y_density)) * units_conversion : 0;
+        _info._pixel_width_mm  = get()->X_density ? (get()->output_width  / double(get()->X_density)) * units_conversion : 0;
+        _info._pixel_height_mm = get()->Y_density ? (get()->output_height / double(get()->Y_density)) * units_conversion : 0;
     }
 
     /// Return image read settings.
@@ -161,14 +201,14 @@ private:
 
     // See jdatasrc.c for default implementation for the following static member functions.
 
-    static void init_device( jpeg_decompress_struct * cinfo )
+    static void init_device( jpeg_decompress_struct* cinfo )
     {
         gil_jpeg_source_mgr* src = reinterpret_cast< gil_jpeg_source_mgr* >( cinfo->src );
         src->_jsrc.bytes_in_buffer = 0;
         src->_jsrc.next_input_byte = src->_this->buffer;
     }
 
-    static boolean fill_buffer( jpeg_decompress_struct * cinfo )
+    static boolean fill_buffer( jpeg_decompress_struct* cinfo )
     {
         gil_jpeg_source_mgr* src = reinterpret_cast< gil_jpeg_source_mgr* >( cinfo->src );
         size_t count = src->_this->_io_dev.read(src->_this->buffer, sizeof(src->_this->buffer) );
@@ -207,8 +247,6 @@ private:
     static void close_device( jpeg_decompress_struct* ) {}
 
 public:
-
-    jpeg_decompress_struct _cinfo;
 
     Device& _io_dev;
 

@@ -25,6 +25,49 @@
 
 namespace boost { namespace gil {
 
+namespace detail { 
+
+///
+/// Wrapper for libjpeg's compress object. Implements value semantics.
+///
+struct jpeg_compress_wrapper
+{
+protected:
+
+    typedef boost::shared_ptr< jpeg_compress_struct > jpeg_compress_ptr_t;
+
+protected:
+
+    ///
+    /// Default Constructor
+    ///
+    jpeg_compress_wrapper()
+    : _jpeg_compress_ptr( new jpeg_compress_struct()
+                        , jpeg_compress_deleter
+                        )
+    {}
+
+    jpeg_compress_struct*       get()       { return _jpeg_compress_ptr.get(); }
+    const jpeg_compress_struct* get() const { return _jpeg_compress_ptr.get(); }
+
+private:
+
+    static void jpeg_compress_deleter( jpeg_compress_struct* jpeg_compress_ptr )
+    {
+        if( jpeg_compress_ptr )
+        {
+            jpeg_destroy_compress( jpeg_compress_ptr );
+        }
+    }
+
+private:
+
+   jpeg_compress_ptr_t _jpeg_compress_ptr;
+
+};
+
+} // namespace detail
+
 ///
 /// JPEG Writer Backend
 ///
@@ -33,15 +76,20 @@ struct writer_backend< Device
                      , jpeg_tag
                      >
     : public jpeg_io_base
+    , public detail::jpeg_compress_wrapper
 {
+
+    ///
+    /// Constructor
+    ///
     writer_backend( Device&                             io_dev
                   , const image_write_info< jpeg_tag >& info
                   )
     : _io_dev( io_dev )
     , _info( info )
     {
-        _cinfo.err         = jpeg_std_error( &_jerr );
-        _cinfo.client_data = this;
+        get()->err         = jpeg_std_error( &_jerr );
+        get()->client_data = this;
 
         // Error exit handler: does not return to caller.
         _jerr.error_exit = &writer< Device, jpeg_tag >::error_exit;
@@ -56,14 +104,14 @@ struct writer_backend< Device
         _dest._jdest.term_destination    = reinterpret_cast< void(*)   ( j_compress_ptr ) >( &writer< Device, jpeg_tag >::close_device );
         _dest._this = this;
 
-        jpeg_create_compress( &_cinfo  );
-        _cinfo.dest = &_dest._jdest;
+        jpeg_create_compress( get() );
+        get()->dest = &_dest._jdest;
     }
 
     ~writer_backend()
     {
-        jpeg_finish_compress ( &_cinfo );
-        jpeg_destroy_compress( &_cinfo );
+        jpeg_finish_compress ( get() );
+        jpeg_destroy_compress( get() );
     }
 
 protected:
@@ -124,8 +172,6 @@ public:
     Device& _io_dev;
 
     image_write_info< jpeg_tag > _info;
-
-    jpeg_compress_struct _cinfo;
 
     gil_jpeg_destination_mgr _dest;
 
