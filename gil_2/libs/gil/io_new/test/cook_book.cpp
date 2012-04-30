@@ -1,6 +1,12 @@
 
 #include <fstream>
 
+#define BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem/convenience.hpp>
+
+
 #include <boost/gil/extension/io_new/bmp_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 #include <boost/gil/extension/io_new/png_all.hpp>
@@ -14,6 +20,7 @@
 
 using namespace std;
 using namespace boost::gil;
+namespace fs = boost::filesystem;
 
 BOOST_AUTO_TEST_SUITE( cook_book )
 
@@ -68,25 +75,35 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
 {
     typedef bmp_tag tag_t;
 
-    std::ifstream in( bmp_filename.c_str(), ios::binary );
+    {
+        std::ifstream in( bmp_filename.c_str(), ios::binary );
 
-    typedef get_reader< std::ifstream
-                       , tag_t
-                       , detail::read_and_no_convert
-                       >::type backend_t;
+        typedef get_reader_backend< std::ifstream
+                                  , tag_t
+                                  >::type backend_t;
 
+        backend_t b = make_reader_backend( in, tag_t() );
+    }
 
-    //typedef get_reader_backend< std::ifstream
-    //                          , tag_t
-    //                          >::type backend_t;
+    {
+        FILE* file = fopen( bmp_filename.c_str(), "rb" );
 
-    //backend_t backend = make_reader( in
-    //                               , tag_t()
-    //                               );
+        typedef get_reader_backend< FILE*
+                                  , tag_t
+                                  >::type backend_t;
 
-    //backend_t backend = read_image_info( in
-    //                                   , tag_t()
-    //                                   );
+        backend_t b = make_reader_backend( file, tag_t() );
+    }
+
+    {
+        fs::path my_path( bmp_filename );
+
+        typedef get_reader_backend< fs::path
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t b = make_reader_backend( my_path, tag_t() );
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

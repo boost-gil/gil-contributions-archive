@@ -111,20 +111,7 @@ read_image_info( Device&                                 file
                                    >::type* /* ptr */ = 0
                )
 {
-    typedef typename detail::is_adaptable_input_device< FormatTag
-                                                      , Device
-                                                      >::device_type device_type;
-
-    device_type dev( file );
-
-
-
-    return reader< device_type
-                 , FormatTag
-                 , detail::read_and_no_convert
-                 >( dev
-                  , settings
-                  );
+    return make_reader_backend( in, settings, tag_t() );
 }
 
 /// \brief Returns the image info. Image info is file format specific.
