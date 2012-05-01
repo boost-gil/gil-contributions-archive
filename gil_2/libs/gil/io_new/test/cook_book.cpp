@@ -76,6 +76,22 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
     typedef bmp_tag tag_t;
 
     {
+        typedef get_reader_backend< const char*
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t b = make_reader_backend( bmp_filename.c_str(), tag_t() );
+    }
+
+    {
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t b = make_reader_backend( bmp_filename, tag_t() );
+    }
+
+    {
         std::ifstream in( bmp_filename.c_str(), ios::binary );
 
         typedef get_reader_backend< std::ifstream

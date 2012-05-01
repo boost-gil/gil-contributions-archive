@@ -33,7 +33,6 @@ struct get_read_device< Device
                                                       >::device_type type;
 };
 
-
 template< typename String
         , typename FormatTag
         >

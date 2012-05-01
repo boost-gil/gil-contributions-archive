@@ -34,6 +34,26 @@ template< typename T
 struct get_reader_backend
 {};
 
+template< typename String
+        , typename FormatTag
+        >
+struct get_reader_backend< String
+                         , FormatTag
+                         , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                                        , is_format_tag< FormatTag >
+                                                        >
+                                             >::type
+                         >
+{
+    typedef typename get_read_device< String
+                                    , FormatTag
+                                    >::type device_t;
+
+    typedef reader_backend< device_t
+                          , FormatTag
+                          > type;
+};
+
 template< typename Device
         , typename FormatTag
         >
