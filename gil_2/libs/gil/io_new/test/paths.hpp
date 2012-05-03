@@ -16,6 +16,8 @@ static const std::string png_out     = base + "output/png/";
 static const std::string pnm_in  = base + "test_images/pnm/";
 static const std::string pnm_out = base + "output/pnm/";
 
+static const std::string raw_in  = base + "test_images/raw/";
+
 static const std::string targa_in  = base + "test_images/targa/";
 static const std::string targa_out = base + "output/targa/";
 
@@ -27,6 +29,7 @@ static const std::string bmp_filename  ( bmp_in    + "rgb.bmp"                  
 static const std::string jpeg_filename ( jpeg_in   + "found online/test.jpg"              );
 static const std::string png_filename  ( base      + "test_images/png/wikipedia/test.png" );
 static const std::string pnm_filename  ( pnm_in    + "rgb.pnm"                            );
+static const std::string raw_filename  ( raw_in    + "RAW_CANON_1DSM3.CR2"                );
 static const std::string targa_filename( targa_in  + "24BPP_compressed.tga"               );
 static const std::string tiff_filename ( tiff_in   + "test.tif"                           );
 

@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Andreas Pokorny, Christian Henning
+    Copyright 2007-2012 Olivier Tournaire, Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,11 +15,29 @@
 /// \brief
 /// \author Olivier Tournaire \n
 ///
-/// \date   2011 \n
+/// \date   2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
+// taken from jpegxx - https://bitbucket.org/edd/jpegxx/src/ea2492a1a4a6/src/ijg_headers.hpp
+#ifndef BOOST_GIL_EXTENSION_IO_RAW_C_LIB_COMPILED_AS_CPLUSPLUS
+    extern "C" {
+#else
+    // DONT_USE_EXTERN_C introduced in v7 of the IJG library.
+    // By default the v7 IJG headers check for __cplusplus being defined and
+    // wrap the content in an 'extern "C"' block if it's present.
+    // When DONT_USE_EXTERN_C is defined, this wrapping is not performed.
+    #ifndef DONT_USE_EXTERN_C
+        #define DONT_USE_EXTERN_C 1
+    #endif
+#endif
+
 #include <libraw/libraw.h>
+
+#ifndef BOOST_GIL_EXTENSION_IO_RAW_C_LIB_COMPILED_AS_CPLUSPLUS
+    }
+#endif
+
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -142,6 +160,17 @@ public:
 private:
     std::istream& _in;
 };
+
+template< typename FormatTag >
+struct is_adaptable_input_device< FormatTag
+                                , LibRaw
+                                , void
+                                >
+    : mpl::true_
+{
+    typedef file_stream_device< FormatTag > device_type;
+};
+
 
 } // namespace detail
 } // namespace gil

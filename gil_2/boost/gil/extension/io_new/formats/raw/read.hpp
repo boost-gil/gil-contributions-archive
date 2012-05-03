@@ -63,7 +63,7 @@ class reader< Device
 private:
 
     typedef reader< Device
-                  , bmp_tag
+                  , raw_tag
                   , ConversionPolicy
                   > this_t;
 
@@ -71,7 +71,7 @@ private:
 
 public:
 
-    typedef reader_backend< Device, bmp_tag > backend_t;
+    typedef reader_backend< Device, raw_tag > backend_t;
 
 public:
 
@@ -152,7 +152,7 @@ public:
 };
 
 ///
-/// BMP Dynamic Reader
+/// RAW Dynamic Reader
 ///
 template< typename Device >
 class dynamic_image_reader< Device
