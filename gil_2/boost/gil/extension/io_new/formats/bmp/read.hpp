@@ -102,7 +102,6 @@ public:
             io_error( "Image header was not read." );
         }
 
-
         typedef typename is_same< ConversionPolicy
                                 , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;

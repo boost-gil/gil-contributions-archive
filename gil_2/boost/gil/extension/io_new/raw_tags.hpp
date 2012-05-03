@@ -72,7 +72,7 @@ struct raw_output_height : property_base< uint16_t > {};
 struct raw_output_width : property_base< uint16_t > {};
 
 /// Defines type for pixel aspect.
-struct raw_pixel_aspect : property_base< double_t > {};
+struct raw_pixel_aspect : property_base< double > {};
 
 /// Defines type for image orientation.
 struct raw_flip : property_base< uint32_t > {};
