@@ -1,5 +1,5 @@
 /*
-    Copyright 2008 Christian Henning
+    Copyright 2012 Olivier Tournaire, Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -13,9 +13,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
 /// \brief
-/// \author Olivier Tournaire \n
+/// \author Olivier Tournaire, Christian Henning \n
 ///
-/// \date 2011 \n
+/// \date 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,10 +34,7 @@
 #include "is_allowed.hpp"
 #include "device.hpp"
 
-// TODO: remove
-#include <iostream>
-
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil {
 
 #define BUILD_INTERLEAVED_VIEW(color_layout, bits_per_pixel) \
 { \
@@ -59,95 +56,68 @@ class reader< Device
     : public reader_base< raw_tag
                         , ConversionPolicy
                         >
+    , public reader_backend< Device
+                           , raw_tag
+                           >
 {
 private:
+
+    typedef reader< Device
+                  , bmp_tag
+                  , ConversionPolicy
+                  > this_t;
 
     typedef typename ConversionPolicy::color_converter_type cc_t;
 
 public:
 
-    reader( Device&                               device
+    typedef reader_backend< Device, bmp_tag > backend_t;
+
+public:
+
+    //
+    // Constructor
+    //
+    reader( const Device&                         io_dev
           , const image_read_settings< raw_tag >& settings
           )
-    : reader_base< raw_tag
-                 , ConversionPolicy >( settings )
-    , _io_dev( device )
+    : backend_t( io_dev
+               , settings
+               )
     {}
 
-    reader( Device&                               device
+    //
+    // Constructor
+    //
+    reader( const Device&                         io_dev
           , const cc_t&                           cc
           , const image_read_settings< raw_tag >& settings
           )
-    : _io_dev( device )
-    , reader_base< raw_tag
+    : reader_base< raw_tag
                  , ConversionPolicy
-                 >( cc
-                  , settings
-                  )
+                 >( cc )
+    , backend_t( io_dev
+               , settings
+               )
     {}
-
-    image_read_info< raw_tag > get_info()
-    {
-        _io_dev.get_mem_image_format(&_info._width
-                                    ,&_info._height
-                                    ,&_info._samples_per_pixel
-                                    ,&_info._bits_per_pixel);
-
-        // iparams
-        _info._camera_manufacturer = _io_dev.get_camera_manufacturer();
-        _info._camera_model        = _io_dev.get_camera_model();
-        _info._raw_images_count    = _io_dev.get_raw_count();
-        _info._dng_version         = _io_dev.get_dng_version();
-        _info._number_colors       = _io_dev.get_colors();
-        //_io_dev.get_filters();
-        _info._colors_description  = _io_dev.get_cdesc();
-
-        // image_sizes
-        _info._raw_width      = _io_dev.get_raw_width();
-        _info._raw_height     = _io_dev.get_raw_height();
-        _info._visible_width  = _io_dev.get_image_width();
-        _info._visible_height = _io_dev.get_image_height();
-        _info._top_margin     = _io_dev.get_top_margin();
-        _info._left_margin    = _io_dev.get_left_margin();
-        _info._output_width   = _io_dev.get_iwidth();
-        _info._output_height  = _io_dev.get_iheight();
-        _info._pixel_aspect   = _io_dev.get_pixel_aspect();
-        _info._flip           = _io_dev.get_flip();
-
-        // imgother
-        _info._iso_speed         = _io_dev.get_iso_speed();
-        _info._shutter           = _io_dev.get_shutter();
-        _info._aperture          = _io_dev.get_aperture();
-        _info._focal_length      = _io_dev.get_focal_len();
-        _info._timestamp         = _io_dev.get_timestamp();
-        _info._shot_order        = _io_dev.get_shot_order();
-        //_io_dev.get_gpsdata();
-        _info._image_description = _io_dev.get_desc();
-        _info._artist            = _io_dev.get_artist();
-
-        _info._libraw_version = _io_dev.get_version();
-
-        _info._valid = true;
-
-        return _info;
-    }
 
     template< typename View >
     void apply( const View& dst_view )
     {
-        if( !_info._valid )
+        if( this->_info._valid == false )
         {
-            get_info();
+            io_error( "Image header was not read." );
         }
 
         typedef typename is_same< ConversionPolicy
-                                , read_and_no_convert
+                                , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
 
-        io_error_if( !is_allowed< View >( this->_info
-                                        , is_read_and_convert_t()
-                                        )
-                   , "Image types aren't compatible." );
+        io_error_if( !detail::is_allowed< View >( this->_info
+                                                , is_read_and_convert_t()
+                                                )
+                   , "Image types aren't compatible."
+                   );
 
         // TODO: better error handling based on return code
         int return_code = _io_dev.unpack();
@@ -179,47 +149,12 @@ public:
             else                          { BUILD_INTERLEAVED_VIEW(rgb,  16); }
         }
     }
-
-protected:
-    Device& _io_dev;
-    image_read_info< raw_tag > _info;
 };
 
-/////////////////////////////////// dynamic image
-
-
-struct raw_type_format_checker
-{
-    raw_type_format_checker( const image_read_info< raw_tag >& info )
-    : _info( info )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef typename Image::view_t view_t;
-
-        return is_allowed< view_t >( _info
-                                   , mpl::true_()
-                                   );
-    }
-
-private:
-
-    const image_read_info< raw_tag >& _info;
-};
-
-struct raw_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , raw_tag
-                                           >
-    {};
-};
-
-template< typename Device
-        >
+///
+/// BMP Dynamic Reader
+///
+template< typename Device >
 class dynamic_image_reader< Device
                           , raw_tag
                           >
@@ -235,10 +170,10 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device&                               device
+    dynamic_image_reader( const Device&                         io_dev
                         , const image_read_settings< raw_tag >& settings
                         )
-    : parent_t( device
+    : parent_t( io_dev
               , settings
               )
     {}
@@ -246,7 +181,7 @@ public:
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        raw_type_format_checker format_checker( this->_info );
+        detail::raw_type_format_checker format_checker( this->_info );
 
         if( !construct_matched( images
                                , format_checker
@@ -267,9 +202,9 @@ public:
                        , this->_info
                        );
 
-            dynamic_io_fnobj< raw_read_is_supported
-                    , parent_t
-                    > op( this );
+            detail::dynamic_io_fnobj< raw_read_is_supported
+                                    , parent_t
+                                    > op( this );
 
             apply_operation( view( images )
                             , op
@@ -278,7 +213,41 @@ public:
     }
 };
 
-} // detail
+namespace detail {
+
+struct raw_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , raw_tag
+                                           >
+    {};
+};
+
+struct raw_type_format_checker
+{
+    raw_type_format_checker( const image_read_info< raw_tag >& info )
+    : _info( info )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef typename Image::view_t view_t;
+
+        return is_allowed< view_t >( _info
+                                   , mpl::true_()
+                                   );
+    }
+
+private:
+    ///todo: do we need this here. Should be part of reader_backend
+    const image_read_info< raw_tag >& _info;
+};
+
+
+} // namespace detail
+
 } // gil
 } // boost
 

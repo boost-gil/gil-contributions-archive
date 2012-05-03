@@ -1,5 +1,5 @@
 /*
-    Copyright 2008 Christian Henning
+    Copyright 2012 Olivier Tournaire, Christian Henning
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -13,9 +13,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file
 /// \brief
-/// \author Olivier Tournaire \n
+/// \author Olivier Tournaire, Christian Henning \n
 ///
-/// \date 2011 \n
+/// \date 2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -28,16 +28,24 @@
 
 #include "device.hpp"
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil { 
 
+///
+/// RAW Writer
+///
 template< typename Device >
 class writer< Device
             , raw_tag
             >
+    : public writer_backend< Device
+                           , raw_tag
+                           >
 {
 public:
-    writer( Device& file ) : _out( file ) {}
-    ~writer() {}
+    writer( const Device&                      io_dev
+          , const image_write_info< raw_tag >& info 
+          )
+    : _out( file ) {}
 
     template<typename View>
     void apply( const View& view )
