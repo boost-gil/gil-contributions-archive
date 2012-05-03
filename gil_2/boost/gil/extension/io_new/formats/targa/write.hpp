@@ -43,7 +43,7 @@ class writer< Device
 {
 public:
 
-    writer( Device&                              io_dev
+    writer( const Device&                        io_dev
           , const image_write_info< targa_tag >& info
           )
     : writer_backend( io_dev
@@ -142,7 +142,7 @@ class dynamic_image_writer< Device
 
 public:
 
-    dynamic_image_writer( Device&                            io_dev
+    dynamic_image_writer( const Device&                        io_dev
                         , const image_write_info< targa_tag >& info
                         )
     : parent_t( io_dev

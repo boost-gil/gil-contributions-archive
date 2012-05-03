@@ -80,7 +80,8 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
                                   , tag_t
                                   >::type backend_t;
 
-        backend_t b = make_reader_backend( bmp_filename.c_str(), tag_t() );
+        backend_t a = read_image_info( bmp_filename.c_str(), tag_t() );
+        backend_t b = read_image_info( bmp_filename.c_str(), image_read_settings<tag_t>() );
     }
 
     {
@@ -88,7 +89,8 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
                                   , tag_t
                                   >::type backend_t;
 
-        backend_t b = make_reader_backend( bmp_filename, tag_t() );
+        backend_t a = read_image_info( bmp_filename, tag_t() );
+        backend_t b = read_image_info( bmp_filename, image_read_settings<tag_t>() );
     }
 
     {
@@ -98,7 +100,8 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
                                   , tag_t
                                   >::type backend_t;
 
-        backend_t b = make_reader_backend( in, tag_t() );
+        backend_t a = read_image_info( in, tag_t() );
+        backend_t b = read_image_info( in, image_read_settings<tag_t>() );
     }
 
     {
@@ -108,7 +111,8 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
                                   , tag_t
                                   >::type backend_t;
 
-        backend_t b = make_reader_backend( file, tag_t() );
+        backend_t a = read_image_info( file, tag_t() );
+        backend_t b = read_image_info( file, image_read_settings<tag_t>() );
     }
 
     {
@@ -118,7 +122,172 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
                                   , tag_t
                                   >::type backend_t;
 
-        backend_t b = make_reader_backend( my_path, tag_t() );
+        backend_t a = read_image_info( my_path, tag_t() );
+        backend_t b = read_image_info( my_path, image_read_settings<tag_t>() );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( recipe_3 )
+{
+    typedef bmp_tag tag_t;
+
+    {
+        rgb8_image_t img;
+
+        read_image( bmp_filename.c_str(), img, tag_t() );
+    }
+
+    {
+        rgb8_image_t img;
+
+        read_image( bmp_filename, img, tag_t() );
+    }
+
+    {
+        std::ifstream in( bmp_filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+
+        read_image( in, img, tag_t() );
+    }
+
+    {
+        FILE* file = fopen( bmp_filename.c_str(), "rb" );
+
+        rgb8_image_t img;
+
+        read_image( file, img, tag_t() );
+    }
+
+    {
+        fs::path my_path( bmp_filename );
+
+        rgb8_image_t img;
+
+        read_image( my_path, img, tag_t() );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( recipe_4 )
+{
+    typedef bmp_tag tag_t;
+
+    {
+        rgb8_image_t img;
+
+        read_view( bmp_filename.c_str(), view( img ), tag_t() );
+    }
+
+    {
+        rgb8_image_t img;
+
+        read_view( bmp_filename, view( img ), tag_t() );
+    }
+
+    {
+        std::ifstream in( bmp_filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+
+        read_view( in, view( img ), tag_t() );
+    }
+
+    {
+        FILE* file = fopen( bmp_filename.c_str(), "rb" );
+
+        rgb8_image_t img;
+
+        read_view( file, view( img ), tag_t() );
+    }
+
+    {
+        fs::path my_path( bmp_filename );
+
+        rgb8_image_t img;
+
+        read_view( my_path, view( img ), tag_t() );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( recipe_5 )
+{
+    typedef bmp_tag tag_t;
+
+    {
+        rgb8_image_t img;
+
+        read_and_convert_image( bmp_filename.c_str(), img, tag_t() );
+    }
+
+    {
+        rgb8_image_t img;
+
+        read_and_convert_image( bmp_filename, img, tag_t() );
+    }
+
+    {
+        std::ifstream in( bmp_filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+
+        read_and_convert_image( in, img, tag_t() );
+    }
+
+    {
+        FILE* file = fopen( bmp_filename.c_str(), "rb" );
+
+        rgb8_image_t img;
+
+        read_and_convert_image( file, img, tag_t() );
+    }
+
+    {
+        fs::path my_path( bmp_filename );
+
+        rgb8_image_t img;
+
+        read_and_convert_image( my_path, img, tag_t() );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( recipe_6 )
+{
+    typedef bmp_tag tag_t;
+
+    {
+        rgb8_image_t img;
+
+        read_and_convert_view( bmp_filename.c_str(), view( img ), tag_t() );
+    }
+
+    {
+        rgb8_image_t img;
+
+        read_and_convert_view( bmp_filename, view( img ), tag_t() );
+    }
+
+    {
+        std::ifstream in( bmp_filename.c_str(), ios::binary );
+
+        rgb8_image_t img;
+
+        read_and_convert_view( in, view( img ), tag_t() );
+    }
+
+    {
+        FILE* file = fopen( bmp_filename.c_str(), "rb" );
+
+        rgb8_image_t img;
+
+        read_and_convert_view( file, view( img ), tag_t() );
+    }
+
+    {
+        fs::path my_path( bmp_filename );
+
+        rgb8_image_t img;
+
+        read_and_convert_view( my_path, view( img ), tag_t() );
     }
 }
 

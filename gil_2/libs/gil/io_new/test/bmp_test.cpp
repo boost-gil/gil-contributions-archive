@@ -72,11 +72,17 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 
     {
         fs::path my_path( bmp_filename );
-        image_read_info< tag_t > info = read_image_info( my_path
-                                                       , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 127 );
-        BOOST_CHECK_EQUAL( info._height, 64  );
+        typedef get_reader_backend< fs::path
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t backend = read_image_info( my_path
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 127 );
+        BOOST_CHECK_EQUAL( backend._info._height, 64  );
     }
 }
 

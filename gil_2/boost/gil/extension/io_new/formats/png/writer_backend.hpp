@@ -50,7 +50,7 @@ public:
     ///
     /// Constructor
     ///
-    writer_backend( Device& io_dev
+    writer_backend( const Device&                      io_dev
                   , const image_write_info< png_tag >& info
                   )
     : _io_dev( io_dev )
@@ -393,7 +393,7 @@ private:
 
 public:
 
-    Device& _io_dev;
+    Device _io_dev;
 
     image_write_info< png_tag > _info;
 };

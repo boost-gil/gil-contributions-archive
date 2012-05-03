@@ -31,14 +31,16 @@ struct writer_backend< Device
                      , bmp_tag
                      >
 {
-    writer_backend( Device& device
+    writer_backend( const Device&                      io_dev
                   , const image_write_info< bmp_tag >& info
                   )
-    : _out( device )
-    , _info( info )
+    : _io_dev( io_dev )
+    , _info  ( info   )
     {}
 
-    Device& _out;
+public:
+
+    Device _io_dev;
 
     image_write_info< bmp_tag > _info;
 };

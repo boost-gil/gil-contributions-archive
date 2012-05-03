@@ -50,7 +50,7 @@ public:
 
 public:
 
-    writer( Device& io_dev
+    writer( const Device&                       io_dev
           , const image_write_info< jpeg_tag >& info
           )
     : backend_t( io_dev
@@ -142,7 +142,7 @@ class dynamic_image_writer< Device
 
 public:
 
-    dynamic_image_writer( Device&                             io_dev
+    dynamic_image_writer( const Device&                       io_dev
                         , const image_write_info< jpeg_tag >& info
                         )
     : parent_t( io_dev

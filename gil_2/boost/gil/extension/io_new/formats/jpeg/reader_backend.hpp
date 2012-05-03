@@ -80,10 +80,10 @@ struct reader_backend< Device
     //
     // Constructor
     //
-    reader_backend( Device&                               file
+    reader_backend( const Device&                          io_dev
                   , const image_read_settings< jpeg_tag >& settings
                   )
-    : _io_dev( file )
+    : _io_dev( io_dev )
     , _settings( settings )
     , _info()
 
@@ -248,7 +248,7 @@ private:
 
 public:
 
-    Device& _io_dev;
+    Device _io_dev;
 
     image_read_settings< jpeg_tag > _settings;
     image_read_info< jpeg_tag >     _info;

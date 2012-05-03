@@ -43,10 +43,10 @@ public:
 
 public:
 
-    reader_backend( Device&                               device
+    reader_backend( const Device&                         io_dev
                   , const image_read_settings< png_tag >& settings
                   )
-    : _io_dev( device )
+    : _io_dev( io_dev )
 
     , _settings( settings )
     , _info()
@@ -623,7 +623,7 @@ protected:
 
 public:
 
-    Device& _io_dev;
+    Device _io_dev;
 
     image_read_settings< png_tag > _settings;
     image_read_info    < png_tag > _info;

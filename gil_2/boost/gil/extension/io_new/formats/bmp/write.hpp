@@ -43,10 +43,10 @@ class writer< Device
 {
 public:
 
-    writer( Device& file
+    writer( const Device&                      io_dev
           , const image_write_info< bmp_tag >& info 
           )
-    : writer_backend( file
+    : writer_backend( io_dev
                     , info
                     )
     {}
@@ -97,24 +97,24 @@ private:
         std::size_t siz = ofs + spn * view.height();
 
         // write the BMP file header
-        _out.write_uint16( bmp_signature );
-        _out.write_uint32( (uint32_t) siz );
-        _out.write_uint16( 0 );
-        _out.write_uint16( 0 );
-        _out.write_uint32( (uint32_t) ofs );
+        _io_dev.write_uint16( bmp_signature );
+        _io_dev.write_uint32( (uint32_t) siz );
+        _io_dev.write_uint16( 0 );
+        _io_dev.write_uint16( 0 );
+        _io_dev.write_uint32( (uint32_t) ofs );
 
         // writes Windows information header
-        _out.write_uint32( bmp_header_size::_win32_info_size );
-        _out.write_uint32( static_cast< uint32_t >( view.width()  ));
-        _out.write_uint32( static_cast< uint32_t >( view.height() ));
-        _out.write_uint16( 1 );
-        _out.write_uint16( static_cast< uint16_t >( bpp ));
-        _out.write_uint32( bmp_compression::_rgb );
-        _out.write_uint32( 0 );
-        _out.write_uint32( 0 );
-        _out.write_uint32( 0 );
-        _out.write_uint32( entries );
-        _out.write_uint32( 0 );
+        _io_dev.write_uint32( bmp_header_size::_win32_info_size );
+        _io_dev.write_uint32( static_cast< uint32_t >( view.width()  ));
+        _io_dev.write_uint32( static_cast< uint32_t >( view.height() ));
+        _io_dev.write_uint16( 1 );
+        _io_dev.write_uint16( static_cast< uint16_t >( bpp ));
+        _io_dev.write_uint32( bmp_compression::_rgb );
+        _io_dev.write_uint32( 0 );
+        _io_dev.write_uint32( 0 );
+        _io_dev.write_uint32( 0 );
+        _io_dev.write_uint32( entries );
+        _io_dev.write_uint32( 0 );
 
         write_image< View
                    , typename detail::get_bgr_cs< num_channels< View >::value >::type
@@ -150,7 +150,7 @@ private:
                        , row
                        );
 
-            _out.write( &buffer.front(), spn );
+            _io_dev.write( &buffer.front(), spn );
         }
 
     }
@@ -173,10 +173,10 @@ class dynamic_image_writer< Device
 
 public:
 
-    dynamic_image_writer( Device& file
+    dynamic_image_writer( const Device&                      io_dev
                         , const image_write_info< bmp_tag >& info
                         )
-    : parent_t( file
+    : parent_t( io_dev
               , info
               )
     {}

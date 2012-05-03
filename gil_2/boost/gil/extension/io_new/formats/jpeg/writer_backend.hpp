@@ -82,7 +82,7 @@ struct writer_backend< Device
     ///
     /// Constructor
     ///
-    writer_backend( Device&                             io_dev
+    writer_backend( const Device&                       io_dev
                   , const image_write_info< jpeg_tag >& info
                   )
     : _io_dev( io_dev )
@@ -169,7 +169,7 @@ protected:
 
 public:
 
-    Device& _io_dev;
+    Device _io_dev;
 
     image_write_info< jpeg_tag > _info;
 

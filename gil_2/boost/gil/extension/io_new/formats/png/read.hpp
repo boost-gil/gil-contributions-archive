@@ -105,7 +105,7 @@ public:
 
 public:
 
-    reader( Device&                               io_dev
+    reader( const Device&                         io_dev
           , const image_read_settings< png_tag >& settings
           )
     : reader_base< png_tag
@@ -116,7 +116,7 @@ public:
                )
     {}
 
-    reader( Device&                                                io_dev
+    reader( const Device&                                          io_dev
           , const typename ConversionPolicy::color_converter_type& cc
           , const image_read_settings< png_tag >&                  settings
           )
@@ -392,10 +392,10 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device&                               device
+    dynamic_image_reader( const Device&                         io_dev
                         , const image_read_settings< png_tag >& settings
                         )
-    : parent_t( device
+    : parent_t( io_dev
               , settings
               )
     {}

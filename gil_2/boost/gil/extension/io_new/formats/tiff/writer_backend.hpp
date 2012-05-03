@@ -31,7 +31,7 @@ struct writer_backend< Device
                      , tiff_tag
                      >
 {
-    writer_backend( Device&                             io_dev
+    writer_backend( const Device&                       io_dev
                   , const image_write_info< tiff_tag >& info
                   )
     : _io_dev( io_dev )
@@ -107,7 +107,7 @@ protected:
 
 public:
 
-    Device& _io_dev;
+    Device _io_dev;
 
     image_write_info< tiff_tag > _info;
 };

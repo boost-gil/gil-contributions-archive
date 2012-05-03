@@ -74,7 +74,7 @@ public:
 
     typedef writer_backend< Device , png_tag > backend_t;
 
-    writer( Device&                            io_dev
+    writer( const Device&                      io_dev
           , const image_write_info< png_tag >& info
           )
     : backend_t( io_dev
@@ -213,8 +213,12 @@ class dynamic_image_writer< Device
 
 public:
 
-    dynamic_image_writer( Device& file )
-    : parent_t( file )
+    dynamic_image_writer( const Device&                      io_dev
+                        , const image_write_info< png_tag >& info
+)
+    : parent_t( io_dev
+              , info
+              )
     {}
 
     template< typename Views >

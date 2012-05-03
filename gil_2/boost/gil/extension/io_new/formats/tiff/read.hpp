@@ -131,25 +131,25 @@ public:
 
 public:
 
-    reader( Device&                                device
+    reader( const Device&                          io_dev
           , const image_read_settings< tiff_tag >& settings
           )
     : reader_base< tiff_tag
                  , ConversionPolicy
                  >()
-    , backend_t( device
+    , backend_t( io_dev
                , settings
                )
     {}
 
-    reader( Device&                                                device
+    reader( const Device&                                          io_dev
           , const typename ConversionPolicy::color_converter_type& cc
           , const image_read_settings< tiff_tag >&                 settings
           )
     : reader_base< tiff_tag
                  , ConversionPolicy
                  >( cc )
-    , backend_t( device
+    , backend_t( io_dev
                , settings
                )
     {}
@@ -731,10 +731,10 @@ class dynamic_image_reader< Device
 
 public:
 
-    dynamic_image_reader( Device&                                device
+    dynamic_image_reader( const Device&                          io_dev
                         , const image_read_settings< tiff_tag >& settings
                         )
-    : parent_t( device
+    : parent_t( io_dev
               , settings
               )
     {}

@@ -48,10 +48,10 @@ struct reader_backend< Device
                      , bmp_tag
                      >
 {
-    reader_backend( Device&                               device
+    reader_backend( const Device&                         io_dev
                   , const image_read_settings< bmp_tag >& settings
                   )
-    : _io_dev  ( device   )
+    : _io_dev  ( io_dev   )
     , _settings( settings )
     , _info()
     , _scanline_length( 0 )

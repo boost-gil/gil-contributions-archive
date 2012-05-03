@@ -70,7 +70,6 @@ make_reader( const std::wstring& file_name
                             );
 }
 
-/// Device cannot be const!
 template< typename Device
         , typename FormatTag
         , typename ConversionPolicy
@@ -114,7 +113,6 @@ typename get_reader_backend< String
                            >::type
 make_reader_backend( const String&                           file_name
                    , const image_read_settings< FormatTag >& settings
-                   , const FormatTag&
                    , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
                                                   , is_format_tag< FormatTag >
                                                            >
@@ -139,7 +137,6 @@ typename get_scanline_reader< std::wstring
                             >::type
 make_reader_backend( const std::wstring&                     file_name
                    , const image_read_settings< FormatTag >& settings
-                   , const FormatTag&
                    )
 {
     typedef get_read_device< std::wstring
@@ -157,7 +154,6 @@ make_reader_backend( const std::wstring&                     file_name
     return reader_backend< device_t, FormatTag >( device, settings );
 }
 
-/// Device cannot be const!
 template< typename Device
         , typename FormatTag
         >
@@ -167,7 +163,6 @@ typename get_reader_backend< Device
                            >::type
 make_reader_backend( Device&                                 io_dev
                    , const image_read_settings< FormatTag >& settings
-                   , const FormatTag&
                    , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
                                                                                      , Device
                                                                                      >
@@ -195,17 +190,16 @@ typename get_reader_backend< String
                            , FormatTag
                            >::type
 make_reader_backend( const String&    file_name
-                   , const FormatTag& tag
+                   , const FormatTag&
                    , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
                                                   , is_format_tag< FormatTag >
                                                            >
                                        >::type* /* ptr */ = 0
                    )
 {
-    return make_reader_backend( file_name, image_read_settings< FormatTag >(), tag );
+    return make_reader_backend( file_name, image_read_settings< FormatTag >() );
 }
 
-/// Device cannot be const!
 template< typename Device
         , typename FormatTag
         >
@@ -223,7 +217,7 @@ make_reader_backend( Device&          io_dev
                                        >::type* /* ptr */ = 0
                    )
 {
-    return make_reader_backend( io_dev, image_read_settings< FormatTag >(), tag );
+    return make_reader_backend( io_dev, image_read_settings< FormatTag >() );
 }
 
 ////////////////////////////////////////////////////////////
@@ -258,34 +252,33 @@ make_scanline_reader( const String&    file_name
                                      );
 }
 
-template< typename FormatTag >
-inline
-typename get_scanline_reader< std::wstring
-                            , FormatTag
-                            >::type
-make_scanline_reader( const std::wstring& file_name
-                    , const FormatTag&
-                    )
-{
-    const char* str = detail::convert_to_native_string( file_name );
+//template< typename FormatTag >
+//inline
+//typename get_scanline_reader< std::wstring
+//                            , FormatTag
+//                            >::type
+//make_scanline_reader( const std::wstring& file_name
+//                    , const FormatTag&
+//                    )
+//{
+//    const char* str = detail::convert_to_native_string( file_name );
+//
+//    get_read_device< std::wstring
+//                   , FormatTag
+//                   >::type device( str
+//                                 , typename detail::file_stream_device< FormatTag >::read_tag()
+//                                 );
+//
+//    delete[] str;
+//
+//    return get_scanline_reader< std::wstring
+//                              , FormatTag
+//                              >::type( device
+//                                     , image_read_settings< FormatTag >()
+//                                     );
+//}
 
-    get_read_device< std::wstring
-                   , FormatTag
-                   >::type device( str
-                                 , typename detail::file_stream_device< FormatTag >::read_tag()
-                                 );
 
-    delete[] str;
-
-    return get_scanline_reader< std::wstring
-                              , FormatTag
-                              >::type( device
-                                     , image_read_settings< FormatTag >()
-                                     );
-}
-
-
-/// Device cannot be const!
 template< typename Device
         , typename FormatTag
         >
@@ -293,7 +286,7 @@ inline
 typename get_scanline_reader< Device
                             , FormatTag
                             >::type
-make_scanline_reader( Device&          file
+make_scanline_reader( Device&          io_dev
                     , const FormatTag&
                     , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
                                                                                       , Device
@@ -303,15 +296,7 @@ make_scanline_reader( Device&          file
                                         >::type* /* ptr */ = 0
                     )
 {
-    get_read_device< Device
-                   , FormatTag
-                   >::type device( file );
-
-    return get_scanline_reader< Device
-                              , FormatTag
-                              >::type( device
-                                     , image_read_settings< FormatTag >()
-                                     );
+    return make_scanline_reader( io_dev, image_read_settings< FormatTag >() );
 }
 
 

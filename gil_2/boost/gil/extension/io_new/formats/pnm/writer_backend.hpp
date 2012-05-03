@@ -31,14 +31,16 @@ struct writer_backend< Device
                      , pnm_tag
                      >
 {
-    writer_backend( Device& device
+    writer_backend( const Device&                      io_dev
                   , const image_write_info< pnm_tag >& info
                   )
-    : _io_dev( device )
+    : _io_dev( io_dev )
     , _info( info )
     {}
 
-    Device& _io_dev;
+public:
+
+    Device _io_dev;
 
     image_write_info< pnm_tag > _info;
 };
