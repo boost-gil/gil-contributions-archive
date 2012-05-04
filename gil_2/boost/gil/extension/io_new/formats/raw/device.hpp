@@ -51,8 +51,17 @@ class raw_device_base
 {
 public:
 
+    ///
+    /// Constructor
+    ///
     raw_device_base() {}
-    raw_device_base( const LibRaw& processor ) : m_libraw_processor(processor) {}
+
+    ///
+    /// Constructor
+    ///
+    raw_device_base( const LibRaw& processor )
+    : m_libraw_processor(processor)
+    {}
 
     // iparams getters
     std::string get_camera_manufacturer() { return std::string(m_libraw_processor.imgdata.idata.make);  }
@@ -99,6 +108,7 @@ public:
     libraw_processed_image_t* dcraw_make_mem_image(int* error_code=NULL) { return m_libraw_processor.dcraw_make_mem_image(error_code); }
 
 protected:
+
     LibRaw m_libraw_processor;
 };
 
@@ -112,19 +122,37 @@ class file_stream_device< raw_tag > : public raw_device_base
 public:
 
     struct read_tag  {};
-    struct write_tag {};
 
-    file_stream_device( std::string const& file_name, read_tag )
+    ///
+    /// Constructor
+    ///
+    file_stream_device( std::string const& file_name
+                      , read_tag   = read_tag()
+                      )
     {
-        io_error_if( m_libraw_processor.open_file(file_name.c_str()) != LIBRAW_SUCCESS , "file_stream_device: failed to open file" );
+        io_error_if( m_libraw_processor.open_file( file_name.c_str() ) != LIBRAW_SUCCESS 
+                   , "file_stream_device: failed to open file"
+                   );
     }
 
-    file_stream_device( std::string const& file_name, write_tag )
+    ///
+    /// Constructor
+    ///
+    file_stream_device( const char* file_name
+                      , read_tag   = read_tag()
+                      )
     {
-        /// TODO
+        io_error_if( m_libraw_processor.open_file( file_name ) != LIBRAW_SUCCESS 
+                   , "file_stream_device: failed to open file"
+                   );
     }
 
-    file_stream_device( const LibRaw& processor ) : raw_device_base( processor ) {}
+    ///
+    /// Constructor
+    ///
+    file_stream_device( const LibRaw& processor ) 
+    : raw_device_base( processor )
+    {}
 };
 
 /*!

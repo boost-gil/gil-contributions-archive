@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( recipe_1 )
 
 BOOST_AUTO_TEST_CASE( recipe_2 )
 {
-    typedef bmp_tag tag_t;
+    typedef tiff_tag tag_t;
 
     {
         typedef get_reader_backend< const char*
@@ -84,47 +84,47 @@ BOOST_AUTO_TEST_CASE( recipe_2 )
         backend_t b = read_image_info( bmp_filename.c_str(), image_read_settings<tag_t>() );
     }
 
-    {
-        typedef get_reader_backend< const std::string
-                                  , tag_t
-                                  >::type backend_t;
+    //{
+    //    typedef get_reader_backend< const std::string
+    //                              , tag_t
+    //                              >::type backend_t;
 
-        backend_t a = read_image_info( bmp_filename, tag_t() );
-        backend_t b = read_image_info( bmp_filename, image_read_settings<tag_t>() );
-    }
+    //    backend_t a = read_image_info( bmp_filename, tag_t() );
+    //    backend_t b = read_image_info( bmp_filename, image_read_settings<tag_t>() );
+    //}
 
-    {
-        std::ifstream in( bmp_filename.c_str(), ios::binary );
+    //{
+    //    std::ifstream in( bmp_filename.c_str(), ios::binary );
 
-        typedef get_reader_backend< std::ifstream
-                                  , tag_t
-                                  >::type backend_t;
+    //    typedef get_reader_backend< std::ifstream
+    //                              , tag_t
+    //                              >::type backend_t;
 
-        backend_t a = read_image_info( in, tag_t() );
-        backend_t b = read_image_info( in, image_read_settings<tag_t>() );
-    }
+    //    backend_t a = read_image_info( in, tag_t() );
+    //    backend_t b = read_image_info( in, image_read_settings<tag_t>() );
+    //}
 
-    {
-        FILE* file = fopen( bmp_filename.c_str(), "rb" );
+    //{
+    //    FILE* file = fopen( bmp_filename.c_str(), "rb" );
 
-        typedef get_reader_backend< FILE*
-                                  , tag_t
-                                  >::type backend_t;
+    //    typedef get_reader_backend< FILE*
+    //                              , tag_t
+    //                              >::type backend_t;
 
-        backend_t a = read_image_info( file, tag_t() );
-        backend_t b = read_image_info( file, image_read_settings<tag_t>() );
-    }
+    //    backend_t a = read_image_info( file, tag_t() );
+    //    backend_t b = read_image_info( file, image_read_settings<tag_t>() );
+    //}
 
-    {
-        fs::path my_path( bmp_filename );
+    //{
+    //    fs::path my_path( bmp_filename );
 
-        typedef get_reader_backend< fs::path
-                                  , tag_t
-                                  >::type backend_t;
+    //    typedef get_reader_backend< fs::path
+    //                              , tag_t
+    //                              >::type backend_t;
 
-        backend_t a = read_image_info( my_path, tag_t() );
-        backend_t b = read_image_info( my_path, image_read_settings<tag_t>() );
-    }
+    //    backend_t a = read_image_info( my_path, tag_t() );
+    //    backend_t b = read_image_info( my_path, image_read_settings<tag_t>() );
+    //}
 }
 
 BOOST_AUTO_TEST_CASE( recipe_3 )

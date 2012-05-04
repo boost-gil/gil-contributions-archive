@@ -28,11 +28,32 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
 
     {
-        get_read_device< char*, tag_t >::type l;
+        //BOOST_STATIC_ASSERT(( boost::is_same< gil::detail::is_adaptable_input_device< bmp_tag, FILE* >::type
+        //                                    , mpl::true_
+        //                                    >::value ));
 
-        //typedef get_reader_backend< const std::string
+        //BOOST_STATIC_ASSERT(( boost::is_same< gil::detail::is_adaptable_input_device< tag_t, LibRaw >::type
+        //                                    , mpl::true_
+        //                                    >::value ));
+
+        //get_read_device< LibRaw, tag_t >::type l( "" );
+
+        typedef get_read_device< const char*
+                               , raw_tag
+                               >::type device_t;
+
+        reader_backend< device_t, raw_tag > p;
+
+
+        /// raw_tag reader's can only constructed with char*, std::string, and LibRaw object
+
+        //typedef get_reader_backend< const char*
         //                          , tag_t
         //                          >::type backend_t;
+
+        //backend_t b = make_reader_backend( raw_filename.c_str()
+        //                                 , image_read_settings< raw_tag >()
+        //                                 );
 
         //backend_t backend = read_image_info( raw_filename
         //                                   , tag_t()
