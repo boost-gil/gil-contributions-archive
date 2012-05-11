@@ -153,23 +153,11 @@ public:
     template< typename Views >
     void apply( const any_image_view< Views >& views )
     {
-        dynamic_io_fnobj< detail::jpeg_write_is_supported
-                        , parent_t
-                        > op( this );
+        detail::dynamic_io_fnobj< detail::jpeg_write_is_supported
+                                , parent_t
+                                > op( this );
 
-        detail::apply_operation( views, op );
-    }
-
-    template< typename Views >
-    void apply( const any_image_view  < Views    >& views
-              , const image_write_info< jpeg_tag >& info
-              )
-    {
-        dynamic_io_fnobj< detail::jpeg_write_is_supported
-                        , parent_t
-                        > op( this );
-
-        detail::apply_operation( views, info, op );
+        apply_operation( views, op );
     }
 };
 
@@ -185,64 +173,62 @@ struct jpeg_write_is_supported
     {};
 };
 
-// unary application
-template <typename Types, typename Tag, typename Bits, typename Op>
-typename Op::result_type GIL_FORCEINLINE apply_operation_basec( const Bits& bits
-                                                              , std::size_t index
-                                                              , const image_write_info< Tag >& info
-                                                              , Op op
-                                                              )
-{
-    return detail::apply_operation_fwd_fn<mpl::size<Types>::value>().template applyc<Types>( bits
-                                                                                           , index
-                                                                                           , op
-                                                                                           );
-}
-
-// unary application
-template< typename Types
-        , typename Info
-        , typename Bits
-        , typename Op
-        >
-typename Op::result_type GIL_FORCEINLINE apply_operation_base( Bits&       bits
-                                                             , std::size_t index
-                                                             , const Info& info
-                                                             , Op op
-                                                             )
-{
-    return detail::apply_operation_fwd_fn< mpl::size< Types >::value>().template apply< Types
-                                                                                      >( bits
-                                                                                       , index
-                                                                                       , info
-                                                                                       , op
-                                                                                       );
-}
-
-
-
-/// \ingroup Variant
-/// \brief Invokes a generic constant operation (represented as a binary function object) on two variants
-template< typename Types1
-        , typename Info
-        , typename BinaryOp
-        >
-GIL_FORCEINLINE
-typename BinaryOp::result_type apply_operation( const variant< Types1 >& arg1
-                                              , const Info&              info
-                                              , BinaryOp op
-                                              )
-{
-    typename variant< Types1 >::base_t bits = arg1.bits();
-
-    return apply_operation_base< Types1
-                               , image_write_info< jpeg_tag >
-                               >( bits
-                                , arg1.index()
-                                , info
-                                , op
-                                );
-}
+///@todo - do we need this?
+//// unary application
+//template <typename Types, typename Tag, typename Bits, typename Op>
+//typename Op::result_type GIL_FORCEINLINE apply_operation_basec( const Bits& bits
+//                                                              , std::size_t index
+//                                                              , const image_write_info< Tag >& info
+//                                                              , Op op
+//                                                              )
+//{
+//    return detail::apply_operation_fwd_fn<mpl::size<Types>::value>().template applyc<Types>( bits
+//                                                                                           , index
+//                                                                                           , op
+//                                                                                           );
+//}
+//
+//// unary application
+//template< typename Types
+//        , typename Bits
+//        , typename Op
+//        >
+//typename Op::result_type GIL_FORCEINLINE apply_operation_base( Bits&       bits
+//                                                             , std::size_t index
+//                                                             , Op op
+//                                                             )
+//{
+//    return detail::apply_operation_fwd_fn< mpl::size< Types >::value>().template apply< Types
+//                                                                                      >( bits
+//                                                                                       , index
+//                                                                                       , op
+//                                                                                       );
+//}
+//
+//
+//
+///// \ingroup Variant
+///// \brief Invokes a generic constant operation (represented as a binary function object) on two variants
+//template< typename Types1
+//        , typename Info
+//        , typename BinaryOp
+//        >
+//GIL_FORCEINLINE
+//typename BinaryOp::result_type apply_operation( const variant< Types1 >& arg1
+//                                              , const Info&              info
+//                                              , BinaryOp op
+//                                              )
+//{
+//    typename variant< Types1 >::base_t bits = arg1.bits();
+//
+//    return apply_operation_base< Types1
+//                               , image_write_info< jpeg_tag >
+//                               >( bits
+//                                , arg1.index()
+//                                , info
+//                                , op
+//                                );
+//}
 
 } // detail
 

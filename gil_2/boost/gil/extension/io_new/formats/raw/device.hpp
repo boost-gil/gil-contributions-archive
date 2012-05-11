@@ -121,7 +121,7 @@ class file_stream_device< raw_tag > : public raw_device_base
 {
 public:
 
-    struct read_tag  {};
+    struct read_tag {};
 
     ///
     /// Constructor
@@ -153,40 +153,6 @@ public:
     file_stream_device( const LibRaw& processor ) 
     : raw_device_base( processor )
     {}
-};
-
-/*!
- *
- * ostream_device specialization for raw images.
- */
-template<>
-class ostream_device< raw_tag > : public raw_device_base
-{
-public:
-    ostream_device( std::ostream & out ) : _out( out )
-    {
-        /// TODO
-    }
-
-private:
-    std::ostream& _out;
-};
-
-/*!
- *
- * istream_device specialization for raw images.
- */
-template<>
-class istream_device< raw_tag > : public raw_device_base
-{
-public:
-    istream_device( std::istream & in ) : _in( in )
-    {
-        /// TODO
-    }
-
-private:
-    std::istream& _in;
 };
 
 template< typename FormatTag >

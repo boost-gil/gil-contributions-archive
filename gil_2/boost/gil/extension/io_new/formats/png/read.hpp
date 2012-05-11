@@ -416,12 +416,12 @@ public:
         else
         {
             init_image( images
-                      , this->_info
+                      , this->_settings
                       );
 
-            boost::gil::detail::dynamic_io_fnobj< boost::gil::detail::png_read_is_supported
-							                    , parent_t
-                                                > op( this );
+            detail::dynamic_io_fnobj< detail::png_read_is_supported
+                                    , parent_t
+                                    > op( this );
 
             apply_operation( view( images )
                            , op

@@ -33,6 +33,7 @@
 
 #include "is_allowed.hpp"
 #include "device.hpp"
+#include "reader_backend.hpp"
 
 namespace boost { namespace gil {
 

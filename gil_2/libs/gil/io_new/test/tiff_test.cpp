@@ -35,39 +35,62 @@ BOOST_AUTO_TEST_SUITE( tiff_test )
 BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
     {
-        image_read_info< tag_t > info = read_image_info( tiff_filename
-                                                       , tag_t() );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 200u );
-        BOOST_CHECK_EQUAL( info._height, 133u );
+        backend_t backend = read_image_info( tiff_filename
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 200u );
+        BOOST_CHECK_EQUAL( backend._info._height, 133u );
     }
 
     {
         ifstream in( tiff_filename.c_str(), ios::binary );
-        image_read_info< tag_t > info = read_image_info( in
-                                                       , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 200u );
-        BOOST_CHECK_EQUAL( info._height, 133u );
+        typedef get_reader_backend< ifstream
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t backend = read_image_info( in
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 200u );
+        BOOST_CHECK_EQUAL( backend._info._height, 133u );
     }
 
     {
         TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
-        image_read_info< tag_t > info = read_image_info( file
-                                                       , tag_t() );
-        
-        BOOST_CHECK_EQUAL( info._width , 200u );
-        BOOST_CHECK_EQUAL( info._height, 133u );
+        typedef get_reader_backend< FILE*
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t backend = read_image_info( file
+                                           , tag_t()
+                                           );
+                                           
+        BOOST_CHECK_EQUAL( backend._info._width , 200u );
+        BOOST_CHECK_EQUAL( backend._info._height, 133u );
     }
 
     {
         fs::path my_path( tiff_filename );
-        image_read_info< tag_t > info = read_image_info( my_path
-                                                       , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 200u );
-        BOOST_CHECK_EQUAL( info._height, 133u );
+        typedef get_reader_backend< fs::path
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t backend = read_image_info( my_path
+                                           , tag_t()
+                                           );
+
+
+        BOOST_CHECK_EQUAL( backend._info._width , 200u );
+        BOOST_CHECK_EQUAL( backend._info._height, 133u );
     }
 }
 
@@ -316,7 +339,7 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
     typedef mpl::vector< gray8_image_t
                        , gray16_image_t
                        , rgb8_image_t
-                       , gil::detail::gray1_image_t
+                       , gray1_image_t
                        > my_img_types;
 
 

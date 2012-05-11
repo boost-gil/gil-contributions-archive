@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
     typedef mpl::vector< gray8_image_t
                        , gray16_image_t
                        , rgb8_image_t
-                       , gil::detail::gray1_image_t
+                       , gray1_image_t
                        > my_img_types;
 
 

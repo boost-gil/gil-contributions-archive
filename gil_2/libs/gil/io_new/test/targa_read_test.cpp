@@ -28,23 +28,27 @@ void write( Image&        img
 BOOST_AUTO_TEST_CASE( read_header_test )
 {
     {
-        image_read_info< tag_t > info = read_image_info( targa_filename
-                                                       , tag_t()
-                                                       );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._header_size     , 18  );
-        BOOST_CHECK_EQUAL( info._offset          , 18  );
-        BOOST_CHECK_EQUAL( info._color_map_type  , 0   );
-        BOOST_CHECK_EQUAL( info._image_type      , 10  );
-        BOOST_CHECK_EQUAL( info._color_map_start , 0   );
-        BOOST_CHECK_EQUAL( info._color_map_length, 0   );
-        BOOST_CHECK_EQUAL( info._color_map_depth , 0   );
-        BOOST_CHECK_EQUAL( info._x_origin        , 0   );
-        BOOST_CHECK_EQUAL( info._y_origin        , 0   );
-        BOOST_CHECK_EQUAL( info._width           , 124 );
-        BOOST_CHECK_EQUAL( info._height          , 124 );
-        BOOST_CHECK_EQUAL( info._bits_per_pixel  , 24  );
-        BOOST_CHECK_EQUAL( info._descriptor      , 0   );
+        backend_t backend = read_image_info( targa_filename
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._header_size     , 18  );
+        BOOST_CHECK_EQUAL( backend._info._offset          , 18  );
+        BOOST_CHECK_EQUAL( backend._info._color_map_type  , 0   );
+        BOOST_CHECK_EQUAL( backend._info._image_type      , 10  );
+        BOOST_CHECK_EQUAL( backend._info._color_map_start , 0   );
+        BOOST_CHECK_EQUAL( backend._info._color_map_length, 0   );
+        BOOST_CHECK_EQUAL( backend._info._color_map_depth , 0   );
+        BOOST_CHECK_EQUAL( backend._info._x_origin        , 0   );
+        BOOST_CHECK_EQUAL( backend._info._y_origin        , 0   );
+        BOOST_CHECK_EQUAL( backend._info._width           , 124 );
+        BOOST_CHECK_EQUAL( backend._info._height          , 124 );
+        BOOST_CHECK_EQUAL( backend._info._bits_per_pixel  , 24  );
+        BOOST_CHECK_EQUAL( backend._info._descriptor      , 0   );
     }
 }
 

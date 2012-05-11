@@ -153,9 +153,9 @@ public:
     template< typename Views >
     void apply( const any_image_view< Views >& views )
     {
-        dynamic_io_fnobj< detail::targa_write_is_supported
-                        , parent_t
-                        > op( this );
+        detail::dynamic_io_fnobj< detail::targa_write_is_supported
+                                , parent_t
+                                > op( this );
 
         apply_operation( views, op );
     }

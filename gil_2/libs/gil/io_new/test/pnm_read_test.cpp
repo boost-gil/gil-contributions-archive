@@ -26,14 +26,18 @@ void write( Image&        img
 BOOST_AUTO_TEST_CASE( read_header_test )
 {
     {
-        image_read_info< tag_t > info = read_image_info( pnm_filename
-                                                       , tag_t()
-                                                       );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._type     , pnm_image_type::color_asc_t::value );
-        BOOST_CHECK_EQUAL( info._width    , 256u                        );
-        BOOST_CHECK_EQUAL( info._height   , 256u                        );
-        BOOST_CHECK_EQUAL( info._max_value, 255u                        );
+        backend_t backend = read_image_info( pnm_filename
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._type     , pnm_image_type::color_asc_t::value );
+        BOOST_CHECK_EQUAL( backend._info._width    , 256u                               );
+        BOOST_CHECK_EQUAL( backend._info._height   , 256u                               );
+        BOOST_CHECK_EQUAL( backend._info._max_value, 255u                               );
     }
 }
 
@@ -74,7 +78,7 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
 
     // p4.pnm
     {
-        detail::gray1_image_t img;
+        gray1_image_t img;
         
         read_image( pnm_in + "p4.pnm", img, tag_t() );
         BOOST_CHECK_EQUAL( view( img ).width() , 200u );

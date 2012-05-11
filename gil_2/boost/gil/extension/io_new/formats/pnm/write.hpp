@@ -127,13 +127,13 @@ private:
         typedef typename View::x_iterator x_it_t;
         x_it_t row_it = x_it_t( &( *row.begin() ));
 
-        negate_bits< byte_vector_t
-                   , mpl::true_
-                   > neg;
+        detail::negate_bits< byte_vector_t
+                           , mpl::true_
+                           > neg;
 
-        mirror_bits< byte_vector_t
-                   , mpl::true_
-                   > mirror;
+        detail::mirror_bits< byte_vector_t
+                           , mpl::true_
+                           > mirror;
 
 
         for( typename View::y_coord_t y = 0; y < src.height(); ++y )
@@ -216,9 +216,9 @@ public:
     template< typename Views >
     void apply( const any_image_view< Views >& views )
     {
-        dynamic_io_fnobj< detail::pnm_write_is_supported
-                        , parent_t
-                        > op( this );
+        detail::dynamic_io_fnobj< detail::pnm_write_is_supported
+                                , parent_t
+                                > op( this );
 
         apply_operation( views, op );
     }

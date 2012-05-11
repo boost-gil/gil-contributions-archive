@@ -188,7 +188,9 @@ public:
                                 , parent_t
                                 > op( this );
 
-        apply_operation( views, op );
+        apply_operation( views
+                       , op
+                       );
     }
 };
 

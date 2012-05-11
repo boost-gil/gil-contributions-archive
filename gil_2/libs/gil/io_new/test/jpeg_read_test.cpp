@@ -16,42 +16,58 @@ BOOST_AUTO_TEST_SUITE( jpeg_test )
 BOOST_AUTO_TEST_CASE( read_header_test )
 {
     {
-        image_read_info< tag_t > info = read_image_info( jpeg_filename
-                                                       , tag_t()
-                                                       );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width         , 136u );
-        BOOST_CHECK_EQUAL( info._height        , 98u  );
+        backend_t backend = read_image_info( jpeg_filename
+                                           , tag_t()
+                                           );
 
-        BOOST_CHECK_EQUAL( info._num_components, 3         );
-        BOOST_CHECK_EQUAL( info._color_space   , JCS_YCbCr );
+        BOOST_CHECK_EQUAL( backend._info._width         , 136u );
+        BOOST_CHECK_EQUAL( backend._info._height        , 98u  );
 
-        BOOST_CHECK_EQUAL( info._data_precision, 8         );
+        BOOST_CHECK_EQUAL( backend._info._num_components, 3         );
+        BOOST_CHECK_EQUAL( backend._info._color_space   , JCS_YCbCr );
+
+        BOOST_CHECK_EQUAL( backend._info._data_precision, 8         );
     }
 }
 
 BOOST_AUTO_TEST_CASE( read_pixel_density_test )
 {
-    image_read_info< tag_t > info = read_image_info( jpeg_in + "EddDawson/36dpi.jpg"
-                                                   , tag_t()
-                                                   );
+    typedef get_reader_backend< const std::string
+                              , tag_t
+                              >::type backend_t;
 
+    backend_t backend = read_image_info( jpeg_in + "EddDawson/36dpi.jpg"
+                                       , tag_t()
+                                       );
+                                           
     rgb8_image_t img;
     read_image( jpeg_in + "EddDawson/36dpi.jpg", img, jpeg_tag() );
 
     image_write_info< jpeg_tag > write_settings;
-    write_settings.set_pixel_dimensions( info._width, info._height, info._pixel_width_mm, info._pixel_height_mm );
+    write_settings.set_pixel_dimensions( backend._info._width
+                                       , backend._info._height
+                                       , backend._info._pixel_width_mm
+                                       , backend._info._pixel_height_mm
+                                       );
 
     stringstream in_memory( ios_base::in | ios_base::out | ios_base::binary );
     write_view( in_memory, view( img ), write_settings );
 
-    image_read_info< tag_t > info2 = read_image_info( in_memory
-                                                    , tag_t()
-                                                    );
+    typedef get_reader_backend< stringstream
+                              , tag_t
+                              >::type backend2_t;
+
+    backend2_t backend2 = read_image_info( in_memory
+                                         , tag_t()
+                                         );
 
     // Because of rounding the two results differ slightly.
-    if(  std::abs( info._pixel_width_mm  - info2._pixel_width_mm  ) > 10.0
-      || std::abs( info._pixel_height_mm - info2._pixel_height_mm ) > 10.0
+    if(  std::abs( backend._info._pixel_width_mm  - backend2._info._pixel_width_mm  ) > 10.0
+      || std::abs( backend._info._pixel_height_mm - backend2._info._pixel_height_mm ) > 10.0
       )
     {
         BOOST_CHECK_EQUAL( 0, 1 );

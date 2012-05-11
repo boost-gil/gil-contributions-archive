@@ -249,10 +249,10 @@ public:
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        jpeg_type_format_checker format_checker( this->_info._color_space != JCS_YCbCr
-                                               ? this->_info._color_space
-                                               : JCS_RGB
-                                               );
+        detail::jpeg_type_format_checker format_checker( this->_info._color_space != JCS_YCbCr
+                                                       ? this->_info._color_space
+                                                       : JCS_RGB
+                                                       );
 
         if( !construct_matched( images
                               , format_checker
@@ -263,12 +263,12 @@ public:
         else
         {
             init_image( images
-                      , this->_info
+                      , this->_settings
                       );
 
-            dynamic_io_fnobj< jpeg_read_is_supported
-                            , parent_t
-                            > op( this );
+            detail::dynamic_io_fnobj< detail::jpeg_read_is_supported
+                                    , parent_t
+                                    > op( this );
 
             apply_operation( view( images )
                            , op

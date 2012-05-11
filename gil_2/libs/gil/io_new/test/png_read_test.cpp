@@ -40,9 +40,14 @@ void test_file( string filename )
     settings._read_file_gamma        = true;
     settings._read_transparency_data = true;
 
-    image_read_info< png_tag > info = read_image_info( png_in + filename
-                                                     , settings
-                                                     );
+
+    typedef get_reader_backend< const std::string
+                                , tag_t
+                                >::type backend_t;
+
+    backend_t backend = read_image_info( png_in + filename
+                                        , settings
+                                        );
 
     read_image( png_in + filename
               , src
@@ -50,14 +55,17 @@ void test_file( string filename )
               );
 
     image_write_info< png_tag > write_info;
-    write_info._file_gamma = info._file_gamma;
+    write_info._file_gamma = backend._info._file_gamma;
 
     write_view( png_out + filename
               , view( src )
               , write_info
               );
 
-    read_image( png_out + filename, dst, settings/*tag_t()*/ );
+    read_image( png_out + filename
+              , dst
+              , settings
+              );
 
 
     BOOST_CHECK( equal_pixels( const_view( src )
@@ -68,25 +76,27 @@ void test_file( string filename )
 
 BOOST_AUTO_TEST_CASE( read_header_test )
 {
-    {
-        image_read_info< tag_t > info = read_image_info( png_filename
-                                                       , tag_t()
-                                                       );
+    typedef get_reader_backend< const std::string
+                              , tag_t
+                              >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 320u );
-        BOOST_CHECK_EQUAL( info._height, 240u );
+    backend_t backend = read_image_info( png_filename
+                                       , tag_t()
+                                       );
 
-        BOOST_CHECK_EQUAL( info._num_channels, 4                   );
-        BOOST_CHECK_EQUAL( info._bit_depth   , 8                   );
-        BOOST_CHECK_EQUAL( info._color_type  , PNG_COLOR_TYPE_RGBA );
+    BOOST_CHECK_EQUAL( backend._info._width , 320u );
+    BOOST_CHECK_EQUAL( backend._info._height, 240u );
 
-        BOOST_CHECK_EQUAL( info._interlace_method  , PNG_INTERLACE_NONE        );
-        BOOST_CHECK_EQUAL( info._compression_method, PNG_COMPRESSION_TYPE_BASE );
-        BOOST_CHECK_EQUAL( info._filter_method     , PNG_FILTER_TYPE_BASE      );
+    BOOST_CHECK_EQUAL( backend._info._num_channels, 4                   );
+    BOOST_CHECK_EQUAL( backend._info._bit_depth   , 8                   );
+    BOOST_CHECK_EQUAL( backend._info._color_type  , PNG_COLOR_TYPE_RGBA );
+
+    BOOST_CHECK_EQUAL( backend._info._interlace_method  , PNG_INTERLACE_NONE        );
+    BOOST_CHECK_EQUAL( backend._info._compression_method, PNG_COMPRESSION_TYPE_BASE );
+    BOOST_CHECK_EQUAL( backend._info._filter_method     , PNG_FILTER_TYPE_BASE      );
 
 
-        BOOST_CHECK_EQUAL( info._file_gamma, 1 );
-    }
+    BOOST_CHECK_EQUAL( backend._info._file_gamma, 1 );
 }
 
 BOOST_AUTO_TEST_CASE( read_pixel_per_meter )
@@ -94,11 +104,15 @@ BOOST_AUTO_TEST_CASE( read_pixel_per_meter )
     image_read_settings< png_tag > settings;
     settings.set_read_members_true();
 
-    image_read_info< tag_t > info = read_image_info( png_base_in + "EddDawson/36dpi.png"
-                                                   , settings
-                                                   );
+    typedef get_reader_backend< const std::string
+                              , tag_t
+                              >::type backend_t;
 
-    BOOST_CHECK_EQUAL( info._pixels_per_meter, 1417 );
+    backend_t backend = read_image_info( png_base_in + "EddDawson/36dpi.png"
+                                       , tag_t()
+                                       );
+
+    BOOST_CHECK_EQUAL( backend._info._pixels_per_meter, 1417 );
 
 }
 

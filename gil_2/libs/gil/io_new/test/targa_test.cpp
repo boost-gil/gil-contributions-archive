@@ -27,43 +27,61 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
 
     {
-        image_read_info< tag_t > info = read_image_info( targa_filename
-                                                       , tag_t()
-                                                       );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 124 );
-        BOOST_CHECK_EQUAL( info._height, 124 );
+        backend_t backend = read_image_info( targa_filename
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 124 );
+        BOOST_CHECK_EQUAL( backend._info._height, 124 );
     }
 
     {
         ifstream in( targa_filename.c_str(), ios::binary );
 
-        image_read_info< tag_t > info = read_image_info( in
-                                                       , tag_t() );
+        typedef get_reader_backend< ifstream
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 124 );
-        BOOST_CHECK_EQUAL( info._height, 124 );
+        backend_t backend = read_image_info( in
+                                           , tag_t()
+                                           );
+                                           
+        BOOST_CHECK_EQUAL( backend._info._width , 124 );
+        BOOST_CHECK_EQUAL( backend._info._height, 124 );
     }
 
     {
         FILE* file = fopen( targa_filename.c_str(), "rb" );
         
-        image_read_info< tag_t > info = read_image_info( file
-                                                       , tag_t()
-                                                       );
+        typedef get_reader_backend< FILE*
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 124 );
-        BOOST_CHECK_EQUAL( info._height, 124 );
+        backend_t backend = read_image_info( file
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 124 );
+        BOOST_CHECK_EQUAL( backend._info._height, 124 );
     }
 
     {
         fs::path my_path( targa_filename );
-        image_read_info< tag_t > info = read_image_info( my_path
-                                                       , tag_t()
-                                                       );
 
-        BOOST_CHECK_EQUAL( info._width , 124 );
-        BOOST_CHECK_EQUAL( info._height, 124  );
+        typedef get_reader_backend< fs::path
+                                  , tag_t
+                                  >::type backend_t;
+
+        backend_t backend = read_image_info( my_path
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 124 );
+        BOOST_CHECK_EQUAL( backend._info._height, 124  );
     }
 }
 

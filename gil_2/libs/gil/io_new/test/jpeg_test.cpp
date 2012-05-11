@@ -27,43 +27,60 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
 
     {
-        image_read_info< jpeg_tag > info = read_image_info( jpeg_filename
-                                                          , tag_t() );
+        typedef get_reader_backend< const std::string
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 136u );
-        BOOST_CHECK_EQUAL( info._height, 98u  );
+        backend_t backend = read_image_info( jpeg_filename
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 136u );
+        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
     }
 
     {
         ifstream in( jpeg_filename.c_str(), ios::binary );
 
-        image_read_info< jpeg_tag > info = read_image_info( in
-                                                          , tag_t() );
+        typedef get_reader_backend< ifstream
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 136u );
-        BOOST_CHECK_EQUAL( info._height, 98u  );
+        backend_t backend = read_image_info( in
+                                           , tag_t()
+                                           );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 136u );
+        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
     }
 
     {
         FILE* file = fopen( jpeg_filename.c_str(), "rb" );
-        
-        image_read_info< tag_t > info = boost::gil::read_image_info( file
-                                                                   , tag_t() );
 
-        BOOST_CHECK_EQUAL( info._width , 136u );
-        BOOST_CHECK_EQUAL( info._height, 98u  );
+        typedef get_reader_backend< FILE*
+                                  , tag_t
+                                  >::type backend_t;
+        
+        backend_t backend = boost::gil::read_image_info( file
+                                                       , tag_t()
+                                                       );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 136u );
+        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
     }
 
     {
-        path my_path( jpeg_filename );
-        image_read_info< tag_t > info = boost::gil::read_image_info( my_path
-                                                                   , tag_t() );
+        typedef get_reader_backend< path
+                                  , tag_t
+                                  >::type backend_t;
 
-        BOOST_CHECK_EQUAL( info._width , 136u );
-        BOOST_CHECK_EQUAL( info._height, 98u  );
+        backend_t backend = boost::gil::read_image_info( path( jpeg_filename )
+                                                       , tag_t()
+                                                       );
+
+        BOOST_CHECK_EQUAL( backend._info._width , 136u );
+        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
     }
-
-
 }
 
 BOOST_AUTO_TEST_CASE( read_image_test )

@@ -303,12 +303,7 @@ public:
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        if( !this->_info._valid )
-        {
-            parent_t::get_info();
-        }
-
-        targa_type_format_checker format_checker( this->_info._bits_per_pixel );
+        detail::targa_type_format_checker format_checker( this->_info._bits_per_pixel );
 
         if( !construct_matched( images
                               , format_checker
@@ -318,11 +313,13 @@ public:
         }
         else
         {
-            init_image( images, this->_info );
+            init_image( images
+                      , this->_settings
+                      );
 
-            dynamic_io_fnobj< targa_read_is_supported
-                            , parent_t
-                            > op( this );
+            detail::dynamic_io_fnobj< detail::targa_read_is_supported
+                                    , parent_t
+                                    > op( this );
 
             apply_operation( view( images )
                            , op

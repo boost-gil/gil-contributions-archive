@@ -391,7 +391,7 @@ public:
     template< typename Images >
     void apply( any_image< Images >& images )
     {
-        pnm_type_format_checker format_checker( this->_info._type );
+        detail::pnm_type_format_checker format_checker( this->_info._type );
 
         if( !construct_matched( images
                               , format_checker
@@ -402,12 +402,12 @@ public:
         else
         {
             init_image( images
-                      , this->_info
+                      , this->_settings
                       );
 
-            dynamic_io_fnobj< pnm_read_is_supported
-                            , parent_t
-                            > op( this );
+            detail::dynamic_io_fnobj< detail::pnm_read_is_supported
+                                    , parent_t
+                                    > op( this );
 
             apply_operation( view( images )
                            , op
