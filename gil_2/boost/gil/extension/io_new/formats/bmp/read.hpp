@@ -75,6 +75,7 @@ public:
     : backend_t( io_dev
                , settings
                )
+    , _pitch( 0 )
     {}
 
     //
@@ -90,6 +91,7 @@ public:
     , backend_t( io_dev
                , settings
                )
+    , _pitch( 0 )
     {}
 
 
@@ -102,6 +104,11 @@ public:
             io_error( "Image header was not read." );
         }
 
+        //
+        this->_settings._dim.x = this->_info._width;
+        this->_settings._dim.y = this->_info._height;
+        //
+
         typedef typename is_same< ConversionPolicy
                                 , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
@@ -113,47 +120,16 @@ public:
                    );
 
         // the row pitch must be multiple 4 bytes
-        int pitch;
-
         if( _info._bits_per_pixel < 8 )
         {
-            pitch = (( this->_info._width * this->_info._bits_per_pixel ) + 7 ) >> 3;
+            _pitch = static_cast<long>((( this->_info._width * this->_info._bits_per_pixel ) + 7 ) >> 3 );
         }
         else
         {
-            pitch = _info._width * (( this->_info._bits_per_pixel + 7 ) >> 3);
+            _pitch = static_cast<long>( _info._width * (( this->_info._bits_per_pixel + 7 ) >> 3 ));
         }
 
-        pitch = (pitch + 3) & ~3;
-
-
-        std::ptrdiff_t ybeg = 0;
-        std::ptrdiff_t yend = this->_settings._dim.y;
-        std::ptrdiff_t yinc = 1;
-
-        // offset to first scanline
-        std::ptrdiff_t offset = 0;
-
-        if( _info._height > 0 )
-        {
-            // the image is upside down
-            ybeg = this->_settings._dim.y - 1;
-            yend = -1;
-            yinc = -1;
-
-            offset = _info._offset
-                   + (   this->_info._height
-                       - this->_settings._top_left.y
-                       - this->_settings._dim.y
-                     ) * pitch;
-
-
-        }
-        else
-        {
-            offset = _info._offset
-                   + this->_settings._top_left.y * pitch;
-        }
+        _pitch = (_pitch + 3) & ~3;
 
         switch( _info._bits_per_pixel )
         {
@@ -165,13 +141,7 @@ public:
                                   , detail::mirror_bits< byte_vector_t
                                                        , mpl::true_
                                                        >
-                                  > ( dst_view
-                                    , pitch
-                                    , ybeg
-                                    , yend
-                                    , yinc
-                                    , offset
-                                    );
+                                  > ( dst_view );
                 break;
             }
 
@@ -184,12 +154,7 @@ public:
                         ///@todo How can we determine that?
                         this->_scanline_length = 0;
 
-					    read_palette_image_rle( dst_view
-					                          , ybeg
-					                          , yend
-					                          , yinc
-					                          , offset
-					                          );
+					    read_palette_image_rle( dst_view );
 
 					    break;
                     }
@@ -202,13 +167,7 @@ public:
 									      , detail::swap_half_bytes< byte_vector_t
 									                               , mpl::true_
 									                               >
-									      > ( dst_view
-									        , pitch
-									        , ybeg
-									        , yend
-									        , yinc
-									        , offset
-									        );
+									      > ( dst_view );
 					    break;
                     }
 
@@ -230,12 +189,7 @@ public:
                         ///@todo How can we determine that?
                         this->_scanline_length = 0;
                         
-                        read_palette_image_rle( dst_view
-					                          , ybeg
-					                          , yend
-					                          , yinc
-					                          , offset
-					                          );
+                        read_palette_image_rle( dst_view );
 					    break;
                     }
 
@@ -245,13 +199,7 @@ public:
 
 					    read_palette_image< gray8_image_t::view_t
 									      , detail::do_nothing< std::vector< gray8_pixel_t > >
-									      > ( dst_view
-									        , pitch
-									        , ybeg
-									        , yend
-									        , yinc
-									        , offset
-									        );
+									      > ( dst_view );
 					    break;
                     }
 
@@ -269,13 +217,7 @@ public:
             {
                 this->_scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
 
-                read_data_15( dst_view
-                            , pitch
-                            , ybeg
-                            , yend
-                            , yinc
-                            , offset
-                            );
+                read_data_15( dst_view );
 
                 break;
             }
@@ -284,7 +226,7 @@ public:
             {
                 _scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
 
-                read_data< bgr8_view_t  >( dst_view, pitch, ybeg, yend, yinc, offset  ); 
+                read_data< bgr8_view_t  >( dst_view ); 
 
                 break;
             }
@@ -293,7 +235,7 @@ public:
             {
                 _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
-                read_data< bgra8_view_t >( dst_view, pitch, ybeg, yend, yinc, offset  ); 
+                read_data< bgra8_view_t >( dst_view ); 
 
                 break;
             }
@@ -302,36 +244,45 @@ public:
 
 private:
 
+    long get_offset( long pos )
+    {
+        long offset = 0;
+
+        if( this->_info._height > 0 )
+        {
+            // the image is upside down
+            return ( this->_info._offset
+                     + ( this->_info._height - 1 - pos ) * _pitch
+                   );
+        }
+        else
+        {
+            return ( this->_info._offset
+                   + pos * _pitch
+                   );
+        }
+    }
+
     template< typename View_Src
             , typename Byte_Manipulator
             , typename View_Dst
             >
-    void read_palette_image( const View_Dst& view
-                           , int             pitch
-                           , std::ptrdiff_t  ybeg
-                           , std::ptrdiff_t  yend
-                           , std::ptrdiff_t  yinc
-                           , std::ptrdiff_t  offset
-                           )
+    void read_palette_image( const View_Dst& view )
     {
-        // jump to first scanline
-        _io_dev.seek( static_cast< long >( offset ));
-
         typedef detail::row_buffer_helper_view< View_Src > rh_t;
         typedef typename rh_t::iterator_t          it_t;
 
-        rh_t rh( pitch, true );
+        rh_t rh( _pitch, true );
 
         // we have to swap bits
         Byte_Manipulator byte_manipulator;
 
-        for( std::ptrdiff_t y = ybeg; y != yend; y += yinc )
+        for( long y = 0; y < std::abs( this->_info._height ); ++y )
         {
-            // @todo: For now we're reading the whole scanline which is
-            // slightly inefficient. Later versions should try to read
-            // only the bytes which are necessary.
+            _io_dev.seek( get_offset( y ));
+
             _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
-                        , pitch
+                        , _pitch
                         );
 
             byte_manipulator( rh.buffer() );
@@ -350,15 +301,9 @@ private:
     }
 
     template< typename View >
-    void read_data_15( const View&    view
-                     , int            pitch
-                     , std::ptrdiff_t ybeg
-                     , std::ptrdiff_t yend
-                     , std::ptrdiff_t yinc
-                     , std::ptrdiff_t offset
-                     )
+    void read_data_15( const View& view )
     {
-        byte_vector_t row( pitch );
+        byte_vector_t row( _pitch );
 
         // read the color masks
         color_mask mask = { {0} };
@@ -406,18 +351,16 @@ private:
             io_error( "bmp_reader::apply(): unsupported BMP compression" );
         }
 
-        // jump to first scanline
-        _io_dev.seek( static_cast< long >( offset ));
-
         typedef rgb8_image_t image_t;
         typedef image_t::view_t::x_iterator it_t;
 
-        for( std::ptrdiff_t y = ybeg; y != yend; y += yinc )
+        for( long y = 0; y < std::abs( this->_info._height ); ++y )
         {
-            // @todo: For now we're reading the whole scanline which is
-            // slightly inefficient. Later versions should try to read
-            // only the bytes which are necessary.
-            _io_dev.read( &row.front(), row.size() );
+            _io_dev.seek( get_offset( y ));
+
+            _io_dev.read( &row.front()
+                        , row.size()
+                        );
 
             image_t img_row( _info._width, 1 );
             image_t::view_t v = gil::view( img_row );
@@ -453,18 +396,9 @@ private:
     template< typename View_Src
             , typename View_Dst
             >
-    void read_data( const View_Dst& view
-                  , int             pitch
-                  , std::ptrdiff_t  ybeg
-                  , std::ptrdiff_t  yend
-                  , std::ptrdiff_t  yinc
-                  , std::ptrdiff_t  offset
-                  )
+    void read_data( const View_Dst& view )
     {
-        byte_vector_t row( pitch );
-
-        // jump to first scanline
-        _io_dev.seek( static_cast< long >( offset ));
+        byte_vector_t row( _pitch );
 
         View_Src v = interleaved_view( _info._width
                                      , 1
@@ -475,12 +409,13 @@ private:
         typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
         typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
-        for( std::ptrdiff_t y = ybeg; y != yend; y += yinc )
+        for( long y = 0; y < std::abs( this->_info._height ); ++y )
         {
-            // @todo: For now we're reading the whole scanline which is
-            // slightly inefficient. Later versions should try to read
-            // only the bytes which are necessary.
-            _io_dev.read( &row.front(), row.size() );
+            _io_dev.seek( get_offset( 0 ));
+
+            _io_dev.read( &row.front()
+                        , row.size()
+                        );
 
             this->_cc_policy.read( beg
                                  , end
@@ -488,7 +423,6 @@ private:
                                  );
         }
     }
-
 
 	template< typename Buffer
             , typename View
@@ -513,12 +447,7 @@ private:
 	}
 
     template< typename View_Dst >
-    void read_palette_image_rle( const View_Dst& view
-                               , std::ptrdiff_t  ybeg
-                               , std::ptrdiff_t  yend
-                               , std::ptrdiff_t  yinc
-                               , std::ptrdiff_t  offset
-                               )
+    void read_palette_image_rle( const View_Dst& view )
     {
         assert(  _info._compression == bmp_compression::_rle4
               || _info._compression == bmp_compression::_rle8
@@ -527,15 +456,29 @@ private:
         read_palette();
 
         // jump to start of rle4 data
-        _io_dev.seek( static_cast< long >( offset ));
+        _io_dev.seek( get_offset( 0 ));
 
         // we need to know the stream position for padding purposes
-        std::size_t stream_pos = offset;
+        std::size_t stream_pos = get_offset( 0 );
 
         typedef std::vector< rgba8_pixel_t > Buf_type;
         Buf_type buf( this->_settings._dim.x );
         Buf_type::iterator dst_it  = buf.begin();
         Buf_type::iterator dst_end = buf.end();
+
+        //
+		std::ptrdiff_t ybeg = 0;
+        //std::ptrdiff_t yend = this->_settings._dim.y;
+        std::ptrdiff_t yend = this->_info._height;
+        std::ptrdiff_t yinc = 1;
+
+        if( _info._height > 0 )
+        {
+            ybeg = this->_settings._dim.y - 1;
+            yend = -1;
+            yinc = -1;
+        }
+        //
 
         std::ptrdiff_t y = ybeg;
         bool finished = false;
@@ -669,7 +612,7 @@ private:
                         }
 
                         // pad to word boundary
-                        if( ( stream_pos - offset ) & 1 )
+                        if( ( stream_pos - get_offset( 0 )) & 1 )
                         {
                             _io_dev.seek( 1, SEEK_CUR );
                             ++stream_pos;
@@ -681,6 +624,10 @@ private:
             }
         }
 	}
+
+private:
+
+    long _pitch;
 };
 
 ///
@@ -724,7 +671,7 @@ public:
         else
         {
             init_image( images
-                      , this->_settings
+                      , this->_info
                       );
 
             detail::dynamic_io_fnobj< detail::bmp_read_is_supported

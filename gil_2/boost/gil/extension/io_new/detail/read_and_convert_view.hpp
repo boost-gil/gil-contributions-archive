@@ -65,7 +65,7 @@ void read_and_convert_view( Device&                                 file
                   );
 
     reader.init_view( view
-                    , reader._settings
+                    , reader._info
                     );
 
     reader.apply( view );

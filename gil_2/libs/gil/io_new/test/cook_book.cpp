@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( recipe_1 )
                                  );
 
     reader.init_image( img
-                     , reader._settings
+                     , reader._info
                      );
 
 

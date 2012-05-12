@@ -402,7 +402,7 @@ public:
         else
         {
             init_image( images
-                      , this->_settings
+                      , this->_info
                       );
 
             detail::dynamic_io_fnobj< detail::pnm_read_is_supported

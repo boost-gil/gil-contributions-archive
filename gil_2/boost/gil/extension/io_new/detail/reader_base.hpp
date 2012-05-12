@@ -59,20 +59,22 @@ public:
     /// @param img  The image.
     /// @param info The image read info.
     template< typename Image >
-    void init_image( Image& img
-                   , image_read_settings< FormatTag > settings
+    void init_image( Image&                              img
+                   , const image_read_info< FormatTag >& info
                    )
     {
-        setup( settings._dim );
+        //setup( backend._settings._dim );
 
-        img.recreate( settings._dim.x
-                    , settings._dim.y
+        assert( info._width && info._height );
+
+        img.recreate( info._width
+                    , info._height
                     );
     }
 
     template< typename View >
-    void init_view( const View& view
-                  , image_read_settings< FormatTag > settings
+    void init_view( const View&                         view
+                  , const image_read_info< FormatTag >& info
                   )
     {
         setup( view.dimensions() );

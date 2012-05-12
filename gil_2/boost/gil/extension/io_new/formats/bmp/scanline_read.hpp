@@ -247,7 +247,7 @@ public:
         // jump to scanline
         long offset = 0;
 
-        if( _info._height > 0 )
+        if( this->_info._height > 0 )
         {
             // the image is upside down
             offset = _info._offset
@@ -255,7 +255,7 @@ public:
         }
         else
         {
-            offset = _info._offset
+            offset = this->_info._offset
                    + pos * _pitch;
         }
         

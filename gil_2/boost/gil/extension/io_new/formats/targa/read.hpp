@@ -314,7 +314,7 @@ public:
         else
         {
             init_image( images
-                      , this->_settings
+                      , this->_info
                       );
 
             detail::dynamic_io_fnobj< detail::targa_read_is_supported
