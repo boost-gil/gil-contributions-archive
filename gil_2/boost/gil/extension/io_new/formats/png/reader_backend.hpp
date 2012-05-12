@@ -55,6 +55,16 @@ public:
     , _number_passes( 0 )
     {
         read_header();
+
+        if( _settings._dim.x == 0 )
+        {
+            _settings._dim.x = _info._width;
+        }
+
+        if( _settings._dim.y == 0 )
+        {
+            _settings._dim.y = _info._height;
+        }
     }
 
     void read_header()
