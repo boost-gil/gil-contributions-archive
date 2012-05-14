@@ -40,6 +40,16 @@ struct reader_backend< Device
     , _scanline_length(0)
     {
         read_header();    
+
+        if( _settings._dim.x == 0 )
+        {
+            _settings._dim.x = _info._width;
+        }
+
+        if( _settings._dim.y == 0 )
+        {
+            _settings._dim.y = _info._height;
+        }
     }
 
     void read_header()
@@ -49,16 +59,7 @@ struct reader_backend< Device
         _info._offset = _io_dev.read_uint8() + _info._header_size;
         
         _info._color_map_type = _io_dev.read_uint8();
-        if( _info._color_map_type != targa_color_map_type::_rgb )
-        {
-            io_error( "scanline reader cannot read indexed targa files." );
-        }
-        
         _info._image_type = _io_dev.read_uint8();
-        if( _info._image_type != targa_image_type::_rgb )
-        {
-            io_error( "scanline reader cannot read this targa image type." );
-        }
         
         _info._color_map_start  = _io_dev.read_uint16();
         _info._color_map_length = _io_dev.read_uint16();

@@ -115,11 +115,11 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
     {
         rgb8_image_t img;
         
-        read_image( bmp_in + "g04rle.bmp", img, tag_t() );
-        BOOST_CHECK_EQUAL( view( img ).width() , 127u );
-        BOOST_CHECK_EQUAL( view( img ).height(),  64u );
+        //read_image( bmp_in + "g04rle.bmp", img, tag_t() );
+        //BOOST_CHECK_EQUAL( view( img ).width() , 127u );
+        //BOOST_CHECK_EQUAL( view( img ).height(),  64u );
 
-        write( img, "g04rle.bmp" );
+        //write( img, "g04rle.bmp" );
     }
 
     // g04p4.bmp - 4-color grayscale palette

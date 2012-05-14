@@ -1,4 +1,24 @@
-#pragma once
+/*
+    Copyright 2012 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
+#ifndef BOOST_GIL_EXTENSION_IO_IMAGE_READ_ITERATOR_HPP
+#define BOOST_GIL_EXTENSION_IO_IMAGE_READ_ITERATOR_HPP
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief
+/// \author Christian Henning \n
+///
+/// \date 2012 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
+
 
 namespace boost { namespace gil {
 
@@ -164,7 +184,6 @@ private:
     {
         if( _reader )
         {
-            _reader->read_header();
             _reader->initialize();
         }
     }
@@ -189,3 +208,5 @@ private:
 
 } // namespace gil
 } // namespace boost
+
+#endif // BOOST_GIL_EXTENSION_IO_IMAGE_READ_ITERATOR_HPP

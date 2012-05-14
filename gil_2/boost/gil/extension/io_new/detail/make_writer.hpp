@@ -1,4 +1,23 @@
-#pragma once
+/*
+    Copyright 2012 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
+#ifndef BOOST_GIL_EXTENSION_IO_MAKE_WRITER_HPP
+#define BOOST_GIL_EXTENSION_IO_MAKE_WRITER_HPP
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief
+/// \author Christian Henning \n
+///
+/// \date 2012 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/utility/enable_if.hpp>
 
@@ -78,3 +97,5 @@ make_writer( Device& file
 
 } // namespace gil
 } // namespace boost
+
+#endif // BOOST_GIL_EXTENSION_IO_MAKE_WRITER_HPP

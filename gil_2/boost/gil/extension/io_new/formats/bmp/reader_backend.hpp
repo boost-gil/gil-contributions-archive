@@ -57,7 +57,17 @@ struct reader_backend< Device
     , _scanline_length( 0 )
     , _palette()
     {
-        read_header();    
+        read_header();
+
+        if( _settings._dim.x == 0 )
+        {
+            _settings._dim.x = _info._width;
+        }
+
+        if( _settings._dim.y == 0 )
+        {
+            _settings._dim.y = _info._height;
+        }
     }
 
     void read_header()

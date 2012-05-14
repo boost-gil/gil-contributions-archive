@@ -171,7 +171,13 @@ public:
                                         , get()
                                         );
 
-        assert( num_elements == count );
+        if(ferror( get() ))
+        {
+            assert( false );
+        }
+
+        //libjpeg sometimes reads blocks in 4096 bytes even when the file is smaller than that.
+        //assert( num_elements == count );
 
         return num_elements;
     }

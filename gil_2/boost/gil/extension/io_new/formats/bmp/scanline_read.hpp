@@ -65,7 +65,9 @@ public:
     scanline_reader( Device&                               device
                    , const image_read_settings< bmp_tag >& settings
                    )
-    : reader_backend( device, settings )
+    : reader_backend( device
+                    , settings
+                    )
 
     , _pitch( 0 )
     {}
@@ -402,7 +404,7 @@ private:
 
     void read_row( byte_t* dst )
     {
-        assert( _io_dev.read( dst, _pitch ) );
+        _io_dev.read( dst, _pitch );
     }
 
 private:

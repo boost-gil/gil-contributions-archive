@@ -138,7 +138,7 @@ void read_image( const String&                           file_name
 {
     typedef typename detail::file_stream_device<FormatTag>::read_tag read_tag;
 
-    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
+    detail::file_stream_device<FormatTag> device( detail::convert_to_native_string( file_name )
                                                 , read_tag()
                                                 );
 
@@ -231,7 +231,7 @@ void read_image( const String&    file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
+    detail::file_stream_device< FormatTag > device( detail::convert_to_native_string( file_name )
                                                   , typename detail::file_stream_device< FormatTag >::read_tag()
                                                   );
 
@@ -431,7 +431,7 @@ void read_image( const String&                           file_name
 {
     typedef typename detail::file_stream_device< FormatTag >::read_tag read_tag;
 
-    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
+    detail::file_stream_device<FormatTag> device( detail::convert_to_native_string( file_name )
                                                 , read_tag()
                                                 );
 
@@ -517,7 +517,7 @@ void read_image( const String&        file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
+    detail::file_stream_device< FormatTag > device( detail::convert_to_native_string( file_name )
                                                   , typename detail::file_stream_device< FormatTag >::read_tag()
                                                   );
 

@@ -72,6 +72,16 @@ public:
 
     void initialize()
     {
+        if( _info._color_map_type != targa_color_map_type::_rgb )
+        {
+            io_error( "scanline reader cannot read indexed targa files." );
+        }
+        
+        if( _info._image_type != targa_image_type::_rgb )
+        {
+            io_error( "scanline reader cannot read this targa image type." );
+        }
+
         std::ptrdiff_t yend = this->_settings._dim.y;
         
         switch( this->_info._image_type )

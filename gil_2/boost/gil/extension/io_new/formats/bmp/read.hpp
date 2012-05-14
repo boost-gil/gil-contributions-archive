@@ -104,11 +104,6 @@ public:
             io_error( "Image header was not read." );
         }
 
-        //
-        this->_settings._dim.x = this->_info._width;
-        this->_settings._dim.y = this->_info._height;
-        //
-
         typedef typename is_same< ConversionPolicy
                                 , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
@@ -244,22 +239,20 @@ public:
 
 private:
 
-    long get_offset( long pos )
+    long get_offset( std::ptrdiff_t pos )
     {
-        long offset = 0;
-
         if( this->_info._height > 0 )
         {
             // the image is upside down
-            return ( this->_info._offset
-                     + ( this->_info._height - 1 - pos ) * _pitch
-                   );
+            return static_cast<long>( ( this->_info._offset
+                                      + ( this->_info._height - 1 - pos ) * _pitch
+                                    ));
         }
         else
         {
-            return ( this->_info._offset
-                   + pos * _pitch
-                   );
+            return static_cast<long>( ( this->_info._offset
+                                      + pos * _pitch
+                                    ));
         }
     }
 
@@ -269,6 +262,8 @@ private:
             >
     void read_palette_image( const View_Dst& view )
     {
+        read_palette();
+
         typedef detail::row_buffer_helper_view< View_Src > rh_t;
         typedef typename rh_t::iterator_t          it_t;
 
@@ -277,7 +272,10 @@ private:
         // we have to swap bits
         Byte_Manipulator byte_manipulator;
 
-        for( long y = 0; y < std::abs( this->_info._height ); ++y )
+        for( std::ptrdiff_t y = this->_settings._top_left.y
+           ; y < this->_settings._dim.y
+           ; ++y
+           )
         {
             _io_dev.seek( get_offset( y ));
 
@@ -354,7 +352,10 @@ private:
         typedef rgb8_image_t image_t;
         typedef image_t::view_t::x_iterator it_t;
 
-        for( long y = 0; y < std::abs( this->_info._height ); ++y )
+        for( std::ptrdiff_t y = this->_settings._top_left.y
+           ; y < this->_settings._dim.y
+           ; ++y
+           )
         {
             _io_dev.seek( get_offset( y ));
 
@@ -409,9 +410,12 @@ private:
         typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
         typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
-        for( long y = 0; y < std::abs( this->_info._height ); ++y )
+        for( std::ptrdiff_t y = this->_settings._top_left.y
+           ; y < this->_settings._dim.y
+           ; ++y
+           )
         {
-            _io_dev.seek( get_offset( 0 ));
+            _io_dev.seek( get_offset( y ));
 
             _io_dev.read( &row.front()
                         , row.size()
@@ -468,8 +472,7 @@ private:
 
         //
 		std::ptrdiff_t ybeg = 0;
-        //std::ptrdiff_t yend = this->_settings._dim.y;
-        std::ptrdiff_t yend = this->_info._height;
+        std::ptrdiff_t yend = this->_settings._dim.y;
         std::ptrdiff_t yinc = 1;
 
         if( _info._height > 0 )
@@ -627,7 +630,7 @@ private:
 
 private:
 
-    long _pitch;
+    std::size_t _pitch;
 };
 
 ///

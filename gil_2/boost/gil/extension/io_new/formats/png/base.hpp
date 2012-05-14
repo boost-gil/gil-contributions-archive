@@ -69,10 +69,11 @@ private:
         {
             assert( png_ptr->_struct && png_ptr->_info );
 
-            png_destroy_read_struct( &png_ptr->_struct
-                                   , &png_ptr->_info
-                                   , NULL
-                                   );
+            //@todo This crashes when writing a png file.
+            //png_destroy_read_struct( &png_ptr->_struct
+            //                       , &png_ptr->_info
+            //                       , NULL
+            //                       );
         }
     }
 

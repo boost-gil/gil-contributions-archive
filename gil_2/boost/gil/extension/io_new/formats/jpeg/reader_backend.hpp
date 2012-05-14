@@ -120,7 +120,19 @@ struct reader_backend< Device
                    , "Image file is not supported."
                    );
 
+        //
         read_header();
+
+        //
+        if( _settings._dim.x == 0 )
+        {
+            _settings._dim.x = _info._width;
+        }
+
+        if( _settings._dim.y == 0 )
+        {
+            _settings._dim.y = _info._height;
+        }
     }
 
 
@@ -159,13 +171,13 @@ struct reader_backend< Device
     /// Return image read settings.
     const image_read_settings< jpeg_tag >& get_settings()
     {
-        return _settings();
+        return _settings;
     }
     
     /// Return image header info.
     const image_read_info< jpeg_tag >& get_info()
     {
-        return _info();
+        return _info;
     }
 
 protected:
