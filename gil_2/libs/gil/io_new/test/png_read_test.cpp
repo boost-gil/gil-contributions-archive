@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( read_pixel_per_meter )
                               >::type backend_t;
 
     backend_t backend = read_image_info( png_base_in + "EddDawson/36dpi.png"
-                                       , tag_t()
+                                       , settings
                                        );
 
     BOOST_CHECK_EQUAL( backend._info._pixels_per_meter, 1417 );

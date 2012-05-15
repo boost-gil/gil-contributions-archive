@@ -65,7 +65,7 @@ void read_image( Device&                                 file
                   );
      
     reader.init_image( img
-                     , reader._info
+                     , reader._settings
                      );
 
     reader.apply( view( img ));
@@ -108,7 +108,7 @@ void read_image( Device&                                 file
                   );
 
     reader.init_image( img
-                     , reader._info
+                     , reader._settings
                      );
 
     reader.apply( view( img ));
@@ -363,7 +363,7 @@ void read_image( Device&                                 file
                                     );
 
     dyn_reader.init_image( images
-                         , dyn_reader._info
+                         , dyn_reader._settings
                          );
 
     dyn_reader.apply( images );
@@ -404,7 +404,7 @@ void read_image( Device&                                 file
                   );
 
     reader.init_image( images
-                     , reader._info
+                     , reader._settings
                      );
 
     reader.apply( view( images ));

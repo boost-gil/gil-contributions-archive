@@ -272,12 +272,12 @@ private:
         // we have to swap bits
         Byte_Manipulator byte_manipulator;
 
-        for( std::ptrdiff_t y = this->_settings._top_left.y
+        for( std::ptrdiff_t y = 0
            ; y < this->_settings._dim.y
            ; ++y
            )
         {
-            _io_dev.seek( get_offset( y ));
+            _io_dev.seek( get_offset( y + this->_settings._top_left.y ));
 
             _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
                         , _pitch
@@ -352,12 +352,12 @@ private:
         typedef rgb8_image_t image_t;
         typedef image_t::view_t::x_iterator it_t;
 
-        for( std::ptrdiff_t y = this->_settings._top_left.y
+        for( std::ptrdiff_t y = 0
            ; y < this->_settings._dim.y
            ; ++y
            )
         {
-            _io_dev.seek( get_offset( y ));
+            _io_dev.seek( get_offset( y + this->_settings._top_left.y ));
 
             _io_dev.read( &row.front()
                         , row.size()
@@ -410,12 +410,12 @@ private:
         typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
         typename View_Src::x_iterator end = beg + this->_settings._dim.x;
 
-        for( std::ptrdiff_t y = this->_settings._top_left.y
+        for( std::ptrdiff_t y = 0
            ; y < this->_settings._dim.y
            ; ++y
            )
         {
-            _io_dev.seek( get_offset( y ));
+            _io_dev.seek( get_offset( y + this->_settings._top_left.y ));
 
             _io_dev.read( &row.front()
                         , row.size()
@@ -674,7 +674,7 @@ public:
         else
         {
             init_image( images
-                      , this->_info
+                      , this->_settings
                       );
 
             detail::dynamic_io_fnobj< detail::bmp_read_is_supported

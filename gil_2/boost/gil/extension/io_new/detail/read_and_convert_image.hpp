@@ -65,7 +65,7 @@ void read_and_convert_image( Device&                                 file
                   );
 
     reader.init_image( img
-                     , reader._info
+                     , reader._settings
                      );
 
     reader.apply( view( img ));

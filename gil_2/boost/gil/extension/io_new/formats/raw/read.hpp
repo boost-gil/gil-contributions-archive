@@ -200,7 +200,7 @@ public:
                 this->get_info();
             }
             init_image( images
-                       , this->_info
+                       , this->_settings
                        );
 
             detail::dynamic_io_fnobj< raw_read_is_supported
