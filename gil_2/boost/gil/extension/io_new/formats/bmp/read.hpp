@@ -460,10 +460,10 @@ private:
         read_palette();
 
         // jump to start of rle4 data
-        _io_dev.seek( get_offset( 0 ));
+        _io_dev.seek( this->_info._offset );
 
         // we need to know the stream position for padding purposes
-        std::size_t stream_pos = get_offset( 0 );
+        std::size_t stream_pos = this->_info._offset;
 
         typedef std::vector< rgba8_pixel_t > Buf_type;
         Buf_type buf( this->_settings._dim.x );
