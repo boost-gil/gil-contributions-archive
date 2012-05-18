@@ -46,9 +46,9 @@ protected:
     ///
     /// Default Constructor
     ///
-    png_struct_info_wrapper()
+    png_struct_info_wrapper( bool read = true )
     : _png_ptr( new png_ptr_wrapper()
-              , png_ptr_deleter
+              , ( ( read ) ? png_ptr_read_deleter : png_ptr_write_deleter )
               )
     {}
 
@@ -63,23 +63,41 @@ protected:
 
 private:
 
-    static void png_ptr_deleter( png_ptr_wrapper* png_ptr )
+    static void png_ptr_read_deleter( png_ptr_wrapper* png_ptr )
     {
         if( png_ptr )
         {
             assert( png_ptr->_struct && png_ptr->_info );
 
-            //@todo This crashes when writing a png file.
-            //png_destroy_read_struct( &png_ptr->_struct
-            //                       , &png_ptr->_info
-            //                       , NULL
-            //                       );
+            png_destroy_read_struct( &png_ptr->_struct
+                                   , &png_ptr->_info
+                                   , NULL
+                                   );
+
+            delete png_ptr;
+            png_ptr = NULL;
         }
     }
 
+    static void png_ptr_write_deleter( png_ptr_wrapper* png_ptr )
+    {
+        if( png_ptr )
+        {
+            assert( png_ptr->_struct && png_ptr->_info );
+
+            png_destroy_write_struct( &png_ptr->_struct
+                                    , &png_ptr->_info
+                                    );
+
+            delete png_ptr;
+            png_ptr = NULL;
+        }
+    }
+
+
 private:
 
-   png_ptr_t _png_ptr;
+    png_ptr_t _png_ptr;
 };
 
 } // namespace detail

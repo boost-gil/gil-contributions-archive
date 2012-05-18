@@ -35,7 +35,8 @@ typename get_reader< String
                    , ConversionPolicy
                    >::type
 make_reader( const String&    file_name
-           , const FormatTag&
+           , const image_read_settings< FormatTag >& settings
+           , const ConversionPolicy&
            , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
                                           , is_format_tag< FormatTag >
                                                    >
@@ -52,7 +53,7 @@ make_reader( const String&    file_name
                      , FormatTag
                      , ConversionPolicy
                      >::type( device
-                            , image_read_settings< FormatTag >()
+                            , settings
                             );
 }
 
@@ -62,9 +63,11 @@ template< typename FormatTag
 inline
 typename get_reader< std::wstring
                    , FormatTag
+                   , ConversionPolicy
                    >::type
 make_reader( const std::wstring& file_name
-           , const FormatTag&
+           , const image_read_settings< FormatTag >& settings
+           , const ConversionPolicy&
            )
 {
     const char* str = detail::convert_to_native_string( file_name );
@@ -81,22 +84,27 @@ make_reader( const std::wstring& file_name
                      , FormatTag
                      , ConversionPolicy
                      >::type( device
-                            , image_read_settings< FormatTag >()
+                            , settings
                             );
 }
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-template< typename FormatTag >
+template< typename FormatTag
+        , typename ConversionPolicy
+        >
 inline
 typename get_reader< std::wstring
                    , FormatTag
+                   , ConversionPolicy
                    >::type
-make_reader( const filesystem::path& path
-           , const FormatTag&
+make_reader( const filesystem::path&                 path
+           , const image_read_settings< FormatTag >& settings
+           , const ConversionPolicy&                 cc
            )
 {
     return make_reader( path.wstring()
-                      , image_read_settings< FormatTag >()
+                      , settings
+                      , cc
                       );
 }
 #endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
@@ -108,9 +116,11 @@ template< typename Device
 inline
 typename get_reader< Device
                    , FormatTag
+                   , ConversionPolicy
                    >::type
 make_reader( Device&          file
-           , const FormatTag&
+           , const image_read_settings< FormatTag >& settings
+           , const ConversionPolicy&
            , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
                                                                              , Device
                                                                              >
@@ -127,8 +137,98 @@ make_reader( Device&          file
                      , FormatTag
                      , ConversionPolicy
                      >::type( device
-                            , image_read_settings< FormatTag >()
+                            , settings
                             );
+}
+
+template< typename String
+        , typename FormatTag
+        , typename ConversionPolicy
+        >
+inline
+typename get_reader< String
+                   , FormatTag
+                   , ConversionPolicy
+                   >::type
+make_reader( const String&    file_name
+           , const FormatTag&
+           , const ConversionPolicy& cc
+           , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                          , is_format_tag< FormatTag >
+                                                   >
+                               >::type* /* ptr */ = 0
+           )
+{
+    return make_reader( file_name
+                      , image_read_settings< FormatTag >()
+                      , cc
+                      );
+}
+
+template< typename FormatTag
+        , typename ConversionPolicy
+        >
+inline
+typename get_reader< std::wstring
+                   , FormatTag
+                   , ConversionPolicy
+                   >::type
+make_reader( const std::wstring&     file_name
+           , const FormatTag&
+           , const ConversionPolicy& cc
+           )
+{
+    return make_reader( file_name
+                      , image_read_settings< FormatTag >()
+                      , cc
+                      );
+}
+
+#ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+template< typename FormatTag
+        , typename ConversionPolicy
+        >
+inline
+typename get_reader< std::wstring
+                   , FormatTag
+                   , ConversionPolicy
+                   >::type
+make_reader( const filesystem::path& path
+           , const FormatTag&
+           , const ConversionPolicy& cc
+           )
+{
+    return make_reader( path.wstring()
+                      , image_read_settings< FormatTag >()
+                      , cc
+                      );
+}
+#endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
+
+template< typename Device
+        , typename FormatTag
+        , typename ConversionPolicy
+        >
+inline
+typename get_reader< Device
+                   , FormatTag
+                   , ConversionPolicy
+                   >::type
+make_reader( Device&                 file
+           , const FormatTag&
+           , const ConversionPolicy& cc
+           , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
+                                                                             , Device
+                                                                             >
+                                          , is_format_tag< FormatTag >
+                                          >
+                               >::type* /* ptr */ = 0
+           )
+{
+    return make_reader( file
+                      , image_read_settings< FormatTag >()
+                      , cc
+                      );
 }
 
 } // namespace gil

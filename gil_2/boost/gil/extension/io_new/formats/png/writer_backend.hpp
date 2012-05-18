@@ -53,7 +53,8 @@ public:
     writer_backend( const Device&                      io_dev
                   , const image_write_info< png_tag >& info
                   )
-    : _io_dev( io_dev )
+    : png_struct_info_wrapper( false )
+    , _io_dev( io_dev )
     , _info( info )
     {
         // Create and initialize the png_struct with the desired error handler

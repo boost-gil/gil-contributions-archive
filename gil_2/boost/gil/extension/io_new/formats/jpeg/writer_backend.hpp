@@ -57,6 +57,9 @@ private:
         if( jpeg_compress_ptr )
         {
             jpeg_destroy_compress( jpeg_compress_ptr );
+
+            delete jpeg_compress_ptr;
+            jpeg_compress_ptr = NULL;
         }
     }
 

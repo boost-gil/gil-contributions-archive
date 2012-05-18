@@ -26,13 +26,46 @@ namespace boost { namespace gil {
 ///
 /// Helper metafunction to generate image reader type.
 ///
+//template< typename T
+//        , typename FormatTag
+//        , typename ConversionPolicy = detail::read_and_no_convert
+//        >
+//struct get_reader
+//{
+//    typedef typename get_read_device< T
+//                                    , FormatTag
+//                                    >::type device_t;
+//
+//    typedef reader< device_t
+//                  , FormatTag
+//                  , ConversionPolicy
+//                  > type;
+//};
+
+
+
 template< typename T
         , typename FormatTag
-        , typename ConversionPolicy = detail::read_and_no_convert
+        , typename ConversionPolicy
+        , class Enable = void
         >
 struct get_reader
+{};
+
+template< typename String
+        , typename FormatTag
+        , typename ConversionPolicy
+        >
+struct get_reader< String
+                 , FormatTag
+                 , ConversionPolicy
+                 , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                                , is_format_tag< FormatTag >
+                                                >
+                                     >::type
+                 >
 {
-    typedef typename get_read_device< T
+    typedef typename get_read_device< String
                                     , FormatTag
                                     >::type device_t;
 
@@ -41,6 +74,40 @@ struct get_reader
                   , ConversionPolicy
                   > type;
 };
+
+template< typename Device
+        , typename FormatTag
+        , typename ConversionPolicy
+        >
+struct get_reader< Device
+                 , FormatTag
+                 , ConversionPolicy
+                 , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
+                                                                                   , Device
+                                                                                   >
+                                                , is_format_tag< FormatTag >
+                                                >
+                                     >::type
+                 >
+{
+    typedef typename get_read_device< Device
+                                    , FormatTag
+                                    >::type device_t;
+
+    typedef reader< device_t
+                  , FormatTag
+                  , ConversionPolicy
+                  > type;
+};
+
+
+
+
+
+
+
+
+
 
 ///
 /// Helper metafunction to generate image backend type.
