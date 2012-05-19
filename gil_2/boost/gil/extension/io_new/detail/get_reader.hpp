@@ -23,27 +23,7 @@
 
 namespace boost { namespace gil {
 
-///
-/// Helper metafunction to generate image reader type.
-///
-//template< typename T
-//        , typename FormatTag
-//        , typename ConversionPolicy = detail::read_and_no_convert
-//        >
-//struct get_reader
-//{
-//    typedef typename get_read_device< T
-//                                    , FormatTag
-//                                    >::type device_t;
-//
-//    typedef reader< device_t
-//                  , FormatTag
-//                  , ConversionPolicy
-//                  > type;
-//};
-
-
-
+/// \brief Helper metafunction to generate image reader type.
 template< typename T
         , typename FormatTag
         , typename ConversionPolicy
@@ -101,18 +81,60 @@ struct get_reader< Device
 };
 
 
+/// \brief Helper metafunction to generate dynamic image reader type.
+template< typename T
+        , typename FormatTag
+        , class Enable = void
+        >
+struct get_dynamic_image_reader
+{};
+
+template< typename String
+        , typename FormatTag
+        >
+struct get_dynamic_image_reader< String
+                               , FormatTag
+                               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                                              , is_format_tag< FormatTag >
+                                                              >
+                                                   >::type
+                               >
+{
+    typedef typename get_read_device< String
+                                    , FormatTag
+                                    >::type device_t;
+
+    typedef dynamic_image_reader< device_t
+                                , FormatTag
+                                > type;
+};
+
+template< typename Device
+        , typename FormatTag
+        >
+struct get_dynamic_image_reader< Device
+                               , FormatTag
+                               , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
+                                                                                                 , Device
+                                                                                                 >
+                                                              , is_format_tag< FormatTag >
+                                                              >
+                                                   >::type
+                               >
+{
+    typedef typename get_read_device< Device
+                                    , FormatTag
+                                    >::type device_t;
+
+    typedef dynamic_image_reader< device_t
+                                , FormatTag
+                                > type;
+};
 
 
+/////////////////////////////////////////////////////////////
 
-
-
-
-
-
-///
-/// Helper metafunction to generate image backend type.
-///
-
+/// \brief Helper metafunction to generate image backend type.
 template< typename T
         , typename FormatTag
         , class Enable = void
@@ -162,9 +184,7 @@ struct get_reader_backend< Device
                           > type;
 };
 
-///
-/// Helper metafunction to generate image scanline_reader type.
-///
+/// \brief Helper metafunction to generate image scanline_reader type.
 template< typename T
         , typename FormatTag
         >

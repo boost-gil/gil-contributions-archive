@@ -118,7 +118,7 @@ typename get_reader< Device
                    , FormatTag
                    , ConversionPolicy
                    >::type
-make_reader( Device&          file
+make_reader( Device&                                 file
            , const image_read_settings< FormatTag >& settings
            , const ConversionPolicy&
            , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag

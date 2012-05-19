@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny, Lubomir Bourdev
+    Copyright 2007-2012 Christian Henning, Andreas Pokorny, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,6 +36,25 @@ namespace boost{ namespace gil {
 /// \ingroup IO
 
 /// \brief Reads an image without conversion. Image memory is allocated.
+/// \param reader    An image reader.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \throw std::ios_base::failure
+template < typename Reader
+         , typename Image
+         >
+inline
+void read_image( Reader& reader
+               , Image&  img
+               )
+{
+    reader.init_image( img
+                     , reader._settings
+                     );
+
+    reader.apply( view( img ));
+}
+
+/// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file      It's a device. Must satisfy is_input_device metafunction.
 /// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
 /// \param settings  Specifies read settings depending on the image format.
@@ -48,70 +67,51 @@ inline
 void read_image( Device&                                 file
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< detail::is_input_device< Device    >
-                                              , is_format_tag          < FormatTag >
-                                              , is_read_supported      < typename get_pixel_type< typename Image::view_t >::type
-                                                                       , FormatTag
-                                                                       >
-                                              >
-                                   >::type* /* ptr */ = 0
                )
 {
-    reader< Device
-          , FormatTag
-          , detail::read_and_no_convert
-          > reader( file
-                  , settings
-                  );
-     
-    reader.init_image( img
-                     , reader._settings
-                     );
+    typedef get_reader< Device
+                      , FormatTag
+                      , detail::read_and_no_convert
+                      >::type reader_t;
 
-    reader.apply( view( img ));
+    reader_t reader = make_reader( file
+                                 , settings
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_image( reader
+              , img
+              );
 }
 
 /// \brief Reads an image without conversion. Image memory is allocated.
-/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
 /// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
-/// \param settings  Specifies read settings depending on the image format.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
 /// \throw std::ios_base::failure
 template < typename Device
          , typename Image
          , typename FormatTag
          >
 inline
-void read_image( Device&                                 file
-               , Image&                                  img
-               , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
-                                                                                 , Device
-                                                                                 >
-                                              , is_format_tag< FormatTag >
-                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                 , FormatTag
-                                                                 >
-                                              >
-                                   >::type* /* ptr */ = 0
-                      )
+void read_image( Device&         file
+               , Image&           img
+               , const FormatTag& tag
+               )
 {
-    typedef typename detail::is_adaptable_input_device< FormatTag
-                                                      , Device
-                                                      >::device_type device_type;
+    typedef get_reader< Device
+                      , FormatTag
+                      , detail::read_and_no_convert
+                      >::type reader_t;
 
-    device_type dev(file);
-    reader< device_type
-          , FormatTag
-          , detail::read_and_no_convert
-          > reader( dev
-                  , settings
-                  );
+    reader_t reader = make_reader( file
+                                 , tag
+                                 , detail::read_and_no_convert()
+                                 );
 
-    reader.init_image( img
-                     , reader._settings
-                     );
-
-    reader.apply( view( img ));
+    read_image( reader
+              , img
+              );
 }
 
 /// \brief Reads an image without conversion. Image memory is allocated.
@@ -127,221 +127,71 @@ inline
 void read_image( const String&                           file_name
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
-                                              , is_format_tag< FormatTag >
-                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                 , FormatTag
-                                                                 >
-                                              >
-                                   >::type* /* ptr */ = 0
                )
 {
-    typedef typename detail::file_stream_device<FormatTag>::read_tag read_tag;
+    typedef get_reader< String
+                      , FormatTag
+                      , detail::read_and_no_convert
+                      >::type reader_t;
 
-    detail::file_stream_device<FormatTag> device( detail::convert_to_native_string( file_name )
-                                                , read_tag()
-                                                );
+    reader_t reader = make_reader( file_name
+                                 , settings
+                                 , detail::read_and_no_convert()
+                                 );
 
-    read_image( device
+    read_image( reader
               , img
-              , settings
               );
 }
 
 /// \brief Reads an image without conversion. Image memory is allocated.
-/// \param file It's a device. Must satisfy is_input_device metafunction.
-/// \param img  The image in which the data is read into. Must satisfy is_read_supported metafunction.
-/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction.     
+/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
+/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
 /// \throw std::ios_base::failure
-template < typename Device
+template < typename String
          , typename Image
          , typename FormatTag
          >
 inline
-void read_image( Device&          file
+void read_image( const String&   file_name
                , Image&           img
-               , const FormatTag&
-               , typename enable_if< mpl::and_< detail::is_input_device< Device    >
-                                              , is_format_tag          < FormatTag >
-                                              , is_read_supported      < typename get_pixel_type< typename Image::view_t >::type
-                                                                       , FormatTag
-                                                                       >
-                                              >
-                                   >::type* /* ptr */ = 0
+               , const FormatTag& tag
                )
 {
-    read_image( file
+    typedef get_reader< String
+                      , FormatTag
+                      , detail::read_and_no_convert
+                      >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , tag
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_image( reader
               , img
-              , image_read_settings< FormatTag >()
               );
+}
+
+///
+
+template < typename Reader
+         , typename Images
+         >
+inline
+void read_image( Reader&              reader
+               , any_image< Images >& images
+               )
+{
+    reader.apply( images );
 }
 
 /// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
-/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
-/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction.
-/// \throw std::ios_base::failure
-template < typename Device
-         , typename Image
-         , typename FormatTag
-         >
-inline
-void read_image( Device&          file
-               , Image&           img
-               , const FormatTag&
-               , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
-                                                                                 , Device
-                                                                                 >
-                                              , is_format_tag< FormatTag >
-                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                 , FormatTag
-                                                                 >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
-{
-    typedef typename detail::is_adaptable_input_device< FormatTag, Device >::device_type device_type;
-    device_type dev( file );
-
-    read_image( dev
-              , img
-              , image_read_settings< FormatTag >()
-              );
-}
-
-/// \brief Reads an image without conversion. Image memory is allocated.
-/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
-/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
-/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
-/// \throw std::ios_base::failure
-template < typename String
-         , typename Image
-         , typename FormatTag
-         >
-inline
-void read_image( const String&    file_name
-               , Image&           img
-               , const FormatTag&
-               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
-                                              , is_format_tag< FormatTag >
-                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                                                 , FormatTag
-                                                                 >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
-{
-    detail::file_stream_device< FormatTag > device( detail::convert_to_native_string( file_name )
-                                                  , typename detail::file_stream_device< FormatTag >::read_tag()
-                                                  );
-
-    read_image( device
-              , img
-              , image_read_settings< FormatTag >()
-              );
-}
-
-#ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-
-/// \brief Reads an image without conversion. Image memory is allocated.
-/// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
-/// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
-/// \throw std::ios_base::failure
-template < typename String
-         , typename Image
-         >
-inline
-void read_image( const String&    file_name
-               , Image&           img
-               , typename enable_if< detail::is_supported_path_spec< String >
-                                   >::type* /* ptr */ = 0
-               )
-{
-    namespace fs = boost::filesystem;
-    namespace al = boost::algorithm;
-
-    fs::path in_path = fs::system_complete( fs::path( file_name, fs::native ));
-    
-#ifdef BOOST_GIL_EXTENSION_IO_BMP_READ_ENABLED
-
-    if( al::to_upper( fs::extension( in_path )) == ".BMP" )
-    {
-        read_image( file_name
-                  , img
-                  , bmp_tag()
-                  );
-
-        return;
-    }
-
-#endif // BOOST_GIL_EXTENSION_IO_BMP_READ_ENABLED
-
-
-#ifdef BOOST_GIL_EXTENSION_IO_JPEG_READ_ENABLED
-
-    if( fs::extension( in_path ) == ".JPG" )
-    {
-        read_image( file_name
-                  , img
-                  , jpeg_tag()
-                  );
-
-        return ;
-    }
-
-#endif // BOOST_GIL_EXTENSION_IO_JPEG_READ_ENABLED
-
-#ifdef BOOST_GIL_EXTENSION_IO_PNG_READ_ENABLED
-
-    if( fs::extension( in_path ) == ".PNG" )
-    {
-        read_image( file_name
-                  , img
-                  , png_tag()
-                  );
-
-        return ;
-    }
-
-#endif // BOOST_GIL_EXTENSION_IO_PNG_READ_ENABLED
-
-#ifdef BOOST_GIL_EXTENSION_IO_PNM_READ_ENABLED
-
-    if( fs::extension( in_path ) == ".PNM" )
-    {
-        read_image( file_name
-                  , img
-                  , pnm_tag()
-                  );
-
-        return ;
-    }
-
-#endif // BOOST_GIL_EXTENSION_IO_PNM_READ_ENABLED
-
-#ifdef BOOST_GIL_EXTENSION_IO_TIFF_READ_ENABLED
-
-    if( fs::extension( in_path ) == ".TIF" )
-    {
-        read_image( file_name
-                  , img
-                  , tiff_tag()
-                  );
-
-        return ;
-    }
-
-#endif // BOOST_GIL_EXTENSION_IO_JPEG_READ_ENABLED
-}
-
-#endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-
-///////////////////////////// dynamic images
-
-/// \brief Reads an image without conversion. Image memory is allocated.
-/// \param file      It's a device. Must satisfy is_input_device metafunction.
 /// \param images    Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
 /// \param settings  Specifies read settings depending on the image format.
+/// \throw std::ios_base::failure
 template < typename Device
          , typename Images
          , typename FormatTag
@@ -350,64 +200,47 @@ inline
 void read_image( Device&                                 file
                , any_image< Images >&                    images
                , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< detail::is_input_device< Device    >
-                                              , is_format_tag          < FormatTag >
-                                              >
-                                   >::type* /* ptr */ = 0
                )
 {
-    dynamic_image_reader< Device
-                        , FormatTag
-                        > dyn_reader( file
-                                    , settings
-                                    );
+    typedef get_dynamic_image_reader< Device
+                                    , FormatTag
+                                    >::type reader_t;
 
-    dyn_reader.init_image( images
-                         , dyn_reader._settings
-                         );
+    reader_t reader = make_dynamic_image_reader( file
+                                               , settings
+                                               );
 
-    dyn_reader.apply( images );
+    read_image( reader
+              , images
+              );
 }
 
 /// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
 /// \param images    Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
-/// \param settings  Specifies read settings depending on the image format.
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
 /// \throw std::ios_base::failure
-
 template < typename Device
          , typename Images
          , typename FormatTag
          >
 inline
-void read_image( Device&                                 file
-               , any_image< Images >&                    images
-               , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
-                                                                                 , Device
-                                                                                 >
-                                              , is_format_tag< FormatTag >
-                                              >
-                                   >::type* /* ptr */ = 0
-                      )
+void read_image( Device&             file
+               , any_image< Images >& images
+               , const FormatTag&     tag
+               )
 {
-    typedef typename detail::is_adaptable_input_device< FormatTag
-                                                      , Device
-                                                      >::device_type device_type;
-    device_type dev( file );
+    typedef get_dynamic_image_reader< Device
+                                    , FormatTag
+                                    >::type reader_t;
 
-    reader< device_type
-          , FormatTag
-          , detail::read_and_no_convert
-          > reader( dev
-                  , settings
-                  );
+    reader_t reader = make_dynamic_image_reader( file
+                                               , tag
+                                               );
 
-    reader.init_image( images
-                     , reader._settings
-                     );
-
-    reader.apply( view( images ));
+    read_image( reader
+              , images
+              );
 }
 
 /// \brief Reads an image without conversion. Image memory is allocated.
@@ -423,78 +256,18 @@ inline
 void read_image( const String&                           file_name
                , any_image< Images >&                    images
                , const image_read_settings< FormatTag >& settings
-               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
-                                              , is_format_tag< FormatTag >
-                                              >
-                                   >::type* /* ptr */ = 0
                )
 {
-    typedef typename detail::file_stream_device< FormatTag >::read_tag read_tag;
+    typedef get_dynamic_image_reader< String
+                                    , FormatTag
+                                    >::type reader_t;
 
-    detail::file_stream_device<FormatTag> device( detail::convert_to_native_string( file_name )
-                                                , read_tag()
-                                                );
+    reader_t reader = make_dynamic_image_reader( file_name
+                                               , settings
+                                               );
 
-    read_image( device
+    read_image( reader
               , images
-              , settings
-              );
-}
-
-/// \brief Reads an image without conversion. Image memory is allocated.
-/// \param file   It's a device. Must satisfy is_input_device metafunction.
-/// \param images Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
-/// \param tag    Defines the image format. Must satisfy is_format_tag metafunction. 
-/// \throw std::ios_base::failure
-template < typename Device
-         , typename Images
-         , typename FormatTag
-         >
-inline
-void read_image( Device&              file
-               , any_image< Images >& images
-               , const FormatTag&
-               , typename enable_if< mpl::and_< detail::is_input_device< Device    >
-                                              , is_format_tag          < FormatTag >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
-{
-    read_image( file
-              , images
-              , image_read_settings< FormatTag >()
-              );
-}
-
-/// \brief Reads an image without conversion. Image memory is allocated.
-/// \param file   It's a device. Must satisfy is_adaptable_input_device metafunction.
-/// \param images Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
-/// \param tag    Defines the image format. Must satisfy is_format_tag metafunction. 
-/// \throw std::ios_base::failure
-template < typename Device
-         , typename Images
-         , typename FormatTag
-         >
-inline
-void read_image( Device&              file
-               , any_image< Images >& images
-               , const FormatTag&
-               , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
-                                                                                 , Device
-                                                                                 >
-                                              , is_format_tag< FormatTag >
-                                              >
-                                   >::type* /* ptr */ = 0
-               )
-{
-    typedef typename detail::is_adaptable_input_device< FormatTag
-                                                      , Device
-                                                      >::device_type device_type;
-    device_type dev( file );
-
-    read_image( dev
-              , images
-              , image_read_settings< FormatTag >()
               );
 }
 
@@ -508,22 +281,21 @@ template < typename String
          , typename FormatTag
          >
 inline
-void read_image( const String&        file_name
+void read_image( const String&       file_name
                , any_image< Images >& images
-               , const FormatTag&
-               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
-                                              , is_format_tag< FormatTag >
-                                              >
-                                   >::type* /* ptr */ = 0
+               , const FormatTag&     tag
                )
 {
-    detail::file_stream_device< FormatTag > device( detail::convert_to_native_string( file_name )
-                                                  , typename detail::file_stream_device< FormatTag >::read_tag()
-                                                  );
+    typedef get_dynamic_image_reader< String
+                                    , FormatTag
+                                    >::type reader_t;
 
-    read_image( device
+    reader_t reader = make_dynamic_image_reader( file_name
+                                               , tag
+                                               );
+
+    read_image( reader
               , images
-              , image_read_settings< FormatTag >()
               );
 }
 
