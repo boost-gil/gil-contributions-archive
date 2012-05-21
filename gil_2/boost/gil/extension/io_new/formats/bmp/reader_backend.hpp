@@ -48,6 +48,12 @@ struct reader_backend< Device
                      , bmp_tag
                      >
 {
+public:
+
+    typedef bmp_tag format_tag_t;
+
+public:
+
     reader_backend( const Device&                         io_dev
                   , const image_read_settings< bmp_tag >& settings
                   )

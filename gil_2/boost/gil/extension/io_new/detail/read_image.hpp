@@ -43,8 +43,15 @@ template < typename Reader
          , typename Image
          >
 inline
-void read_image( Reader& reader
-               , Image&  img
+void read_image( Reader&          reader
+               , Image&           img
+               , typename enable_if< mpl::and_< detail::is_reader< Reader >
+                                              , is_format_tag< typename Reader::format_tag_t >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , typename Reader::format_tag_t
+                                                                 >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
     reader.init_image( img
@@ -67,19 +74,21 @@ inline
 void read_image( Device&                                 file
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
+               , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                      , Device
+                                                                      >
+                                              , is_format_tag< FormatTag >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_reader< Device
-                      , FormatTag
-                      , detail::read_and_no_convert
-                      >::type reader_t;
-
-    reader_t reader = make_reader( file
-                                 , settings
-                                 , detail::read_and_no_convert()
-                                 );
-
-    read_image( reader
+    read_image( make_reader( file
+                           , settings
+                           , detail::read_and_no_convert()
+                           )
               , img
               );
 }
@@ -97,19 +106,21 @@ inline
 void read_image( Device&         file
                , Image&           img
                , const FormatTag& tag
+               , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                      , Device
+                                                                      >
+                                              , is_format_tag< FormatTag >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_reader< Device
-                      , FormatTag
-                      , detail::read_and_no_convert
-                      >::type reader_t;
-
-    reader_t reader = make_reader( file
-                                 , tag
-                                 , detail::read_and_no_convert()
-                                 );
-
-    read_image( reader
+    read_image( make_reader( file
+                           , tag
+                           , detail::read_and_no_convert()
+                           )
               , img
               );
 }
@@ -127,19 +138,19 @@ inline
 void read_image( const String&                           file_name
                , Image&                                  img
                , const image_read_settings< FormatTag >& settings
+               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                              , is_format_tag< FormatTag >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_reader< String
-                      , FormatTag
-                      , detail::read_and_no_convert
-                      >::type reader_t;
-
-    reader_t reader = make_reader( file_name
-                                 , settings
-                                 , detail::read_and_no_convert()
-                                 );
-
-    read_image( reader
+    read_image( make_reader( file_name
+                           , settings
+                           , detail::read_and_no_convert()
+                           )
               , img
               );
 }
@@ -154,22 +165,22 @@ template < typename String
          , typename FormatTag
          >
 inline
-void read_image( const String&   file_name
+void read_image( const String&    file_name
                , Image&           img
                , const FormatTag& tag
+               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                              , is_format_tag< FormatTag >
+                                              , is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                                                 , FormatTag
+                                                                 >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_reader< String
-                      , FormatTag
-                      , detail::read_and_no_convert
-                      >::type reader_t;
-
-    reader_t reader = make_reader( file_name
-                                 , tag
-                                 , detail::read_and_no_convert()
-                                 );
-
-    read_image( reader
+    read_image(  make_reader( file_name
+                            , tag
+                            , detail::read_and_no_convert()
+                            )
               , img
               );
 }
@@ -182,6 +193,10 @@ template < typename Reader
 inline
 void read_image( Reader&              reader
                , any_image< Images >& images
+               , typename enable_if< mpl::and_< detail::is_dynamic_image_reader< Reader >
+                                              , is_format_tag< typename Reader::format_tag_t >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
     reader.apply( images );
@@ -200,17 +215,17 @@ inline
 void read_image( Device&                                 file
                , any_image< Images >&                    images
                , const image_read_settings< FormatTag >& settings
+               , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                      , Device
+                                                                      >
+                                              , is_format_tag< FormatTag >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_dynamic_image_reader< Device
-                                    , FormatTag
-                                    >::type reader_t;
-
-    reader_t reader = make_dynamic_image_reader( file
-                                               , settings
-                                               );
-
-    read_image( reader
+    read_image( make_dynamic_image_reader( file
+                                         , settings
+                                         )
               , images
               );
 }
@@ -225,20 +240,20 @@ template < typename Device
          , typename FormatTag
          >
 inline
-void read_image( Device&             file
+void read_image( Device&              file
                , any_image< Images >& images
                , const FormatTag&     tag
+               , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                      , Device
+                                                                      >
+                                              , is_format_tag< FormatTag >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_dynamic_image_reader< Device
-                                    , FormatTag
-                                    >::type reader_t;
-
-    reader_t reader = make_dynamic_image_reader( file
-                                               , tag
-                                               );
-
-    read_image( reader
+    read_image( make_dynamic_image_reader( file
+                                         , tag
+                                         )
               , images
               );
 }
@@ -256,17 +271,15 @@ inline
 void read_image( const String&                           file_name
                , any_image< Images >&                    images
                , const image_read_settings< FormatTag >& settings
+               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                              , is_format_tag< FormatTag >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_dynamic_image_reader< String
-                                    , FormatTag
-                                    >::type reader_t;
-
-    reader_t reader = make_dynamic_image_reader( file_name
-                                               , settings
-                                               );
-
-    read_image( reader
+    read_image( make_dynamic_image_reader( file_name
+                                         , settings
+                                         )
               , images
               );
 }
@@ -284,17 +297,15 @@ inline
 void read_image( const String&       file_name
                , any_image< Images >& images
                , const FormatTag&     tag
+               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                              , is_format_tag< FormatTag >
+                                              >
+                                   >::type* /* ptr */ = 0
                )
 {
-    typedef get_dynamic_image_reader< String
-                                    , FormatTag
-                                    >::type reader_t;
-
-    reader_t reader = make_dynamic_image_reader( file_name
-                                               , tag
-                                               );
-
-    read_image( reader
+    read_image( make_dynamic_image_reader( file_name
+                                         , tag
+                                         )
               , images
               );
 }

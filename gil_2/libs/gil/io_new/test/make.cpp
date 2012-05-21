@@ -21,6 +21,20 @@ BOOST_AUTO_TEST_SUITE( make_test )
 BOOST_AUTO_TEST_CASE( make_reader_backend_test )
 {
     {
+        BOOST_STATIC_ASSERT(( is_same< int, int >::value ));
+        BOOST_STATIC_ASSERT(( is_same< detail::is_read_device< bmp_tag, FILE* >::type, boost::mpl::true_ >::value ));
+    }
+
+    {
+        typedef get_reader< const char*
+                          , bmp_tag
+                          , detail::read_and_no_convert
+                          >::type reader_t;
+
+        BOOST_STATIC_ASSERT(( is_same< detail::is_reader< reader_t >::type, boost::mpl::true_ >::value ));
+    }
+
+    {
         auto backend_char   = make_reader_backend( bmp_filename.c_str(), bmp_tag() );
         auto backend_string = make_reader_backend( bmp_filename, bmp_tag() );
 

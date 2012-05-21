@@ -36,6 +36,10 @@ struct reader_backend< Device
 {
 public:
 
+    typedef png_tag format_tag_t;
+
+public:
+
     typedef reader_backend< Device
                           , png_tag
                           > this_t;

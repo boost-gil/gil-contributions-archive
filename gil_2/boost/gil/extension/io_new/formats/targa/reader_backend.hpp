@@ -31,6 +31,12 @@ struct reader_backend< Device
                      , targa_tag
                      >
 {
+public:
+
+    typedef targa_tag format_tag_t;
+
+public:
+
     reader_backend( const Device&                           io_dev
                   , const image_read_settings< targa_tag >& settings
                   )

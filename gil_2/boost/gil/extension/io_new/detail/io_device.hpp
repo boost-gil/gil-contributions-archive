@@ -575,6 +575,29 @@ struct is_adaptable_input_device< FormatTag
     typedef file_stream_device< FormatTag > device_type;
 };
 
+///
+/// Metafunction to decide if a given type is an acceptable read device type.
+///
+template< typename FormatTag
+        , typename T
+        , typename D = void
+        >
+struct is_read_device : mpl::false_
+{};
+
+template< typename FormatTag
+        , typename T
+        >
+struct is_read_device< FormatTag
+                     , T
+                     , typename enable_if< mpl::or_< is_input_device< FormatTag >
+                                                   , is_adaptable_input_device< FormatTag
+                                                                              , T
+                                                                              >
+                                                   >
+                                         >::type
+                     > : mpl::true_
+{};
 
 
 /**
@@ -620,6 +643,41 @@ template< typename Device, typename FormatTag, typename Log = no_log > class wri
 
 template< typename Device, typename FormatTag > class dynamic_image_reader;
 template< typename Device, typename FormatTag, typename Log = no_log > class dynamic_image_writer;
+
+
+namespace detail {
+
+template< typename T >
+struct is_reader : mpl::false_
+{};
+
+template< typename Device
+        , typename FormatTag
+        , typename ConversionPolicy
+        >
+struct is_reader< reader< Device
+                        , FormatTag
+                        , ConversionPolicy
+                        >
+                > : mpl::true_
+{};
+
+template< typename T >
+struct is_dynamic_image_reader : mpl::false_
+{};
+
+template< typename Device
+        , typename FormatTag
+        >
+struct is_dynamic_image_reader< dynamic_image_reader< Device
+                                                    , FormatTag
+                                                    >
+                              > : mpl::true_
+{};
+
+
+} // namespace detail
+
 
 } // namespace gil
 } // namespace boost

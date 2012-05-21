@@ -31,6 +31,12 @@ struct reader_backend< Device
                      , pnm_tag
                      >
 {
+public:
+
+    typedef pnm_tag format_tag_t;
+
+public:
+
     reader_backend( const Device&                         io_dev
                   , const image_read_settings< pnm_tag >& settings
                   )

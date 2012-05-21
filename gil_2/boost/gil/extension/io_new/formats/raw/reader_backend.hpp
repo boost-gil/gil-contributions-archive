@@ -31,6 +31,12 @@ struct reader_backend< Device
                      , raw_tag
                      >
 {
+public:
+
+    typedef raw_tag format_tag_t;
+
+public:
+
     reader_backend( const Device&                         io_dev
                   , const image_read_settings< raw_tag >& settings
                   )
