@@ -103,7 +103,7 @@ template < typename Device
          , typename FormatTag
          >
 inline
-void read_image( Device&         file
+void read_image( Device&          file
                , Image&           img
                , const FormatTag& tag
                , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
@@ -177,10 +177,10 @@ void read_image( const String&    file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image(  make_reader( file_name
-                            , tag
-                            , detail::read_and_no_convert()
-                            )
+    read_image( make_reader( file_name
+                           , tag
+                           , detail::read_and_no_convert()
+                           )
               , img
               );
 }

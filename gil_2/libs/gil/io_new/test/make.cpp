@@ -69,6 +69,7 @@ BOOST_AUTO_TEST_CASE( make_reader_test )
 {
     {
         auto reader_char   = make_reader( bmp_filename.c_str(), bmp_tag(), detail::read_and_no_convert() );
+
         auto reader_string = make_reader( bmp_filename, bmp_tag(), detail::read_and_no_convert() );
 
         FILE* file = fopen( bmp_filename.c_str(), "rb" );

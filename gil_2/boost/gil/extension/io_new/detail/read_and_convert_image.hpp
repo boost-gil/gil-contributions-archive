@@ -1,5 +1,5 @@
 /*
-    Copyright 2007-2008 Christian Henning, Andreas Pokorny, Lubomir Bourdev
+    Copyright 2007-2012 Christian Henning, Andreas Pokorny, Lubomir Bourdev
     Use, modification and distribution are subject to the Boost Software License,
     Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
     http://www.boost.org/LICENSE_1_0.txt).
@@ -15,7 +15,7 @@
 /// \brief
 /// \author Christian Henning, Andreas Pokorny, Lubomir Bourdev \n
 ///
-/// \date   2007-2008 \n
+/// \date   2007-2012 \n
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,32 +38,18 @@ namespace boost{ namespace gil {
 /// \param settings  Specifies read settings depending on the image format.
 /// \param cc        Color converter function object.
 /// \throw std::ios_base::failure
-template< typename Device
+template< typename Reader
         , typename Image
-        , typename ColorConverter
-        , typename FormatTag
         >
 inline
-void read_and_convert_image( Device&                                 file
+void read_and_convert_image( Reader&                                 reader
                            , Image&                                  img
-                           , const image_read_settings< FormatTag >& settings
-                           , const ColorConverter&                   cc
-                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                                          , detail::is_input_device< Device >
+                           , typename enable_if< mpl::and_< detail::is_reader< Reader >
+                                                          , is_format_tag< typename Reader::format_tag_t >
                                                           >
-                                                >::type* /* ptr */ = 0
+                           >::type* /* ptr */ = 0
                            )
 {
-    typedef detail::read_and_convert< ColorConverter > reader_color_convert;
-
-    reader< Device
-          , FormatTag
-          , reader_color_convert
-          > reader( file
-                  , cc
-                  , settings
-                  );
-
     reader.init_image( img
                      , reader._settings
                      );
@@ -72,7 +58,7 @@ void read_and_convert_image( Device&                                 file
 }
 
 /// \brief Reads and color-converts an image. Image memory is allocated.
-/// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
 /// \param img       The image in which the data is read into.
 /// \param settings  Specifies read settings depending on the image format.
 /// \param cc        Color converter function object.
@@ -87,23 +73,19 @@ void read_and_convert_image( Device&                                 file
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
                            , const ColorConverter&                   cc
-                           , typename enable_if< mpl::and_< is_format_tag< FormatTag >
-                                                          , detail::is_adaptable_input_device< FormatTag
-                                                                                             , Device
-                                                                                             >
+                           , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                                  , Device
+                                                                                  >
+                                                          , is_format_tag< FormatTag >
                                                           >
-                                               >::type* /* ptr */ = 0
+                                                >::type* /* ptr */ = 0
                            )
 {
-    typedef typename detail::is_adaptable_input_device< FormatTag
-                                                      , Device
-                                                      >::device_type device_type;
-    device_type dev( file );
-
-    read_and_convert_image( dev
+    read_and_convert_image( make_reader( file
+                                       , settings
+                                       , detail::read_and_convert( cc )
+                                       )
                           , img
-                          , settings
-                          , cc
                           );
 }
 
@@ -129,14 +111,11 @@ void read_and_convert_image( const String&                           file_name
                                                >::type* /* ptr */ = 0
                            )
 {
-    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
-                                                  , typename detail::file_stream_device< FormatTag >::read_tag()
-                                                  );
-
-    read_and_convert_image( device
+    read_and_convert_image( make_reader( file_name
+                                       , settings
+                                       , detail::read_and_convert( cc )
+                                       )
                           , img
-                          , settings
-                          , cc
                           );
 }
 
@@ -155,17 +134,18 @@ inline
 void read_and_convert_image( const String&         file_name
                            , Image&                img
                            , const ColorConverter& cc
-                           , const FormatTag&
+                           , const FormatTag&      tag
                            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                                           , detail::is_supported_path_spec< String >
                                                           >
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( file_name
+    read_and_convert_image( make_reader( file_name
+                                       , tag
+                                       , detail::read_and_convert( cc )
+                                       )
                           , img
-                          , image_read_settings< FormatTag >()
-                          , cc
                           );
 }
 
@@ -184,21 +164,20 @@ inline
 void read_and_convert_image( Device&               device
                            , Image&                img
                            , const ColorConverter& cc
-                           , const FormatTag&
-                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
-                                                                    , detail::is_adaptable_input_device< FormatTag
-                                                                                                       , Device
-                                                                                                       >
-                                                                    >
-                                                                    , is_format_tag< FormatTag >
+                           , const FormatTag&      tag
+                           , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                                  , Device
+                                                                                  >
+                                                          , is_format_tag< FormatTag >
                                                           >
                                                >::type* /* ptr */ = 0 
                            )
 {
-    read_and_convert_image( device
+    read_and_convert_image( make_reader( device
+                                       , tag
+                                       , detail::read_and_convert( cc )
+                                       )
                           , img
-                          , image_read_settings< FormatTag >()
-                          , cc
                           );
 }
 
@@ -221,11 +200,12 @@ void read_and_convert_image( const String&                           file_name
                                                >::type* /* ptr */ = 0
                            )
 {
-   read_and_convert_image( file_name
-                         , img
-                         , settings
-                         , default_color_converter()
-                         );
+    read_and_convert_image( make_reader( file_name
+                                       , settings
+                                       , detail::read_and_convert< default_color_converter >()
+                                       )
+                          , img
+                          );
 }
 
 /// \brief Reads and color-converts an image. Image memory is allocated. Default color converter is used.
@@ -241,21 +221,20 @@ inline
 void read_and_convert_image( Device&                                 device
                            , Image&                                  img
                            , const image_read_settings< FormatTag >& settings
-                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
-                                                                    , detail::is_adaptable_input_device< FormatTag
-                                                                                                       , Device
-                                                                                                       >
-                                                                    >
+                           , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                                  , Device
+                                                                                  >
                                                           , is_format_tag< FormatTag >
                                                           >
-                                               >::type* /* ptr */ = 0
+                                               >::type* /* ptr */ = 0 
                            )
 {
-   read_and_convert_image( device
-                         , img
-                         , settings
-                         , default_color_converter()
-                         );
+    read_and_convert_image( make_reader( device
+                                       , settings
+                                       , detail::read_and_convert< default_color_converter >()
+                                       )
+                          , img
+                          );
 }
 
 /// \brief Reads and color-converts an image. Image memory is allocated. Default color converter is used.
@@ -270,18 +249,19 @@ template < typename String
 inline
 void read_and_convert_image( const String&    file_name
                            , Image&           img
-                           , const FormatTag&
+                           , const FormatTag& tag
                            , typename enable_if< mpl::and_< is_format_tag< FormatTag >
                                                           , detail::is_supported_path_spec< String >
                                                           >
                                                >::type* /* ptr */ = 0
                            )
 {
-   read_and_convert_image( file_name
-                         , img
-                         , image_read_settings< FormatTag >()
-                         , default_color_converter()
-                         );
+    read_and_convert_image( make_reader( file_name
+                                       , tag
+                                       , detail::read_and_convert< default_color_converter >()
+                                       )
+                          , img
+                          );
 }
 
 /// \brief Reads and color-converts an image. Image memory is allocated. Default color converter is used.
@@ -296,22 +276,21 @@ template < typename Device
 inline
 void read_and_convert_image( Device&          device
                            , Image&           img
-                           , const FormatTag&
-                           , typename enable_if< mpl::and_< mpl::or_< detail::is_input_device< Device >
-                                                                    , detail::is_adaptable_input_device< FormatTag
-                                                                                                       , Device
-                                                                                                       >
-                                                                    >
+                           , const FormatTag& tag
+                           , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
+                                                                                  , Device
+                                                                                  >
                                                           , is_format_tag< FormatTag >
                                                           >
-                                               >::type* /* ptr */ = 0
+                                               >::type* /* ptr */ = 0 
                            )
 {
-   read_and_convert_image( device
-                         , img
-                         , image_read_settings< FormatTag >()
-                         , default_color_converter()
-                         );
+    read_and_convert_image( make_reader( device
+                                       , tag
+                                       , detail::read_and_convert< default_color_converter >()
+                                       )
+                          , img
+                          );
 }
 
 } // namespace gil

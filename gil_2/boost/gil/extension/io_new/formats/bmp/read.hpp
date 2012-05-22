@@ -82,7 +82,7 @@ public:
     // Constructor
     //
     reader( const Device&                         io_dev
-          , const cc_t&                           cc
+          , const ConversionPolicy&               cc
           , const image_read_settings< bmp_tag >& settings
           )
     : reader_base< bmp_tag

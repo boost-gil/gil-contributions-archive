@@ -72,8 +72,12 @@ public:
     typedef CC color_converter_type;
     CC _cc;
 
-    read_and_convert( color_converter_type const& cc )
-        : _cc(cc) {}
+    read_and_convert()
+    {}
+
+    read_and_convert( const color_converter_type& cc )
+    : _cc( cc )
+    {}
 
     template< typename InIterator
             , typename OutIterator
