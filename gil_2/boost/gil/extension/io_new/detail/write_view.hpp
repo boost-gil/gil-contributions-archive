@@ -32,6 +32,28 @@
 namespace boost{ namespace gil {
 
 /// \ingroup IO
+
+template< typename Writer
+        , typename View
+        , typename FormatTag
+        >
+inline
+void write_view( Writer&          writer
+               , const View&      view
+               , typename enable_if< typename mpl::and_< typename detail::is_writer< Writer >::type
+                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_write_supported< typename get_pixel_type< View >::type
+                                                                                    , FormatTag
+                                                                                    >::type
+                                                       >::type
+                                   >::type* /* ptr */ = 0
+               )
+{
+    writer.apply( view );
+}
+
+
+
 template< typename Device
         , typename View
         , typename FormatTag

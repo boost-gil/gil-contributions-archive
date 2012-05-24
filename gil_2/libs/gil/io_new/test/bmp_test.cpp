@@ -180,31 +180,31 @@ BOOST_AUTO_TEST_CASE( read_view_test )
     }
 }
 
-//BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
-//{
-//    {
-//        rgb8_image_t img( 127, 64 );
-//        read_and_convert_view( bmp_filename, view( img ), tag_t() );
-//    }
-//
-//    {
-//        ifstream in( bmp_filename.c_str(), ios::binary );
-//
-//        rgb8_image_t img( 127, 64 );
-//        read_and_convert_view( in, view( img ), tag_t() );
-//    }
-//
-//    {
-//        FILE* file = fopen( bmp_filename.c_str(), "rb" );
-//        
-//        rgb8_image_t img( 127, 64 );
-//        read_and_convert_view( file
-//                             , view( img )
-//                             , tag_t()
-//                             );
-//    }
-//}
-//
+BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
+{
+    {
+        rgb8_image_t img( 127, 64 );
+        read_and_convert_view( bmp_filename, view( img ), tag_t() );
+    }
+
+    {
+        ifstream in( bmp_filename.c_str(), ios::binary );
+
+        rgb8_image_t img( 127, 64 );
+        read_and_convert_view( in, view( img ), tag_t() );
+    }
+
+    {
+        FILE* file = fopen( bmp_filename.c_str(), "rb" );
+        
+        rgb8_image_t img( 127, 64 );
+        read_and_convert_view( file
+                             , view( img )
+                             , tag_t()
+                             );
+    }
+}
+
 //BOOST_AUTO_TEST_CASE( write_view_test )
 //{
 //    {

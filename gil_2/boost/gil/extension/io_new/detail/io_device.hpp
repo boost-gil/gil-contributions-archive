@@ -634,6 +634,31 @@ template<typename FormatTag> struct is_adaptable_output_device<FormatTag,FILE*,v
     typedef file_stream_device< FormatTag > device_type;
 };
 
+
+///
+/// Metafunction to decide if a given type is an acceptable read device type.
+///
+template< typename FormatTag
+        , typename T
+        , typename D = void
+        >
+struct is_write_device : mpl::false_
+{};
+
+template< typename FormatTag
+        , typename T
+        >
+struct is_write_device< FormatTag
+                      , T
+                      , typename enable_if< mpl::or_< is_output_device< FormatTag >
+                                                    , is_adaptable_output_device< FormatTag
+                                                                                , T
+                                                                                >
+                                                    >
+                                          >::type
+                      > : mpl::true_
+{};
+
 } // namespace detail
 
 template< typename Device, typename FormatTag > class scanline_reader;
@@ -673,6 +698,19 @@ struct is_dynamic_image_reader< dynamic_image_reader< Device
                                                     , FormatTag
                                                     >
                               > : mpl::true_
+{};
+
+template< typename T >
+struct is_writer : mpl::false_
+{};
+
+template< typename Device
+        , typename FormatTag
+        >
+struct is_writer< writer< Device
+                        , FormatTag
+                        >
+                > : mpl::true_
 {};
 
 

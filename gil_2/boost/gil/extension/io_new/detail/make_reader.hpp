@@ -141,6 +141,8 @@ make_reader( Device&                                 file
                             );
 }
 
+// no image_read_settings
+
 template< typename String
         , typename FormatTag
         , typename ConversionPolicy
