@@ -31,6 +31,12 @@ struct writer_backend< Device
                      , pnm_tag
                      >
 {
+public:
+
+    typedef pnm_tag format_tag_t;
+
+public:
+
     writer_backend( const Device&                      io_dev
                   , const image_write_info< pnm_tag >& info
                   )

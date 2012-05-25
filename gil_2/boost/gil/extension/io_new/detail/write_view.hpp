@@ -35,50 +35,19 @@ namespace boost{ namespace gil {
 
 template< typename Writer
         , typename View
-        , typename FormatTag
         >
 inline
-void write_view( Writer&          writer
-               , const View&      view
+void write_view( Writer&     writer
+               , const View& view
                , typename enable_if< typename mpl::and_< typename detail::is_writer< Writer >::type
-                                                       , typename is_format_tag< FormatTag >::type
+                                                       , typename is_format_tag< typename Writer::format_tag_t >::type
                                                        , typename is_write_supported< typename get_pixel_type< View >::type
-                                                                                    , FormatTag
+                                                                                    , typename Writer::format_tag_t
                                                                                     >::type
                                                        >::type
                                    >::type* /* ptr */ = 0
                )
 {
-    writer.apply( view );
-}
-
-
-
-template< typename Device
-        , typename View
-        , typename FormatTag
-        >
-inline
-void write_view( Device&          device
-               , const View&      view
-               , const FormatTag&
-               , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
-                                                       , typename is_format_tag< FormatTag >::type
-                                                       , typename is_write_supported< typename get_pixel_type< View >::type
-                                                                                    , FormatTag
-                                                                                    >::type
-                                                       >::type
-                                   >::type* /* ptr */ = 0
-               )
-{
-    image_write_info< FormatTag > info;
-
-    writer< Device
-          , FormatTag
-          > writer( device
-                  , info
-                  );
-
     writer.apply( view );
 }
 
@@ -90,25 +59,21 @@ inline
 void write_view( Device&          device
                , const View&      view
                , const FormatTag& tag
-               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
-                                                                                                    , Device
-                                                                                                    >::type
+               , typename enable_if< typename mpl::and_< typename detail::is_write_device< FormatTag
+                                                                                         , Device
+                                                                                         >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        , typename is_write_supported< typename get_pixel_type< View >::type
                                                                                     , FormatTag
                                                                                     >::type
                                                        >::type
                                    >::type* /* ptr */ = 0
-        )
+               )
 {
-    typedef typename detail::is_adaptable_output_device< FormatTag
-                                                       , Device
-                                                       >::device_type dev_t;
-    dev_t dev( device );
-
-    write_view( dev
+    write_view( make_writer( device
+                           , tag
+                           )
               , view
-              , tag
               );
 }
 
@@ -129,13 +94,10 @@ void write_view( const String&    file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
-                                                , typename detail::file_stream_device<FormatTag>::write_tag()
-                                                );
-
-    write_view( device
+    write_view( make_writer( file_name
+                           , tag
+                           )
               , view
-              , tag
               );
 }
 
@@ -146,10 +108,12 @@ template< typename Device
         , typename Log
         >
 inline
-void write_view( Device&                            device
-               , const View&                        view
+void write_view( Device&                                 device
+               , const View&                             view
                , const image_write_info<FormatTag, Log>& info
-               , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
+               , typename enable_if< typename mpl::and_< typename detail::is_write_device< FormatTag
+                                                                                         , Device
+                                                                                         >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        , typename is_write_supported< typename get_pixel_type< View >::type
                                                                                     , FormatTag
@@ -158,43 +122,10 @@ void write_view( Device&                            device
                                    >::type* /* ptr */ = 0
                )
 {
-    writer< Device
-          , FormatTag
-          , Log
-          > writer( device
-                  , info
-                  );
-
-    writer.apply( view );
-}
-
-template< typename Device
-        , typename View
-        , typename FormatTag
-        , typename Log
-        >
-inline
-void write_view( Device&                                   device
-               , const View&                               view
-               , const image_write_info< FormatTag, Log >& info
-               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
-                                                                                                    , Device
-                                                                                                    >::type
-                                                       , typename is_format_tag< FormatTag >::type
-                                                       , typename is_write_supported< typename get_pixel_type< View >::type
-                                                                                    , FormatTag
-                                                                                    >::type
-                                                       >::type
-                                   >::type* /* ptr */ = 0
-               )
-{
-    typename detail::is_adaptable_output_device< FormatTag
-                                               , Device
-                                               >::device_type dev( device );
-
-    write_view( dev
+    write_view( make_writer( device
+                           , info
+                           )
               , view
-              , info
               );
 }
 
@@ -204,8 +135,8 @@ template< typename String
         , typename Log
         >
 inline
-void write_view( const String&                        file_name
-               , const View&                          view
+void write_view( const String&                             file_name
+               , const View&                               view
                , const image_write_info< FormatTag, Log >& info
                , typename enable_if< typename mpl::and_< typename detail::is_supported_path_spec< String >::type
                                                        , typename is_format_tag< FormatTag >::type
@@ -216,13 +147,10 @@ void write_view( const String&                        file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
-                                                  , typename detail::file_stream_device< FormatTag >::write_tag()
-                                                  );
-
-    write_view( device
+    write_view( make_writer( file_name
+                           , info
+                           )
               , view
-              , info
               );
 }
 
@@ -230,30 +158,22 @@ void write_view( const String&                        file_name
 ////////////////////////////////////// dynamic_image
 
 // without image_write_info
-template< typename Device
+template< typename Writer
         , typename Views
-        , typename FormatTag
         >
 inline
-void write_view( Device&                        device
+void write_view( Writer&                        writer
                , const any_image_view< Views >& view
-               , const FormatTag&
-               , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
-                                                       , typename is_format_tag< FormatTag >::type
+               , typename enable_if< typename mpl::and_< typename detail::is_dynamic_image_writer< Writer >::type
+                                                       , typename is_format_tag< typename Writer::format_tag_t >::type
                                                        >::type
                                    >::type* /* ptr */ = 0
                )
 {
-    image_write_info< FormatTag > info;
-
-    dynamic_image_writer< Device
-                        , FormatTag
-                        > dyn_writer( device
-                                    , info
-                                    );
-
-    dyn_writer.apply( view );
+    writer.apply( view );
 }
+
+// without image_write_info
 
 template< typename Device
         , typename Views
@@ -262,23 +182,19 @@ template< typename Device
 inline
 void write_view( Device&                        device
                , const any_image_view< Views >& views
-               , const FormatTag&               tag
-               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
-                                                                                                    , Device
-                                                                                                    >::type
+               , const FormatTag&
+               , typename enable_if< typename mpl::and_< typename detail::is_write_device< FormatTag
+                                                                                         , Device
+                                                                                         >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        >::type
                                    >::type* /* ptr */ = 0
-        )
+               )
 {
-    typedef typename detail::is_adaptable_output_device< FormatTag
-                                                       , Device
-                                                       >::device_type dev_t;
-    dev_t dev( device );
-
-    write_view( dev
+    write_view( make_dynamic_image_writer( device
+                                         , image_write_info< FormatTag >()
+                                         )
               , views
-              , tag
               );
 }
 
@@ -296,14 +212,11 @@ void write_view( const String&                  file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::file_stream_device<FormatTag> device( detail::convert_to_string( file_name )
-                                                , typename detail::file_stream_device<FormatTag>::write_tag()
-                                                );
-
-    write_view( device
-               , views
-               , tag
-               );
+    write_view( make_dynamic_image_writer( file_name
+                                         , image_write_info< FormatTag >()
+                                         )
+              , views
+              );
 }
 
 // with image_write_info
@@ -319,48 +232,18 @@ void write_view( Device&                           device
                , const image_write_info< FormatTag
                                        , Log
                                        >&           info
-               , typename enable_if< typename mpl::and_< typename detail::is_output_device< Device >::type
+               , typename enable_if< typename mpl::and_< typename detail::is_write_device< FormatTag
+                                                                                         , Device
+                                                                                         >::type
                                                        , typename is_format_tag< FormatTag >::type
                                                        >::type
                                    >::type* /* ptr */ = 0
                )
 {
-    dynamic_image_writer< Device
-                        , FormatTag
-                        , Log
-                        > dyn_writer( device
-                                    , info
-                                    );
-
-    dyn_writer.apply( views );
-}
-
-template< typename Device
-        , typename Views
-        , typename FormatTag
-        , typename Log
-        >
-inline
-void write_view( Device&                           device
-               , const any_image_view< Views >&    views
-               , const image_write_info< FormatTag
-                                       , Log
-                                       >&          info
-               , typename enable_if< typename mpl::and_< typename detail::is_adaptable_output_device< FormatTag
-                                                                                                    , Device
-                                                                                                    >::type
-                                                       , typename is_format_tag< FormatTag >::type
-                                                       >::type
-                                   >::type* /* ptr */ = 0
-               )
-{
-    typename detail::is_adaptable_output_device< FormatTag
-                                               , Device
-                                               >::device_type dev( device );
-
-    write_view( dev
+    write_view( make_dynamic_image_writer( device
+                                         , info
+                                         )
               , views
-              , info
               );
 }
 
@@ -381,13 +264,10 @@ void write_view( const String&                      file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    detail::file_stream_device< FormatTag > device( detail::convert_to_string( file_name )
-                                                  , typename detail::file_stream_device< FormatTag >::write_tag()
-                                                  );
-
-    write_view( device
+    write_view( make_dynamic_image_writer( file_name
+                                         , info
+                                         )
               , views
-              , info
               );
 }
 

@@ -81,7 +81,11 @@ struct writer_backend< Device
     : public jpeg_io_base
     , public detail::jpeg_compress_wrapper
 {
+public:
 
+    typedef jpeg_tag format_tag_t;
+
+public:
     ///
     /// Constructor
     ///

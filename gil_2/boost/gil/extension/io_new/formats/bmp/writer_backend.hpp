@@ -31,6 +31,12 @@ struct writer_backend< Device
                      , bmp_tag
                      >
 {
+public:
+
+    typedef bmp_tag format_tag_t;
+
+public:
+
     writer_backend( const Device&                      io_dev
                   , const image_write_info< bmp_tag >& info
                   )

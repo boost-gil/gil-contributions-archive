@@ -23,9 +23,7 @@
 
 namespace boost { namespace gil {
 
-///
-/// Helper metafunction to generate image writer type.
-///
+/// \brief Helper metafunction to generate writer type.
 template< typename T
         , typename FormatTag
         , class Enable = void
@@ -75,6 +73,58 @@ struct get_writer< Device
                   , FormatTag
                   > type;
 };
+
+
+/// \brief Helper metafunction to generate dynamic image writer type.
+template< typename T
+        , typename FormatTag
+        , class Enable = void
+        >
+struct get_dynamic_image_writer
+{};
+
+template< typename String
+        , typename FormatTag
+        >
+struct get_dynamic_image_writer< String
+                               , FormatTag
+                               , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
+                                                              , is_format_tag< FormatTag >
+                                                              >
+                                                   >::type
+                               >
+{
+    typedef typename get_write_device< String
+                                     , FormatTag
+                                     >::type device_t;
+
+    typedef dynamic_image_writer< device_t
+                                , FormatTag
+                                > type;
+};
+
+template< typename Device
+        , typename FormatTag
+        >
+struct get_dynamic_image_writer< Device
+                               , FormatTag
+                               , typename enable_if< mpl::and_< detail::is_write_device< FormatTag
+                                                                                       , Device
+                                                                                       >
+                                                              , is_format_tag< FormatTag >
+                                                              >
+                                                   >::type
+                               >
+{
+    typedef typename get_write_device< Device
+                                     , FormatTag
+                                     >::type device_t;
+
+    typedef dynamic_image_writer< device_t
+                                , FormatTag
+                                > type;
+};
+
 
 } // namespace gil
 } // namespace boost

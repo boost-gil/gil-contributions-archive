@@ -31,6 +31,12 @@ struct writer_backend< Device
                      , tiff_tag
                      >
 {
+public:
+
+    typedef tiff_tag format_tag_t;
+
+public:
+
     writer_backend( const Device&                       io_dev
                   , const image_write_info< tiff_tag >& info
                   )

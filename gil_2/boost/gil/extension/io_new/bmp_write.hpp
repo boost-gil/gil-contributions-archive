@@ -24,6 +24,7 @@
 #include "formats/bmp/write.hpp"
 
 #include "detail/make_writer.hpp"
+#include "detail/make_dynamic_image_writer.hpp"
 
 #include "detail/write_view.hpp"
 

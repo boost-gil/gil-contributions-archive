@@ -205,53 +205,65 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
     }
 }
 
-//BOOST_AUTO_TEST_CASE( write_view_test )
-//{
-//    {
-//        string filename( bmp_out + "write_test_ofstream.bmp" );
-//
-//        ofstream out( filename.c_str(), ios::binary );
-//
-//        write_view( out
-//                  , create_mandel_view( 127, 64
-//                                      , rgb8_pixel_t( 0,   0, 255 )
-//                                      , rgb8_pixel_t( 0, 255,   0 )
-//                                      )
-//                  , tag_t()
-//                  );
-//    }
-//
-//    {
-//        string filename( bmp_out + "write_test_file.bmp" );
-//
-//        FILE* file = fopen( filename.c_str(), "wb" );
-//        
-//        write_view( file
-//                  , create_mandel_view( 127, 64
-//                                      , rgb8_pixel_t( 0,   0, 255 )
-//                                      , rgb8_pixel_t( 0, 255,   0 )
-//                                      )
-//                  , tag_t()
-//                  );
-//    }
-//
-//    {
-//        string filename( bmp_out + "write_test_info.bmp" );
-//
-//        image_write_info< tag_t > info;
-//
-//        FILE* file = fopen( filename.c_str(), "wb" );
-//
-//        write_view( file
-//                  , create_mandel_view( 127, 64
-//                                      , rgb8_pixel_t( 0,   0, 255 )
-//                                      , rgb8_pixel_t( 0, 255,   0 )
-//                                      )
-//                  , info
-//                  );
-//    }
-//}
-//
+BOOST_AUTO_TEST_CASE( write_view_test )
+{
+    {
+        string filename( bmp_out + "write_test_string.bmp" );
+
+        write_view( filename
+                  , create_mandel_view( 127, 64
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
+    }
+
+    {
+        string filename( bmp_out + "write_test_ofstream.bmp" );
+
+        ofstream out( filename.c_str(), ios::binary );
+
+        write_view( out
+                  , create_mandel_view( 127, 64
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
+    }
+
+    {
+        string filename( bmp_out + "write_test_file.bmp" );
+
+        FILE* file = fopen( filename.c_str(), "wb" );
+        
+        write_view( file
+                  , create_mandel_view( 127, 64
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
+    }
+
+    {
+        string filename( bmp_out + "write_test_info.bmp" );
+
+        image_write_info< tag_t > info;
+
+        FILE* file = fopen( filename.c_str(), "wb" );
+
+        write_view( file
+                  , create_mandel_view( 127, 64
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , info
+                  );
+    }
+}
+
 //BOOST_AUTO_TEST_CASE( stream_test )
 //{
 //    // 1. Read an image.
@@ -305,26 +317,26 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 //                                            );
 //}
 //
-//BOOST_AUTO_TEST_CASE( dynamic_image_test )
-//{
-//    typedef mpl::vector< gray8_image_t
-//                       , gray16_image_t
-//                       , rgb8_image_t
-//                       , rgba8_image_t
-//                       > my_img_types;
-//
-//
-//    any_image< my_img_types > runtime_image;
-//
-//    read_image( bmp_filename.c_str()
-//              , runtime_image
-//              , tag_t()
-//              );
-//
-//    write_view( bmp_out + "dynamic_image_test.bmp"
-//              , view( runtime_image )
-//              , tag_t()
-//              );
-//}
+BOOST_AUTO_TEST_CASE( dynamic_image_test )
+{
+    typedef mpl::vector< gray8_image_t
+                       , gray16_image_t
+                       , rgb8_image_t
+                       , rgba8_image_t
+                       > my_img_types;
+
+
+    any_image< my_img_types > runtime_image;
+
+    read_image( bmp_filename.c_str()
+              , runtime_image
+              , tag_t()
+              );
+
+    write_view( bmp_out + "dynamic_image_test.bmp"
+              , view( runtime_image )
+              , tag_t()
+              );
+}
 
 BOOST_AUTO_TEST_SUITE_END()

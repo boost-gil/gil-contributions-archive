@@ -31,6 +31,12 @@ struct writer_backend< Device
                      , targa_tag
                      >
 {
+public:
+
+    typedef targa_tag format_tag_t;
+
+public:
+
     writer_backend( const Device&                        io_dev
                   , const image_write_info< targa_tag >& info
                   )

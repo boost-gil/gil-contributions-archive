@@ -47,6 +47,10 @@ private:
 
 public:
 
+    typedef png_tag format_tag_t;
+
+public:
+
     ///
     /// Constructor
     ///

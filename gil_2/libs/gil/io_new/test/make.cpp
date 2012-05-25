@@ -20,19 +20,19 @@ BOOST_AUTO_TEST_SUITE( make_test )
 
 BOOST_AUTO_TEST_CASE( make_reader_backend_test )
 {
-    {
-        BOOST_STATIC_ASSERT(( is_same< int, int >::value ));
-        BOOST_STATIC_ASSERT(( is_same< detail::is_read_device< bmp_tag, FILE* >::type, boost::mpl::true_ >::value ));
-    }
+    //{
+    //    BOOST_STATIC_ASSERT(( is_same< int, int >::value ));
+    //    BOOST_STATIC_ASSERT(( is_same< detail::is_read_device< bmp_tag, FILE* >::type, boost::mpl::true_ >::value ));
+    //}
 
-    {
-        typedef get_reader< const char*
-                          , bmp_tag
-                          , detail::read_and_no_convert
-                          >::type reader_t;
+    //{
+    //    typedef get_reader< const char*
+    //                      , bmp_tag
+    //                      , detail::read_and_no_convert
+    //                      >::type reader_t;
 
-        BOOST_STATIC_ASSERT(( is_same< detail::is_reader< reader_t >::type, boost::mpl::true_ >::value ));
-    }
+    //    BOOST_STATIC_ASSERT(( is_same< detail::is_reader< reader_t >::type, boost::mpl::true_ >::value ));
+    //}
 
     {
         auto backend_char   = make_reader_backend( bmp_filename.c_str(), bmp_tag() );
@@ -154,6 +154,14 @@ BOOST_AUTO_TEST_CASE( make_writer_test )
     }
 
     {
+        typedef get_writer< const char*
+                          , bmp_tag
+                          >::type writer_t;
+
+        BOOST_STATIC_ASSERT(( is_same< detail::is_writer< writer_t >::type, boost::mpl::true_ >::value ));
+    }
+
+    {
         auto writer_char   = make_writer( (bmp_out + string( "make_test.bmp")).c_str(), bmp_tag() );
         auto writer_string = make_writer( bmp_out  + "make_test.bmp", bmp_tag() );
 
@@ -181,6 +189,39 @@ BOOST_AUTO_TEST_CASE( make_writer_test )
         fs::path my_path( bmp_out  + "make_test.bmp" );
         auto writer_wstring = make_writer( my_path.wstring(), image_write_info< bmp_tag >() );
         auto writer_path    = make_writer( my_path          , image_write_info< bmp_tag >() );
+    }
+}
+
+BOOST_AUTO_TEST_CASE( make_dynamic_image_writer_test )
+{
+    {
+        auto writer_char   = make_dynamic_image_writer( (bmp_out + string( "make_test.bmp")).c_str(), bmp_tag() );
+        auto writer_string = make_dynamic_image_writer( bmp_out  + "make_test.bmp", bmp_tag() );
+
+        FILE* file = fopen( (bmp_out + string( "make_test.bmp")).c_str(), "wb" );
+        auto writer_file = make_dynamic_image_writer( file, bmp_tag() );
+
+        ofstream out( bmp_out  + "make_test.bmp", ios::binary );
+        auto writer_ofstream = make_dynamic_image_writer( out, bmp_tag() );
+
+        fs::path my_path( bmp_out  + "make_test.bmp" );
+        auto writer_wstring = make_dynamic_image_writer( my_path.wstring(), bmp_tag() );
+        auto writer_path    = make_dynamic_image_writer( my_path          , bmp_tag() );
+    }
+
+    {
+        auto writer_char   = make_dynamic_image_writer( (bmp_out + string( "make_test.bmp")).c_str(), image_write_info< bmp_tag >() );
+        auto writer_string = make_dynamic_image_writer( bmp_out  + "make_test.bmp", image_write_info< bmp_tag >() );
+
+        FILE* file = fopen( (bmp_out + string( "make_test.bmp")).c_str(), "wb" );
+        auto writer_file = make_dynamic_image_writer( file, image_write_info< bmp_tag >() );
+
+        ofstream out( bmp_out  + "make_test.bmp", ios::binary );
+        auto writer_ofstream = make_dynamic_image_writer( out, image_write_info< bmp_tag >() );
+
+        fs::path my_path( bmp_out  + "make_test.bmp" );
+        auto writer_wstring = make_dynamic_image_writer( my_path.wstring(), image_write_info< bmp_tag >() );
+        auto writer_path    = make_dynamic_image_writer( my_path          , image_write_info< bmp_tag >() );
     }
 }
 

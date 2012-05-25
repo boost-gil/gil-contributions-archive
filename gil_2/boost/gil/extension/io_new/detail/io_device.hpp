@@ -713,6 +713,18 @@ struct is_writer< writer< Device
                 > : mpl::true_
 {};
 
+template< typename T >
+struct is_dynamic_image_writer : mpl::false_
+{};
+
+template< typename Device
+        , typename FormatTag
+        >
+struct is_dynamic_image_writer< dynamic_image_writer< Device
+                                                    , FormatTag
+                                                    >
+                > : mpl::true_
+{};
 
 } // namespace detail
 
