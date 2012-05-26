@@ -264,59 +264,59 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 }
 
-//BOOST_AUTO_TEST_CASE( stream_test )
-//{
-//    // 1. Read an image.
-//    ifstream in( bmp_filename.c_str(), ios::binary );
-//
-//    rgb8_image_t img;
-//    read_image( in, img, tag_t() );
-//
-//    // 2. Write image to in-memory buffer.
-//    stringstream out_buffer( ios_base::in | ios_base::out | ios_base::binary );
-//    write_view( out_buffer, view( img ), tag_t() );
-//
-//    // 3. Copy in-memory buffer to another.
-//    stringstream in_buffer( ios_base::in | ios_base::out | ios_base::binary );
-//    in_buffer << out_buffer.rdbuf();
-//
-//    // 4. Read in-memory buffer to gil image
-//    rgb8_image_t dst;
-//    read_image( in_buffer, dst, tag_t() );
-//
-//    // 5. Write out image.
-//    string filename( bmp_out + "stream_test.bmp" );
-//    ofstream out( filename.c_str(), ios_base::binary );
-//    write_view( out, view( dst ), tag_t() );
-//}
-//
-//BOOST_AUTO_TEST_CASE( stream_test_2 )
-//{
-//    filebuf in_buf;
-//    if( !in_buf.open( bmp_filename.c_str(), ios::in | ios::binary ) )
-//    {
-//        BOOST_CHECK( false );
-//    }
-//
-//    istream in( &in_buf );
-//
-//    rgb8_image_t img;
-//    read_image( in, img, tag_t() );
-//}
-//
-//BOOST_AUTO_TEST_CASE( subimage_test )
-//{
-//    run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
-//                                            , point_t(   0, 0 )
-//                                            , point_t( 127, 1 )
-//                                            );
-//
-//    run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
-//                                            , point_t( 39,  7 )
-//                                            , point_t( 50, 50 )
-//                                            );
-//}
-//
+BOOST_AUTO_TEST_CASE( stream_test )
+{
+    // 1. Read an image.
+    ifstream in( bmp_filename.c_str(), ios::binary );
+
+    rgb8_image_t img;
+    read_image( in, img, tag_t() );
+
+    // 2. Write image to in-memory buffer.
+    stringstream out_buffer( ios_base::in | ios_base::out | ios_base::binary );
+    write_view( out_buffer, view( img ), tag_t() );
+
+    // 3. Copy in-memory buffer to another.
+    stringstream in_buffer( ios_base::in | ios_base::out | ios_base::binary );
+    in_buffer << out_buffer.rdbuf();
+
+    // 4. Read in-memory buffer to gil image
+    rgb8_image_t dst;
+    read_image( in_buffer, dst, tag_t() );
+
+    // 5. Write out image.
+    string filename( bmp_out + "stream_test.bmp" );
+    ofstream out( filename.c_str(), ios_base::binary );
+    write_view( out, view( dst ), tag_t() );
+}
+
+BOOST_AUTO_TEST_CASE( stream_test_2 )
+{
+    filebuf in_buf;
+    if( !in_buf.open( bmp_filename.c_str(), ios::in | ios::binary ) )
+    {
+        BOOST_CHECK( false );
+    }
+
+    istream in( &in_buf );
+
+    rgb8_image_t img;
+    read_image( in, img, tag_t() );
+}
+
+BOOST_AUTO_TEST_CASE( subimage_test )
+{
+    run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
+                                            , point_t(   0, 0 )
+                                            , point_t( 127, 1 )
+                                            );
+
+    run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
+                                            , point_t( 39,  7 )
+                                            , point_t( 50, 50 )
+                                            );
+}
+
 BOOST_AUTO_TEST_CASE( dynamic_image_test )
 {
     typedef mpl::vector< gray8_image_t

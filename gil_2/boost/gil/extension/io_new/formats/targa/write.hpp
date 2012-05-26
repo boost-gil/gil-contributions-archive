@@ -37,9 +37,9 @@ template< typename Device >
 class writer< Device
             , targa_tag
             >
-    : writer_backend< Device
-                    , targa_tag
-                    >
+    : public writer_backend< Device
+                           , targa_tag
+                           >
 {
 public:
 

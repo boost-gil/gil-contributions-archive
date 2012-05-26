@@ -48,9 +48,9 @@ class writer< Device
             , tiff_tag
             , Log
             >
-    : writer_backend< Device
-                    , tiff_tag
-                    >
+    : public writer_backend< Device
+                           , tiff_tag
+                           >
 {
 public:
 
