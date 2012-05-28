@@ -54,7 +54,6 @@ class writer< Device
 {
 public:
 
-
     writer( const Device&                       io_dev
           , const image_write_info< tiff_tag >& info
           )

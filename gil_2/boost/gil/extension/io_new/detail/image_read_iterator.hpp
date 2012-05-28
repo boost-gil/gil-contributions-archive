@@ -48,8 +48,8 @@ public:
     {}
 
     /// Constructor with preallocated image. Reading starts at first scanline of source image.
-    scanline_read_iterator( Reader&       reader
-                          , const byte_t* buffer
+    scanline_read_iterator( Reader& reader
+                          , byte_t* buffer
                           )
     : _pos( 0 )
     , _reader( &reader )
@@ -128,13 +128,13 @@ public:
 
 
     /// Dereference Operator
-    reference operator*() const
+    reference operator*()
     {
         if( _reader && _buffer )
         {
             _reader->read( _buffer, _pos );
 
-            ++_pos;
+            increase_pos();
 
             return _buffer;
         }
@@ -167,6 +167,16 @@ public:
         return (_reader == rhs._reader) && ( _buffer == rhs._buffer );
     }
 
+    bool operator ==( const scanline_read_iterator< Reader >& rhs ) const
+    {
+        return _pos == rhs._pos;
+    }
+
+    bool operator !=( const scanline_read_iterator< Reader >& rhs ) const
+    {
+        return _pos != rhs._pos;
+    }
+
     /// Return backend.
     typename const backend_t& backend()
     {
@@ -182,10 +192,11 @@ private:
 
     void init()
     {
-        if( _reader )
-        {
-            _reader->initialize();
-        }
+        // this needs to be done by the scanline_reader. Otherwise the user wont know the scanline length.
+        //if( _reader )
+        //{
+        //    _reader->initialize();
+        //}
     }
 
     void _skip()
@@ -194,7 +205,19 @@ private:
         {
             _reader->skip( _buffer, _pos );
 
+            increase_pos();
+        }
+    }
+
+    void increase_pos()
+    {
+        if( _pos < this->_reader->_info._height - 1 )
+        {
             ++_pos;
+        }
+        else
+        {
+            _pos = -1;
         }
     }
 

@@ -70,7 +70,44 @@ public:
                     )
 
     , _pitch( 0 )
-    {}
+    {
+        initialize();
+    }
+
+    void clean_up(){}
+
+    /// Read part of image defined by View and return the data.
+    void read( byte_t* dst, int pos )
+    {
+        // jump to scanline
+        long offset = 0;
+
+        if( this->_info._height > 0 )
+        {
+            // the image is upside down
+            offset = _info._offset
+                   + ( this->_info._height - 1 - pos ) * this->_pitch;
+        }
+        else
+        {
+            offset = this->_info._offset
+                   + pos * _pitch;
+        }
+        
+        _io_dev.seek( offset );
+
+
+        // read data
+        _read_function(this, dst);
+    }
+
+    /// Skip over a scanline.
+    void skip( byte_t*, int )
+    {
+        // nothing to do.
+    }
+
+private:
 
     void initialize()
     {
@@ -241,41 +278,6 @@ public:
         }
     }
 
-    void clean_up(){}
-
-    /// Read part of image defined by View and return the data.
-    void read( byte_t* dst, int pos )
-    {
-        // jump to scanline
-        long offset = 0;
-
-        if( this->_info._height > 0 )
-        {
-            // the image is upside down
-            offset = _info._offset
-                   + ( this->_info._height - 1 - pos ) * this->_pitch;
-        }
-        else
-        {
-            offset = this->_info._offset
-                   + pos * _pitch;
-        }
-        
-        _io_dev.seek( offset );
-
-
-        // read data
-        _read_function(this, dst);
-    }
-
-    /// Skip over a scanline.
-    void skip( byte_t*, int )
-    {
-        // nothing to do.
-    }
-
-private:
-
     void read_palette()
     {
         if( _palette.size() > 0 )
@@ -417,7 +419,6 @@ private:
     detail::swap_half_bytes< std::vector< byte_t >, mpl::true_ > _swap_half_bytes;
 
     boost::function< void ( this_t*, byte_t* ) > _read_function;
-    boost::function< void ( this_t* )          > _skip_function;
 };
 
 } // namespace gil
