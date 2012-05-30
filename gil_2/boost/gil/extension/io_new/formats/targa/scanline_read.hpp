@@ -68,7 +68,25 @@ public:
     : reader_backend( device
                     , settings
                     )
-    {}
+    {
+        initialize();
+    }
+
+    void clean_up() {}
+
+    /// Read part of image defined by View and return the data.
+    void read( byte_t* dst, int pos )
+    {
+        read_row( dst );
+    }
+
+    /// Skip over a scanline.
+    void skip( byte_t*, int )
+    {
+        _io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
+    }
+
+private:
 
     void initialize()
     {
@@ -126,22 +144,6 @@ public:
             }
         }
     }
-
-    void clean_up() {}
-
-    /// Read part of image defined by View and return the data.
-    void read( byte_t* dst, int pos )
-    {
-        read_row( dst );
-    }
-
-    /// Skip over a scanline.
-    void skip( byte_t*, int )
-    {
-        _io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
-    }
-
-private:
 
     void read_row( byte_t* dst )
     {

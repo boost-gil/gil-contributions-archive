@@ -418,47 +418,47 @@ BOOST_AUTO_TEST_CASE( read_reference_images_image_iterator_test )
     // g08os2.bmp - OS/2-style bitmap. This is an obsolete variety of BMP 
     // that is still encountered sometimes. It has 3-byte palette 
     // entries (instead of 4), and 16-bit width/height fields (instead of 32).
-    test_scanline_reader< bgr8_image_t, bmp_tag >( string( bmp_in + "g08os2.bmp" ).c_str() );
+    test_scanline_reader< rgb8_image_t, bmp_tag >( string( bmp_in + "g08os2.bmp" ).c_str() );
 
     // g08res22.bmp - resolution 7874x7874 pixels/meter (200x200 dpi)
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08res22.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08res22.bmp" ).c_str() );
 
     // g08res11.bmp - resolution 3937x3937 pixels/meter (100x100 dpi)
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08res11.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08res11.bmp" ).c_str() );
 
     // g08res21.bmp resolution 7874x3937 pixels/meter (200x100 dpi). 
     // Some programs (e.g. Imaging for Windows) may display this image 
     // stretched vertically, which is the optimal thing to do if the 
     // program is primarily a viewer, rather than an editor.
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08res21.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08res21.bmp" ).c_str() );
 
     // g08s0.bmp - bits size not given (set to 0). This is legal for uncompressed bitmaps.
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08s0.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08s0.bmp" ).c_str() );
 
     // g08offs.bmp - bfOffBits in header not set to the usual value. 
     // There are 100 extra unused bytes between palette and bits.
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08offs.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08offs.bmp" ).c_str() );
 
     // g08w126.bmp - size 126x63 (right and bottom slightly clipped)
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08w126.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08w126.bmp" ).c_str() );
 
     // g08w125.bmp - size 125x62
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08w125.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08w125.bmp" ).c_str() );
 
     // g08w124.bmp - size 124x61
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08w124.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08w124.bmp" ).c_str() );
 
     // g08p64.bmp - 64-color grayscale palette
-    test_scanline_reader< bgra8_image_t, bmp_tag >( string( bmp_in + "g08p64.bmp" ).c_str() );
+    test_scanline_reader< rgba8_image_t, bmp_tag >( string( bmp_in + "g08p64.bmp" ).c_str() );
 
     // g16def555.bmp - 15-bit color (1 bit wasted), biCompression=BI_RGB (no bitfields, defaults to 5-5-5)
-    test_scanline_reader< bgr8_image_t, bmp_tag >( string( bmp_in + "g16def555.bmp" ).c_str() );
+    test_scanline_reader< rgb8_image_t, bmp_tag >( string( bmp_in + "g16def555.bmp" ).c_str() );
 
     // g16bf555.bmp - 15-bit color, biCompression=BI_BITFIELDS (bitfields indicate 5-5-5)
-    test_scanline_reader< bgr8_image_t, bmp_tag >( string( bmp_in + "g16bf555.bmp" ).c_str() );
+    test_scanline_reader< rgb8_image_t, bmp_tag >( string( bmp_in + "g16bf555.bmp" ).c_str() );
 
     // g16bf565.bmp - 16-bit color, biCompression=BI_BITFIELDS (bitfields indicate 5-6-5)
-    test_scanline_reader< bgr8_image_t, bmp_tag >( string( bmp_in + "g16bf565.bmp" ).c_str() );
+    test_scanline_reader< rgb8_image_t, bmp_tag >( string( bmp_in + "g16bf565.bmp" ).c_str() );
 
     // g24.bmp - 24-bit color (BGR)
     test_scanline_reader< bgr8_image_t, bmp_tag >( string( bmp_in + "g24.bmp" ).c_str() );

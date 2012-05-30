@@ -90,7 +90,28 @@ public:
     : backend_t( device
                , settings
                )
-    {}
+    {
+        initialize();
+    }
+
+    /// Read part of image defined by View and return the data.
+    void read( byte_t* dst, int pos )
+    {
+        _read_function( this, dst, pos );
+    }    
+
+    /// Skip over a scanline.
+    void skip( byte_t* dst, int pos )
+    {
+        this->_read_function( this, dst, pos );
+    }
+
+    void clean_up()
+    {
+        ///@todo
+    }
+
+private:
 
     void initialize()
     {
@@ -361,25 +382,6 @@ public:
             }
         }
     }
-
-    /// Read part of image defined by View and return the data.
-    void read( byte_t* dst, int pos )
-    {
-        _read_function( this, dst, pos );
-    }    
-
-    /// Skip over a scanline.
-    void skip( byte_t* dst, int pos )
-    {
-        this->_read_function( this, dst, pos );
-    }
-
-    void clean_up()
-    {
-        ///@todo
-    }
-
-private:
 
     template< typename Src_View >
     void read_n_bits_row( byte_t* dst, int pos )

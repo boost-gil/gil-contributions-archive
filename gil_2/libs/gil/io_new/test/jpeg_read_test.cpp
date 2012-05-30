@@ -5,6 +5,7 @@
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
 #include "paths.hpp"
+#include "scanline_read_test.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -111,6 +112,11 @@ BOOST_AUTO_TEST_CASE( dct_method_read_test )
                   , tag_t()
                   );
     }
+}
+
+BOOST_AUTO_TEST_CASE( read_reference_images_image_iterator_test )
+{
+    test_scanline_reader< rgb8_image_t, jpeg_tag >( jpeg_filename.c_str() );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

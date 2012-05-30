@@ -22,8 +22,6 @@
 #include <csetjmp>
 #include <vector>
 
-#include <boost/function.hpp>
-
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
 #include <boost/gil/extension/io_new/detail/reader_base.hpp>
@@ -60,13 +58,38 @@ public:
                      >( device
                       , settings
                       )
-    {}
+    {
+        initialize();
+    }
+
+    void read( byte_t* dst, int pos )
+    {
+        // Fire exception in case of error.
+        if( setjmp( this->_mark )) { this->raise_error(); }
+
+        // read data
+        read_scanline( dst );
+    }
+
+    /// Skip over a scanline.
+    void skip( byte_t* dst, int )
+    {
+        // Fire exception in case of error.
+        if( setjmp( this->_mark )) { this->raise_error(); }
+
+        // read data
+        read_scanline( dst );
+    }
+
+    void clean_up() {}
+
+private:
 
     void initialize()
     {
-        this->get().dct_method = this->_settings._dct_method;
+        this->get()->dct_method = this->_settings._dct_method;
 
-        io_error_if( jpeg_start_decompress( &this->get() ) == false
+        io_error_if( jpeg_start_decompress( this->get() ) == false
                     , "Cannot start decompression." );
 
         switch( this->_info._color_space )
@@ -92,7 +115,7 @@ public:
             //!\todo add Y'CbCrK? We loose image quality when reading JCS_YCCK as JCS_CMYK
             case JCS_YCCK:
             {
-                this->get().out_color_space = JCS_CMYK;
+                this->get()->out_color_space = JCS_CMYK;
                 this->_scanline_length = this->_info._width * num_channels< cmyk8_view_t >::value;
 
                 break;
@@ -101,31 +124,6 @@ public:
             default: { io_error( "Unsupported jpeg color space." ); }
         }
     }
-
-    void read( byte_t* dst, int pos )
-    {
-        // Fire exception in case of error.
-        if( setjmp( this->_mark )) { this->raise_error(); }
-
-        // read data
-        read_scanline( dst );
-    }
-
-    /// Skip over a scanline.
-    void skip( byte_t* dst, int )
-    {
-        // Fire exception in case of error.
-        if( setjmp( this->_mark )) { this->raise_error(); }
-
-        // read data
-        read_scanline( dst );
-    }
-
-    void clean_up()
-    {
-    }
-
-private:
 
     void read_scanline( byte_t* dst )
     {

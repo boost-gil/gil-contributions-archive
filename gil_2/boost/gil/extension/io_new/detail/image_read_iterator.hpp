@@ -211,7 +211,7 @@ private:
 
     void increase_pos()
     {
-        if( _pos < this->_reader->_info._height - 1 )
+        if( _pos < static_cast< int >( this->_reader->_info._height ) - 1 )
         {
             ++_pos;
         }

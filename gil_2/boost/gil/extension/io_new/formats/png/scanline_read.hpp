@@ -19,8 +19,6 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/function.hpp>
-
 #include <boost/gil/gil_all.hpp>
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
@@ -69,85 +67,8 @@ public:
                     >( io_dev
                      , settings
                      )
-    {}
-
-    void initialize()
     {
-        // Now it's time for some transformations.
-
-        if( little_endian() )
-        {
-            if( this->_info._bit_depth == 16 )
-            {
-                // Swap bytes of 16 bit files to least significant byte first.
-                png_set_swap( this->_png_ptr );
-            }
-
-            if( this->_info._bit_depth < 8 )
-            {
-                // swap bits of 1, 2, 4 bit packed pixel formats
-                png_set_packswap( this->_png_ptr );
-            }
-        }
-
-        if( this->_info._color_type == PNG_COLOR_TYPE_PALETTE )
-        {
-            png_set_palette_to_rgb( this->_png_ptr );
-        }
-
-        if( this->_info._num_trans > 0 )
-        {
-            png_set_tRNS_to_alpha( this->_png_ptr );
-        }
-
-        // Tell libpng to handle the gamma conversion for you.  The final call
-        // is a good guess for PC generated images, but it should be configurable
-        // by the user at run time by the user.  It is strongly suggested that
-        // your application support gamma correction.
-        if( this->_settings._apply_screen_gamma )
-        {
-            // png_set_gamma will change the image data!
-
-#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
-        png_set_gamma( _png_ptr
-                     , this->_settings._screen_gamma
-                     , this->_info._file_gamma
-                     );
-#else
-        png_set_gamma( this->_png_ptr
-                     , this->_settings._screen_gamma
-                     , this->_info._file_gamma
-                     );
-#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
-        }
-
-        // Turn on interlace handling.  REQUIRED if you are not using
-        // png_read_image().  To see how to handle interlacing passes,
-        // see the png_read_row() method below:
-        this->_number_passes = png_set_interlace_handling( this->_png_ptr );
-        io_error_if( this->_number_passes != 1, "scanline_read_iterator cannot read interlaced png images." );
-
-
-        // The above transformation might have changed the bit_depth and color type.
-        png_read_update_info( this->_png_ptr
-                            , this->_info_ptr
-                            );
-
-        this->_info._bit_depth = png_get_bit_depth( this->_png_ptr
-                                                  , this->_info_ptr
-                                                  );
-
-        this->_info._num_channels = png_get_channels( this->_png_ptr
-                                                    , this->_info_ptr
-                                                    );
-
-        this->_info._color_type = png_get_color_type( this->_png_ptr
-                                                    , this->_info_ptr
-                                                    );
-
-        this->_scanline_length = png_get_rowbytes( this->_png_ptr
-                                                 , this->_info_ptr
-                                                 );
+        initialize();
     }
 
     void read( byte_t* dst, int pos )
@@ -161,31 +82,96 @@ public:
         read_scanline( dst );
     }
 
-    void clean_up()
-    {
-        // read rest of file, and get additional chunks in info_ptr
-
-        ///@todo
-        //png_read_end( _png_ptr
-        //            , NULL
-        //            );
-    }
+    void clean_up() {}
 
 private:
+
+    void initialize()
+    {
+        // Now it's time for some transformations.
+
+        if( little_endian() )
+        {
+            if( this->_info._bit_depth == 16 )
+            {
+                // Swap bytes of 16 bit files to least significant byte first.
+                png_set_swap( this->get()->_struct );
+            }
+
+            if( this->_info._bit_depth < 8 )
+            {
+                // swap bits of 1, 2, 4 bit packed pixel formats
+                png_set_packswap( this->get()->_struct );
+            }
+        }
+
+        if( this->_info._color_type == PNG_COLOR_TYPE_PALETTE )
+        {
+            png_set_palette_to_rgb( this->get()->_struct );
+        }
+
+        if( this->_info._num_trans > 0 )
+        {
+            png_set_tRNS_to_alpha( this->get()->_struct );
+        }
+
+        // Tell libpng to handle the gamma conversion for you.  The final call
+        // is a good guess for PC generated images, but it should be configurable
+        // by the user at run time by the user.  It is strongly suggested that
+        // your application support gamma correction.
+        if( this->_settings._apply_screen_gamma )
+        {
+            // png_set_gamma will change the image data!
+
+#ifdef BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
+        png_set_gamma( this->get()->_struct
+                     , this->_settings._screen_gamma
+                     , this->_info._file_gamma
+                     );
+#else
+        png_set_gamma( this->get()->_struct
+                     , this->_settings._screen_gamma
+                     , this->_info._file_gamma
+                     );
+#endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
+        }
+
+        // Interlaced images are not supported.
+        this->_number_passes = png_set_interlace_handling( this->get()->_struct );
+        io_error_if( this->_number_passes != 1
+                   , "scanline_read_iterator cannot read interlaced png images."
+                   );
+
+
+        // The above transformation might have changed the bit_depth and color type.
+        png_read_update_info( this->get()->_struct
+                            , this->get()->_info
+                            );
+
+        this->_info._bit_depth = png_get_bit_depth( this->get()->_struct
+                                                  , this->get()->_info
+                                                  );
+
+        this->_info._num_channels = png_get_channels( this->get()->_struct
+                                                    , this->get()->_info
+                                                    );
+
+        this->_info._color_type = png_get_color_type( this->get()->_struct
+                                                    , this->get()->_info
+                                                    );
+
+        this->_scanline_length = png_get_rowbytes( this->get()->_struct
+                                                 , this->get()->_info
+                                                 );
+    }
 
     void read_scanline( byte_t* dst )
     {
-        png_read_rows( this->_png_ptr
-                     , &dst
-                     , NULL
-                     , 1
-                     );
+        png_read_row( this->get()->_struct
+                    , dst
+                    , NULL
+                    );
     }
-
-
-private:
-
-    boost::function< void ( this_t*, byte_t* ) > _read_function;
 };
 
 } // namespace gil

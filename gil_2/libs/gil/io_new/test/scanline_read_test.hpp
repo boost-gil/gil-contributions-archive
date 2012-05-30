@@ -5,20 +5,6 @@
 
 #include "cmp_view.hpp"
 
-inline
-int align_to_four( int width )
-{
-    return ( width + 3 ) & ~3;
-}
-
-/// Also works with bit_aligned_images.
-template< typename View >
-inline
-unsigned char* make_byte_t_ptr( View v )
-{
-    return &boost::gil::at_c<0>(*( v.row_begin( 0 )));
-}
-
 template< typename Image
         , typename FormatTag
         >
@@ -30,10 +16,10 @@ void test_scanline_reader( const char* file_name )
 
     reader_t reader = make_scanline_reader( file_name, FormatTag() );
 
-    Image dst   ( reader._info._width                , reader._info._height );
-    Image buffer( align_to_four( reader._info._width),                    1 );
+    Image dst( reader._info._width, reader._info._height );
+    byte_t* buffer = new byte_t[ reader._scanline_length ];
 
-    auto it  = scanline_read_iterator< reader_t >( reader, make_byte_t_ptr( view( buffer )));
+    auto it  = scanline_read_iterator< reader_t >( reader, buffer );
     auto end = scanline_read_iterator< reader_t >();
 
     int row = 0;
@@ -41,12 +27,14 @@ void test_scanline_reader( const char* file_name )
     {
         *it;
 
-        copy_pixels( subimage_view( view( buffer ), 0,   0, reader._info._width, 1 )
+        copy_pixels( interleaved_view( reader._info._width, 1, ( Image::view_t::x_iterator ) buffer, reader._scanline_length )
                    , subimage_view( view( dst    ), 0, row, reader._info._width, 1 )
                    );
 
         ++row;
     }
+
+    delete[] buffer;
 
     //compare
     Image img;

@@ -69,7 +69,25 @@ public:
     : reader_backend( device
                     , settings
                     )
-    {}
+    {
+        initialize();
+    }
+
+    void clean_up() {}
+
+    /// Read part of image defined by View and return the data.
+    void read( byte_t* dst, int pos )
+    {
+        _read_function( this, dst );
+    }
+
+    /// Skip over a scanline.
+    void skip( byte_t*, int )
+    {
+        _skip_function( this );
+    }
+
+private:
 
     void initialize()
     {
@@ -134,22 +152,6 @@ public:
             default: { io_error( "Unsupported pnm file." ); break; }
 		}
     }
-
-    void clean_up() {}
-
-    /// Read part of image defined by View and return the data.
-    void read( byte_t* dst, int pos )
-    {
-        _read_function( this, dst );
-    }
-
-    /// Skip over a scanline.
-    void skip( byte_t*, int )
-    {
-        _skip_function( this );
-    }
-
-private:
 
     void read_text_row( byte_t* dst )
     {

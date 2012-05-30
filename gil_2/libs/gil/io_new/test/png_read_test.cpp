@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include "paths.hpp"
+#include "scanline_read_test.hpp"
 
 using namespace std;
 using namespace boost;
@@ -74,6 +75,12 @@ void test_file( string filename )
                );
 }
 
+template< typename Image >
+void test_png_scanline_reader( string filename )
+{
+    test_scanline_reader<Image, png_tag>( string( png_out + filename ).c_str() );
+}
+
 BOOST_AUTO_TEST_CASE( read_header_test )
 {
     typedef get_reader_backend< const std::string
@@ -122,48 +129,63 @@ BOOST_AUTO_TEST_CASE( BASIc_format_test )
 
     // BASN0g01    -   black & white
     test_file< gray1_image_t >( "BASN0G01.PNG" );
+    test_png_scanline_reader< gray1_image_t >( "BASN0G01.PNG" );
 
     // BASN0g02    -   2 bit (4 level) grayscale
     test_file< gray2_image_t >( "BASN0G02.PNG" );
+    test_png_scanline_reader< gray2_image_t >( "BASN0G02.PNG" );
 
     // BASN0g04    -   4 bit (16 level) grayscale
     test_file< gray4_image_t >( "BASN0G04.PNG" );
+    test_png_scanline_reader< gray4_image_t >( "BASN0G04.PNG" );
 
     // BASN0g08    -   8 bit (256 level) grayscale
     test_file< gray8_image_t >( "BASN0G08.PNG" );
+    test_png_scanline_reader< gray8_image_t >( "BASN0G08.PNG" );
 
     // BASN0g16    -   16 bit (64k level) grayscale
     test_file< gray16_image_t >( "BASN0G16.PNG" );
+    test_png_scanline_reader< gray16_image_t >( "BASN0G16.PNG" );
 
     // BASN2c08    -   3x8 bits rgb color
     test_file< rgb8_image_t >( "BASN2C08.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "BASN2C08.PNG" );
 
     // BASN2c16    -   3x16 bits rgb color
     test_file< rgb16_image_t >( "BASN2C16.PNG" );
+    test_png_scanline_reader< rgb16_image_t >( "BASN2C16.PNG" );
 
     // BASN3p01    -   1 bit (2 color) paletted
     test_file< rgb8_image_t >( "BASN3P01.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "BASN3P01.PNG" );
 
     // BASN3p02    -   2 bit (4 color) paletted
     test_file< rgb8_image_t >( "BASN3P02.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "BASN3P02.PNG" );
 
     // BASN3p04    -   4 bit (16 color) paletted
     test_file< rgb8_image_t >( "BASN3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "BASN3P04.PNG" );
 
     // BASN3p08    -   8 bit (256 color) paletted
     test_file< rgb8_image_t >( "BASN3P08.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "BASN3P08.PNG" );
 
     // BASN4a08    -   8 bit grayscale + 8 bit alpha-channel
     test_file< gray_alpha8_image_t >( "BASN4A08.PNG" );
+    test_png_scanline_reader< gray_alpha8_image_t >( "BASN4A08.PNG" );
 
     // BASN4a16    -   16 bit grayscale + 16 bit alpha-channel
     test_file< gray_alpha16_image_t >( "BASN4A16.PNG" );
+    test_png_scanline_reader< gray_alpha16_image_t >( "BASN4A16.PNG" );
 
     // BASN6a08    -   3x8 bits rgb color + 8 bit alpha-channel
     test_file< rgba8_image_t >( "BASN6A08.PNG" );
+    test_png_scanline_reader< rgba8_image_t >( "BASN6A08.PNG" );
 
     // BASN6a16    -   3x16 bits rgb color + 16 bit alpha-channel
     test_file< rgba16_image_t >( "BASN6A16.PNG" );
+    test_png_scanline_reader< rgba16_image_t >( "BASN6A16.PNG" );
 }
 
 BOOST_AUTO_TEST_CASE( BASIc_format_interlaced_test )
@@ -223,108 +245,126 @@ BOOST_AUTO_TEST_CASE( odd_sizes_test )
 
     // S01N3P01 - 1x1 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S01N3P01.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S01N3P01.PNG" );
 
     // S02I3P01 - 2x2 paletted file, interlaced 
     test_file< rgb8_image_t >( "S02I3P01.PNG" );
 
     // S02N3P01 - 2x2 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S02N3P01.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S02N3P01.PNG" );
 
     // S03I3P01 - 3x3 paletted file, interlaced 
     test_file< rgb8_image_t >( "S03I3P01.PNG" );
 
     // S03N3P01 - 3x3 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S03N3P01.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S03N3P01.PNG" );
 
     // S04I3P01 - 4x4 paletted file, interlaced 
     test_file< rgb8_image_t >( "S04I3P01.PNG" );
 
     // S04N3P01 - 4x4 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S04N3P01.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S04N3P01.PNG" );
 
     // S05I3P02 - 5x5 paletted file, interlaced 
     test_file< rgb8_image_t >( "S05I3P02.PNG" );
 
     // S05N3P02 - 5x5 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S05N3P02.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S05N3P02.PNG" );
 
     // S06I3P02 - 6x6 paletted file, interlaced 
     test_file< rgb8_image_t >( "S06I3P02.PNG" );
 
     // S06N3P02 - 6x6 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S06N3P02.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S06N3P02.PNG" );
 
     // S07I3P02 - 7x7 paletted file, interlaced 
     test_file< rgb8_image_t >( "S07I3P02.PNG" );
 
     // S07N3P02 - 7x7 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S07N3P02.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S07N3P02.PNG" );
 
     // S08I3P02 - 8x8 paletted file, interlaced 
     test_file< rgb8_image_t >( "S08I3P02.PNG" );
 
     // S08N3P02 - 8x8 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S08N3P02.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S08N3P02.PNG" );
 
     // S09I3P02 - 9x9 paletted file, interlaced 
     test_file< rgb8_image_t >( "S09I3P02.PNG" );
 
     // S09N3P02 - 9x9 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S09N3P02.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S09N3P02.PNG" );
 
     // S32I3P04 - 32x32 paletted file, interlaced 
     test_file< rgb8_image_t >( "S32I3P04.PNG" );
 
     // S32N3P04 - 32x32 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S32N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S32N3P04.PNG" );
 
     // S33I3P04 - 33x33 paletted file, interlaced 
     test_file< rgb8_image_t >( "S33I3P04.PNG" );
 
     // S33N3P04 - 33x33 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S33N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S33N3P04.PNG" );
 
     // S34I3P04 - 34x34 paletted file, interlaced 
     test_file< rgb8_image_t >( "S34I3P04.PNG" );
 
     // S34N3P04 - 34x34 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S34N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S34N3P04.PNG" );
 
     // S35I3P04 - 35x35 paletted file, interlaced 
     test_file< rgb8_image_t >( "S35I3P04.PNG" );
 
     // S35N3P04 - 35x35 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S35N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S35N3P04.PNG" );
 
     // S36I3P04 - 36x36 paletted file, interlaced 
     test_file< rgb8_image_t >( "S36I3P04.PNG" );
 
     // S36N3P04 - 36x36 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S36N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S36N3P04.PNG" );
 
     // S37I3P04 - 37x37 paletted file, interlaced 
     test_file< rgb8_image_t >( "S37I3P04.PNG" );
 
     // S37N3P04 - 37x37 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S37N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S37N3P04.PNG" );
 
     // S38I3P04 - 38x38 paletted file, interlaced 
     test_file< rgb8_image_t >( "S38I3P04.PNG" );
 
     // S38N3P04 - 38x38 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S38N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S38N3P04.PNG" );
 
     // S39I3P04 - 39x39 paletted file, interlaced 
     test_file< rgb8_image_t >( "S39I3P04.PNG" );
 
     // S39N3P04 - 39x39 paletted file, no interlacing 
     test_file< rgb8_image_t >( "S39N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S39N3P04.PNG" );
 
     // S40I3P04 - 40x40 paletted file, interlaced 
     test_file< rgb8_image_t >( "S40I3P04.PNG" );
 
     // S40N3P04 - 40x40 paletted file, no interlacing
     test_file< rgb8_image_t >( "S40N3P04.PNG" );
+    test_png_scanline_reader< rgb8_image_t >( "S40N3P04.PNG" );
 }
 
 BOOST_AUTO_TEST_CASE( background_test )
