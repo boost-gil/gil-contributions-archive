@@ -4,6 +4,7 @@
 #include <boost/gil/extension/io_new/pnm_all.hpp>
 
 #include "paths.hpp"
+#include "scanline_read_test.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -21,6 +22,12 @@ void write( Image&        img
               , view( img )
               , tag_t()
               );
+}
+
+template< typename Image >
+void test_pnm_scanline_reader( string filename )
+{
+    test_scanline_reader<Image, pnm_tag>( string( pnm_in + filename ).c_str() );
 }
 
 BOOST_AUTO_TEST_CASE( read_header_test )
@@ -52,6 +59,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p1.pnm" );
+
+        test_pnm_scanline_reader< gray8_image_t >( "p1.pnm" );
     }
 
     // p2.pnm
@@ -63,6 +72,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p2.pnm" );
+
+        test_pnm_scanline_reader< gray8_image_t >( "p2.pnm" );
     }
 
     // p3.pnm
@@ -74,6 +85,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 256u );
 
         write( img, "p3.pnm" );
+
+        test_pnm_scanline_reader< rgb8_image_t >( "p3.pnm" );
     }
 
     // p4.pnm
@@ -85,6 +98,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p4.pnm" );
+
+        test_pnm_scanline_reader< gray1_image_t >( "p4.pnm" );
     }
 
     // p5.pnm
@@ -96,6 +111,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 200u );
 
         write( img, "p5.pnm" );
+
+        test_pnm_scanline_reader< gray8_image_t >( "p5.pnm" );
     }
 
     // p6.pnm
@@ -107,6 +124,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 256u );
 
         write( img, "p6.pnm" );
+
+        test_pnm_scanline_reader< rgb8_image_t >( "p6.pnm" );
     }
 }
 

@@ -92,7 +92,8 @@ public:
 
     // TIFFIsByteSwapped returns a non-zero value if the image data was in a different 
     // byte-order than the host machine. Zero is returned if the TIFF file and local 
-    // host byte-orders are the same.
+    // host byte-orders are the same. Note that TIFFReadTile(), TIFFReadStrip() and TIFFReadScanline() 
+    // functions already normally perform byte swapping to local host order if needed.
     bool are_bytes_swapped()
     {
         return ( TIFFIsByteSwapped( _tiff_file.get() )) ? true : false;

@@ -77,6 +77,13 @@ public:
     /// Read part of image defined by View and return the data.
     void read( byte_t* dst, int pos )
     {
+        // jump to scanline
+        long offset = this->_info._offset
+                    + ( this->_info._height - 1 - pos ) * static_cast< long >( this->_scanline_length );
+        
+        _io_dev.seek( offset );
+        
+
         read_row( dst );
     }
 
@@ -90,12 +97,12 @@ private:
 
     void initialize()
     {
-        if( _info._color_map_type != targa_color_map_type::_rgb )
+        if( this->_info._color_map_type != targa_color_map_type::_rgb )
         {
             io_error( "scanline reader cannot read indexed targa files." );
         }
         
-        if( _info._image_type != targa_image_type::_rgb )
+        if( this->_info._image_type != targa_image_type::_rgb )
         {
             io_error( "scanline reader cannot read this targa image type." );
         }
@@ -116,7 +123,7 @@ private:
                     io_error( "Non-indexed targa files containing a palette are not supported." );
                 }
                 
-                switch( _info._bits_per_pixel )
+                switch( this->_info._bits_per_pixel )
                 {
                     case 24:
                     case 32:
@@ -124,7 +131,7 @@ private:
                         this->_scanline_length = this->_info._width * ( this->_info._bits_per_pixel / 8 );
 
                         // jump to first scanline
-                        this->_io_dev.seek( static_cast<long>(_info._offset) );
+                        this->_io_dev.seek( static_cast< long >( this->_info._offset ));
 
                         break;
                     }

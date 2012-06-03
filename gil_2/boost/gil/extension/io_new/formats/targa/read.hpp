@@ -98,27 +98,27 @@ public:
                                 , detail::read_and_no_convert
                                 >::type is_read_and_convert_t;
 
-        io_error_if( !detail::is_allowed< View >( _info, is_read_and_convert_t() )
+        io_error_if( !detail::is_allowed< View >( this->_info, is_read_and_convert_t() )
                    , "Image types aren't compatible."
                    );
         
         std::ptrdiff_t yend = this->_settings._dim.y;
         
-        switch( _info._image_type )
+        switch( this->_info._image_type )
         {
             case targa_image_type::_rgb:
             {
-                if( _info._color_map_type != targa_color_map_type::_rgb )
+                if( this->_info._color_map_type != targa_color_map_type::_rgb )
                 {
                     io_error( "Inconsistent color map type and image type in targa file." );
                 }
                 
-                if( _info._color_map_length != 0 )
+                if( this->_info._color_map_length != 0 )
                 {
                     io_error( "Non-indexed targa files containing a palette are not supported." );
                 }
                 
-                switch( _info._bits_per_pixel )
+                switch( this->_info._bits_per_pixel )
                 {
                     case 24:
                     {
@@ -147,17 +147,17 @@ public:
             }
             case targa_image_type::_rle_rgb:
             {
-                if( _info._color_map_type != targa_color_map_type::_rgb )
+                if( this->_info._color_map_type != targa_color_map_type::_rgb )
                 {
                     io_error( "Inconsistent color map type and image type in targa file." );
                 }
                 
-                if( _info._color_map_length != 0 )
+                if( this->_info._color_map_length != 0 )
                 {
                     io_error( "Non-indexed targa files containing a palette are not supported." );
                 }
                 
-                switch( _info._bits_per_pixel )
+                switch( this->_info._bits_per_pixel )
                 {
                     case 24:
                     {
@@ -193,15 +193,16 @@ private:
     template< typename View_Src, typename View_Dst >
     void read_data( const View_Dst& view )
     {
-        byte_vector_t row( _info._width * (_info._bits_per_pixel / 8) );
+        byte_vector_t row( this->_info._width * (_info._bits_per_pixel / 8) );
 
         // jump to first scanline
-        _io_dev.seek( static_cast<long>(_info._offset) );
+        _io_dev.seek( static_cast< long >( this->_info._offset ));
 
-        View_Src v = interleaved_view( _info._width,
+        View_Src v = interleaved_view( this->_info._width,
                                        1,
                                        reinterpret_cast<typename View_Src::value_type*>( &row.front() ),
-                                       _info._width * num_channels< View_Src >::value );
+                                       this->_info._width * num_channels< View_Src >::value
+                                     );
 
         typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
         typename View_Src::x_iterator end = beg + this->_settings._dim.x;
@@ -222,11 +223,11 @@ private:
     template< typename View_Src, typename View_Dst >
     void read_rle_data( const View_Dst& view )
     {
-        targa_depth::type bytes_per_pixel = _info._bits_per_pixel / 8;
-        size_t image_size = _info._width * _info._height * bytes_per_pixel;
+        targa_depth::type bytes_per_pixel = this->_info._bits_per_pixel / 8;
+        size_t image_size = this->_info._width * this->_info._height * bytes_per_pixel;
         byte_vector_t image_data( image_size );
         
-        _io_dev.seek( static_cast<long>(_info._offset) );
+        _io_dev.seek( static_cast< long >( this->_info._offset ));
         
         for( size_t pixel = 0; pixel < image_size; )
         {
@@ -258,10 +259,10 @@ private:
             }
         }
 
-        View_Src v = flipped_up_down_view( interleaved_view( _info._width,
-                                                             _info._height,
+        View_Src v = flipped_up_down_view( interleaved_view( this->_info._width,
+                                                             this->_info._height,
                                                              reinterpret_cast<typename View_Src::value_type*>( &image_data.front() ),
-                                                             _info._width * num_channels< View_Src >::value ) );
+                                                             this->_info._width * num_channels< View_Src >::value ) );
 
         for( std::ptrdiff_t y = 0; y != this->_settings._dim.y; ++y )
         {

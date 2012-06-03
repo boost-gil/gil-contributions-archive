@@ -6,6 +6,7 @@
 #include <boost/gil/extension/io_new/targa_all.hpp>
 
 #include "paths.hpp"
+#include "scanline_read_test.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -13,6 +14,12 @@ using namespace boost::gil;
 typedef targa_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( targa_test )
+
+template< typename Image >
+void test_targa_scanline_reader( string filename )
+{
+    test_scanline_reader<Image, targa_tag>( string( targa_in + filename ).c_str() );
+}
 
 template< typename Image >
 void write( Image&        img
@@ -74,6 +81,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 124 );
 
         write( img, "24BPP_uncompressed_out.tga" );
+
+        test_targa_scanline_reader< bgr8_image_t >( "24BPP_uncompressed.tga" );
     }
 
     // 32BPP_compressed.tga
@@ -96,6 +105,8 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         BOOST_CHECK_EQUAL( view( img ).height(), 124 );
 
         write( img, "32BPP_uncompressed_out.tga" );
+
+        test_targa_scanline_reader< bgra8_image_t >( "32BPP_uncompressed.tga" );
     }
 }
 

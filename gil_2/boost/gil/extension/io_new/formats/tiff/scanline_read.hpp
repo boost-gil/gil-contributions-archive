@@ -115,7 +115,7 @@ private:
 
     void initialize()
     {
-        io_error_if( _info._is_tiled
+        io_error_if( this->_info._is_tiled
                    , "scanline_reader doesn't support tiled tiff images."
                    );
 
@@ -393,11 +393,6 @@ private:
                                    , 0
                                    );
 
-        if( this->_io_dev.are_bytes_swapped() )
-        {
-            _mirror_bites( _buffer );
-        }
-
         Src_View src_view = interleaved_view( this->_info._width
                                             , 1
                                             , (typename Src_View::x_iterator) &_buffer.front()
@@ -415,7 +410,7 @@ private:
         dst_view_t::x_iterator dst_it        = dst_view.row_begin( 0 );
 
         for( dst_view_t::x_coord_t i = 0
-           ; i < _info._width
+           ; i < this->_info._width
            ; ++i, src_it++, dst_it++
            )
         {
@@ -465,11 +460,6 @@ private:
                                     , pos
                                     , 0
                                     );
-
-        if( this->_io_dev.are_bytes_swapped() )
-        {
-            _mirror_bites( dst, this->_scanline_length );
-        }
     }
 
 private:

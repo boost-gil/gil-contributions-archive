@@ -115,18 +115,18 @@ public:
                    );
 
         // the row pitch must be multiple 4 bytes
-        if( _info._bits_per_pixel < 8 )
+        if( this->_info._bits_per_pixel < 8 )
         {
             _pitch = static_cast<long>((( this->_info._width * this->_info._bits_per_pixel ) + 7 ) >> 3 );
         }
         else
         {
-            _pitch = static_cast<long>( _info._width * (( this->_info._bits_per_pixel + 7 ) >> 3 ));
+            _pitch = static_cast<long>( this->_info._width * (( this->_info._bits_per_pixel + 7 ) >> 3 ));
         }
 
         _pitch = (_pitch + 3) & ~3;
 
-        switch( _info._bits_per_pixel )
+        switch( this->_info._bits_per_pixel )
         {
             case 1:
             {
@@ -142,7 +142,7 @@ public:
 
             case 4:
             {
-				switch ( _info._compression )
+				switch ( this->_info._compression )
 				{
 				    case bmp_compression::_rle4:
 				    {
@@ -177,7 +177,7 @@ public:
 
             case 8:
             {
-				switch ( _info._compression )
+				switch ( this->_info._compression )
 				{
 				    case bmp_compression::_rle8:
 				    {
@@ -305,7 +305,7 @@ private:
 
         // read the color masks
         color_mask mask = { {0} };
-        if( _info._compression == bmp_compression::_bitfield )
+        if( this->_info._compression == bmp_compression::_bitfield )
         {
             this->_mask.red.mask    = this->_io_dev.read_uint32();
             this->_mask.green.mask  = this->_io_dev.read_uint32();
@@ -319,9 +319,9 @@ private:
             this->_mask.green.shift = detail::trailing_zeros( this->_mask.green.mask );
             this->_mask.blue.shift  = detail::trailing_zeros( this->_mask.blue.mask  );
         }
-        else if( _info._compression == bmp_compression::_rgb )
+        else if( this->_info._compression == bmp_compression::_rgb )
         {
-            switch( _info._bits_per_pixel )
+            switch( this->_info._bits_per_pixel )
             {
                 case 15:
                 case 16:
@@ -363,7 +363,7 @@ private:
                         , row.size()
                         );
 
-            image_t img_row( _info._width, 1 );
+            image_t img_row( this->_info._width, 1 );
             image_t::view_t v = gil::view( img_row );
             it_t it = v.row_begin( 0 );
 
@@ -371,7 +371,7 @@ private:
             it_t end = beg + this->_settings._dim.x;
 
             byte_t* src = &row.front();
-            for( int32_t i = 0 ; i < _info._width; ++i, src += 2 )
+            for( int32_t i = 0 ; i < this->_info._width; ++i, src += 2 )
             {
                 int p = ( src[1] << 8 ) | src[0];
 
@@ -401,10 +401,10 @@ private:
     {
         byte_vector_t row( _pitch );
 
-        View_Src v = interleaved_view( _info._width
+        View_Src v = interleaved_view( this->_info._width
                                      , 1
                                      , (typename View_Src::value_type*) &row.front()
-                                     , _info._width * num_channels< View_Src >::value
+                                     , this->_info._width * num_channels< View_Src >::value
                                      );
 
         typename View_Src::x_iterator beg = v.row_begin( 0 ) + this->_settings._top_left.x;
@@ -453,8 +453,8 @@ private:
     template< typename View_Dst >
     void read_palette_image_rle( const View_Dst& view )
     {
-        assert(  _info._compression == bmp_compression::_rle4
-              || _info._compression == bmp_compression::_rle8
+        assert(  this->_info._compression == bmp_compression::_rle4
+              || this->_info._compression == bmp_compression::_rle8
               );
 
         read_palette();
@@ -475,7 +475,7 @@ private:
         std::ptrdiff_t yend = this->_settings._dim.y;
         std::ptrdiff_t yinc = 1;
 
-        if( _info._height > 0 )
+        if( this->_info._height > 0 )
         {
             ybeg = this->_settings._dim.y - 1;
             yend = -1;
@@ -502,7 +502,7 @@ private:
                     count = dst_end - dst_it;
                 }
 
-                if( _info._compression == bmp_compression::_rle4 )
+                if( this->_info._compression == bmp_compression::_rle4 )
                 {
                     std::ptrdiff_t cs[2] = { second >> 4, second & 0x0f };
 
@@ -563,7 +563,7 @@ private:
                         std::ptrdiff_t x = dst_it - buf.begin();
                         x += dx;
 
-                        if( x > _info._width )
+                        if( x > this->_info._width )
                         {
                             io_error( "Mangled BMP file." );
                         }
@@ -590,7 +590,7 @@ private:
                             count = dst_end - dst_it;
                         }
 
-                        if ( _info._compression == bmp_compression::_rle4 )
+                        if ( this->_info._compression == bmp_compression::_rle4 )
                         {
                             for( int i = 0; i < count; ++i )
                             {

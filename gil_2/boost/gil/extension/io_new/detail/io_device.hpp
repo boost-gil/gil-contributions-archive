@@ -178,6 +178,7 @@ public:
 
         //libjpeg sometimes reads blocks in 4096 bytes even when the file is smaller than that.
         //assert( num_elements == count );
+        assert( num_elements > 0 );
 
         return num_elements;
     }

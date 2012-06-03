@@ -68,7 +68,6 @@ BOOST_AUTO_TEST_CASE( make_reader_backend_test )
 BOOST_AUTO_TEST_CASE( make_reader_test )
 {
     {
-        auto reader_char_   = make_reader( "c:\\chhenning\\rgb.bmp", bmp_tag(), detail::read_and_no_convert() );
         auto reader_char   = make_reader( bmp_filename.c_str(), bmp_tag(), detail::read_and_no_convert() );
         auto reader_string = make_reader( bmp_filename, bmp_tag(), detail::read_and_no_convert() );
 

@@ -32,6 +32,11 @@ struct mirror_bits
    mirror_bits( bool ) {}
 
    void operator() ( Buffer& ) {}
+
+
+    void operator() ( byte_t* , std::size_t )
+    {
+    }
 };
 
 

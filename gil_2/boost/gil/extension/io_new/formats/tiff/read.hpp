@@ -278,6 +278,7 @@ public:
                                 case  8: { read_data< detail::row_buffer_helper_view< cmyk8_view_t  > >( dst_view, 0 );  break; }
                                 case 16: { read_data< detail::row_buffer_helper_view< cmyk16_view_t > >( dst_view, 0 );  break; }
                                 case 32: { read_data< detail::row_buffer_helper_view< cmyk32_view_t > >( dst_view, 0 );  break; }
+                                default: { io_error( "Image type is not supported." ); }
                             }
 
                             break;
@@ -457,10 +458,6 @@ private:
 
        row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
 
-       detail::mirror_bits< buffer_t
-                          , typename is_bit_aligned< typename View::value_type >::type
-                          > mirror_bits( _io_dev.are_bytes_swapped() );
-
        for( unsigned int y = 0; y < image_height; y += tile_height )
        {
            for( unsigned int x = 0; x < image_width; x += tile_width )
@@ -474,8 +471,6 @@ private:
                                 , 0
                                 , static_cast< tsample_t >( plane )
                                 );
-
-               mirror_bits( row_buffer_helper.buffer() );
 
                // these are all whole image coordinates
                point_t tile_top_left   ( x, y );
@@ -581,10 +576,6 @@ private:
 
        row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
 
-       detail::mirror_bits< buffer_t
-                          , typename is_bit_aligned< typename View::value_type >::type
-                          > mirror_bits( _io_dev.are_bytes_swapped() );
-
        for( unsigned int y = 0; y < image_height; y += tile_height )
        {
            for( unsigned int x = 0; x < image_width; x += tile_width )
@@ -598,8 +589,6 @@ private:
                                 , 0
                                 , static_cast< tsample_t >( plane )
                                 );
-
-               mirror_bits( row_buffer_helper.buffer() );
 
                View dst_subimage_view = subimage_view( dst_view
                                                      , x
@@ -656,10 +645,6 @@ private:
                     , plane
                     );
 
-      detail::mirror_bits< buffer_t
-                         , typename is_bit_aligned< View >::type
-                         > mirror_bits( _io_dev.are_bytes_swapped() );
-
       std::ptrdiff_t row     = this->_settings._top_left.y;
       std::ptrdiff_t row_end = row + this->_settings._dim.y;
       std::ptrdiff_t dst_row = 0;
@@ -673,8 +658,6 @@ private:
                               , row
                               , static_cast< tsample_t >( plane )
                               );
-
-         mirror_bits( row_buffer_helper.buffer() );
 
          this->_cc_policy.read( first
                               , last

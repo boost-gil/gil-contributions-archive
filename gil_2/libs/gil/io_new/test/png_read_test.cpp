@@ -78,7 +78,7 @@ void test_file( string filename )
 template< typename Image >
 void test_png_scanline_reader( string filename )
 {
-    test_scanline_reader<Image, png_tag>( string( png_out + filename ).c_str() );
+    test_scanline_reader<Image, png_tag>( string( png_in + filename ).c_str() );
 }
 
 BOOST_AUTO_TEST_CASE( read_header_test )

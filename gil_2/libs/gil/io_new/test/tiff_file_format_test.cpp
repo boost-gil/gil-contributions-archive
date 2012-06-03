@@ -10,6 +10,7 @@
 #include <boost/gil/extension/io_new/tiff_all.hpp>
 
 #include "paths.hpp"
+#include "scanline_read_test.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -17,6 +18,12 @@ using namespace boost::gil;
 typedef tiff_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
+
+template< typename Image >
+void test_tiff_scanline_reader( string filename )
+{
+    test_scanline_reader<Image, tag_t>( filename.c_str() );
+}
 
 // 73x43 2-bit minisblack gray image
 BOOST_AUTO_TEST_CASE( two_bit_minisblack_gray_image_test )
@@ -36,6 +43,8 @@ BOOST_AUTO_TEST_CASE( two_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -57,6 +66,8 @@ BOOST_AUTO_TEST_CASE( four_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -78,6 +89,8 @@ BOOST_AUTO_TEST_CASE( six_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -99,6 +112,8 @@ BOOST_AUTO_TEST_CASE( eight_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -120,6 +135,8 @@ BOOST_AUTO_TEST_CASE( ten_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -141,6 +158,8 @@ BOOST_AUTO_TEST_CASE( twelve_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -162,6 +181,8 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -183,6 +204,8 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -204,6 +227,8 @@ BOOST_AUTO_TEST_CASE( twentyfour_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -225,6 +250,8 @@ BOOST_AUTO_TEST_CASE( thirtytwo_bit_minisblack_gray_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -246,6 +273,8 @@ BOOST_AUTO_TEST_CASE( four_entry_colormapped_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -267,6 +296,8 @@ BOOST_AUTO_TEST_CASE( sixteen_entry_colormapped_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -288,6 +319,8 @@ BOOST_AUTO_TEST_CASE( twohundred_twenty_five_entry_colormapped_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -309,6 +342,8 @@ BOOST_AUTO_TEST_CASE( sixtyfive_thousand_entry_colormapped_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -330,6 +365,8 @@ BOOST_AUTO_TEST_CASE( two_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -351,6 +388,8 @@ BOOST_AUTO_TEST_CASE( four_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -372,6 +411,8 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -393,6 +434,8 @@ BOOST_AUTO_TEST_CASE( ten_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -414,6 +457,8 @@ BOOST_AUTO_TEST_CASE( twelve_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -435,6 +480,8 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -456,6 +503,8 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -477,6 +526,8 @@ BOOST_AUTO_TEST_CASE( twenty_four_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -498,6 +549,8 @@ BOOST_AUTO_TEST_CASE( thirty_two_bit_contiguous_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -519,6 +572,7 @@ BOOST_AUTO_TEST_CASE( two_bit_seperated_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
     }
 }
 
@@ -540,6 +594,7 @@ BOOST_AUTO_TEST_CASE( four_bit_seperated_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
     }
 }
 
@@ -561,6 +616,7 @@ BOOST_AUTO_TEST_CASE( eight_bit_seperated_RGB_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
     }
 }
 
@@ -708,6 +764,8 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_CMYK_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -729,6 +787,8 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_CMYK_image_test )
                   , view( img )
                   , tiff_tag()
                   );
+
+        test_tiff_scanline_reader< image_t >( filename );
     }
 }
 
@@ -791,6 +851,7 @@ BOOST_AUTO_TEST_CASE( tiger_separated_strip_contig_08 )
                   , view( img )
                   , tiff_tag()
                   );
+
     }
 }
 

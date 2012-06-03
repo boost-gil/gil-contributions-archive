@@ -85,7 +85,7 @@ public:
         if( this->_info._height > 0 )
         {
             // the image is upside down
-            offset = _info._offset
+            offset = this->_info._offset
                    + ( this->_info._height - 1 - pos ) * this->_pitch;
         }
         else
@@ -111,20 +111,20 @@ private:
 
     void initialize()
     {
-        if( _info._bits_per_pixel < 8 )
+        if( this->_info._bits_per_pixel < 8 )
         {
             _pitch = (( this->_info._width * this->_info._bits_per_pixel ) + 7 ) >> 3;
         }
         else
         {
-            _pitch = _info._width * (( this->_info._bits_per_pixel + 7 ) >> 3);
+            _pitch = this->_info._width * (( this->_info._bits_per_pixel + 7 ) >> 3);
         }
 
         _pitch = (_pitch + 3) & ~3;
 
         //
 
-        switch( _info._bits_per_pixel )
+        switch( this->_info._bits_per_pixel )
         {
             case 1:
             {
@@ -140,7 +140,7 @@ private:
 
             case 4:
             {
-				switch( _info._compression )
+				switch( this->_info._compression )
 				{
 				    case bmp_compression::_rle4:
                     {
@@ -172,7 +172,7 @@ private:
 
             case 8:
             {
-				switch( _info._compression )
+				switch( this->_info._compression )
 				{
 				    case bmp_compression::_rle8:
                     {
@@ -205,7 +205,7 @@ private:
 
                 _buffer.resize( _pitch );
 
-                if( _info._compression == bmp_compression::_bitfield )
+                if( this->_info._compression == bmp_compression::_bitfield )
                 {
                     _mask.red.mask    = _io_dev.read_uint32();
                     _mask.green.mask  = _io_dev.read_uint32();
@@ -219,9 +219,9 @@ private:
                     _mask.green.shift = detail::trailing_zeros( _mask.green.mask );
                     _mask.blue.shift  = detail::trailing_zeros( _mask.blue.mask  );
                 }
-                else if( _info._compression == bmp_compression::_rgb )
+                else if( this->_info._compression == bmp_compression::_rgb )
                 {
-                    switch( _info._bits_per_pixel )
+                    switch( this->_info._bits_per_pixel )
                     {
                         case 15:
                         case 16:
@@ -290,7 +290,7 @@ private:
 
         if( entries == 0 )
         {
-            entries = 1 << _info._bits_per_pixel;
+            entries = 1 << this->_info._bits_per_pixel;
         }
 
         _palette.resize( entries );
@@ -303,7 +303,7 @@ private:
 
             // there are 4 entries when windows header
             // but 3 for os2 header
-            if( _info._header_size == bmp_header_size::_win32_info_size )
+            if( this->_info._header_size == bmp_header_size::_win32_info_size )
             {
                 _io_dev.read_uint8();
             }
@@ -334,7 +334,7 @@ private:
         dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
 
         for( dst_view_t::x_coord_t i = 0
-           ; i < _info._width
+           ; i < this->_info._width
            ; ++i, src_it++, dst_it++
            )
         {
@@ -346,7 +346,7 @@ private:
     // Read 1 bit image. The colors are encoded by an index.
     void read_1_bit_row( byte_t* dst )
     {
-        assert( _io_dev.read( &_buffer.front(), _pitch ) );
+        _io_dev.read( &_buffer.front(), _pitch );
         _mirror_bits( _buffer );
 
         read_bit_row< gray1_image_t::view_t >( dst );
@@ -355,7 +355,7 @@ private:
     // Read 4 bits image. The colors are encoded by an index.
     void read_4_bits_row( byte_t* dst )
     {
-        assert( _io_dev.read( &_buffer.front(), _pitch ) );
+        _io_dev.read( &_buffer.front(), _pitch );
         _swap_half_bytes( _buffer );
 
         read_bit_row< gray4_image_t::view_t >( dst );
@@ -364,7 +364,7 @@ private:
     /// Read 8 bits image. The colors are encoded by an index.
     void read_8_bits_row( byte_t* dst )
     {
-        assert( _io_dev.read( &_buffer.front(), _pitch ) );
+        _io_dev.read( &_buffer.front(), _pitch );
 
         read_bit_row< gray8_image_t::view_t >( dst );
     }
@@ -388,7 +388,7 @@ private:
         _io_dev.read( src, _pitch );
 
         for( dst_view_t::x_coord_t i = 0
-           ; i < _info._width
+           ; i < this->_info._width
            ; ++i, src += 2
            )
         {
