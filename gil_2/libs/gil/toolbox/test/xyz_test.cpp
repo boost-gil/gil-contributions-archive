@@ -7,16 +7,13 @@
 /// \brief Unit test for XYZ Colorspace
 /// \author Davide Anastasia <davideanastasia@users.sourceforge.net>
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE ColorSpaceConversionXYZ
-
-#include <boost/test/unit_test.hpp>
-
 #include <iostream>
 #include <limits>
 #include <boost/cstdint.hpp>
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/toolbox/xyz.hpp>
+
+#include <boost/test/unit_test.hpp>
 
 using namespace boost;
 using namespace std;
@@ -102,7 +99,7 @@ BOOST_AUTO_TEST_CASE(xyz32f_rgb32f_1)
 
 BOOST_AUTO_TEST_CASE(xyz32f_rgb32f_2)
 {
-    gil::xyz32f_pixel_t xyz32f(.375155, .352705f, .260025f), xyz32f_b;
+    gil::xyz32f_pixel_t xyz32f(.375155f, .352705f, .260025f), xyz32f_b;
     gil::rgb32f_pixel_t p32f;
     gil::color_convert(xyz32f, p32f);
     gil::color_convert(p32f, xyz32f_b);

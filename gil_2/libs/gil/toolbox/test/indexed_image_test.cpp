@@ -1,19 +1,23 @@
-// indexed_image_test.cpp
-//
+// Copyright 2012 Christian Henning
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
 
-#include "stdafx.h"
+/// \brief Unit test for indexed_image type.
 
-#include <boost/gil/extension/toolbox/hsl.hpp>
-#include <boost/gil/extension/toolbox/hsv.hpp>
+#include <boost/gil/gil_all.hpp>
+#include <boost/gil/extension/toolbox/indexed_image.hpp>
+
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace gil;
-using namespace toolbox;
 
 
+BOOST_AUTO_TEST_SUITE( index_image_test_suite )
 
-int _tmain(int argc, _TCHAR* argv[])
+BOOST_AUTO_TEST_CASE( index_image_test )
 {
     {
         indexed_image< uint8_t, rgb8_pixel_t > img( 640, 480 );
@@ -106,7 +110,6 @@ int _tmain(int argc, _TCHAR* argv[])
             }
         }
     }
-
-	return 0;
 }
 
+BOOST_AUTO_TEST_SUITE_END()

@@ -1,19 +1,23 @@
-// hsl.cpp : Defines the entry point for the console application.
-//
+// Copyright 2012 Christian Henning
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
 
-#include "stdafx.h"
+/// \brief Unit test for hsl and hsv color spaces 
 
+#include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/toolbox/hsl.hpp>
 #include <boost/gil/extension/toolbox/hsv.hpp>
+
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace gil;
-using namespace toolbox;
 
+BOOST_AUTO_TEST_SUITE( hsl_hsv_test_suite )
 
-
-int _tmain(int argc, _TCHAR* argv[])
+BOOST_AUTO_TEST_CASE( hsl_hsv_test )
 {
    {
       gray32f_pixel_t g( 1.f );
@@ -60,42 +64,41 @@ int _tmain(int argc, _TCHAR* argv[])
          }
       }
 
-      bmp_write_view( ".\\hsl_test.bmp"
-                    , color_converted_view<rgb8_pixel_t>( color_converted_view<rgb32f_pixel_t>( view( hsl_img ))));
+      //bmp_write_view( ".\\hsl_test.bmp"
+      //              , color_converted_view<rgb8_pixel_t>( color_converted_view<rgb32f_pixel_t>( view( hsl_img ))));
 
-      bmp_write_view( ".\\hsv_test.bmp"
-                    , color_converted_view<rgb8_pixel_t>( color_converted_view<rgb32f_pixel_t>( view( hsv_img ))));
+      //bmp_write_view( ".\\hsv_test.bmp"
+      //              , color_converted_view<rgb8_pixel_t>( color_converted_view<rgb32f_pixel_t>( view( hsv_img ))));
    }
 
 
    {
       rgb8_image_t rgb_img;
-      bmp_read_image( ".\\flower.bmp", rgb_img );
+      //bmp_read_image( ".\\flower.bmp", rgb_img );
 
       hsl32f_image_t hsl_img( view( rgb_img ).dimensions() );
 
       copy_pixels( color_converted_view<hsl32f_pixel_t>( view( rgb_img ))
                  , view( hsl_img ));
 
-      bmp_write_view( ".\\flower_hsl.bmp"
-                    , color_converted_view<rgb8_pixel_t>(view( rgb_img )));
+      //bmp_write_view( ".\\flower_hsl.bmp"
+      //              , color_converted_view<rgb8_pixel_t>(view( rgb_img )));
       
    }
 
    {
       rgb8_image_t rgb_img;
-      bmp_read_image( ".\\flower.bmp", rgb_img );
+      //bmp_read_image( ".\\flower.bmp", rgb_img );
 
       hsv32f_image_t hsv_img( view( rgb_img ).dimensions() );
 
       copy_pixels( color_converted_view<hsv32f_pixel_t>( view( rgb_img ))
                  , view( hsv_img ));
 
-      bmp_write_view( ".\\flower_hsv.bmp"
-                    , color_converted_view<rgb8_pixel_t>(view( rgb_img )));
+      //bmp_write_view( ".\\flower_hsv.bmp"
+      //              , color_converted_view<rgb8_pixel_t>(view( rgb_img )));
       
    }
-
-	return 0;
 }
 
+BOOST_AUTO_TEST_SUITE_END()
