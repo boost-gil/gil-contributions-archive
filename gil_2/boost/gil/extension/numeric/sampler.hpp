@@ -9,7 +9,7 @@
 #ifndef GIL_SAMPLER_HPP
 #define GIL_SAMPLER_HPP
 
-#include "../../extension/dynamic_image/dynamic_image_all.hpp"
+#include "boost/gil/extension/dynamic_image/dynamic_image_all.hpp"
 #include "pixel_numeric_operations.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -99,48 +99,91 @@ struct add_dst_mul_src {
 struct bilinear_sampler {};
 
 template <typename DstP, typename SrcView, typename F>
-bool sample(bilinear_sampler, const SrcView& src, const point2<F>& p, DstP& result) {
+bool sample(bilinear_sampler, const SrcView& src, const point2<F>& p, DstP& result)
+{
     typedef typename SrcView::value_type SrcP;
-    point2<std::ptrdiff_t> p0(ifloor(p)); // the closest integer coordinate top left from p
+
+    point2<ptrdiff_t> p0(ifloor(p.x), ifloor(p.y)); // the closest integer coordinate top left from p
     point2<F> frac(p.x-p0.x, p.y-p0.y);
-    if (p0.x < 0 || p0.y < 0 || p0.x>=src.width() || p0.y>=src.height()) return false;
 
-    pixel<F,devicen_layout_t<num_channels<SrcView>::value> > mp(0);                     // suboptimal
-    typename SrcView::xy_locator loc=src.xy_at(p0.x,p0.y);
-
-    if (p0.x+1<src.width()) {
-        if (p0.y+1<src.height()) {
-            // most common case - inside the image, not on the last row or column
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.x)*(1-frac.y),mp);
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *(1-frac.y),mp);
-            ++loc.y();
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.x)*   frac.y ,mp);
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *   frac.y ,mp);
-        } else {
-            // on the last row, but not the bottom-right corner pixel
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.x),mp);
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x ,mp);
-        }
-    } else {
-        if (p0.y+1<src.height()) {
-            // on the last column, but not the bottom-right corner pixel
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.y),mp);
-            ++loc.y();
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,         frac.y ,mp);
-        } else {
-            // the bottom-right corner pixel
-            detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,1,mp);
-        }
+    if (p0.x < -1 || p0.y < -1 || p0.x>=src.width() || p0.y>=src.height()) 
+    {
+        return false;
     }
 
-    // Convert from floating point average value to the source type
-    SrcP src_result;
-    cast_pixel(mp,src_result);
+	pixel<F,devicen_layout_t<num_channels<SrcView>::value> > mp(0); // suboptimal
+	typename SrcView::xy_locator loc=src.xy_at(p0.x,p0.y);
 
-    color_convert(src_result, result);
-    return true;
+	if (p0.x == -1)
+    {
+		if (p0.y == -1)
+        {
+			++loc.y();
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *   frac.y ,mp);
+		}
+        else if (p0.y+1<src.height())
+        {
+			// most common case - inside the image, not on the last row or column
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *(1-frac.y),mp);
+			++loc.y();
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *   frac.y ,mp);
+		}
+        else
+        {
+			// on the last row, but not the bottom-right corner pixel
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x ,mp);
+		}
+	}
+    else if (p0.x+1<src.width())
+    {
+		if (p0.y == -1)
+        {
+			++loc.y();
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.x)*   frac.y ,mp);
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *   frac.y ,mp);
+		}
+        else if (p0.y+1<src.height())
+        {
+			// most common case - inside the image, not on the last row or column
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.x)*(1-frac.y),mp);
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *(1-frac.y),mp);
+			++loc.y();
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.x)*   frac.y ,mp);
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x *   frac.y ,mp);
+		}
+        else
+        {
+			// on the last row, but not the bottom-right corner pixel
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.x),mp);
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(loc.x()[1],   frac.x ,mp);
+		}
+	}
+    else
+    {
+		if (p0.y+1<src.height())
+        {
+			// on the last column, but not the bottom-right corner pixel
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,      (1-frac.y),mp);
+			++loc.y();
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,         frac.y ,mp);
+		}
+        else
+        {
+			// the bottom-right corner pixel
+			detail::add_dst_mul_src<SrcP,F,pixel<F,devicen_layout_t<num_channels<SrcView>::value> > >()(*loc,1,mp);
+		}
+	}
+
+	// Convert from floating point average value to the source type
+	SrcP src_result;
+	cast_pixel(mp,src_result);
+
+	color_convert(src_result, result);
+
+	return true;
 }
 
-} }  // namespace boost::gil
+}  // namespace gil
+}  // namespace boost
 
-#endif
+#endif // GIL_SAMPLER_HPP
