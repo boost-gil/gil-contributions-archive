@@ -152,6 +152,40 @@ public:
     }
 };
 
+namespace detail {
+
+struct raw_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , raw_tag
+                                           >
+    {};
+};
+
+struct raw_type_format_checker
+{
+    raw_type_format_checker( const image_read_info< raw_tag >& info )
+    : _info( info )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef typename Image::view_t view_t;
+
+        return is_allowed< view_t >( _info
+                                   , mpl::true_()
+                                   );
+    }
+
+private:
+    ///todo: do we need this here. Should be part of reader_backend
+    const image_read_info< raw_tag >& _info;
+};
+
+} // namespace detail
+
 ///
 /// RAW Dynamic Reader
 ///
@@ -213,41 +247,6 @@ public:
         }
     }
 };
-
-namespace detail {
-
-struct raw_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , raw_tag
-                                           >
-    {};
-};
-
-struct raw_type_format_checker
-{
-    raw_type_format_checker( const image_read_info< raw_tag >& info )
-    : _info( info )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef typename Image::view_t view_t;
-
-        return is_allowed< view_t >( _info
-                                   , mpl::true_()
-                                   );
-    }
-
-private:
-    ///todo: do we need this here. Should be part of reader_backend
-    const image_read_info< raw_tag >& _info;
-};
-
-
-} // namespace detail
 
 } // gil
 } // boost

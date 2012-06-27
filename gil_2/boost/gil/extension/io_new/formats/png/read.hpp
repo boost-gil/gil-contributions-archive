@@ -35,45 +35,6 @@
 
 namespace boost { namespace gil {
 
-namespace detail {
-
-struct png_type_format_checker
-{
-    png_type_format_checker( png_bitdepth::type   bit_depth
-                           , png_color_type::type color_type
-                           )
-    : _bit_depth ( bit_depth  )
-    , _color_type( color_type )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                 , png_tag
-                                 > is_supported_t;
-
-        return is_supported_t::_bit_depth  == _bit_depth
-            && is_supported_t::_color_type == _color_type;
-    }
-
-private:
-
-    png_bitdepth::type   _bit_depth;
-    png_color_type::type _color_type;
-};
-
-struct png_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , png_tag
-                                           >
-    {};
-};
-
-} // namespace detail
-
 ///
 /// PNG Reader
 ///
@@ -370,6 +331,45 @@ private:
         }
     }
 };
+
+namespace detail {
+
+struct png_type_format_checker
+{
+    png_type_format_checker( png_bitdepth::type   bit_depth
+                           , png_color_type::type color_type
+                           )
+    : _bit_depth ( bit_depth  )
+    , _color_type( color_type )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                 , png_tag
+                                 > is_supported_t;
+
+        return is_supported_t::_bit_depth  == _bit_depth
+            && is_supported_t::_color_type == _color_type;
+    }
+
+private:
+
+    png_bitdepth::type   _bit_depth;
+    png_color_type::type _color_type;
+};
+
+struct png_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , png_tag
+                                           >
+    {};
+};
+
+} // namespace detail
 
 
 ///

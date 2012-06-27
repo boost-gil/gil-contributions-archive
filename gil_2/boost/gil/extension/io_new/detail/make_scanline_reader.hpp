@@ -40,11 +40,11 @@ make_scanline_reader( const String&    file_name
                                         >::type* /* ptr */ = 0
            )
 {
-    get_read_device< String
-                   , FormatTag
-                   >::type device( detail::convert_to_native_string( file_name )
-                                 , typename detail::file_stream_device< FormatTag >::read_tag()
-                                 );
+    typename get_read_device< String
+                            , FormatTag
+                            >::type device( detail::convert_to_native_string( file_name )
+                                          , typename detail::file_stream_device< FormatTag >::read_tag()
+                                          );
 
     return get_scanline_reader< String
                               , FormatTag
@@ -64,11 +64,11 @@ make_scanline_reader( const std::wstring& file_name
 {
     const char* str = detail::convert_to_native_string( file_name );
 
-    get_read_device< std::wstring
-                   , FormatTag
-                   >::type device( str
-                                 , typename detail::file_stream_device< FormatTag >::read_tag()
-                                 );
+    typename get_read_device< std::wstring
+                            , FormatTag
+                            >::type device( str
+                                          , typename detail::file_stream_device< FormatTag >::read_tag()
+                                          );
 
     delete[] str;
 

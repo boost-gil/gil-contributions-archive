@@ -84,7 +84,7 @@ void read_and_convert_view( Device&                                 file
 {
     read_and_convert_image( make_reader( file
                                        , settings
-                                       , detail::read_and_convert( cc )
+                                       , detail::read_and_convert< ColorConverter >( cc )
                                        )
                           , view
                           );
@@ -114,7 +114,7 @@ void read_and_convert_view( const String&                           file_name
 {
     read_and_convert_image( make_reader( file_name
                                        , settings
-                                       , detail::read_and_convert( cc )
+                                       , detail::read_and_convert< ColorConverter >( cc )
                                        )
                           , view
                           );
@@ -144,7 +144,7 @@ void read_and_convert_view( const String&         file_name
 {
     read_and_convert_image( make_reader( file_name
                                        , tag
-                                       , detail::read_and_convert( cc )
+                                       , detail::read_and_convert< ColorConverter >( cc )
                                        )
                           , view
                           );
@@ -176,7 +176,7 @@ void read_and_convert_view( Device&               device
 {
     read_and_convert_image( make_reader( device
                                        , tag
-                                       , detail::read_and_convert( cc )
+                                       , detail::read_and_convert< ColorConverter >( cc )
                                        )
                           , view
                           );

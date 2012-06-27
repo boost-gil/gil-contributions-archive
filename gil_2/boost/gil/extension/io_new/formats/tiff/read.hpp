@@ -695,6 +695,41 @@ private:
    template < int K > friend struct plane_recursion;
 };
 
+namespace detail {
+
+struct tiff_type_format_checker
+{
+    tiff_type_format_checker( const image_read_info< tiff_tag >& info )
+    : _info( info )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef typename Image::view_t view_t;
+
+        return is_allowed< view_t >( _info
+                                   , mpl::true_()
+                                   );
+    }
+
+private:
+
+    const image_read_info< tiff_tag >& _info;
+};
+
+struct tiff_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , tiff_tag
+                                           >
+    {};
+};
+
+} // namespace detail
+
+
 ///
 /// Tiff Dynamic Image Reader
 ///
@@ -749,41 +784,6 @@ public:
         }
     }
 };
-
-
-namespace detail {
-
-struct tiff_type_format_checker
-{
-    tiff_type_format_checker( const image_read_info< tiff_tag >& info )
-    : _info( info )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef typename Image::view_t view_t;
-
-        return is_allowed< view_t >( _info
-                                   , mpl::true_()
-                                   );
-    }
-
-private:
-
-    const image_read_info< tiff_tag >& _info;
-};
-
-struct tiff_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , tiff_tag
-                                           >
-    {};
-};
-
-} // namespace detail
 
 } // namespace gil
 } // namespace boost

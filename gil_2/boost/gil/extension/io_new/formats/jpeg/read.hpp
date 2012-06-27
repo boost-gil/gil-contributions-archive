@@ -219,6 +219,38 @@ private:
     }
 };
 
+namespace detail { 
+
+struct jpeg_type_format_checker
+{
+    jpeg_type_format_checker( jpeg_color_space::type color_space )
+    : _color_space( color_space )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        return is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                , jpeg_tag
+                                >::_color_space == _color_space;
+    }
+
+private:
+
+    jpeg_color_space::type _color_space;
+};
+
+struct jpeg_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , jpeg_tag
+                                           >
+    {};
+};
+
+} // namespace detail
+
 ///
 /// JPEG Dynamic Reader
 ///
@@ -276,38 +308,6 @@ public:
         }
     }
 };
-
-namespace detail { 
-
-struct jpeg_type_format_checker
-{
-    jpeg_type_format_checker( jpeg_color_space::type color_space )
-    : _color_space( color_space )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        return is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                , jpeg_tag
-                                >::_color_space == _color_space;
-    }
-
-private:
-
-    jpeg_color_space::type _color_space;
-};
-
-struct jpeg_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , jpeg_tag
-                                           >
-    {};
-};
-
-} // detail
 
 } // gil
 } // boost

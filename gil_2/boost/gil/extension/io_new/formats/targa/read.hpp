@@ -273,6 +273,48 @@ private:
     }
 };
 
+namespace detail { 
+
+class targa_type_format_checker
+{
+public:
+
+    targa_type_format_checker( const targa_depth::type& bpp )
+    : _bpp( bpp )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        if( _bpp < 32 )
+        {
+            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+        else
+        {
+            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+    }
+
+private:
+
+    const targa_depth::type& _bpp;
+};
+
+struct targa_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , targa_tag
+                                           >
+    {};
+};
+
+} // namespace detail
 
 ///
 /// Targa Dynamic Image Reader
@@ -328,49 +370,6 @@ public:
         }
     }
 };
-
-namespace detail { 
-
-class targa_type_format_checker
-{
-public:
-
-    targa_type_format_checker( const targa_depth::type& bpp )
-    : _bpp( bpp )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        if( _bpp < 32 )
-        {
-            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-        else
-        {
-            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-    }
-
-private:
-
-    const targa_depth::type& _bpp;
-};
-
-struct targa_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , targa_tag
-                                           >
-    {};
-};
-
-} // namespace detail
 
 } // namespace gil
 } // namespace boost

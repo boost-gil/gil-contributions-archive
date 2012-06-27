@@ -1,4 +1,4 @@
-# (C) Copyright 2010: Mateusz Loskot and Christian Henning
+# (C) Copyright 2012: Mateusz Loskot and Christian Henning
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,10 +7,10 @@
 # bring in rules for testing
 import testing ;
 
-using jpeg 	    : 	 8b : C:/chhenning/jpeg-8b ;
+using jpeg 	    : 	 8b : C:/chhenning/jpeg-8c ;
 using zlib      : 1.2.5 : C:/chhenning/zlib-1.2.5 ;
-using png       : 1.4.4 : C:/chhenning/lpng144 ;
-using libtiff   : 3.9.4 : C:/chhenning/tiff-3.9.4 ;
+using png       : 1.4.4 : C:/chhenning/png/lpng154 ;
+using libtiff   : 3.9.4 : C:/chhenning/tiff/tiff-3.9.5 ;
 
 project
     : requirements

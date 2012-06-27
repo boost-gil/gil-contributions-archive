@@ -633,6 +633,49 @@ private:
     std::size_t _pitch;
 };
 
+namespace detail {
+
+class bmp_type_format_checker
+{
+public:
+
+    bmp_type_format_checker( const bmp_bits_per_pixel::type& bpp )
+    : _bpp( bpp )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        if( _bpp < 32 )
+        {
+            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+        else
+        {
+            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
+                   ? true
+                   : false;
+        }
+    }
+
+private:
+
+    const bmp_bits_per_pixel::type& _bpp;
+};
+
+struct bmp_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , bmp_tag
+                                           >
+    {};
+};
+
+} // namespace detail
+
 ///
 /// BMP Dynamic Reader
 ///
@@ -687,49 +730,6 @@ public:
         }
     }
 };
-
-namespace detail {
-
-class bmp_type_format_checker
-{
-public:
-
-    bmp_type_format_checker( const bmp_bits_per_pixel::type& bpp )
-    : _bpp( bpp )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        if( _bpp < 32 )
-        {
-            return pixels_are_compatible< typename Image::value_type, rgb8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-        else
-        {
-            return pixels_are_compatible< typename Image::value_type, rgba8_pixel_t >::value
-                   ? true
-                   : false;
-        }
-    }
-
-private:
-
-    const bmp_bits_per_pixel::type& _bpp;
-};
-
-struct bmp_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , bmp_tag
-                                           >
-    {};
-};
-
-} // detail
 
 } // gil
 } // boost

@@ -360,6 +360,41 @@ private:
 };
 
 
+namespace detail { 
+
+struct pnm_type_format_checker
+{
+    pnm_type_format_checker( pnm_image_type::type type )
+    : _type( type )
+    {}
+
+    template< typename Image >
+    bool apply()
+    {
+        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
+                                 , pnm_tag
+                                 > is_supported_t;
+
+        return is_supported_t::_asc_type == _type
+            || is_supported_t::_bin_type == _type;
+    }
+
+private:
+
+    pnm_image_type::type _type;
+};
+
+struct pnm_read_is_supported
+{
+    template< typename View >
+    struct apply : public is_read_supported< typename get_pixel_type< View >::type
+                                           , pnm_tag
+                                           >
+    {};
+};
+
+} // namespace detail
+
 ///
 /// PNM Dynamic Image Reader
 ///
@@ -415,41 +450,6 @@ public:
         }
     }
 };
-
-namespace detail { 
-
-struct pnm_type_format_checker
-{
-    pnm_type_format_checker( pnm_image_type::type type )
-    : _type( type )
-    {}
-
-    template< typename Image >
-    bool apply()
-    {
-        typedef is_read_supported< typename get_pixel_type< typename Image::view_t >::type
-                                 , pnm_tag
-                                 > is_supported_t;
-
-        return is_supported_t::_asc_type == _type
-            || is_supported_t::_bin_type == _type;
-    }
-
-private:
-
-    pnm_image_type::type _type;
-};
-
-struct pnm_read_is_supported
-{
-    template< typename View >
-    struct apply : public is_read_supported< typename get_pixel_type< View >::type
-                                           , pnm_tag
-                                           >
-    {};
-};
-
-} // detail
 
 } // gil
 } // boost
