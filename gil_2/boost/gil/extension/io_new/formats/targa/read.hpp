@@ -193,10 +193,10 @@ private:
     template< typename View_Src, typename View_Dst >
     void read_data( const View_Dst& view )
     {
-        byte_vector_t row( this->_info._width * (_info._bits_per_pixel / 8) );
+        byte_vector_t row( this->_info._width * (this->_info._bits_per_pixel / 8) );
 
         // jump to first scanline
-        _io_dev.seek( static_cast< long >( this->_info._offset ));
+        this->_io_dev.seek( static_cast< long >( this->_info._offset ));
 
         View_Src v = interleaved_view( this->_info._width,
                                        1,
@@ -213,7 +213,7 @@ private:
             // @todo: For now we're reading the whole scanline which is
             // slightly inefficient. Later versions should try to read
             // only the bytes which are necessary.
-            _io_dev.read( &row.front(), row.size() );
+            this->_io_dev.read( &row.front(), row.size() );
             this->_cc_policy.read( beg, end, view.row_begin(y) );
         }
     }
@@ -227,11 +227,11 @@ private:
         size_t image_size = this->_info._width * this->_info._height * bytes_per_pixel;
         byte_vector_t image_data( image_size );
         
-        _io_dev.seek( static_cast< long >( this->_info._offset ));
+        this->_io_dev.seek( static_cast< long >( this->_info._offset ));
         
         for( size_t pixel = 0; pixel < image_size; )
         {
-            targa_offset::type current_byte = _io_dev.read_uint8();
+            targa_offset::type current_byte = this->_io_dev.read_uint8();
             
             if( current_byte & 0x80 ) // run length chunk (high bit = 1)
             {
@@ -239,7 +239,7 @@ private:
                 uint8_t pixel_data[4];
                 for( size_t channel = 0; channel < bytes_per_pixel; ++channel )
                 {
-                    pixel_data[channel] = _io_dev.read_uint8();
+                    pixel_data[channel] = this->_io_dev.read_uint8();
                 }
                 
                 // Repeat the next pixel chunk_length times
@@ -254,7 +254,7 @@ private:
                 
                 // Write the next chunk_length pixels directly
                 size_t pixels_written = chunk_length * bytes_per_pixel;
-                _io_dev.read( &image_data[pixel], pixels_written );
+                this->_io_dev.read( &image_data[pixel], pixels_written );
                 pixel += pixels_written;
             }
         }

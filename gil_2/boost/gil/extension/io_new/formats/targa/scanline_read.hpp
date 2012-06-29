@@ -65,7 +65,7 @@ public:
     scanline_reader( Device&                                 device
                    , const image_read_settings< targa_tag >& settings
                    )
-    : reader_backend( device
+    : backend_t( device
                     , settings
                     )
     {
@@ -81,7 +81,7 @@ public:
         long offset = this->_info._offset
                     + ( this->_info._height - 1 - pos ) * static_cast< long >( this->_scanline_length );
         
-        _io_dev.seek( offset );
+        this->_io_dev.seek( offset );
         
 
         read_row( dst );
@@ -90,7 +90,7 @@ public:
     /// Skip over a scanline.
     void skip( byte_t*, int )
     {
-        _io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
+        this->_io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
     }
 
 private:
@@ -154,7 +154,7 @@ private:
 
     void read_row( byte_t* dst )
     {
-        _io_dev.read( dst, this->_scanline_length );
+        this->_io_dev.read( dst, this->_scanline_length );
     }
 };
 

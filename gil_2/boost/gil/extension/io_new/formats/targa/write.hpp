@@ -30,6 +30,24 @@
 
 namespace boost { namespace gil {
 
+namespace detail {
+
+template < int N > struct get_targa_view_type {};
+template <> struct get_targa_view_type< 3 > { typedef bgr8_view_t type; };
+template <> struct get_targa_view_type< 4 > { typedef bgra8_view_t type; };
+
+struct targa_write_is_supported
+{
+    template< typename View >
+    struct apply
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , targa_tag
+                                   >
+    {};
+};
+
+} // detail
+
 ///
 /// TARGA Writer
 ///
@@ -41,14 +59,17 @@ class writer< Device
                            , targa_tag
                            >
 {
+private:
+     typedef writer_backend< Device, targa_tag > backend_t;
+
 public:
 
     writer( const Device&                        io_dev
           , const image_write_info< targa_tag >& info
           )
-    : writer_backend( io_dev
-                    , info
-                    )
+    : backend_t( io_dev
+               , info
+               )
     {}
 
     template<typename View>
@@ -160,24 +181,6 @@ public:
         apply_operation( views, op );
     }
 };
-
-namespace detail {
-
-template < int N > struct get_targa_view_type {};
-template <> struct get_targa_view_type< 3 > { typedef bgr8_view_t type; };
-template <> struct get_targa_view_type< 4 > { typedef bgra8_view_t type; };
-
-struct targa_write_is_supported
-{
-    template< typename View >
-    struct apply
-        : public is_write_supported< typename get_pixel_type< View >::type
-                                   , targa_tag
-                                   >
-    {};
-};
-
-} // detail
 
 } // gil
 } // boost
