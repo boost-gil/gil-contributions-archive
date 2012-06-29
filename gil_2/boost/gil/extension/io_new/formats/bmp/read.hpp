@@ -219,7 +219,7 @@ public:
 
             case 24:
             {
-                _scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
+                this->_scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
 
                 read_data< bgr8_view_t  >( dst_view ); 
 
@@ -228,7 +228,7 @@ public:
 
             case 32:
             {
-                _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+                this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
                 read_data< bgra8_view_t >( dst_view ); 
 
@@ -262,7 +262,7 @@ private:
             >
     void read_palette_image( const View_Dst& view )
     {
-        read_palette();
+        this->read_palette();
 
         typedef detail::row_buffer_helper_view< View_Src > rh_t;
         typedef typename rh_t::iterator_t          it_t;
@@ -277,9 +277,9 @@ private:
            ; ++y
            )
         {
-            _io_dev.seek( get_offset( y + this->_settings._top_left.y ));
+            this->_io_dev.seek( get_offset( y + this->_settings._top_left.y ));
 
-            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
+            this->_io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
                         , _pitch
                         );
 
@@ -326,9 +326,9 @@ private:
                 case 15:
                 case 16:
                 {
-                    _mask.red.mask   = 0x007C00; _mask.red.width   = 5; _mask.red.shift   = 10;
-                    _mask.green.mask = 0x0003E0; _mask.green.width = 5; _mask.green.shift =  5;
-                    _mask.blue.mask  = 0x00001F; _mask.blue.width  = 5; _mask.blue.shift  =  0;
+                    this->_mask.red.mask   = 0x007C00; this->_mask.red.width   = 5; this->_mask.red.shift   = 10;
+                    this->_mask.green.mask = 0x0003E0; this->_mask.green.width = 5; this->_mask.green.shift =  5;
+                    this->_mask.blue.mask  = 0x00001F; this->_mask.blue.width  = 5; this->_mask.blue.shift  =  0;
 
                     break;
                 }
@@ -336,9 +336,9 @@ private:
                 case 24:
                 case 32:
                 {
-                    _mask.red.mask   = 0xFF0000; _mask.red.width   = 8; _mask.red.shift   = 16;
-                    _mask.green.mask = 0x00FF00; _mask.green.width = 8; _mask.green.shift =  8;
-                    _mask.blue.mask  = 0x0000FF; _mask.blue.width  = 8; _mask.blue.shift  =  0;
+                    this->_mask.red.mask   = 0xFF0000; this->_mask.red.width   = 8; this->_mask.red.shift   = 16;
+                    this->_mask.green.mask = 0x00FF00; this->_mask.green.width = 8; this->_mask.green.shift =  8;
+                    this->_mask.blue.mask  = 0x0000FF; this->_mask.blue.width  = 8; this->_mask.blue.shift  =  0;
 
                     break;
                 }
@@ -357,9 +357,9 @@ private:
            ; ++y
            )
         {
-            _io_dev.seek( get_offset( y + this->_settings._top_left.y ));
+            this->_io_dev.seek( get_offset( y + this->_settings._top_left.y ));
 
-            _io_dev.read( &row.front()
+            this->_io_dev.read( &row.front()
                         , row.size()
                         );
 
@@ -375,9 +375,9 @@ private:
             {
                 int p = ( src[1] << 8 ) | src[0];
 
-                int r = ((p & _mask.red.mask)   >> _mask.red.shift)   << (8 - _mask.red.width);
-                int g = ((p & _mask.green.mask) >> _mask.green.shift) << (8 - _mask.green.width);
-                int b = ((p & _mask.blue.mask)  >> _mask.blue.shift)  << (8 - _mask.blue.width);
+                int r = ((p & this->_mask.red.mask)   >> this->_mask.red.shift)   << (8 - this->_mask.red.width);
+                int g = ((p & this->_mask.green.mask) >> this->_mask.green.shift) << (8 - this->_mask.green.width);
+                int b = ((p & this->_mask.blue.mask)  >> this->_mask.blue.shift)  << (8 - this->_mask.blue.width);
 
                 get_color( it[i], red_t()   ) = static_cast< byte_t >( r );
                 get_color( it[i], green_t() ) = static_cast< byte_t >( g );
@@ -415,9 +415,9 @@ private:
            ; ++y
            )
         {
-            _io_dev.seek( get_offset( y + this->_settings._top_left.y ));
+            this->_io_dev.seek( get_offset( y + this->_settings._top_left.y ));
 
-            _io_dev.read( &row.front()
+            this->_io_dev.read( &row.front()
                         , row.size()
                         );
 
@@ -457,10 +457,10 @@ private:
               || this->_info._compression == bmp_compression::_rle8
               );
 
-        read_palette();
+        this->read_palette();
 
         // jump to start of rle4 data
-        _io_dev.seek( this->_info._offset );
+        this->_io_dev.seek( this->_info._offset );
 
         // we need to know the stream position for padding purposes
         std::size_t stream_pos = this->_info._offset;
@@ -488,8 +488,8 @@ private:
 
         while ( !finished )
         {
-            std::ptrdiff_t count  = _io_dev.read_uint8();
-            std::ptrdiff_t second = _io_dev.read_uint8();
+            std::ptrdiff_t count  = this->_io_dev.read_uint8();
+            std::ptrdiff_t second = this->_io_dev.read_uint8();
             stream_pos += 2;
 
             if ( count )
@@ -551,8 +551,8 @@ private:
 
                     case 2:  // offset coordinates
                     {
-                        std::ptrdiff_t dx = _io_dev.read_uint8();
-                        std::ptrdiff_t dy = _io_dev.read_uint8() * yinc;
+                        std::ptrdiff_t dx = this->_io_dev.read_uint8();
+                        std::ptrdiff_t dy = this->_io_dev.read_uint8() * yinc;
                         stream_pos += 2;
 
                         if( dy )
@@ -594,7 +594,7 @@ private:
                         {
                             for( int i = 0; i < count; ++i )
                             {
-                                uint8_t packed_indices = _io_dev.read_uint8();
+                                uint8_t packed_indices = this->_io_dev.read_uint8();
                                 ++stream_pos;
 
                                 *dst_it++ = this->_palette[ packed_indices >> 4 ];
@@ -608,7 +608,7 @@ private:
                         {
                             for( int i = 0; i < count; ++i )
                             {
-                                uint8_t c = _io_dev.read_uint8();
+                                uint8_t c = this->_io_dev.read_uint8();
                                 ++stream_pos;
                                 *dst_it++ = this->_palette[ c ];
                              }
@@ -617,7 +617,7 @@ private:
                         // pad to word boundary
                         if( ( stream_pos - get_offset( 0 )) & 1 )
                         {
-                            _io_dev.seek( 1, SEEK_CUR );
+                            this->_io_dev.seek( 1, SEEK_CUR );
                             ++stream_pos;
                         }
 

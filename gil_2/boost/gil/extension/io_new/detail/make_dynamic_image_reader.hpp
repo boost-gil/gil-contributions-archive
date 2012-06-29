@@ -40,7 +40,7 @@ make_dynamic_image_reader( const String&    file_name
                                              >::type* /* ptr */ = 0
                          )
 {
-    get_read_device< String
+    typename get_read_device< String
                    , FormatTag
                    >::type device( detail::convert_to_native_string( file_name )
                                  , typename detail::file_stream_device< FormatTag >::read_tag()
@@ -64,7 +64,7 @@ make_dynamic_image_reader( const std::wstring& file_name
 {
     const char* str = detail::convert_to_native_string( file_name );
 
-    get_read_device< std::wstring
+    typename get_read_device< std::wstring
                    , FormatTag
                    >::type device( str
                                  , typename detail::file_stream_device< FormatTag >::read_tag()
@@ -112,7 +112,7 @@ make_dynamic_image_reader( Device&          file
                                              >::type* /* ptr */ = 0
                          )
 {
-    get_read_device< Device
+    typename get_read_device< Device
                    , FormatTag
                    >::type device( file );
 

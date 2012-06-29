@@ -75,7 +75,7 @@ private:
         // @todo Is the buffer above cleaned up when the exception is thrown?
         //       The strategy right now is to allocate necessary memory before
         //       the setjmp.
-        if( setjmp( _mark )) { raise_error(); }
+        if( setjmp( this->_mark )) { this->raise_error(); }
 
         typedef typename channel_type< typename View::value_type >::type channel_t;
 

@@ -78,12 +78,12 @@ public:
     {
         init();
 
-        if( _pos >= _reader._info._height )
+        if( _pos >= _reader->_info._height )
         {
             std::runtime_error( "Trying to read past image." );
         }
 
-        if( pos > 0 && _buffer == null )
+        if( pos > 0 && _buffer == NULL )
         {
             std::runtime_error( "Cannot proceed without initializing read buffer." );
         }
@@ -178,7 +178,7 @@ public:
     }
 
     /// Return backend.
-    typename const backend_t& backend()
+    const backend_t& backend()
     {
         if( _reader )
         {

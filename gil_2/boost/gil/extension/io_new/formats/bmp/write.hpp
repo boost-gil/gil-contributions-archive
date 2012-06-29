@@ -30,6 +30,25 @@
 
 namespace boost { namespace gil {
 
+namespace detail {
+
+struct bmp_write_is_supported
+{
+    template< typename View >
+    struct apply
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , bmp_tag
+                                   >
+    {};
+};
+
+template < int N > struct get_bgr_cs {};
+template <> struct get_bgr_cs< 1 > { typedef gray8_view_t type; };
+template <> struct get_bgr_cs< 3 > { typedef bgr8_view_t type;  };
+template <> struct get_bgr_cs< 4 > { typedef bgra8_view_t type; };
+
+} // namespace detail
+
 ///
 /// BMP Writer
 ///
@@ -46,7 +65,7 @@ public:
     writer( const Device&                      io_dev
           , const image_write_info< bmp_tag >& info 
           )
-    : writer_backend( io_dev
+    : backend_t( io_dev
                     , info
                     )
     {}
@@ -58,6 +77,8 @@ public:
     }
 
 private:
+
+    typedef writer_backend< Device, bmp_tag > backend_t;
 
     template< typename View >
     void write( const View& view )
@@ -97,24 +118,24 @@ private:
         std::size_t siz = ofs + spn * view.height();
 
         // write the BMP file header
-        _io_dev.write_uint16( bmp_signature );
-        _io_dev.write_uint32( (uint32_t) siz );
-        _io_dev.write_uint16( 0 );
-        _io_dev.write_uint16( 0 );
-        _io_dev.write_uint32( (uint32_t) ofs );
+        this->_io_dev.write_uint16( bmp_signature );
+        this->_io_dev.write_uint32( (uint32_t) siz );
+        this->_io_dev.write_uint16( 0 );
+        this->_io_dev.write_uint16( 0 );
+        this->_io_dev.write_uint32( (uint32_t) ofs );
 
         // writes Windows information header
-        _io_dev.write_uint32( bmp_header_size::_win32_info_size );
-        _io_dev.write_uint32( static_cast< uint32_t >( view.width()  ));
-        _io_dev.write_uint32( static_cast< uint32_t >( view.height() ));
-        _io_dev.write_uint16( 1 );
-        _io_dev.write_uint16( static_cast< uint16_t >( bpp ));
-        _io_dev.write_uint32( bmp_compression::_rgb );
-        _io_dev.write_uint32( 0 );
-        _io_dev.write_uint32( 0 );
-        _io_dev.write_uint32( 0 );
-        _io_dev.write_uint32( entries );
-        _io_dev.write_uint32( 0 );
+        this->_io_dev.write_uint32( bmp_header_size::_win32_info_size );
+        this->_io_dev.write_uint32( static_cast< uint32_t >( view.width()  ));
+        this->_io_dev.write_uint32( static_cast< uint32_t >( view.height() ));
+        this->_io_dev.write_uint16( 1 );
+        this->_io_dev.write_uint16( static_cast< uint16_t >( bpp ));
+        this->_io_dev.write_uint32( bmp_compression::_rgb );
+        this->_io_dev.write_uint32( 0 );
+        this->_io_dev.write_uint32( 0 );
+        this->_io_dev.write_uint32( 0 );
+        this->_io_dev.write_uint32( entries );
+        this->_io_dev.write_uint32( 0 );
 
         write_image< View
                    , typename detail::get_bgr_cs< num_channels< View >::value >::type
@@ -150,7 +171,7 @@ private:
                        , row
                        );
 
-            _io_dev.write( &buffer.front(), spn );
+            this->_io_dev.write( &buffer.front(), spn );
         }
 
     }
@@ -193,25 +214,6 @@ public:
                        );
     }
 };
-
-namespace detail {
-
-struct bmp_write_is_supported
-{
-    template< typename View >
-    struct apply
-        : public is_write_supported< typename get_pixel_type< View >::type
-                                   , bmp_tag
-                                   >
-    {};
-};
-
-template < int N > struct get_bgr_cs {};
-template <> struct get_bgr_cs< 1 > { typedef gray8_view_t type; };
-template <> struct get_bgr_cs< 3 > { typedef bgr8_view_t type;  };
-template <> struct get_bgr_cs< 4 > { typedef bgra8_view_t type; };
-
-} // namespace detail
 
 
 } // gil

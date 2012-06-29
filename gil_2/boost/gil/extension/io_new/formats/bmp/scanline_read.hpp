@@ -65,7 +65,7 @@ public:
     scanline_reader( Device&                               device
                    , const image_read_settings< bmp_tag >& settings
                    )
-    : reader_backend( device
+    : backend_t( device
                     , settings
                     )
 
@@ -94,7 +94,7 @@ public:
                    + pos * _pitch;
         }
         
-        _io_dev.seek( offset );
+        this->_io_dev.seek( offset );
 
 
         // read data
@@ -207,17 +207,17 @@ private:
 
                 if( this->_info._compression == bmp_compression::_bitfield )
                 {
-                    _mask.red.mask    = _io_dev.read_uint32();
-                    _mask.green.mask  = _io_dev.read_uint32();
-                    _mask.blue.mask   = _io_dev.read_uint32();
+                    this->_mask.red.mask    = this->_io_dev.read_uint32();
+                    this->_mask.green.mask  = this->_io_dev.read_uint32();
+                    this->_mask.blue.mask   = this->_io_dev.read_uint32();
 
-                    _mask.red.width   = detail::count_ones( _mask.red.mask   );
-                    _mask.green.width = detail::count_ones( _mask.green.mask );
-                    _mask.blue.width  = detail::count_ones( _mask.blue.mask  );
+                    this->_mask.red.width   = detail::count_ones( this->_mask.red.mask   );
+                    this->_mask.green.width = detail::count_ones( this->_mask.green.mask );
+                    this->_mask.blue.width  = detail::count_ones( this->_mask.blue.mask  );
 
-                    _mask.red.shift   = detail::trailing_zeros( _mask.red.mask   );
-                    _mask.green.shift = detail::trailing_zeros( _mask.green.mask );
-                    _mask.blue.shift  = detail::trailing_zeros( _mask.blue.mask  );
+                    this->_mask.red.shift   = detail::trailing_zeros( this->_mask.red.mask   );
+                    this->_mask.green.shift = detail::trailing_zeros( this->_mask.green.mask );
+                    this->_mask.blue.shift  = detail::trailing_zeros( this->_mask.blue.mask  );
                 }
                 else if( this->_info._compression == bmp_compression::_rgb )
                 {
@@ -226,9 +226,9 @@ private:
                         case 15:
                         case 16:
                         {
-                            _mask.red.mask   = 0x007C00; _mask.red.width   = 5; _mask.red.shift   = 10;
-                            _mask.green.mask = 0x0003E0; _mask.green.width = 5; _mask.green.shift =  5;
-                            _mask.blue.mask  = 0x00001F; _mask.blue.width  = 5; _mask.blue.shift  =  0;
+                            this->_mask.red.mask   = 0x007C00; this->_mask.red.width   = 5; this->_mask.red.shift   = 10;
+                            this->_mask.green.mask = 0x0003E0; this->_mask.green.width = 5; this->_mask.green.shift =  5;
+                            this->_mask.blue.mask  = 0x00001F; this->_mask.blue.width  = 5; this->_mask.blue.shift  =  0;
 
                             break;
                         }
@@ -236,9 +236,9 @@ private:
                         case 24:
                         case 32:
                         {
-                            _mask.red.mask   = 0xFF0000; _mask.red.width   = 8; _mask.red.shift   = 16;
-                            _mask.green.mask = 0x00FF00; _mask.green.width = 8; _mask.green.shift =  8;
-                            _mask.blue.mask  = 0x0000FF; _mask.blue.width  = 8; _mask.blue.shift  =  0;
+                            this->_mask.red.mask   = 0xFF0000; this->_mask.red.width   = 8; this->_mask.red.shift   = 16;
+                            this->_mask.green.mask = 0x00FF00; this->_mask.green.width = 8; this->_mask.green.shift =  8;
+                            this->_mask.blue.mask  = 0x0000FF; this->_mask.blue.width  = 8; this->_mask.blue.shift  =  0;
 
                             break;
                         }
@@ -257,7 +257,7 @@ private:
 
             case 24:
             {
-                _scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
+                this->_scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
                 _read_function = boost::mem_fn( &this_t::read_row ); 
 
                 break;
@@ -265,7 +265,7 @@ private:
 
             case 32:
             {
-                _scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
+                this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
                 _read_function = boost::mem_fn( &this_t::read_row ); 
                 
                 break;
@@ -280,7 +280,7 @@ private:
 
     void read_palette()
     {
-        if( _palette.size() > 0 )
+        if( this->_palette.size() > 0 )
         {
             // palette has been read already.
             return;
@@ -293,19 +293,19 @@ private:
             entries = 1 << this->_info._bits_per_pixel;
         }
 
-        _palette.resize( entries );
+        this->_palette.resize( entries );
 
         for( int i = 0; i < entries; ++i )
         {
-            get_color( _palette[i], blue_t()  ) = _io_dev.read_uint8();
-            get_color( _palette[i], green_t() ) = _io_dev.read_uint8();
-            get_color( _palette[i], red_t()   ) = _io_dev.read_uint8();
+            get_color( this->_palette[i], blue_t()  ) = this->_io_dev.read_uint8();
+            get_color( this->_palette[i], green_t() ) = this->_io_dev.read_uint8();
+            get_color( this->_palette[i], red_t()   ) = this->_io_dev.read_uint8();
 
             // there are 4 entries when windows header
             // but 3 for os2 header
             if( this->_info._header_size == bmp_header_size::_win32_info_size )
             {
-                _io_dev.read_uint8();
+                this->_io_dev.read_uint8();
             }
 
         } // for
@@ -330,8 +330,8 @@ private:
                                               );
         
 
-        src_view_t::x_iterator src_it = src_view.row_begin( 0 );
-        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
+        typename src_view_t::x_iterator src_it = src_view.row_begin( 0 );
+        typename dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
 
         for( dst_view_t::x_coord_t i = 0
            ; i < this->_info._width
@@ -346,7 +346,7 @@ private:
     // Read 1 bit image. The colors are encoded by an index.
     void read_1_bit_row( byte_t* dst )
     {
-        _io_dev.read( &_buffer.front(), _pitch );
+        this->_io_dev.read( &_buffer.front(), _pitch );
         _mirror_bits( _buffer );
 
         read_bit_row< gray1_image_t::view_t >( dst );
@@ -355,7 +355,7 @@ private:
     // Read 4 bits image. The colors are encoded by an index.
     void read_4_bits_row( byte_t* dst )
     {
-        _io_dev.read( &_buffer.front(), _pitch );
+        this->_io_dev.read( &_buffer.front(), _pitch );
         _swap_half_bytes( _buffer );
 
         read_bit_row< gray4_image_t::view_t >( dst );
@@ -364,7 +364,7 @@ private:
     /// Read 8 bits image. The colors are encoded by an index.
     void read_8_bits_row( byte_t* dst )
     {
-        _io_dev.read( &_buffer.front(), _pitch );
+        this->_io_dev.read( &_buffer.front(), _pitch );
 
         read_bit_row< gray8_image_t::view_t >( dst );
     }
@@ -385,7 +385,7 @@ private:
 
         //
         byte_t* src = &_buffer.front();
-        _io_dev.read( src, _pitch );
+        this->_io_dev.read( src, _pitch );
 
         for( dst_view_t::x_coord_t i = 0
            ; i < this->_info._width
@@ -394,9 +394,9 @@ private:
         {
             int p = ( src[1] << 8 ) | src[0];
 
-            int r = ((p & _mask.red.mask)   >> _mask.red.shift)   << (8 - _mask.red.width);
-            int g = ((p & _mask.green.mask) >> _mask.green.shift) << (8 - _mask.green.width);
-            int b = ((p & _mask.blue.mask)  >> _mask.blue.shift)  << (8 - _mask.blue.width);
+            int r = ((p & this->_mask.red.mask)   >> this->_mask.red.shift)   << (8 - this->_mask.red.width);
+            int g = ((p & this->_mask.green.mask) >> this->_mask.green.shift) << (8 - this->_mask.green.width);
+            int b = ((p & this->_mask.blue.mask)  >> this->_mask.blue.shift)  << (8 - this->_mask.blue.width);
 
             get_color( dst_it[i], red_t()   ) = static_cast< byte_t >( r );
             get_color( dst_it[i], green_t() ) = static_cast< byte_t >( g );
@@ -406,7 +406,7 @@ private:
 
     void read_row( byte_t* dst )
     {
-        _io_dev.read( dst, _pitch );
+        this->_io_dev.read( dst, _pitch );
     }
 
 private:
