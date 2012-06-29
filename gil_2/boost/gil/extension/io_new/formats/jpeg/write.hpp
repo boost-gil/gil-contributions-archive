@@ -31,6 +31,20 @@
 
 namespace boost { namespace gil {
 
+namespace detail { 
+
+struct jpeg_write_is_supported
+{
+    template< typename View >
+    struct apply
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , jpeg_tag
+                                   >
+    {};
+};
+
+} // detail
+
 ///
 /// JPEG Writer
 ///
@@ -79,32 +93,32 @@ private:
 
         typedef typename channel_type< typename View::value_type >::type channel_t;
 
-        get()->image_width      = JDIMENSION( view.width()  );
-        get()->image_height     = JDIMENSION( view.height() );
-        get()->input_components = num_channels<View>::value;
-        get()->in_color_space   = detail::jpeg_write_support< channel_t
+        this->get()->image_width      = JDIMENSION( view.width()  );
+        this->get()->image_height     = JDIMENSION( view.height() );
+        this->get()->input_components = num_channels<View>::value;
+        this->get()->in_color_space   = detail::jpeg_write_support< channel_t
                                                                   , typename color_space_type< View >::type
                                                                   >::_color_space;
 
-        jpeg_set_defaults( get() );
+        jpeg_set_defaults( this->get() );
 
-        jpeg_set_quality ( get()
+        jpeg_set_quality ( this->get()
                          , this->_info._quality
                          , TRUE
                          );
 
         // Needs to be done after jpeg_set_defaults() since it's overridding this value back to slow.
-        get()->dct_method = this->_info._dct_method;
+        this->get()->dct_method = this->_info._dct_method;
 
 
         // set the pixel dimensions
-        get()->density_unit = this->_info._density_unit;
-        get()->X_density    = this->_info._x_density;
-        get()->Y_density    = this->_info._y_density;
+        this->get()->density_unit = this->_info._density_unit;
+        this->get()->X_density    = this->_info._x_density;
+        this->get()->Y_density    = this->_info._y_density;
 
         // done reading header information
 
-        jpeg_start_compress( get()
+        jpeg_start_compress( this->get()
                            , TRUE
                            );
 
@@ -117,7 +131,7 @@ private:
                      , row_buffer.begin()
                      );
 
-            jpeg_write_scanlines( get()
+            jpeg_write_scanlines( this->get()
                                 , &row_addr
                                 , 1
                                 );
@@ -160,20 +174,6 @@ public:
         apply_operation( views, op );
     }
 };
-
-namespace detail { 
-
-struct jpeg_write_is_supported
-{
-    template< typename View >
-    struct apply
-        : public is_write_supported< typename get_pixel_type< View >::type
-                                   , jpeg_tag
-                                   >
-    {};
-};
-
-} // detail
 
 } // gil
 } // boost
