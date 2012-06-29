@@ -32,6 +32,20 @@
 
 namespace boost { namespace gil { 
 
+namespace detail {
+
+struct pnm_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , pnm_tag
+                                   >
+    {};
+};
+
+} // namespace detail
+
 ///
 /// PNM Writer
 ///
@@ -43,14 +57,17 @@ class writer< Device
                            , pnm_tag
                            >
 {
+private:
+    typedef writer_backend< Device, pnm_tag > backend_t;
+
 public:
 
     writer( const Device&                      io_dev
           , const image_write_info< pnm_tag >& info
           )
-    : writer_backend( io_dev
-                    , info
-                    )
+    : backend_t( io_dev
+                , info
+                )
     {}
 
     template< typename View >
@@ -223,20 +240,6 @@ public:
         apply_operation( views, op );
     }
 };
-
-namespace detail {
-
-struct pnm_write_is_supported
-{
-    template< typename View >
-    struct apply 
-        : public is_write_supported< typename get_pixel_type< View >::type
-                                   , pnm_tag
-                                   >
-    {};
-};
-
-} // namespace detail
 
 } // gil
 } // boost

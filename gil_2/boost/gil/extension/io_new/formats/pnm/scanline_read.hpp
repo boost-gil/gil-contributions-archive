@@ -66,9 +66,9 @@ public:
     scanline_reader( Device&                                device
                    , const image_read_settings< pnm_tag >& settings
                    )
-    : reader_backend( device
-                    , settings
-                    )
+    : backend_t( device
+               , settings
+               )
     {
         initialize();
     }
@@ -159,7 +159,7 @@ private:
         {
             for( uint32_t k = 0; ; )
             {
-				int ch = _io_dev.getc_unchecked();
+				int ch = this->_io_dev.getc_unchecked();
 
 				if( isdigit( ch ))
 				{
@@ -198,7 +198,7 @@ private:
         {
             for( uint32_t k = 0; ; )
             {
-				int ch = _io_dev.getc_unchecked();
+				int ch = this->_io_dev.getc_unchecked();
 
 				if( isdigit( ch ))
 				{
@@ -219,7 +219,7 @@ private:
 
     void read_binary_bit_row( byte_t* dst )
     {
-        _io_dev.read( dst
+        this->_io_dev.read( dst
                     , this->_scanline_length
                     );
 
@@ -230,14 +230,14 @@ private:
 
     void read_binary_byte_row( byte_t* dst )
     {
-        _io_dev.read( dst
+        this->_io_dev.read( dst
                     , this->_scanline_length
                     );
     }
 
     void skip_binary_row()
     {
-        _io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
+        this->_io_dev.seek( static_cast<long>( this->_scanline_length ), SEEK_CUR );
     }
 
 private:

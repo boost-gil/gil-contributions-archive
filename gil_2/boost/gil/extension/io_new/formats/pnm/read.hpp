@@ -202,7 +202,7 @@ private:
         {
             for( uint32_t k = 0; ; )
             {
-				int ch = _io_dev.getc_unchecked();
+				int ch = this->_io_dev.getc_unchecked();
 
 				if( isdigit( ch ))
 				{
@@ -332,14 +332,14 @@ private:
         //Skip scanlines if necessary.
         for( y_t y = 0; y < this->_settings._top_left.y; ++y )
         {
-            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
+            this->_io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
                         , this->_scanline_length
                         );
         }
 
         for( y_t y = 0; y < view.height(); ++y )
         {
-            _io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
+            this->_io_dev.read( reinterpret_cast< byte_t* >( rh.data() )
                         , this->_scanline_length
                         );
 
