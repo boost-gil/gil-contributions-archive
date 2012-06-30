@@ -52,14 +52,16 @@ class writer< Device
                            , tiff_tag
                            >
 {
+private:
+    typedef writer_backend< Device, tiff_tag > backend_t;
 public:
 
     writer( const Device&                       io_dev
           , const image_write_info< tiff_tag >& info
           )
-    : writer_backend( io_dev
-                    , info
-                    )
+    : backend_t( io_dev
+               , info
+               )
     {}
 
     template<typename View>

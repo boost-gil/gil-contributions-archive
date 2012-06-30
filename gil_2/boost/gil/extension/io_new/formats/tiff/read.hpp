@@ -187,7 +187,7 @@ public:
         }
         else
         {
-            this->_scanline_length = _io_dev.get_scanline_size();
+            this->_scanline_length = this->_io_dev.get_scanline_size();
 
             // In case we only read the image the user's type and
             // the tiff type need to compatible. Which means:
@@ -329,7 +329,7 @@ private:
       tiff_color_map::green_t green = NULL;
       tiff_color_map::blue_t  blue  = NULL;
 
-      _io_dev.get_field_defaulted( red, green, blue );
+      this->_io_dev.get_field_defaulted( red, green, blue );
 
       typedef typename channel_traits<
                     typename element_type<
@@ -383,7 +383,7 @@ private:
          // page ( diagnostics section ) for more information.
          for( std::ptrdiff_t row = 0; row < this->_settings._top_left.y; ++row )
          {
-            _io_dev.read_scanline( buffer
+            this->_io_dev.read_scanline( buffer
                                  , row
                                  , static_cast< tsample_t >( plane ));
          }
@@ -396,7 +396,7 @@ private:
    void read_data( const View& dst_view
                  , int         plane     )
     {
-        if( _io_dev.is_tiled() )
+        if( this->_io_dev.is_tiled() )
         {
             read_tiled_data< Buffer >( dst_view, 0 );
         }
@@ -456,7 +456,7 @@ private:
        std::ptrdiff_t subimage_width  = this->_settings._dim.x;
        std::ptrdiff_t subimage_height = this->_settings._dim.y;
 
-       row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
+       row_buffer_helper_t row_buffer_helper(this->_io_dev.get_tile_size(), true );
 
        for( unsigned int y = 0; y < image_height; y += tile_height )
        {
@@ -465,7 +465,7 @@ private:
                uint32_t current_tile_width  = ( x + tile_width  <  image_width ) ? tile_width  : image_width  - x;
                uint32_t current_tile_length = ( y + tile_height < image_height ) ? tile_height : image_height - y;
 
-               _io_dev.read_tile( row_buffer_helper.buffer()
+               this->_io_dev.read_tile( row_buffer_helper.buffer()
                                 , x
                                 , y
                                 , 0
@@ -574,7 +574,7 @@ private:
        tiff_tile_width::type  tile_width  = this->_info._tile_width;
        tiff_tile_length::type tile_height = this->_info._tile_length;
 
-       row_buffer_helper_t row_buffer_helper( _io_dev.get_tile_size(), true );
+       row_buffer_helper_t row_buffer_helper(this->_io_dev.get_tile_size(), true );
 
        for( unsigned int y = 0; y < image_height; y += tile_height )
        {
@@ -583,7 +583,7 @@ private:
                uint32_t current_tile_width  = ( x + tile_width  <  image_width ) ? tile_width  : image_width  - x;
                uint32_t current_tile_length = ( y + tile_height < image_height ) ? tile_height : image_height - y;
 
-               _io_dev.read_tile( row_buffer_helper.buffer()
+               this->_io_dev.read_tile( row_buffer_helper.buffer()
                                 , x
                                 , y
                                 , 0
@@ -654,7 +654,7 @@ private:
          ; ++row, ++dst_row
          )
       {
-         _io_dev.read_scanline( row_buffer_helper.buffer()
+         this->_io_dev.read_scanline( row_buffer_helper.buffer()
                               , row
                               , static_cast< tsample_t >( plane )
                               );
@@ -670,7 +670,7 @@ private:
                            , mpl::false_ // is_bit_aligned
                            )
     {
-        std::size_t scanline_size_in_bytes = _io_dev.get_scanline_size();
+        std::size_t scanline_size_in_bytes = this->_io_dev.get_scanline_size();
 
         std::size_t element_size = sizeof( Pixel );
 
@@ -687,7 +687,7 @@ private:
                             , mpl::true_  // is_bit_aligned
                             )
     {
-        return _io_dev.get_scanline_size();
+        return this->_io_dev.get_scanline_size();
     }
 
 private:

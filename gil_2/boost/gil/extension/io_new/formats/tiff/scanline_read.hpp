@@ -126,12 +126,12 @@ private:
                                    * num_channels< rgb16_view_t >::value 
                                    * sizeof( channel_type<rgb16_view_t>::type );
 
-            _io_dev.get_field_defaulted( this->_red
+            this->_io_dev.get_field_defaulted( this->_red
                                         , this->_green
                                         , this->_blue
                                         );
 
-            _buffer = std::vector< byte_t >( _io_dev.get_scanline_size() );
+            _buffer = std::vector< byte_t >( this->_io_dev.get_scanline_size() );
 
             switch( this->_info._bits_per_sample )
             {
@@ -141,7 +141,7 @@ private:
 
                     int num_colors = channel_traits< channel_t >::max_value() + 1;
 
-                    _palette = planar_rgb_view( num_colors
+                    this->_palette = planar_rgb_view( num_colors
                                               , 1
                                               , this->_red
                                               , this->_green
@@ -160,7 +160,7 @@ private:
 
                     int num_colors = channel_traits< channel_t >::max_value() + 1;
 
-                    _palette = planar_rgb_view( num_colors
+                    this->_palette = planar_rgb_view( num_colors
                                               , 1
                                               , this->_red
                                               , this->_green
@@ -178,7 +178,7 @@ private:
 
                     int num_colors = channel_traits< channel_t >::max_value() + 1;
 
-                    _palette = planar_rgb_view( num_colors
+                    this->_palette = planar_rgb_view( num_colors
                                               , 1
                                               , this->_red
                                               , this->_green
@@ -197,7 +197,7 @@ private:
 
                     int num_colors = channel_traits< channel_t >::max_value() + 1;
 
-                    _palette = planar_rgb_view( num_colors
+                    this->_palette = planar_rgb_view( num_colors
                                               , 1
                                               , this->_red
                                               , this->_green
@@ -216,7 +216,7 @@ private:
 
                     int num_colors = channel_traits< channel_t >::max_value() + 1;
 
-                    _palette = planar_rgb_view( num_colors
+                    this->_palette = planar_rgb_view( num_colors
                                               , 1
                                               , this->_red
                                               , this->_green
@@ -235,7 +235,7 @@ private:
 
                     int num_colors = channel_traits< channel_t >::max_value() + 1;
 
-                    _palette = planar_rgb_view( num_colors
+                    this->_palette = planar_rgb_view( num_colors
                                               , 1
                                               , this->_red
                                               , this->_green
@@ -254,7 +254,7 @@ private:
 
                     int num_colors = channel_traits< channel_t >::max_value() + 1;
 
-                    _palette = planar_rgb_view( num_colors
+                    this->_palette = planar_rgb_view( num_colors
                                               , 1
                                               , this->_red
                                               , this->_green
@@ -271,7 +271,7 @@ private:
         }
         else
         {
-            this->_scanline_length = _io_dev.get_scanline_size();
+            this->_scanline_length = this->_io_dev.get_scanline_size();
 
             if( this->_info._planar_configuration == PLANARCONFIG_SEPARATE )
             {
