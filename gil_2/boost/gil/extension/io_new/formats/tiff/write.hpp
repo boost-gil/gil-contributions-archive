@@ -40,6 +40,74 @@ extern "C" {
 
 namespace boost { namespace gil {
 
+namespace detail {
+
+template <typename PixelReference>
+struct my_interleaved_pixel_iterator_type_from_pixel_reference
+{
+private:
+	typedef typename remove_reference< PixelReference >::type::value_type pixel_t;
+public:
+	typedef typename iterator_type_from_pixel< pixel_t
+	                                         , false
+	                                         , false
+	                                         , true
+	                                         >::type type;
+};
+
+
+template< typename Channel
+        , typename Layout
+        , bool Mutable
+        >
+struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< byte_t
+                                                                                                 , Channel
+                                                                                                 , Layout
+                                                                                                 , Mutable
+                                                                                                 >
+                                                              >
+	: public iterator_type_from_pixel< const bit_aligned_pixel_reference< uint8_t
+	                                                                    , Channel
+	                                                                    , Layout
+	                                                                    , Mutable
+	                                                                    >
+	                                 ,false
+	                                 ,false
+	                                 ,true
+	                                 > {};
+
+
+
+
+
+template < typename Channel > struct sample_format : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32f> : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<double>  : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<bits8s>  : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits16s> : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits32s> : public mpl::int_<SAMPLEFORMAT_INT> {};
+
+template <typename Channel> struct photometric_interpretation {};
+template<> struct photometric_interpretation< gray_t > : public mpl::int_< PHOTOMETRIC_MINISBLACK > {};
+template<> struct photometric_interpretation< rgb_t  > : public mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< rgba_t > : public mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< cmyk_t > : public mpl::int_< PHOTOMETRIC_SEPARATED  > {};
+
+struct tiff_write_is_supported
+{
+    template< typename View >
+    struct apply 
+        : public is_write_supported< typename get_pixel_type< View >::type
+                                   , tiff_tag
+                                   >
+    {};
+};
+
+} // namespace detail
+
 ///
 /// TIFF Writer
 ///
@@ -306,74 +374,6 @@ public:
         apply_operation( views, op );
     }
 };
-
-namespace detail {
-
-template <typename PixelReference>
-struct my_interleaved_pixel_iterator_type_from_pixel_reference
-{
-private:
-	typedef typename remove_reference< PixelReference >::type::value_type pixel_t;
-public:
-	typedef typename iterator_type_from_pixel< pixel_t
-	                                         , false
-	                                         , false
-	                                         , true
-	                                         >::type type;
-};
-
-
-template< typename Channel
-        , typename Layout
-        , bool Mutable
-        >
-struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligned_pixel_reference< byte_t
-                                                                                                 , Channel
-                                                                                                 , Layout
-                                                                                                 , Mutable
-                                                                                                 >
-                                                              >
-	: public iterator_type_from_pixel< const bit_aligned_pixel_reference< uint8_t
-	                                                                    , Channel
-	                                                                    , Layout
-	                                                                    , Mutable
-	                                                                    >
-	                                 ,false
-	                                 ,false
-	                                 ,true
-	                                 > {};
-
-
-
-
-
-template < typename Channel > struct sample_format : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits32>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits32f> : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
-template<> struct sample_format<double>  : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
-template<> struct sample_format<bits8s>  : public mpl::int_<SAMPLEFORMAT_INT> {};
-template<> struct sample_format<bits16s> : public mpl::int_<SAMPLEFORMAT_INT> {};
-template<> struct sample_format<bits32s> : public mpl::int_<SAMPLEFORMAT_INT> {};
-
-template <typename Channel> struct photometric_interpretation {};
-template<> struct photometric_interpretation< gray_t > : public mpl::int_< PHOTOMETRIC_MINISBLACK > {};
-template<> struct photometric_interpretation< rgb_t  > : public mpl::int_< PHOTOMETRIC_RGB        > {};
-template<> struct photometric_interpretation< rgba_t > : public mpl::int_< PHOTOMETRIC_RGB        > {};
-template<> struct photometric_interpretation< cmyk_t > : public mpl::int_< PHOTOMETRIC_SEPARATED  > {};
-
-struct tiff_write_is_supported
-{
-    template< typename View >
-    struct apply 
-        : public is_write_supported< typename get_pixel_type< View >::type
-                                   , tiff_tag
-                                   >
-    {};
-};
-
-} // namespace detail
 
 } // namespace gil
 } // namespace boost
