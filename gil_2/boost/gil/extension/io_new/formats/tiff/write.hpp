@@ -76,26 +76,6 @@ struct my_interleaved_pixel_iterator_type_from_pixel_reference< const bit_aligne
 	                                 ,true
 	                                 > {};
 
-
-
-
-
-template < typename Channel > struct sample_format : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits32>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
-template<> struct sample_format<bits32f> : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
-template<> struct sample_format<double>  : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
-template<> struct sample_format<bits8s>  : public mpl::int_<SAMPLEFORMAT_INT> {};
-template<> struct sample_format<bits16s> : public mpl::int_<SAMPLEFORMAT_INT> {};
-template<> struct sample_format<bits32s> : public mpl::int_<SAMPLEFORMAT_INT> {};
-
-template <typename Channel> struct photometric_interpretation {};
-template<> struct photometric_interpretation< gray_t > : public mpl::int_< PHOTOMETRIC_MINISBLACK > {};
-template<> struct photometric_interpretation< rgb_t  > : public mpl::int_< PHOTOMETRIC_RGB        > {};
-template<> struct photometric_interpretation< rgba_t > : public mpl::int_< PHOTOMETRIC_RGB        > {};
-template<> struct photometric_interpretation< cmyk_t > : public mpl::int_< PHOTOMETRIC_SEPARATED  > {};
-
 struct tiff_write_is_supported
 {
     template< typename View >

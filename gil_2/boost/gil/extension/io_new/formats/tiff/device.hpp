@@ -382,6 +382,24 @@ struct is_adaptable_output_device< FormatTag
     typedef file_stream_device< FormatTag > device_type;
 };
 
+
+template < typename Channel > struct sample_format : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits8>   : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits16>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32>  : public mpl::int_<SAMPLEFORMAT_UINT> {};
+template<> struct sample_format<bits32f> : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<double>  : public mpl::int_<SAMPLEFORMAT_IEEEFP> {};
+template<> struct sample_format<bits8s>  : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits16s> : public mpl::int_<SAMPLEFORMAT_INT> {};
+template<> struct sample_format<bits32s> : public mpl::int_<SAMPLEFORMAT_INT> {};
+
+template <typename Channel> struct photometric_interpretation {};
+template<> struct photometric_interpretation< gray_t > : public mpl::int_< PHOTOMETRIC_MINISBLACK > {};
+template<> struct photometric_interpretation< rgb_t  > : public mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< rgba_t > : public mpl::int_< PHOTOMETRIC_RGB        > {};
+template<> struct photometric_interpretation< cmyk_t > : public mpl::int_< PHOTOMETRIC_SEPARATED  > {};
+
+
 } // namespace detail
 } // namespace gil
 } // namespace boost
