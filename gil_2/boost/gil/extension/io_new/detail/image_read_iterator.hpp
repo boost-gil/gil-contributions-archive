@@ -80,12 +80,12 @@ public:
 
         if( _pos >= _reader->_info._height )
         {
-            std::runtime_error( "Trying to read past image." );
+            throw std::runtime_error( "Trying to read past image." );
         }
 
         if( pos > 0 && _buffer == NULL )
         {
-            std::runtime_error( "Cannot proceed without initializing read buffer." );
+            throw std::runtime_error( "Cannot proceed without initializing read buffer." );
         }
 
         for( std::size_t i = 0; i < pos; ++i )

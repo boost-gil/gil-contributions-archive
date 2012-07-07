@@ -714,8 +714,11 @@ struct tiff_type_format_checker
     }
 
 private:
+    tiff_type_format_checker& operator=( const tiff_type_format_checker& ) { return *this; }
 
-    const image_read_info< tiff_tag >& _info;
+private:
+
+    const image_read_info< tiff_tag > _info;
 };
 
 struct tiff_read_is_supported

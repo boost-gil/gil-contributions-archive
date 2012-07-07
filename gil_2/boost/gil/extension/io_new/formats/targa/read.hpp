@@ -302,7 +302,12 @@ public:
 
 private:
 
-    const targa_depth::type& _bpp;
+    // to avoid C4512
+    targa_type_format_checker& operator=( const targa_type_format_checker& ) { return *this; }
+
+private:
+
+    const targa_depth::type _bpp;
 };
 
 struct targa_read_is_supported

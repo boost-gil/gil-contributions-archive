@@ -325,6 +325,9 @@ public:
     }
 
 private:
+    ostream_device& operator=( const ostream_device& ) { return *this; }
+
+private:
 
     std::ostream& _out;
 };
@@ -351,6 +354,9 @@ public:
 
         _tiff_file = tiff_file_t( tiff, TIFFClose );
     }
+
+private:
+    istream_device& operator=( const istream_device& ) { return *this; }
 
 private:
 

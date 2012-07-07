@@ -90,7 +90,7 @@ public:
                    , "png format cannot handle empty views."
                    );
 
-        write_header( view );
+        this->write_header( view );
 
         write_view( view
                   , typename is_bit_aligned< View >::type()

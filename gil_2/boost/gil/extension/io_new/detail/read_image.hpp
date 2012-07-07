@@ -43,7 +43,7 @@ template < typename Reader
          , typename Image
          >
 inline
-void read_image( Reader&          reader
+void read_image( Reader           reader
                , Image&           img
                , typename enable_if< mpl::and_< detail::is_reader< Reader >
                                               , is_format_tag< typename Reader::format_tag_t >

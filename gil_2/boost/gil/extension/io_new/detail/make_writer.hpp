@@ -46,11 +46,11 @@ make_writer( const String&                        file_name
                                   , typename detail::file_stream_device< FormatTag >::write_tag()
                                   );
 
-    return get_writer< String
-                     , FormatTag
-                     >::type( device
-                            , info
-                            );
+    return typename get_writer< String
+                              , FormatTag
+                              >::type( device
+                                     , info
+                                     );
 }
 
 template< typename FormatTag >

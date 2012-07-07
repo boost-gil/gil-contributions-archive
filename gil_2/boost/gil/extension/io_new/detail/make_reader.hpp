@@ -49,12 +49,12 @@ make_reader( const String&    file_name
                                           , typename detail::file_stream_device< FormatTag >::read_tag()
                                           );
 
-    return get_reader< String
-                     , FormatTag
-                     , ConversionPolicy
-                     >::type( device
-                            , settings
-                            );
+    return typename get_reader< String
+                              , FormatTag
+                              , ConversionPolicy
+                              >::type( device
+                                     , settings
+                                     );
 }
 
 template< typename FormatTag

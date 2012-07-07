@@ -37,7 +37,7 @@ template< typename Writer
         , typename View
         >
 inline
-void write_view( Writer&     writer
+void write_view( Writer      writer
                , const View& view
                , typename enable_if< typename mpl::and_< typename detail::is_writer< Writer >::type
                                                        , typename is_format_tag< typename Writer::format_tag_t >::type

@@ -121,14 +121,14 @@ public:
                    );
 
         // TODO: better error handling based on return code
-        int return_code = _io_dev.unpack();
+        int return_code = this->_io_dev.unpack();
         io_error_if( return_code != LIBRAW_SUCCESS, "Unable to unpack image" );
         _info._unpack_function_name = _io_dev.get_unpack_function_name();
 
-        return_code = _io_dev.dcraw_process();
+        return_code = this->_io_dev.dcraw_process();
         io_error_if( return_code != LIBRAW_SUCCESS, "Unable to emulate dcraw behavior to process image" );
 
-        libraw_processed_image_t* processed_image = _io_dev.dcraw_make_mem_image(&return_code);
+        libraw_processed_image_t* processed_image = this->_io_dev.dcraw_make_mem_image(&return_code);
         io_error_if( return_code != LIBRAW_SUCCESS, "Unable to dcraw_make_mem_image" );
 
         if(processed_image->colors!=1 && processed_image->colors!=3)
@@ -237,7 +237,7 @@ public:
                        , this->_settings
                        );
 
-            detail::dynamic_io_fnobj< raw_read_is_supported
+            detail::dynamic_io_fnobj< detail::raw_read_is_supported
                                     , parent_t
                                     > op( this );
 

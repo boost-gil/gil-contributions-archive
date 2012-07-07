@@ -183,7 +183,7 @@ public:
 				    {
                         ///@todo How can we determine that?
                         this->_scanline_length = 0;
-                        
+
                         read_palette_image_rle( dst_view );
 					    break;
                     }
@@ -221,7 +221,7 @@ public:
             {
                 this->_scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
 
-                read_data< bgr8_view_t  >( dst_view ); 
+                read_data< bgr8_view_t  >( dst_view );
 
                 break;
             }
@@ -230,7 +230,7 @@ public:
             {
                 this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
 
-                read_data< bgra8_view_t >( dst_view ); 
+                read_data< bgra8_view_t >( dst_view );
 
                 break;
             }
@@ -304,7 +304,6 @@ private:
         byte_vector_t row( _pitch );
 
         // read the color masks
-        color_mask mask = { {0} };
         if( this->_info._compression == bmp_compression::_bitfield )
         {
             this->_mask.red.mask    = this->_io_dev.read_uint32();
@@ -662,7 +661,12 @@ public:
 
 private:
 
-    const bmp_bits_per_pixel::type& _bpp;
+    // to avoid C4512
+    bmp_type_format_checker& operator=( const bmp_type_format_checker& ) { return *this; }
+
+private:
+
+    const bmp_bits_per_pixel::type _bpp;
 };
 
 struct bmp_read_is_supported
