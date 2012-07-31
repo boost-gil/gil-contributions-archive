@@ -255,7 +255,9 @@ void read_image( Device&                                 file
                                              , FormatTag
                                              >::type reader_t;
 
-    reader_t reader = make_dynamic_image_reader( file, tag );
+    reader_t reader = make_dynamic_image_reader( file
+                                               , settings
+                                               );
 
     read_image( reader
               , images
@@ -287,7 +289,9 @@ void read_image( Device&              file
                                              , FormatTag
                                              >::type reader_t;
 
-    reader_t reader = make_dynamic_image_reader( file, tag );
+    reader_t reader = make_dynamic_image_reader( file
+                                               , tag
+                                               );
 
     read_image( reader
               , images
@@ -317,7 +321,9 @@ void read_image( const String&                           file_name
                                              , FormatTag
                                              >::type reader_t;
 
-    reader_t reader = make_dynamic_image_reader( file_name, tag );
+    reader_t reader = make_dynamic_image_reader( file_name
+                                               , settings
+                                               );
 
     read_image( reader
               , images
