@@ -85,10 +85,17 @@ void read_image( Device&                                 file
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_reader( file
-                           , settings
-                           , detail::read_and_no_convert()
-                           )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , settings
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_image( reader
               , img
               );
 }
@@ -117,10 +124,17 @@ void read_image( Device&          file
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_reader( file
-                           , tag
-                           , detail::read_and_no_convert()
-                           )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , tag
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_image( reader
               , img
               );
 }
@@ -147,10 +161,17 @@ void read_image( const String&                           file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_reader( file_name
-                           , settings
-                           , detail::read_and_no_convert()
-                           )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , settings
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_image( reader
               , img
               );
 }
@@ -177,10 +198,17 @@ void read_image( const String&    file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_reader( file_name
-                           , tag
-                           , detail::read_and_no_convert()
-                           )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , tag
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_image( reader
               , img
               );
 }
@@ -229,7 +257,6 @@ void read_image( Device&                                 file
 
     reader_t reader = make_dynamic_image_reader( file, tag );
 
-
     read_image( reader
               , images
               );
@@ -262,7 +289,6 @@ void read_image( Device&              file
 
     reader_t reader = make_dynamic_image_reader( file, tag );
 
-
     read_image( reader
               , images
               );
@@ -292,7 +318,6 @@ void read_image( const String&                           file_name
                                              >::type reader_t;
 
     reader_t reader = make_dynamic_image_reader( file_name, tag );
-
 
     read_image( reader
               , images

@@ -81,10 +81,17 @@ void read_and_convert_image( Device&                                 file
                                                 >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( file
-                                       , settings
-                                       , detail::read_and_convert< ColorConverter >( cc )
-                                       )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , settings
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }
@@ -111,10 +118,17 @@ void read_and_convert_image( const String&                           file_name
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( file_name
-                                       , settings
-                                       , detail::read_and_convert< ColorConverter >( cc )
-                                       )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , settings
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }
@@ -141,10 +155,17 @@ void read_and_convert_image( const String&         file_name
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( file_name
-                                       , tag
-                                       , detail::read_and_convert< ColorConverter >( cc )
-                                       )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , tag
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }
@@ -173,10 +194,17 @@ void read_and_convert_image( Device&               device
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( device
-                                       , tag
-                                       , detail::read_and_convert< ColorConverter >( cc )
-                                       )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , tag
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }
@@ -200,10 +228,17 @@ void read_and_convert_image( const String&                           file_name
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( file_name
-                                       , settings
-                                       , detail::read_and_convert< default_color_converter >()
-                                       )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , settings
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }
@@ -229,10 +264,17 @@ void read_and_convert_image( Device&                                 device
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( device
-                                       , settings
-                                       , detail::read_and_convert< default_color_converter >()
-                                       )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , settings
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }
@@ -256,10 +298,17 @@ void read_and_convert_image( const String&    file_name
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( file_name
-                                       , tag
-                                       , detail::read_and_convert< default_color_converter >()
-                                       )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , tag
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }
@@ -274,7 +323,7 @@ template < typename Device
          , typename FormatTag
          >
 inline
-void read_and_convert_image( Device&          device
+void read_and_convert_image( Device&          file
                            , Image&           img
                            , const FormatTag& tag
                            , typename enable_if< mpl::and_< detail::is_read_device< FormatTag
@@ -285,10 +334,17 @@ void read_and_convert_image( Device&          device
                                                >::type* /* ptr */ = 0
                            )
 {
-    read_and_convert_image( make_reader( device
-                                       , tag
-                                       , detail::read_and_convert< default_color_converter >()
-                                       )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , tag
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_image( reader
                           , img
                           );
 }

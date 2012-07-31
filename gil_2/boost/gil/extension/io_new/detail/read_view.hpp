@@ -82,10 +82,17 @@ void read_view( Device&                                 file
                                   >::type* /* ptr */ = 0
               )
 {
-    read_view( make_reader( file
-                          , settings
-                          , detail::read_and_no_convert()
-                          )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , settings
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_view( reader
              , view
              );
 }
@@ -100,7 +107,7 @@ template< typename Device
         , typename FormatTag
         >
 inline
-void read_view( Device&          device
+void read_view( Device&          file
               , const View&      view
               , const FormatTag& tag
               , typename enable_if< typename mpl::and_< typename is_format_tag< FormatTag >::type
@@ -114,10 +121,17 @@ void read_view( Device&          device
                                   >::type* /* ptr */ = 0
               )
 {
-    read_view( make_reader( device
-                          , tag
-                          , detail::read_and_no_convert()
-                          )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file
+                                 , tag
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_view( reader
              , view
              );
 }
@@ -144,10 +158,17 @@ void read_view( const String&                           file_name
                                   >::type* /* ptr */ = 0
               )
 {
-    read_view( make_reader( file_name
-                          , settings
-                          , detail::read_and_no_convert()
-                          )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , settings
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_view( reader
              , view
              );
 }
@@ -174,10 +195,17 @@ void read_view( const String&    file_name
                                   >::type* /* ptr */ = 0
               )
 {
-    read_view( make_reader( file_name
-                          , tag
-                          , detail::read_and_no_convert()
-                          )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_no_convert
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , tag
+                                 , detail::read_and_no_convert()
+                                 );
+
+    read_view( reader
              , view
              );
 }

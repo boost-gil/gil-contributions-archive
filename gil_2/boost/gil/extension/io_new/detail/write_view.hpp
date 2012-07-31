@@ -70,9 +70,15 @@ void write_view( Device&          device
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_writer( device
-                           , tag
-                           )
+    typedef typename get_writer< Device
+                               , FormatTag
+                               >::type writer_t;
+
+    writer_t writer = make_writer( device
+                                 , tag
+                                 );
+
+    write_view( writer
               , view
               );
 }
@@ -94,9 +100,15 @@ void write_view( const String&    file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_writer( file_name
-                           , tag
-                           )
+    typedef typename get_writer< String
+                               , FormatTag
+                               >::type writer_t;
+
+    writer_t writer = make_writer( file_name
+                                 , tag
+                                 );
+
+    write_view( writer
               , view
               );
 }
@@ -122,9 +134,15 @@ void write_view( Device&                                 device
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_writer( device
-                           , info
-                           )
+    typedef typename get_writer< Device
+                               , FormatTag
+                               >::type writer_t;
+
+    writer_t writer = make_writer( device
+                                 , info
+                                 );
+
+    write_view( writer
               , view
               );
 }
@@ -147,9 +165,15 @@ void write_view( const String&                             file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_writer( file_name
-                           , info
-                           )
+    typedef typename get_writer< String
+                               , FormatTag
+                               >::type writer_t;
+
+    writer_t writer = make_writer( file_name
+                                 , info
+                                 );
+
+    write_view( writer
               , view
               );
 }
@@ -182,7 +206,7 @@ template< typename Device
 inline
 void write_view( Device&                        device
                , const any_image_view< Views >& views
-               , const FormatTag&
+               , const FormatTag&               tag
                , typename enable_if< typename mpl::and_< typename detail::is_write_device< FormatTag
                                                                                          , Device
                                                                                          >::type
@@ -191,9 +215,15 @@ void write_view( Device&                        device
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_dynamic_image_writer( device
-                                         , image_write_info< FormatTag >()
-                                         )
+    typedef typename get_dynamic_image_writer< Device
+                                             , FormatTag
+                                             >::type writer_t;
+
+    writer_t writer = make_dynamic_image_writer( device
+                                               , tag
+                                               );
+
+    write_view( writer
               , views
               );
 }
@@ -212,9 +242,15 @@ void write_view( const String&                  file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_dynamic_image_writer( file_name
-                                         , image_write_info< FormatTag >()
-                                         )
+    typedef typename get_dynamic_image_writer< String
+                                             , FormatTag
+                                             >::type writer_t;
+
+    writer_t writer = make_dynamic_image_writer( file_name
+                                               , tag
+                                               );
+
+    write_view( writer
               , views
               );
 }
@@ -240,9 +276,15 @@ void write_view( Device&                           device
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_dynamic_image_writer( device
-                                         , info
-                                         )
+    typedef typename get_dynamic_image_writer< Device
+                                             , FormatTag
+                                             >::type writer_t;
+
+    writer_t writer = make_dynamic_image_writer( device
+                                               , info
+                                               );
+
+    write_view( writer
               , views
               );
 }
@@ -264,9 +306,15 @@ void write_view( const String&                      file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    write_view( make_dynamic_image_writer( file_name
-                                         , info
-                                         )
+    typedef typename get_dynamic_image_writer< String
+                                             , FormatTag
+                                             >::type writer_t;
+
+    writer_t writer = make_dynamic_image_writer( file_name
+                                               , info
+                                               );
+
+    write_view( writer
               , views
               );
 }
