@@ -30,9 +30,9 @@ template< typename String >
 inline
 point2< std::ptrdiff_t > targa_read_dimensions( const String& filename )
 {
-    typedef get_reader_backend< String
-                              , targa_tag
-                              >::type backend_t;
+    typedef typename get_reader_backend< String
+                                       , targa_tag
+                                       >::type backend_t;
 
     backend_t backend = read_image_info( filename
                                        , targa_tag()

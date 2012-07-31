@@ -102,7 +102,10 @@ public:
         // Error exit handler: does not return to caller.
         _jerr.error_exit = &reader_backend::error_exit;
 
-        if( setjmp( _mark )) { raise_error(); }
+        if( setjmp( _mark ))
+        {
+            raise_error();
+        }
 
         _src._jsrc.bytes_in_buffer   = 0;
         _src._jsrc.next_input_byte   = buffer;
@@ -141,7 +144,6 @@ public:
             _settings._dim.y = _info._height;
         }
     }
-
 
     /// Read image header.
     void read_header()

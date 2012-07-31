@@ -80,12 +80,12 @@ make_reader( const std::wstring& file_name
 
     delete[] str;
 
-    return get_reader< std::wstring
-                     , FormatTag
-                     , ConversionPolicy
-                     >::type( device
-                            , settings
-                            );
+    return typename get_reader< std::wstring
+                              , FormatTag
+                              , ConversionPolicy
+                              >::type( device
+                                     , settings
+                                     );
 }
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
@@ -133,12 +133,12 @@ make_reader( Device&                                 file
                             , FormatTag
                             >::type device( file );
 
-    return get_reader< Device
-                     , FormatTag
-                     , ConversionPolicy
-                     >::type( device
-                            , settings
-                            );
+    return typename get_reader< Device
+                              , FormatTag
+                              , ConversionPolicy
+                              >::type( device
+                                     , settings
+                                     );
 }
 
 // no image_read_settings

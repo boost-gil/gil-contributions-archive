@@ -401,13 +401,13 @@ private:
 
         dst_view_t dst_view = interleaved_view( this->_info._width
                                               , 1
-                                              , (dst_view_t::value_type*) dst
+                                              , (typename dst_view_t::value_type*) dst
                                               , num_channels< dst_view_t >::value * 2 * this->_info._width
                                               );
 
 
-        typename Src_View::x_iterator src_it = src_view.row_begin( 0 );
-        dst_view_t::x_iterator dst_it        = dst_view.row_begin( 0 );
+        typename Src_View::x_iterator   src_it = src_view.row_begin( 0 );
+        typename dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
 
         for( dst_view_t::x_coord_t i = 0
            ; i < this->_info._width

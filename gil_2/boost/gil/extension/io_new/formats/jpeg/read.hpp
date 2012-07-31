@@ -100,7 +100,10 @@ public:
     void apply( const View& view )
     {
         // Fire exception in case of error.
-        if( setjmp( this->_mark )) { this->raise_error(); }
+        if( setjmp( this->_mark ))
+        {
+            this->raise_error();
+        }
 
         this->get()->dct_method = this->_settings._dct_method;
 
@@ -170,7 +173,10 @@ private:
         // @todo Is the buffer above cleaned up when the exception is thrown?
         //       The strategy right now is to allocate necessary memory before
         //       the setjmp.
-        if( setjmp( this->_mark )) { this->raise_error(); }
+        if( setjmp( this->_mark ))
+        {
+            this->raise_error();
+        }
 
 
         JSAMPLE *row_adr = reinterpret_cast< JSAMPLE* >( &buffer[0] );

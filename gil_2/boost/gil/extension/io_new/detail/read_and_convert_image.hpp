@@ -123,7 +123,7 @@ void read_and_convert_image( const String&                           file_name
 /// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
 /// \param img       The image in which the data is read into.
 /// \param cc        Color converter function object.
-/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template < typename String
          , typename Image
@@ -153,7 +153,7 @@ void read_and_convert_image( const String&         file_name
 /// \param file It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
 /// \param img  The image in which the data is read into.
 /// \param cc   Color converter function object.
-/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template < typename Device
          , typename Image
@@ -170,7 +170,7 @@ void read_and_convert_image( Device&               device
                                                                                   >
                                                           , is_format_tag< FormatTag >
                                                           >
-                                               >::type* /* ptr */ = 0 
+                                               >::type* /* ptr */ = 0
                            )
 {
     read_and_convert_image( make_reader( device
@@ -226,7 +226,7 @@ void read_and_convert_image( Device&                                 device
                                                                                   >
                                                           , is_format_tag< FormatTag >
                                                           >
-                                               >::type* /* ptr */ = 0 
+                                               >::type* /* ptr */ = 0
                            )
 {
     read_and_convert_image( make_reader( device
@@ -282,7 +282,7 @@ void read_and_convert_image( Device&          device
                                                                                   >
                                                           , is_format_tag< FormatTag >
                                                           >
-                                               >::type* /* ptr */ = 0 
+                                               >::type* /* ptr */ = 0
                            )
 {
     read_and_convert_image( make_reader( device

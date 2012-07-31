@@ -26,7 +26,6 @@ BOOST_AUTO_TEST_SUITE( bmp_test )
 
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
-
     {
         typedef get_reader_backend< const std::string
                                   , tag_t

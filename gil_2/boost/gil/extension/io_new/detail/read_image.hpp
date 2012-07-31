@@ -96,7 +96,7 @@ void read_image( Device&                                 file
 /// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file      It's a device. Must satisfy is_input_device metafunction.
 /// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
-/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template < typename Device
          , typename Image
@@ -158,7 +158,7 @@ void read_image( const String&                           file_name
 /// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
 /// \param img       The image in which the data is read into. Must satisfy is_read_supported metafunction.
-/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template < typename String
          , typename Image
@@ -223,9 +223,14 @@ void read_image( Device&                                 file
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_dynamic_image_reader( file
-                                         , settings
-                                         )
+    typedef typename get_dynamic_image_reader< Device
+                                             , FormatTag
+                                             >::type reader_t;
+
+    reader_t reader = make_dynamic_image_reader( file, tag );
+
+
+    read_image( reader
               , images
               );
 }
@@ -233,7 +238,7 @@ void read_image( Device&                                 file
 /// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file      It's a device. Must satisfy is_adaptable_input_device metafunction.
 /// \param images    Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
-/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template < typename Device
          , typename Images
@@ -251,9 +256,14 @@ void read_image( Device&              file
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_dynamic_image_reader( file
-                                         , tag
-                                         )
+    typedef typename get_dynamic_image_reader< Device
+                                             , FormatTag
+                                             >::type reader_t;
+
+    reader_t reader = make_dynamic_image_reader( file, tag );
+
+
+    read_image( reader
               , images
               );
 }
@@ -277,9 +287,14 @@ void read_image( const String&                           file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_dynamic_image_reader( file_name
-                                         , settings
-                                         )
+    typedef typename get_dynamic_image_reader< String
+                                             , FormatTag
+                                             >::type reader_t;
+
+    reader_t reader = make_dynamic_image_reader( file_name, tag );
+
+
+    read_image( reader
               , images
               );
 }
@@ -287,14 +302,14 @@ void read_image( const String&                           file_name
 /// \brief Reads an image without conversion. Image memory is allocated.
 /// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
 /// \param images    Dynamic image ( mpl::vector ). See boost::gil::dynamic_image extension.
-/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template < typename String
          , typename Images
          , typename FormatTag
          >
 inline
-void read_image( const String&       file_name
+void read_image( const String&        file_name
                , any_image< Images >& images
                , const FormatTag&     tag
                , typename enable_if< mpl::and_< detail::is_supported_path_spec< String >
@@ -303,9 +318,13 @@ void read_image( const String&       file_name
                                    >::type* /* ptr */ = 0
                )
 {
-    read_image( make_dynamic_image_reader( file_name
-                                         , tag
-                                         )
+    typedef typename get_dynamic_image_reader< String
+                                             , FormatTag
+                                             >::type reader_t;
+
+    reader_t reader = make_dynamic_image_reader( file_name, tag );
+
+    read_image( reader
               , images
               );
 }

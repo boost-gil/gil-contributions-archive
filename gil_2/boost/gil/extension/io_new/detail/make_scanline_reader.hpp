@@ -46,11 +46,11 @@ make_scanline_reader( const String&    file_name
                                           , typename detail::file_stream_device< FormatTag >::read_tag()
                                           );
 
-    return get_scanline_reader< String
-                              , FormatTag
-                              >::type( device
-                                     , image_read_settings<FormatTag>()
-                                     );
+    return typename get_scanline_reader< String
+                                       , FormatTag
+                                       >::type( device
+                                              , image_read_settings<FormatTag>()
+                                              );
 }
 
 template< typename FormatTag >
@@ -72,11 +72,11 @@ make_scanline_reader( const std::wstring& file_name
 
     delete[] str;
 
-    return get_scanline_reader< std::wstring
-                              , FormatTag
-                              >::type( device
-                                     , image_read_settings< FormatTag >()
-                                     );
+    return typename get_scanline_reader< std::wstring
+                                       , FormatTag
+                                       >::type( device
+                                              , image_read_settings< FormatTag >()
+                                              );
 }
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT

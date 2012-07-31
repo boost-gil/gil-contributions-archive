@@ -12,7 +12,11 @@ void test_scanline_reader( const char* file_name )
 {
 
     // read image using scanline_read_iterator
-    typedef scanline_reader< get_read_device< const char*, FormatTag >::type, FormatTag > reader_t;
+    typedef scanline_reader< typename get_read_device< const char*
+                                                     , FormatTag
+                                                     >::type
+                           , FormatTag
+                           > reader_t;
 
     reader_t reader = make_scanline_reader( file_name, FormatTag() );
 
@@ -27,7 +31,7 @@ void test_scanline_reader( const char* file_name )
     {
         *it;
 
-        copy_pixels( interleaved_view( reader._info._width, 1, ( Image::view_t::x_iterator ) buffer, reader._scanline_length )
+        copy_pixels( interleaved_view( reader._info._width, 1, ( typename Image::view_t::x_iterator ) buffer, reader._scanline_length )
                    , subimage_view( view( dst    ), 0, row, reader._info._width, 1 )
                    );
 

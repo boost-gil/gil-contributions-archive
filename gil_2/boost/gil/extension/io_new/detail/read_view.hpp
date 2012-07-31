@@ -40,7 +40,7 @@ template < typename Reader
          , typename View
          >
 inline
-void read_view( Reader&                                 reader
+void read_view( Reader                                  reader
               , const View&                             view
               , typename enable_if< typename mpl::and_< detail::is_reader< Reader >
                                                       , typename is_format_tag< typename Reader::format_tag_t >::type
@@ -93,7 +93,7 @@ void read_view( Device&                                 file
 /// \brief Reads an image view without conversion. No memory is allocated.
 /// \param file It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
 /// \param view The image view in which the data is read into.
-/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template< typename Device
         , typename View
@@ -155,7 +155,7 @@ void read_view( const String&                           file_name
 /// \brief Reads an image view without conversion. No memory is allocated.
 /// \param file_name File name. Must satisfy is_supported_path_spec metafunction.
 /// \param view      The image view in which the data is read into.
-/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param tag       Defines the image format. Must satisfy is_format_tag metafunction.
 /// \throw std::ios_base::failure
 template < typename String
          , typename View

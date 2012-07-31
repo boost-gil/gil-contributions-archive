@@ -93,7 +93,7 @@ public:
             offset = this->_info._offset
                    + pos * _pitch;
         }
-        
+
         this->_io_dev.seek( offset );
 
 
@@ -187,7 +187,7 @@ private:
                         read_palette();
                         _buffer.resize( _pitch );
 
-                        _read_function = boost::mem_fn( &this_t::read_8_bits_row ); 
+                        _read_function = boost::mem_fn( &this_t::read_8_bits_row );
 
                         break;
                     }
@@ -250,7 +250,7 @@ private:
                 }
 
 
-                _read_function = boost::mem_fn( &this_t::read_15_bits_row ); 
+                _read_function = boost::mem_fn( &this_t::read_15_bits_row );
 
                 break;
             }
@@ -258,7 +258,7 @@ private:
             case 24:
             {
                 this->_scanline_length = ( this->_info._width * num_channels< rgb8_view_t >::value + 3 ) & ~3;
-                _read_function = boost::mem_fn( &this_t::read_row ); 
+                _read_function = boost::mem_fn( &this_t::read_row );
 
                 break;
             }
@@ -266,8 +266,8 @@ private:
             case 32:
             {
                 this->_scanline_length = ( this->_info._width * num_channels< rgba8_view_t >::value + 3 ) & ~3;
-                _read_function = boost::mem_fn( &this_t::read_row ); 
-                
+                _read_function = boost::mem_fn( &this_t::read_row );
+
                 break;
             }
 
@@ -316,19 +316,19 @@ private:
     {
         typedef View src_view_t;
         typedef rgba8_image_t::view_t dst_view_t;
-        
+
         src_view_t src_view = interleaved_view( this->_info._width
                                               , 1
-                                              , (src_view_t::x_iterator) &_buffer.front()
+                                              , (typename src_view_t::x_iterator) &_buffer.front()
                                               , this->_pitch
                                               );
 
         dst_view_t dst_view = interleaved_view( this->_info._width
                                               , 1
-                                              , (dst_view_t::value_type*) dst
+                                              , (typename dst_view_t::value_type*) dst
                                               , num_channels< dst_view_t >::value * this->_info._width
                                               );
-        
+
 
         typename src_view_t::x_iterator src_it = src_view.row_begin( 0 );
         typename dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
@@ -373,15 +373,15 @@ private:
     void read_15_bits_row( byte_t* dst )
     {
         typedef rgb8_view_t dst_view_t;
-        typedef dst_view_t::x_iterator it_t;
+        typedef typename dst_view_t::x_iterator it_t;
 
         dst_view_t dst_view = interleaved_view( this->_info._width
                                               , 1
-                                              , (dst_view_t::value_type*) dst
+                                              , (typename dst_view_t::value_type*) dst
                                               , this->_pitch
                                               );
 
-        dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
+        typename dst_view_t::x_iterator dst_it = dst_view.row_begin( 0 );
 
         //
         byte_t* src = &_buffer.front();

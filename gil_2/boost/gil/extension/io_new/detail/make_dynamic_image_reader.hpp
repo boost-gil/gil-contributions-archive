@@ -46,11 +46,11 @@ make_dynamic_image_reader( const String&    file_name
                                  , typename detail::file_stream_device< FormatTag >::read_tag()
                                  );
 
-    return get_dynamic_image_reader< String
-                               , FormatTag
-                               >::type( device
-                                      , settings
-                                      );
+    return typename get_dynamic_image_reader< String
+                                            , FormatTag
+                                            >::type( device
+                                                   , settings
+                                                   );
 }
 
 template< typename FormatTag >
@@ -72,11 +72,11 @@ make_dynamic_image_reader( const std::wstring& file_name
 
     delete[] str;
 
-    return get_dynamic_image_reader< std::wstring
-                                   , FormatTag
-                                   >::type( device
-                                          , settings
-                                          );
+    return typename get_dynamic_image_reader< std::wstring
+                                            , FormatTag
+                                            >::type( device
+                                                   , settings
+                                                   );
 }
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
@@ -116,11 +116,11 @@ make_dynamic_image_reader( Device&          file
                    , FormatTag
                    >::type device( file );
 
-    return get_dynamic_image_reader< Device
-                                   , FormatTag
-                                   >::type( device
-                                          , settings
-                                          );
+    return typename get_dynamic_image_reader< Device
+                                            , FormatTag
+                                            >::type( device
+                                                   , settings
+                                                   );
 }
 
 // without image_read_settings

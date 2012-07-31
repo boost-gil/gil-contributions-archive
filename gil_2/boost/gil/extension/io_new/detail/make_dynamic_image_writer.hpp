@@ -46,11 +46,11 @@ make_dynamic_image_writer( const String&                        file_name
                                   , typename detail::file_stream_device< FormatTag >::write_tag()
                                   );
 
-    return get_dynamic_image_writer< String
-                                   , FormatTag
-                                   >::type( device
-                                          , info
-                                          );
+    return typename get_dynamic_image_writer< String
+                                            , FormatTag
+                                            >::type( device
+                                                   , info
+                                                   );
 }
 
 template< typename FormatTag >
@@ -72,11 +72,11 @@ make_dynamic_image_writer( const std::wstring&                  file_name
 
     delete[] str;
 
-    return get_dynamic_image_writer< std::wstring
-                                   , FormatTag
-                                   >::type( device
-                                          , info
-                                          );
+    return typename get_dynamic_image_writer< std::wstring
+                                            , FormatTag
+                                            >::type( device
+                                                   , info
+                                                   );
 }
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
@@ -115,11 +115,11 @@ make_dynamic_image_writer( Device&                              file
                     , FormatTag
                     >::type device( file );
 
-    return get_dynamic_image_writer< Device
-                                   , FormatTag
-                                   >::type( device
-                                          , info
-                                          );
+    return typename get_dynamic_image_writer< Device
+                                            , FormatTag
+                                            >::type( device
+                                                   , info
+                                                   );
 }
 
 

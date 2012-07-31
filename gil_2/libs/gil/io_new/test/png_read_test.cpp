@@ -43,8 +43,8 @@ void test_file( string filename )
 
 
     typedef get_reader_backend< const std::string
-                                , tag_t
-                                >::type backend_t;
+                              , tag_t
+                              >::type backend_t;
 
     backend_t backend = read_image_info( png_in + filename
                                         , settings

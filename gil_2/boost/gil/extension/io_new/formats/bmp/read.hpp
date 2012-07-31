@@ -349,7 +349,7 @@ private:
         }
 
         typedef rgb8_image_t image_t;
-        typedef image_t::view_t::x_iterator it_t;
+        typedef typename image_t::view_t::x_iterator it_t;
 
         for( std::ptrdiff_t y = 0
            ; y < this->_settings._dim.y
