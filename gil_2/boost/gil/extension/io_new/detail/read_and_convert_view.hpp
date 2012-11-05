@@ -82,10 +82,17 @@ void read_and_convert_view( Device&                                 file
 
                           )
 {
-    read_and_convert_view( make_reader( file
-                                      , settings
-                                      , detail::read_and_convert< ColorConverter >( cc )
-                                      )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( device
+                                 , settings
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_view( reader
                          , view
                          );
 }
@@ -112,10 +119,17 @@ void read_and_convert_view( const String&                           file_name
                                             >::type* /* ptr */ = 0
                           )
 {
-    read_and_convert_view( make_reader( file_name
-                                      , settings
-                                      , detail::read_and_convert< ColorConverter >( cc )
-                                      )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , settings
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_view( reader
                          , view
                          );
 }
@@ -142,10 +156,17 @@ void read_and_convert_view( const String&         file_name
                                             >::type* /* ptr */ = 0
                           )
 {
-    read_and_convert_view( make_reader( file_name
-                                      , tag
-                                      , detail::read_and_convert< ColorConverter >( cc )
-                                      )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , tag
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_view( reader
                          , view
                          );
 }
@@ -174,10 +195,17 @@ void read_and_convert_view( Device&               device
                                                >::type* /* ptr */ = 0
                           )
 {
-    read_and_convert_view( make_reader( device
-                                      , tag
-                                      , detail::read_and_convert< ColorConverter >( cc )
-                                      )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< ColorConverter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( device
+                                 , tag
+                                 , detail::read_and_convert< ColorConverter >( cc )
+                                 );
+
+    read_and_convert_view( reader
                          , view
                          );
 }
@@ -201,10 +229,17 @@ void read_and_convert_view( const String&                           file_name
                                             >::type* /* ptr */ = 0
                           )
 {
-    read_and_convert_view( make_reader( file_name
-                                      , settings
-                                      , detail::read_and_convert< default_color_converter >()
-                                      )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , settings
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_view( reader
                          , view
                          );
 }
@@ -230,12 +265,20 @@ void read_and_convert_view( Device&                                 device
                                                >::type* /* ptr */ = 0
                           )
 {
-    read_and_convert_view( make_reader( device
-                                      , settings
-                                      , detail::read_and_convert< default_color_converter >()
-                                      )
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( device
+                                 , settings
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_view( reader
                          , view
                          );
+
 }
 
 /// \brief Reads and color-converts an image view. No memory is allocated.
@@ -257,10 +300,17 @@ void read_and_convert_view( const String&    file_name
                                               >::type* /* ptr */ = 0
                           )
 {
-    read_and_convert_view( make_reader( file_name
-                                      , tag
-                                      , detail::read_and_convert< default_color_converter >()
-                                      )
+    typedef typename get_reader< String
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( file_name
+                                 , tag
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_view( reader
                          , view
                          );
 }
@@ -286,12 +336,19 @@ void read_and_convert_view( Device&          device
                                                >::type* /* ptr */ = 0
                           )
 {
-    read_and_convert_view( make_reader( device
-                                      , tag
-                                      , detail::read_and_convert< default_color_converter >()
-                                      )
-                          , view
-                          );
+    typedef typename get_reader< Device
+                               , FormatTag
+                               , detail::read_and_convert< default_color_converter >
+                               >::type reader_t;
+
+    reader_t reader = make_reader( device
+                                 , tag
+                                 , detail::read_and_convert< default_color_converter >()
+                                 );
+
+    read_and_convert_view( reader
+                         , view
+                         );
 }
 
 } // namespace gil
