@@ -69,7 +69,7 @@ template< typename Device
         , typename FormatTag
         >
 inline
-void read_and_convert_view( Device&                                 file
+void read_and_convert_view( Device&                                 device
                           , const View&                             view
                           , const image_read_settings< FormatTag >& settings
                           , const ColorConverter&                   cc
