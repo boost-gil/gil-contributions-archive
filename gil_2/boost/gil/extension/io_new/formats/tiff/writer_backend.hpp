@@ -74,10 +74,7 @@ protected:
         this->_io_dev.template set_property< tiff_image_height >( height );
 
         // write planar configuration
-        if( is_bit_aligned< View >::value == false )
-        {
-            this->_io_dev.template set_property<tiff_planar_configuration>( this->_info._planar_configuration );
-        }
+        this->_io_dev.template set_property<tiff_planar_configuration>( this->_info._planar_configuration );
 
         // write samples per pixel
         tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;

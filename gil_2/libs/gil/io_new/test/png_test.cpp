@@ -199,6 +199,18 @@ BOOST_AUTO_TEST_CASE( write_view_test )
     }
 
     {
+        string filename( png_out + "write_test_string_bgr.png" );
+
+        write_view( filename
+                  , create_mandel_view( 320, 240
+                                      , bgr8_pixel_t( 255, 0, 0 )
+                                      , bgr8_pixel_t( 0, 255, 0 )
+                                      )
+                  , tag_t()
+                  );
+    }
+
+    {
         string filename( png_out + "write_test_ofstream.png" );
 
         ofstream out( filename.c_str(), ios::out | ios::binary );

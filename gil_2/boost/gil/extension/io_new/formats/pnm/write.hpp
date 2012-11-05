@@ -175,32 +175,42 @@ private:
                    , const mpl::false_&    // bit_aligned
                    )
     {
-		byte_vector_t buf( pitch );
+        std::vector< pixel< typename channel_type< View >::type
+                          , layout<typename color_space_type< View >::type >
+                          >
+                   > buf( src.width() );
 
         typedef typename View::value_type pixel_t;
         typedef typename view_type_from_pixel< pixel_t >::type view_t;
 
-        view_t row = interleaved_view( src.width()
-                                     , 1
-                                     , reinterpret_cast< pixel_t* >( &buf.front() )
-                                     , pitch
-                                     );
+        //view_t row = interleaved_view( src.width()
+        //                             , 1
+        //                             , reinterpret_cast< pixel_t* >( &buf.front() )
+        //                             , pitch
+        //                             );
+
+        byte_t* row_addr = reinterpret_cast< byte_t* >( &buf.front() );
 
         for( typename View::y_coord_t y = 0
            ; y < src.height()
            ; ++y
            )
 		{
-            copy_pixels( subimage_view( src
-                                      , 0
-                                      , (int) y
-                                      , (int) src.width()
-                                      , 1
-                                      )
-                       , row
-                       );
+            //copy_pixels( subimage_view( src
+            //                          , 0
+            //                          , (int) y
+            //                          , (int) src.width()
+            //                          , 1
+            //                          )
+            //           , row
+            //           );
 
-            this->_io_dev.write( &buf.front(), pitch );
+            std::copy( src.row_begin( y )
+                     , src.row_end  ( y )
+                     , buf.begin()
+                     );
+
+            this->_io_dev.write( row_addr, pitch );
 		}
     }
 };

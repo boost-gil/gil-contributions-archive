@@ -42,13 +42,13 @@ template< typename Reader
         , typename View
         >
 inline
-void read_and_convert_image( Reader&     reader
-                           , const View& view
-                           , typename enable_if< mpl::and_< detail::is_reader< Reader >
-                                                          , is_format_tag< typename Reader::format_tag_t >
-                                                          >
-                           >::type* /* ptr */ = 0
-                           )
+void read_and_convert_view( Reader&     reader
+                          , const View& view
+                          , typename enable_if< mpl::and_< detail::is_reader< Reader >
+                                                         , is_format_tag< typename Reader::format_tag_t >
+                                                         >
+                          >::type* /* ptr */ = 0
+                          )
 {
     reader.init_view( view
                     , reader._settings
@@ -58,7 +58,7 @@ void read_and_convert_image( Reader&     reader
 }
 
 /// \brief Reads and color-converts an image view. No memory is allocated.
-/// \param device    It's a device. Must satisfy is_input_device metafunction.
+/// \param file      It's a device. Must satisfy is_input_device metafunction.
 /// \param view      The image view in which the data is read into.
 /// \param settings  Specifies read settings depending on the image format.
 /// \param cc        Color converter function object.
@@ -69,7 +69,7 @@ template< typename Device
         , typename FormatTag
         >
 inline
-void read_and_convert_view( Device&                                 device
+void read_and_convert_view( Device&                                 file
                           , const View&                             view
                           , const image_read_settings< FormatTag >& settings
                           , const ColorConverter&                   cc
@@ -82,17 +82,10 @@ void read_and_convert_view( Device&                                 device
 
                           )
 {
-    typedef typename get_reader< Device
-                               , FormatTag
-                               , detail::read_and_convert< ColorConverter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( device
-                                 , settings
-                                 , detail::read_and_convert< ColorConverter >( cc )
-                                 );
-    
-    read_and_convert_view( reader
+    read_and_convert_view( make_reader( file
+                                      , settings
+                                      , detail::read_and_convert< ColorConverter >( cc )
+                                      )
                          , view
                          );
 }
@@ -119,17 +112,10 @@ void read_and_convert_view( const String&                           file_name
                                             >::type* /* ptr */ = 0
                           )
 {
-    typedef typename get_reader< String
-                               , FormatTag
-                               , detail::read_and_convert< ColorConverter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( file_name
-                                 , settings
-                                 , detail::read_and_convert< ColorConverter >( cc )
-                                 );
-    
-    read_and_convert_view( reader
+    read_and_convert_view( make_reader( file_name
+                                      , settings
+                                      , detail::read_and_convert< ColorConverter >( cc )
+                                      )
                          , view
                          );
 }
@@ -156,26 +142,19 @@ void read_and_convert_view( const String&         file_name
                                             >::type* /* ptr */ = 0
                           )
 {
-    typedef typename get_reader< String
-                               , FormatTag
-                               , detail::read_and_convert< ColorConverter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( file_name
-                                 , tag
-                                 , detail::read_and_convert< ColorConverter >( cc )
-                                 );
-    
-    read_and_convert_view( reader
+    read_and_convert_view( make_reader( file_name
+                                      , tag
+                                      , detail::read_and_convert< ColorConverter >( cc )
+                                      )
                          , view
                          );
 }
 
 /// \brief Reads and color-converts an image view. No memory is allocated.
-/// \param device It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
-/// \param view   The image view in which the data is read into.
-/// \param cc     Color converter function object.
-/// \param tag    Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param file It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
+/// \param view The image view in which the data is read into.
+/// \param cc   Color converter function object.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
 /// \throw std::ios_base::failure
 template < typename Device
          , typename View
@@ -195,17 +174,10 @@ void read_and_convert_view( Device&               device
                                                >::type* /* ptr */ = 0
                           )
 {
-    typedef typename get_reader< Device
-                               , FormatTag
-                               , detail::read_and_convert< ColorConverter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( device
-                                 , tag
-                                 , detail::read_and_convert< ColorConverter >( cc )
-                                 );
-    
-    read_and_convert_view( reader
+    read_and_convert_view( make_reader( device
+                                      , tag
+                                      , detail::read_and_convert< ColorConverter >( cc )
+                                      )
                          , view
                          );
 }
@@ -229,23 +201,16 @@ void read_and_convert_view( const String&                           file_name
                                             >::type* /* ptr */ = 0
                           )
 {
-    typedef typename get_reader< String
-                               , FormatTag
-                               , detail::read_and_convert< default_color_converter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( file_name
-                                 , settings
-                                 , detail::read_and_convert< default_color_converter >()
-                                 );
-
-    read_and_convert_view( reader
+    read_and_convert_view( make_reader( file_name
+                                      , settings
+                                      , detail::read_and_convert< default_color_converter >()
+                                      )
                          , view
                          );
 }
 
 /// \brief Reads and color-converts an image view. No memory is allocated.
-/// \param device    It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
+/// \param file      It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
 /// \param view      The image view in which the data is read into.
 /// \param settings  Specifies read settings depending on the image format.
 /// \throw std::ios_base::failure
@@ -265,17 +230,10 @@ void read_and_convert_view( Device&                                 device
                                                >::type* /* ptr */ = 0
                           )
 {
-    typedef typename get_reader< Device
-                               , FormatTag
-                               , detail::read_and_convert< default_color_converter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( device
-                                 , settings
-                                 , detail::read_and_convert< default_color_converter >()
-                                 );
-
-    read_and_convert_view( reader
+    read_and_convert_view( make_reader( device
+                                      , settings
+                                      , detail::read_and_convert< default_color_converter >()
+                                      )
                          , view
                          );
 }
@@ -299,26 +257,18 @@ void read_and_convert_view( const String&    file_name
                                               >::type* /* ptr */ = 0
                           )
 {
-    typedef typename get_reader< String
-                               , FormatTag
-                               , detail::read_and_convert< default_color_converter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( file_name
-                                 , tag
-                                 , detail::read_and_convert< default_color_converter >()
-                                 );
-
-    //@todo Visual Studio 2010 breaks here
-    //read_and_convert_view( reader
-    //                     , view
-    //                     );
+    read_and_convert_view( make_reader( file_name
+                                      , tag
+                                      , detail::read_and_convert< default_color_converter >()
+                                      )
+                         , view
+                         );
 }
 
 /// \brief Reads and color-converts an image view. No memory is allocated.
-/// \param device It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
-/// \param view   The image view in which the data is read into.
-/// \param tag    Defines the image format. Must satisfy is_format_tag metafunction. 
+/// \param file It's a device. Must satisfy is_input_device metafunction or is_adaptable_input_device.
+/// \param view The image view in which the data is read into.
+/// \param tag  Defines the image format. Must satisfy is_format_tag metafunction. 
 /// \throw std::ios_base::failure
 template < typename Device
          , typename View
@@ -336,20 +286,12 @@ void read_and_convert_view( Device&          device
                                                >::type* /* ptr */ = 0
                           )
 {
-    typedef typename get_reader< Device
-                               , FormatTag
-                               , detail::read_and_convert< default_color_converter >
-                               >::type reader_t;
-
-    reader_t reader = make_reader( device
-                                 , tag
-                                 , detail::read_and_convert< default_color_converter >()
-                                 );
-
-    //@todo Visual Studio 2010 breaks here
-    //read_and_convert_view( reader
-    //                     , view
-    //                     );
+    read_and_convert_view( make_reader( device
+                                      , tag
+                                      , detail::read_and_convert< default_color_converter >()
+                                      )
+                          , view
+                          );
 }
 
 } // namespace gil

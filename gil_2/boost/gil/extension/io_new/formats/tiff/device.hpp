@@ -198,6 +198,20 @@ public:
                    );
     }
 
+    void write_scaline( byte_t*     buffer
+                      , uint32      row
+                      , tsample_t   plane
+                      )
+    {
+       io_error_if( TIFFWriteScanline( _tiff_file.get()
+                                     , buffer
+                                     , row
+                                     , plane 
+                                     ) == -1
+                   , "Write error"
+                   );
+    }
+
     template< typename Buffer >
     void write_tile( Buffer&     buffer
                    , uint32      x

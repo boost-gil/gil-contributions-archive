@@ -4,6 +4,7 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io_new/jpeg_all.hpp>
 
+#include "color_space_write_test.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
 
@@ -68,6 +69,13 @@ BOOST_AUTO_TEST_CASE( dct_method_write_test )
                   , info
                   );
     }
+}
+
+BOOST_AUTO_TEST_CASE( rgb_color_space_write_test )
+{
+    color_space_write_test< jpeg_tag >( jpeg_out + "rgb_color_space_test.jpg"
+                                      , jpeg_out + "bgr_color_space_test.jpg"
+                                      );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

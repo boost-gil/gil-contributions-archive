@@ -3,6 +3,7 @@
 
 #include <boost/gil/extension/io_new/pnm_all.hpp>
 
+#include "color_space_write_test.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
 
@@ -50,6 +51,13 @@ BOOST_AUTO_TEST_CASE( write_test )
                   , pnm_tag()
                   );
     }
+}
+
+BOOST_AUTO_TEST_CASE( rgb_color_space_write_test )
+{
+    color_space_write_test< pnm_tag >( pnm_out + "rgb_color_space_test.pnm"
+                                     , pnm_out + "bgr_color_space_test.pnm"
+                                     );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -83,7 +83,10 @@ private:
     template<typename View>
     void write_rows( const View& view )
     {
-        std::vector< typename View::value_type > row_buffer( view.width() );
+        std::vector< pixel< typename channel_type< View >::type
+                          , layout<typename color_space_type< View >::type >
+                          >
+                   > row_buffer( view.width() );
 
         // In case of an error we'll jump back to here and fire an exception.
         // @todo Is the buffer above cleaned up when the exception is thrown?
@@ -102,10 +105,10 @@ private:
 
         jpeg_set_defaults( this->get() );
 
-        jpeg_set_quality ( this->get()
-                         , this->_info._quality
-                         , TRUE
-                         );
+        jpeg_set_quality( this->get()
+                        , this->_info._quality
+                        , TRUE
+                        );
 
         // Needs to be done after jpeg_set_defaults() since it's overridding this value back to slow.
         this->get()->dct_method = this->_info._dct_method;

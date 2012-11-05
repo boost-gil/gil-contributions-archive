@@ -38,6 +38,7 @@
     }
 #endif
 
+#include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
 #include "writer_backend.hpp"
@@ -93,7 +94,7 @@ public:
         this->write_header( view );
 
         write_view( view
-                  , typename is_bit_aligned< View >::type()
+                  , typename is_bit_aligned< typename View::value_type >::type()
                   );
     }
 
@@ -123,9 +124,10 @@ private:
             }
         }
 
-        detail::row_buffer_helper_view< View > row_buffer( view.width()
-                                                         , false
-                                                         );
+        std::vector< pixel< typename channel_type< View >::type
+                          , layout<typename color_space_type< View >::type >
+                          >
+                   > row_buffer( view.width() );
 
         for( int y = 0; y != view.height(); ++ y)
         {

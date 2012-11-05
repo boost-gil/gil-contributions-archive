@@ -209,20 +209,21 @@ private:
                    , const mpl::false_&    // bit_aligned
                    )
     {
-        byte_vector_t row( row_size_in_bytes );
+        std::vector< pixel< typename channel_type< View >::type
+                          , layout<typename color_space_type< View >::type >
+                          >
+                   > row( view.size() );
 
-        typedef typename detail::my_interleaved_pixel_iterator_type_from_pixel_reference< typename View::reference >::type x_iterator;
-
-        x_iterator row_it = x_iterator( &(*row.begin()));
+        byte_t* row_addr = reinterpret_cast< byte_t* >( &row.front() );
 
         for( typename View::y_coord_t y = 0; y < view.height(); ++y )
         {
             std::copy( view.row_begin( y )
-                     , view.row_end( y )
-                     , row_it
+                     , view.row_end  ( y )
+                     , row.begin()
                      );
 
-            this->_io_dev.write_scaline( row
+            this->_io_dev.write_scaline( row_addr
                                        , (uint32) y
                                        , 0
                                        );
@@ -248,7 +249,8 @@ private:
     }
 
     template< typename View,
-              typename IteratorType >
+              typename IteratorType
+            >
     void internal_write_tiled_data( const View&            view
                                   , tiff_tile_width::type  tw
                                   , tiff_tile_length::type th

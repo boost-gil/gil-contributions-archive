@@ -4,8 +4,10 @@
 #include <boost/gil/gil_all.hpp>
 
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
-#include <boost/gil/extension/io_new/bmp_write.hpp>
+#include <boost/gil/extension/io_new/bmp_all.hpp>
 
+#include "cmp_view.hpp"
+#include "color_space_write_test.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
 
@@ -38,6 +40,13 @@ BOOST_AUTO_TEST_CASE( write_test )
                   , tag_t()
                   );
     }
+}
+
+BOOST_AUTO_TEST_CASE( rgb_color_space_write_test )
+{
+    color_space_write_test< bmp_tag >( bmp_out + "rgb_color_space_test.bmp"
+                                     , bmp_out + "bgr_color_space_test.bmp"
+                                     );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

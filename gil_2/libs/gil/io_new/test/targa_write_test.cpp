@@ -4,8 +4,9 @@
 #include <boost/gil/gil_all.hpp>
 
 #include <boost/gil/extension/io_new/detail/typedefs.hpp>
-#include <boost/gil/extension/io_new/targa_write.hpp>
+#include <boost/gil/extension/io_new/targa_all.hpp>
 
+#include "color_space_write_test.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
 
@@ -38,6 +39,13 @@ BOOST_AUTO_TEST_CASE( write_test )
                   , tag_t()
                   );
     }
+}
+
+BOOST_AUTO_TEST_CASE( rgb_color_space_write_test )
+{
+    color_space_write_test< tag_t >( targa_out + "rgb_color_space_test.tga"
+                                   , targa_out + "bgr_color_space_test.tga"
+                                   );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
