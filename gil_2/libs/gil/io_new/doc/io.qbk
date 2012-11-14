@@ -21,6 +21,7 @@
 [def _PNG_Wiki_            [@http://en.wikipedia.org/wiki/Portable_Network_Graphics]]
 [def _PNG_Lib_             [@http://libpng.org/pub/png/libpng.html]]
 [def _PNM_Wiki_            [@http://en.wikipedia.org/wiki/Portable_anymap]]
+[def _RAW_Wiki_            [@http://en.wikipedia.org/wiki/Raw_image_format]]
 [def _TARGA_Wiki           [@http://en.wikipedia.org/wiki/Truevision_TGA]]
 [def _TIFF_Wiki_           [@http://en.wikipedia.org/wiki/Tagged_Image_File_Format]]
 [def _TIFF_Lib_            [@http://www.remotesensing.org/libtiff/]]

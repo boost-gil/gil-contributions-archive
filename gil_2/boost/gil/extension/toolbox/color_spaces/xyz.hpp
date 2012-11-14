@@ -1,24 +1,27 @@
-// Copyright 2008-12 Chung-Lin Wen, Davide Anastasia
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+/*
+    Copyright 2012 Chung-Lin Wen, Davide Anastasia
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
 
 /*************************************************************************************************/
 
-#ifndef GIL_XYZ_H
-#define GIL_XYZ_H
+#ifndef BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_XYZ_HPP
+#define BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_XYZ_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file xyz.hpp
 /// \brief Support for CIE XYZ color space
-/// \author Chung-Lin Wen \n
-/// \author Davide Anastasia \n
+/// \author Chung-Lin Wen, Davide Anastasia \n
+///
+/// \date 2012 \n
+///
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/cast.hpp>
-#include <boost/gil/gil_all.hpp>
 
-namespace boost { namespace gil {
+namespace boost{ namespace gil {
 
 /// \addtogroup ColorNameModel
 /// \{
@@ -154,6 +157,7 @@ public:
     }
 };
 
-} }  // namespace boost::gil
+} // namespace gil
+} // namespace boost
 
-#endif // GIL_XYZ_H
+#endif // BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_XYZ_HPP

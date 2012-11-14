@@ -20,7 +20,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/gil/extension/toolbox/gil_extensions.hpp>
+#include <boost/gil/extension/toolbox/metafunctions/is_bit_aligned.hpp>
 
 #include "typedefs.hpp"
 

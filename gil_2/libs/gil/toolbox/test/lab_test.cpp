@@ -7,9 +7,6 @@
 /// \brief Unit test for LAB Colorspace
 /// \author Davide Anastasia <davideanastasia@users.sourceforge.net>
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE LABColorSpaceTest
-
 #include <boost/test/unit_test.hpp>
 
 #define TEST_CHECK_CLOSE(a, b) \
@@ -17,15 +14,15 @@
 
 #include <iostream>
 #include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/toolbox/lab.hpp>
+#include <boost/gil/extension/toolbox/color_spaces/lab.hpp>
 
 using namespace boost;
 
-BOOST_AUTO_TEST_SUITE(Lab_to_XYZ)
+BOOST_AUTO_TEST_SUITE(Lab_Test)
 
 BOOST_AUTO_TEST_CASE(Lab_to_XYZ_Test1)
 {
-    gil::lab32f_pixel_t lab_pixel(40.366198, 53.354489, 26.117702);
+    gil::lab32f_pixel_t lab_pixel(40.366198f, 53.354489f, 26.117702f);
     gil::xyz32f_pixel_t xyz_pixel;
 
     gil::color_convert(lab_pixel, xyz_pixel);
@@ -47,10 +44,6 @@ BOOST_AUTO_TEST_CASE(Lab_to_XYZ_Test2)
     TEST_CHECK_CLOSE(static_cast<float>(xyz_pixel[2]), 0.200548f);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(XYZ_to_Lab)
-
 BOOST_AUTO_TEST_CASE(XYZ_to_Lab_Test1)
 {
     gil::lab32f_pixel_t lab_pixel;
@@ -62,10 +55,6 @@ BOOST_AUTO_TEST_CASE(XYZ_to_Lab_Test1)
     TEST_CHECK_CLOSE(static_cast<float>(lab_pixel[1]), 23.4674f);
     TEST_CHECK_CLOSE(static_cast<float>(lab_pixel[2]), -22.322275f);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(RGB_to_Lab)
 
 BOOST_AUTO_TEST_CASE(RGB_to_Lab_Test1)
 {
@@ -127,10 +116,6 @@ BOOST_AUTO_TEST_CASE(RGB_to_Lab_Test5)
     TEST_CHECK_CLOSE(static_cast<float>(lab_pixel[2]), 0.f);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(Lab_to_RGB)
-
 BOOST_AUTO_TEST_CASE(Lab_to_RGB_Test1)
 {
     gil::lab32f_pixel_t lab_pixel(75.f, 20.f, 40.f);
@@ -157,12 +142,12 @@ BOOST_AUTO_TEST_CASE(Lab_to_RGB_Test2)
 
 BOOST_AUTO_TEST_CASE(Lab_to_RGB_Test3)
 {
-    gil::lab32f_pixel_t lab_pixel(56.8140f, -42.3665, 10.6728f);
+    gil::lab32f_pixel_t lab_pixel(56.8140f, -42.3665f, 10.6728f);
     gil::rgb32f_pixel_t rgb_pixel;
 
     gil::color_convert(lab_pixel, rgb_pixel);
 
-    TEST_CHECK_CLOSE(static_cast<float>(rgb_pixel[0]), 0.1f);
+    TEST_CHECK_CLOSE(static_cast<float>(rgb_pixel[0]), 0.099999f);
     TEST_CHECK_CLOSE(static_cast<float>(rgb_pixel[1]), 0.605568f);
     TEST_CHECK_CLOSE(static_cast<float>(rgb_pixel[2]), 0.456662f);
 }

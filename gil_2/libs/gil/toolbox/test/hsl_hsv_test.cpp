@@ -6,8 +6,8 @@
 /// \brief Unit test for hsl and hsv color spaces 
 
 #include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/toolbox/hsl.hpp>
-#include <boost/gil/extension/toolbox/hsv.hpp>
+#include <boost/gil/extension/toolbox/color_spaces/hsl.hpp>
+#include <boost/gil/extension/toolbox/color_spaces/hsv.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -19,86 +19,57 @@ BOOST_AUTO_TEST_SUITE( hsl_hsv_test_suite )
 
 BOOST_AUTO_TEST_CASE( hsl_hsv_test )
 {
-   {
-      gray32f_pixel_t g( 1.f );
+    {
+        rgb8_pixel_t p( 128, 0, 128 );
 
-      float red_1 = channel_convert< bits32f >( 1.f );
-      float red_2 = channel_convert< bits32f >( (bits32f) 1.f );
+        hsl32f_pixel_t h;
 
-      int i = 9;
-   }
+        color_convert( p, h );
+        color_convert( h, p );
+    }
 
+    {
+        size_t width  = 640;
+        size_t height = 480;
 
-   {
-      rgb8_pixel_t p( 128, 0, 128 );
+        hsl32f_image_t hsl_img( width, height );
+        hsv32f_image_t hsv_img( width, height );
 
-      hsl32f_pixel_t h;
+        for( size_t y = 0; y < height; y++ )
+        {
+            hsl32f_view_t::x_iterator hsl_x_it = view( hsl_img ).row_begin( y );
+            hsv32f_view_t::x_iterator hsv_x_it = view( hsv_img ).row_begin( y );
 
-      color_convert( p, h );
-      color_convert( h, p );
+            float v = static_cast<float>( height -  y ) 
+                    / height;
 
-      int i = 9;
-   }
+            for( size_t x = 0; x < width; x++ )
+            {
+                float hue = ( x + 1.f ) / width;
 
-   {
-      size_t width  = 640;
-      size_t height = 480;
+                hsl_x_it[x] = hsl32f_pixel_t( hue, 1.0, v );
+                hsv_x_it[x] = hsv32f_pixel_t( hue, 1.0, v );
+            }
+        }
+    }
 
-      hsl32f_image_t hsl_img( width, height );
-      hsv32f_image_t hsv_img( width, height );
+    {
+        rgb8_image_t rgb_img( 640, 480 );
+        fill_pixels( view(rgb_img), rgb8_pixel_t( 255, 128, 64 ));
+        hsl32f_image_t hsl_img( view( rgb_img ).dimensions() );
 
-      for( size_t y = 0; y < height; y++ )
-      {
-         hsl32f_view_t::x_iterator hsl_x_it = view( hsl_img ).row_begin( y );
-         hsv32f_view_t::x_iterator hsv_x_it = view( hsv_img ).row_begin( y );
+        copy_pixels( color_converted_view<hsl32f_pixel_t>( view( rgb_img ))
+                    , view( hsl_img ));
+    }
 
-         float v = static_cast<float>( height -  y ) 
-                 / height;
+    {
+        rgb8_image_t rgb_img( 640, 480 );
+        fill_pixels( view(rgb_img), rgb8_pixel_t( 255, 128, 64 ));
+        hsv32f_image_t hsv_img( view( rgb_img ).dimensions() );
 
-         for( size_t x = 0; x < width; x++ )
-         {
-            float hue = ( x + 1.f ) / width;
-
-            hsl_x_it[x] = hsl32f_pixel_t( hue, 1.0, v );
-            hsv_x_it[x] = hsv32f_pixel_t( hue, 1.0, v );
-         }
-      }
-
-      //bmp_write_view( ".\\hsl_test.bmp"
-      //              , color_converted_view<rgb8_pixel_t>( color_converted_view<rgb32f_pixel_t>( view( hsl_img ))));
-
-      //bmp_write_view( ".\\hsv_test.bmp"
-      //              , color_converted_view<rgb8_pixel_t>( color_converted_view<rgb32f_pixel_t>( view( hsv_img ))));
-   }
-
-
-   {
-      rgb8_image_t rgb_img;
-      //bmp_read_image( ".\\flower.bmp", rgb_img );
-
-      hsl32f_image_t hsl_img( view( rgb_img ).dimensions() );
-
-      copy_pixels( color_converted_view<hsl32f_pixel_t>( view( rgb_img ))
-                 , view( hsl_img ));
-
-      //bmp_write_view( ".\\flower_hsl.bmp"
-      //              , color_converted_view<rgb8_pixel_t>(view( rgb_img )));
-      
-   }
-
-   {
-      rgb8_image_t rgb_img;
-      //bmp_read_image( ".\\flower.bmp", rgb_img );
-
-      hsv32f_image_t hsv_img( view( rgb_img ).dimensions() );
-
-      copy_pixels( color_converted_view<hsv32f_pixel_t>( view( rgb_img ))
-                 , view( hsv_img ));
-
-      //bmp_write_view( ".\\flower_hsv.bmp"
-      //              , color_converted_view<rgb8_pixel_t>(view( rgb_img )));
-      
-   }
+        copy_pixels( color_converted_view<hsv32f_pixel_t>( view( rgb_img ))
+                    , view( hsv_img ));
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

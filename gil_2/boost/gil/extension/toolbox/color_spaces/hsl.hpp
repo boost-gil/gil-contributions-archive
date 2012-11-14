@@ -1,22 +1,25 @@
-// Copyright 2007 Christian Henning.
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+/*
+    Copyright 2012 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
 
 /*************************************************************************************************/
 
-#ifndef GIL_HSL_H
-#define GIL_HSL_H
+#ifndef BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_HSL_HPP
+#define BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_HSL_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file
+/// \file hsl.hpp
 /// \brief Support for HSL color space
 /// \author Christian Henning \n
+///
+/// \date 2012 \n
+///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/gil/gil_all.hpp>
-
-namespace boost { namespace gil {
+namespace boost{ namespace gil {
 
 /// \addtogroup ColorNameModel
 /// \{
@@ -257,6 +260,7 @@ struct default_color_converter_impl<hsl_t,rgb_t>
    }
 };
 
-} }  // namespace boost::gil
+} // namespace gil
+} // namespace boost
 
-#endif // GIL_HSL_H
+#endif // BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_HSL_HPP

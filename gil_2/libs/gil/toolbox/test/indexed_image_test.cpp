@@ -5,10 +5,11 @@
 
 /// \brief Unit test for indexed_image type.
 
-#include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/toolbox/indexed_image.hpp>
-
 #include <boost/test/unit_test.hpp>
+
+#include <boost/gil/gil_all.hpp>
+#include <boost/gil/extension/toolbox/image_types/indexed_image.hpp>
+
 
 using namespace std;
 using namespace boost;

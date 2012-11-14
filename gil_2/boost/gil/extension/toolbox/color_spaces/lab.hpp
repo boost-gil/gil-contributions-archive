@@ -1,24 +1,29 @@
-// Copyright 2008 Chung-Lin Wen.
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+/*
+    Copyright 2012 Chung-Lin Wen
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
 
 /*************************************************************************************************/
 
-#ifndef GIL_LAB_H
-#define GIL_LAB_H
+#ifndef BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_LAB_HPP
+#define BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_LAB_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file
+/// \file lap.hpp
 /// \brief Support for CIE Lab color space
 /// \author Chung-Lin Wen \n
+///
+/// \date 2012 \n
+///
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/cast.hpp>
 #include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/toolbox/xyz.hpp>
+#include <boost/gil/extension/toolbox/color_spaces/xyz.hpp>
 
-namespace boost { namespace gil {
+namespace boost{ namespace gil {
 
 /// \addtogroup ColorNameModel
 /// \{
@@ -168,6 +173,7 @@ struct default_color_converter_impl<lab_t,rgb_t>
     }
 };
 
-} }  // namespace boost::gil
+} // namespace gil
+} // namespace boost
 
-#endif // GIL_LAB_H
+#endif // BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_LAB_HPP

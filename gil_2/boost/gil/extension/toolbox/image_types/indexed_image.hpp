@@ -1,27 +1,32 @@
-// Copyright 2009 Christian Henning.
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+/*
+    Copyright 2012 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
 
 /*************************************************************************************************/
 
-#ifndef BOOST_GIL_EXTENSION_TOOLBOX_INDEXED_IMAGE_HPP_INCLUDED
-#define BOOST_GIL_EXTENSION_TOOLBOX_INDEXED_IMAGE_HPP_INCLUDED
+#ifndef BOOST_GIL_EXTENSION_TOOLBOX_IMAGE_TYPES_INDEXED_IMAGE_HPP
+#define BOOST_GIL_EXTENSION_TOOLBOX_IMAGE_TYPES_INDEXED_IMAGE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file   indexed_image.hpp
-/// \brief  Indexed Image extension
+/// \file indexed_image.hpp
+/// \brief Indexed Image extension
 /// \author Christian Henning \n
+///
+/// \date 2012 \n
+///
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <boost/gil/image.hpp>
+#include <boost/gil/extension/toolbox/metafunctions/is_bit_aligned.hpp>
 
-#include <boost/gil/extension/toolbox/gil_extensions.hpp>
 
-namespace boost { namespace gil {
+namespace boost{ namespace gil {
 
 typedef boost::gil::point2< std::ptrdiff_t > point_t;
 
@@ -347,7 +352,7 @@ void fill_pixels( const indexed_image_view< Locator >& view
     *view.get_palette_view().begin() = value;
 }
 
-} // gil
-} // boost
+} // namespace gil
+} // namespace boost
 
-#endif // BOOST_GIL_EXTENSION_TOOLBOX_INDEXED_IMAGE_HPP_INCLUDED
+#endif // BOOST_GIL_EXTENSION_TOOLBOX_IMAGE_TYPES_INDEXED_IMAGE_HPP

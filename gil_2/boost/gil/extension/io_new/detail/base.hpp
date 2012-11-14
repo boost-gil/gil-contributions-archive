@@ -32,7 +32,7 @@
 #include <boost/gil/bit_aligned_pixel_reference.hpp>
 #include <boost/gil/bit_aligned_pixel_iterator.hpp>
 
-#include <boost/gil/extension/toolbox/gil_extensions.hpp>
+#include <boost/gil/extension/toolbox/toolbox.hpp>
 
 #include "typedefs.hpp"
 #include "io_error.hpp"

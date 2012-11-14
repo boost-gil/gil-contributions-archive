@@ -110,6 +110,13 @@ inline bool construct_matched(any_image<Images>& im,Pred pred) {
     return detail::construct_matched_t<mpl::size<Images>::value>::apply(im,pred);
 }
 
+template<>
+struct color_space_type< any_image_pixel_t >
+{
+    typedef any_image_color_space_t type;
+};
+
+
 } }  // namespace boost::gil
 
 #endif // BOOST_GIL_EXTENSION_TOOLBOX_DYNAMIC_IMAGES_HPP

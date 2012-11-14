@@ -11,7 +11,7 @@
 #include <limits>
 #include <boost/cstdint.hpp>
 #include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/toolbox/xyz.hpp>
+#include <boost/gil/extension/toolbox/color_spaces/xyz.hpp>
 
 #include <boost/test/unit_test.hpp>
 
