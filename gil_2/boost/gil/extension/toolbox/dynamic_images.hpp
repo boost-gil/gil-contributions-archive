@@ -12,17 +12,18 @@
 #ifndef BOOST_GIL_EXTENSION_TOOLBOX_DYNAMIC_IMAGES_HPP
 #define BOOST_GIL_EXTENSION_TOOLBOX_DYNAMIC_IMAGES_HPP
 
-/// \file
-/// \brief  Generic io functions for dealing with dynamic images
-//
-/// \author Hailin Jin and Lubomir Bourdev \n
-///         Adobe Systems Incorporated
-/// \date   2005-2007 \n Last updated May 30, 2006
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file dynamic_images.hpp
+/// \brief Generic io functions for dealing with dynamic images.
+/// \author Hailin Jin, Lubomir Bourdev, and Christian Henning \n
+///
+/// \date 2012 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/gil/gil_config.hpp>
-#include <boost/gil/extension/io_new/detail/io_error.hpp>
 #include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
 
 namespace boost { namespace gil {
@@ -71,7 +72,10 @@ class dynamic_io_fnobj {
     }
 
     template <typename View>
-    void apply(const View& /* view */ ,mpl::false_) {io_error("dynamic_io: unsupported view type for the given file format");}
+    void apply(const View& /* view */ ,mpl::false_)
+    {
+        throw std::ios_base::failure( "dynamic_io: unsupported view type for the given file format" );
+    }
 
     template <typename View, typename Info >
     void apply( const View& /* view */
@@ -79,7 +83,7 @@ class dynamic_io_fnobj {
               , const mpl::false_
               )
     {
-        io_error( "dynamic_io: unsupported view type for the given file format" );
+        throw std::ios_base::failure( "dynamic_io: unsupported view type for the given file format" );
     }
 
 public:

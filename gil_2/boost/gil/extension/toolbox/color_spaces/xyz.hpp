@@ -49,7 +49,7 @@ GIL_DEFINE_ALL_TYPEDEFS( 32f, xyz );
 
 /// \ingroup ColorConvert
 /// \brief RGB to XYZ
-/// \ref http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+/// <a href="http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html">Link</a> 
 /// \note rgb_t is assumed to be sRGB D65
 template <>
 struct default_color_converter_impl< rgb_t, xyz_t >

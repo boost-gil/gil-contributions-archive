@@ -11,7 +11,7 @@
 #define BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_HSV_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file has.hpp
+/// \file hsv.hpp
 /// \brief Support for HSV color space
 /// \author Christian Henning \n
 ///

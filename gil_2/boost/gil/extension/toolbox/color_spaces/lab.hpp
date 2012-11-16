@@ -11,7 +11,7 @@
 #define BOOST_GIL_EXTENSION_TOOLBOX_COLOR_SPACES_LAB_HPP
 
 ////////////////////////////////////////////////////////////////////////////////////////
-/// \file lap.hpp
+/// \file lab.hpp
 /// \brief Support for CIE Lab color space
 /// \author Chung-Lin Wen \n
 ///
