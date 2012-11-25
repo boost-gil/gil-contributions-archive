@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE( read_pixel_per_meter )
                                        , settings
                                        );
 
-    BOOST_CHECK_EQUAL( backend._info._pixels_per_meter, 1417 );
+    BOOST_CHECK_EQUAL( backend._info._pixels_per_meter, png_uint_32( 1417 ));
 
 }
 

@@ -36,6 +36,11 @@
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 ///
 /// Targa Reader
 ///
@@ -101,8 +106,6 @@ public:
         io_error_if( !detail::is_allowed< View >( this->_info, is_read_and_convert_t() )
                    , "Image types aren't compatible."
                    );
-        
-        std::ptrdiff_t yend = this->_settings._dim.y;
         
         switch( this->_info._image_type )
         {
@@ -375,6 +378,10 @@ public:
         }
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

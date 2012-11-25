@@ -32,6 +32,11 @@
 
 namespace boost { namespace gil { 
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 namespace detail {
 
 struct pnm_write_is_supported
@@ -81,22 +86,7 @@ public:
         std::size_t chn    = num_channels< View >::value;
         std::size_t pitch  = chn * width;
 
-        unsigned int type;
-        if( num_channels< View >::value == 1 )
-        {
-            if( is_bit_aligned< pixel_t >::value )
-            {
-                type = pnm_image_type::mono_bin_t::value;
-            }
-            else
-            {
-                type = pnm_image_type::gray_bin_t::value;
-            }
-        }
-        else
-        {
-            type = pnm_image_type::color_bin_t::value;
-        }
+        unsigned int type = get_type< num_channels< View >::value >( is_bit_aligned< pixel_t >() );
 
         // write header
 
@@ -127,6 +117,12 @@ public:
     }
 
 private:
+
+    template< int Channels > unsigned int get_type( mpl::true_  /* is_bit_aligned */ ) { return pnm_image_type::color_bin_t::value; }
+    template< int Channels > unsigned int get_type( mpl::false_ /* is_bit_aligned */ ) { return pnm_image_type::color_bin_t::value; }
+
+    template<>               unsigned int get_type< 1 >( mpl::true_  /* is_bit_aligned */ ) { return pnm_image_type::mono_bin_t::value; }
+    template<>               unsigned int get_type< 1 >( mpl::false_ /* is_bit_aligned */ ) { return pnm_image_type::gray_bin_t::value; }
 
     template< typename View >
     void write_data( const View&   src
@@ -250,6 +246,10 @@ public:
         apply_operation( views, op );
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // gil
 } // boost

@@ -71,7 +71,9 @@ public:
         initialize();
     }
 
-    void read( byte_t* dst, int pos )
+    void read( byte_t* dst
+             , int
+             )
     {
         read_scanline( dst );
     }

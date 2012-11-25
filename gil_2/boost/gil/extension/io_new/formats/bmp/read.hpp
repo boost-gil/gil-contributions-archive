@@ -21,6 +21,10 @@
 
 #include <vector>
 
+#include <boost/mpl/and.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
+
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/bit_operations.hpp>
 #include <boost/gil/extension/io_new/detail/conversion_policies.hpp>
@@ -33,6 +37,11 @@
 #include "is_allowed.hpp"
 
 namespace boost { namespace gil {
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
 
 ///
 /// BMP Reader
@@ -734,6 +743,10 @@ public:
         }
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // gil
 } // boost

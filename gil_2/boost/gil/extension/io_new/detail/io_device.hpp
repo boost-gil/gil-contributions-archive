@@ -26,7 +26,15 @@
 #include <boost/utility/enable_if.hpp>
 #include "base.hpp"
 
-namespace boost { namespace gil { namespace detail {
+namespace boost { namespace gil {
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
+
+namespace detail {
 
 template < typename T > struct buff_item
 {
@@ -161,6 +169,7 @@ public:
         return ( char ) ch;
     }
 
+    ///@todo: change byte_t* to void*
     std::size_t read( byte_t*     data
                     , std::size_t count
                     )
@@ -171,6 +180,7 @@ public:
                                         , get()
                                         );
 
+        ///@todo: add compiler symbol to turn error checking on and off.
         if(ferror( get() ))
         {
             assert( false );
@@ -187,7 +197,7 @@ public:
     template< typename T
             , int      N
             >
-    size_t read( T (&buf)[N] )
+    std::size_t read( T (&buf)[N] )
     {
 	    return read( buf, N );
     }
@@ -221,9 +231,9 @@ public:
 
     /// Writes number of elements from a buffer
     template < typename T >
-    size_t write( const T*    buf
-                , std::size_t count
-                )
+    std::size_t write( const T*    buf
+                     , std::size_t count
+                     )
     throw()
     {
         std::size_t num_elements = fwrite( buf
@@ -238,10 +248,10 @@ public:
     }
 
     /// Writes array
-    template < typename T
-             , size_t   N
+    template < typename    T
+             , std::size_t N
              >
-    size_t write( const T (&buf)[N] ) throw()
+    std::size_t write( const T (&buf)[N] ) throw()
     {
         return write( buf, N );
     }
@@ -335,7 +345,6 @@ private:
     typedef boost::shared_ptr< FILE > file_ptr_t;
     file_ptr_t _file;
 };
-
 
 /**
  * Input stream device
@@ -452,8 +461,8 @@ public:
     {
     }
 
-    size_t read( byte_t*     data
-               , std::size_t count )
+    std::size_t read( byte_t*     data
+                    , std::size_t count )
     {
         io_error( "Bad io error." );
 
@@ -480,8 +489,8 @@ public:
     }
 
     /// Writes array
-    template < typename T
-             , size_t   N
+    template < typename    T
+             , std::size_t N
              >
     void write( const T (&buf)[N] ) throw()
     {
@@ -729,6 +738,9 @@ struct is_dynamic_image_writer< dynamic_image_writer< Device
 
 } // namespace detail
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

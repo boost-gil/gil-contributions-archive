@@ -35,6 +35,11 @@
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 ///
 /// PNG Reader
 ///
@@ -430,9 +435,11 @@ public:
     }
 };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
+
 } // namespace gil
 } // namespace boost
-
-
 
 #endif // BOOST_GIL_EXTENSION_IO_DETAIL_PNG_IO_READ_HPP

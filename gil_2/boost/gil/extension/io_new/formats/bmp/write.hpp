@@ -30,6 +30,11 @@
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 namespace detail {
 
 struct bmp_write_is_supported
@@ -215,6 +220,9 @@ public:
     }
 };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // gil
 } // boost

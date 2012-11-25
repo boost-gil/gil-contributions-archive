@@ -40,6 +40,11 @@ extern "C" {
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 namespace detail {
 
 template <typename PixelReference>
@@ -205,7 +210,7 @@ private:
 
     template< typename View >
     void write_data( const View&   view
-                   , std::size_t   row_size_in_bytes
+                   , std::size_t
                    , const mpl::false_&    // bit_aligned
                    )
     {
@@ -356,6 +361,10 @@ public:
         apply_operation( views, op );
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

@@ -74,7 +74,7 @@ public:
 
     template< typename View >
     void init_view( const View&                             view
-                  , const image_read_settings< FormatTag >& setttings
+                  , const image_read_settings< FormatTag >&
                   )
     {
         setup( view.dimensions() );
@@ -82,7 +82,7 @@ public:
 
 private:
 
-    void setup( const point_t& dim )
+    void setup( const point_t& /* dim */ )
     {
         //check_coordinates( dim );
 
@@ -97,7 +97,7 @@ private:
         //}
     }
 
-    void check_coordinates( const point_t& dim )
+    void check_coordinates( const point_t& /* dim */ )
     {
        //typedef point_t::value_type int_t;
 

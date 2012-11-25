@@ -71,7 +71,7 @@ struct mirror_bits< Buffer
                                                , mpl::true_
                                                >::lookup
                                  , *this
-                                 , _1
+                                 , ::_1
                                  )
                     );
         }

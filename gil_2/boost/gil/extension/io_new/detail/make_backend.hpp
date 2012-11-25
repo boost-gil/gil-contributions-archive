@@ -145,7 +145,7 @@ typename get_reader_backend< Device
                            , FormatTag
                            >::type
 make_reader_backend( Device&          io_dev
-                   , const FormatTag& tag
+                   , const FormatTag&
                    , typename enable_if< mpl::and_< detail::is_adaptable_input_device< FormatTag
                                                                                      , Device
                                                                                      >

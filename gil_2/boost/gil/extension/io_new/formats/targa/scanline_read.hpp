@@ -107,8 +107,6 @@ private:
             io_error( "scanline reader cannot read this targa image type." );
         }
 
-        std::ptrdiff_t yend = this->_settings._dim.y;
-        
         switch( this->_info._image_type )
         {
             case targa_image_type::_rgb:

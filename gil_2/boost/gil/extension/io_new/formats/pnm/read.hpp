@@ -35,8 +35,12 @@
 #include "reader_backend.hpp"
 #include "is_allowed.hpp"
 
-
 namespace boost { namespace gil {
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
 
 ///
 /// PNM Reader
@@ -450,6 +454,10 @@ public:
         }
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // gil
 } // boost

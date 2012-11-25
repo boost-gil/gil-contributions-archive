@@ -59,6 +59,11 @@
 
 namespace boost { namespace gil { 
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 template < int K >
 struct plane_recursion
 {
@@ -211,86 +216,9 @@ public:
             }
             else if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
             {
-
-                if( is_read_only::value == false )
-                {
-                    // the read_data function needs to know what gil type the source image is
-                    // to have the default color converter function correctly
-
-                    switch( this->_info._photometric_interpretation )
-                    {
-                        case PHOTOMETRIC_MINISWHITE:
-                        case PHOTOMETRIC_MINISBLACK:
-                        {
-                            switch( this->_info._bits_per_sample )
-                            {
-                                case  1: { read_data< detail::row_buffer_helper_view< gray1_image_t::view_t > >( dst_view, 0 );  break; }
-                                case  2: { read_data< detail::row_buffer_helper_view< gray2_image_t::view_t > >( dst_view, 0 );  break; }
-                                case  4: { read_data< detail::row_buffer_helper_view< gray4_image_t::view_t > >( dst_view, 0 );  break; }
-                                case  8: { read_data< detail::row_buffer_helper_view< gray8_view_t  > >( dst_view, 0 );  break; }
-                                case 16: { read_data< detail::row_buffer_helper_view< gray16_view_t > >( dst_view, 0 );  break; }
-                                case 32: { read_data< detail::row_buffer_helper_view< gray32_view_t > >( dst_view, 0 );  break; }
-                                default: { io_error( "Image type is not supported." ); }
-                            }
-
-                            break;
-                        }
-
-                        case PHOTOMETRIC_RGB:
-                        {
-                            switch( this->_info._samples_per_pixel )
-                            {
-                                case 3:
-                                {
-                                    switch( this->_info._bits_per_sample )
-                                    {
-                                        case  8: { read_data< detail::row_buffer_helper_view< rgb8_view_t  > >( dst_view, 0 );  break; }
-                                        case 16: { read_data< detail::row_buffer_helper_view< rgb16_view_t > >( dst_view, 0 );  break; }
-                                        case 32: { read_data< detail::row_buffer_helper_view< rgb32_view_t > >( dst_view, 0 );  break; }
-                                        default: { io_error( "Image type is not supported." ); }
-                                    }
-
-                                    break;
-                                }
-
-                                case 4:
-                                {
-                                    switch( this->_info._bits_per_sample )
-                                    {
-                                        case  8: { read_data< detail::row_buffer_helper_view< rgba8_view_t  > >( dst_view, 0 );  break; }
-                                        case 16: { read_data< detail::row_buffer_helper_view< rgba16_view_t > >( dst_view, 0 );  break; }
-                                        case 32: { read_data< detail::row_buffer_helper_view< rgba32_view_t > >( dst_view, 0 );  break; }
-                                        default: { io_error( "Image type is not supported." ); }
-                                    }
-
-                                    break;
-                                }
-
-                                default: { io_error( "Image type is not supported." ); }
-                            }
-
-                            break;
-                        }
-                        case PHOTOMETRIC_SEPARATED: // CYMK
-                        {
-                            switch( this->_info._bits_per_sample )
-                            {
-                                case  8: { read_data< detail::row_buffer_helper_view< cmyk8_view_t  > >( dst_view, 0 );  break; }
-                                case 16: { read_data< detail::row_buffer_helper_view< cmyk16_view_t > >( dst_view, 0 );  break; }
-                                case 32: { read_data< detail::row_buffer_helper_view< cmyk32_view_t > >( dst_view, 0 );  break; }
-                                default: { io_error( "Image type is not supported." ); }
-                            }
-
-                            break;
-                        }
-
-                        default: { io_error( "Image type is not supported." ); }
-                    }
-                }
-                else
-                {
-                    read_data< detail::row_buffer_helper_view< View > >( dst_view, 0 );
-                }
+                read( dst_view
+                    , is_read_only::type()
+                    );
             }
             else
             {
@@ -298,8 +226,95 @@ public:
             }
         }
     }
-
+    
 private:
+
+    template< typename View >
+    void read( View v
+             , mpl::true_ // is_read_only
+             )
+    {
+        read_data< detail::row_buffer_helper_view< View > >( v, 0 );
+    }
+
+    template< typename View >
+    void read( View v
+             , mpl::false_  // is_read_only
+             )
+    {
+        // the read_data function needs to know what gil type the source image is
+        // to have the default color converter function correctly
+
+        switch( this->_info._photometric_interpretation )
+        {
+            case PHOTOMETRIC_MINISWHITE:
+            case PHOTOMETRIC_MINISBLACK:
+            {
+                switch( this->_info._bits_per_sample )
+                {
+                    case  1: { read_data< detail::row_buffer_helper_view< gray1_image_t::view_t > >( v, 0 );  break; }
+                    case  2: { read_data< detail::row_buffer_helper_view< gray2_image_t::view_t > >( v, 0 );  break; }
+                    case  4: { read_data< detail::row_buffer_helper_view< gray4_image_t::view_t > >( v, 0 );  break; }
+                    case  8: { read_data< detail::row_buffer_helper_view< gray8_view_t  > >( v, 0 );  break; }
+                    case 16: { read_data< detail::row_buffer_helper_view< gray16_view_t > >( v, 0 );  break; }
+                    case 32: { read_data< detail::row_buffer_helper_view< gray32_view_t > >( v, 0 );  break; }
+                    default: { io_error( "Image type is not supported." ); }
+                }
+
+                break;
+            }
+
+            case PHOTOMETRIC_RGB:
+            {
+                switch( this->_info._samples_per_pixel )
+                {
+                    case 3:
+                    {
+                        switch( this->_info._bits_per_sample )
+                        {
+                            case  8: { read_data< detail::row_buffer_helper_view< rgb8_view_t  > >( v, 0 );  break; }
+                            case 16: { read_data< detail::row_buffer_helper_view< rgb16_view_t > >( v, 0 );  break; }
+                            case 32: { read_data< detail::row_buffer_helper_view< rgb32_view_t > >( v, 0 );  break; }
+                            default: { io_error( "Image type is not supported." ); }
+                        }
+
+                        break;
+                    }
+
+                    case 4:
+                    {
+                        switch( this->_info._bits_per_sample )
+                        {
+                            case  8: { read_data< detail::row_buffer_helper_view< rgba8_view_t  > >( v, 0 );  break; }
+                            case 16: { read_data< detail::row_buffer_helper_view< rgba16_view_t > >( v, 0 );  break; }
+                            case 32: { read_data< detail::row_buffer_helper_view< rgba32_view_t > >( v, 0 );  break; }
+                            default: { io_error( "Image type is not supported." ); }
+                        }
+
+                        break;
+                    }
+
+                    default: { io_error( "Image type is not supported." ); }
+                }
+
+                break;
+            }
+            case PHOTOMETRIC_SEPARATED: // CYMK
+            {
+                switch( this->_info._bits_per_sample )
+                {
+                    case  8: { read_data< detail::row_buffer_helper_view< cmyk8_view_t  > >( v, 0 );  break; }
+                    case 16: { read_data< detail::row_buffer_helper_view< cmyk16_view_t > >( v, 0 );  break; }
+                    case 32: { read_data< detail::row_buffer_helper_view< cmyk32_view_t > >( v, 0 );  break; }
+                    default: { io_error( "Image type is not supported." ); }
+                }
+
+                break;
+            }
+
+            default: { io_error( "Image type is not supported." ); }
+        }
+    }
 
    template< typename PaletteImage
            , typename View
@@ -394,7 +409,7 @@ private:
            , typename View
            >
    void read_data( const View& dst_view
-                 , int         plane     )
+                 , int         /* plane */ )
     {
         if( this->_io_dev.is_tiled() )
         {
@@ -787,6 +802,10 @@ public:
         }
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

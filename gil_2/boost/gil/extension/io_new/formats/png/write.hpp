@@ -38,12 +38,22 @@
     }
 #endif
 
+#include <boost/mpl/and.hpp>
+#include <boost/mpl/equal_to.hpp>
+#include <boost/mpl/less.hpp>
+#include <boost/mpl/not.hpp>
+
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
 #include <boost/gil/extension/io_new/detail/row_buffer_helper.hpp>
 
 #include "writer_backend.hpp"
 
 namespace boost { namespace gil {
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
 
 namespace detail {
 
@@ -113,15 +123,7 @@ private:
 
         if( little_endian() )
         {
-            if( png_rw_info::_bit_depth == 16 )
-            {
-                png_set_swap( this->get_struct() );
-            }
-
-            if( png_rw_info::_bit_depth < 8 )
-            {
-                png_set_packswap( this->get_struct() );
-            }
+            set_swap< png_rw_info >();
         }
 
         std::vector< pixel< typename channel_type< View >::type
@@ -159,15 +161,7 @@ private:
 
         if (little_endian() )
         {
-            if( png_rw_info::_bit_depth == 16 )
-            {
-                png_set_swap( this->get_struct() );
-            }
-
-            if( png_rw_info::_bit_depth < 8 )
-            {
-                png_set_packswap( this->get_struct() );
-            }
+            set_swap< png_rw_info >();
         }
 
         detail::row_buffer_helper_view< View > row_buffer( view.width()
@@ -196,6 +190,29 @@ private:
                      , this->get_info()
                      );
     }
+
+    template< typename Info > struct is_less_than_eight : mpl::less< mpl::int_< Info::_bit_depth >, mpl::int_< 8 > > {};
+    template< typename Info > struct is_equal_to_sixteen : mpl::equal_to< mpl::int_< Info::_bit_depth >, mpl::int_< 16 > > {};
+
+    template< typename Info >
+    void set_swap( typename enable_if< is_less_than_eight< Info > >::type* /* ptr */ = 0 )
+    {
+        png_set_packswap( this->get_struct() );
+    }
+
+    template< typename Info >
+    void set_swap( typename enable_if< is_equal_to_sixteen< Info > >::type* /* ptr */ = 0 )
+    {
+        png_set_swap( this->get_struct() );
+    }
+
+    template< typename Info >
+    void set_swap( typename enable_if< mpl::and_< mpl::not_< is_less_than_eight< Info > >
+                                                , mpl::not_< is_equal_to_sixteen< Info > >
+                                                >
+                                     >::type* /* ptr */ = 0 
+                 )
+    {}
 };
 
 ///
@@ -233,6 +250,10 @@ public:
         apply_operation( views, op );
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

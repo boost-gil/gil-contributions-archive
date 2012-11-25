@@ -166,7 +166,7 @@ typename get_dynamic_image_writer< std::wstring
                                  , FormatTag
                                  >::type
 make_dynamic_image_writer( const filesystem::path& path
-                         , const FormatTag&        tag
+                         , const FormatTag&
                          )
 {
     return make_dynamic_image_writer( path.wstring()

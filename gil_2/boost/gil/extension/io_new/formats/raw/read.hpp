@@ -37,6 +37,11 @@
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 #define BUILD_INTERLEAVED_VIEW(color_layout, bits_per_pixel) \
 { \
     color_layout##bits_per_pixel##_view_t build = boost::gil::interleaved_view(processed_image->width, \
@@ -247,6 +252,10 @@ public:
         }
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // gil
 } // boost

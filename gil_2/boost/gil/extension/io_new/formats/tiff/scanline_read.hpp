@@ -414,7 +414,7 @@ private:
            ; ++i, src_it++, dst_it++
            )
         {
-            boost::uint16_t c = get_color( *src_it, gray_color_t() );
+            boost::uint16_t c = static_cast< boost::uint16_t >( get_color( *src_it, gray_color_t() ));
             *dst_it = this->_palette[c];
         }
     }

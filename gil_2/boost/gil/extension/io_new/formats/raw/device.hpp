@@ -68,7 +68,7 @@ public:
     float get_aperture()      { return _processor_ptr.get()->imgdata.other.aperture; }
     float get_focal_len()     { return _processor_ptr.get()->imgdata.other.focal_len; }
     time_t get_timestamp()    { return _processor_ptr.get()->imgdata.other.timestamp; }
-    unsigned get_shot_order() { return _processor_ptr.get()->imgdata.other.shot_order; }
+    unsigned int get_shot_order() { return _processor_ptr.get()->imgdata.other.shot_order; }
     unsigned* get_gpsdata()   { return _processor_ptr.get()->imgdata.other.gpsdata; }
     std::string get_desc()    { return std::string(_processor_ptr.get()->imgdata.other.desc); }
     std::string get_artist()  { return std::string(_processor_ptr.get()->imgdata.other.artist); }

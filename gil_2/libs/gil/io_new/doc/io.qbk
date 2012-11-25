@@ -23,6 +23,8 @@
 [def _PNM_Wiki_            [@http://en.wikipedia.org/wiki/Portable_anymap]]
 [def _RAW_Wiki_            [@http://en.wikipedia.org/wiki/Raw_image_format]]
 [def _TARGA_Wiki           [@http://en.wikipedia.org/wiki/Truevision_TGA]]
+[def _RAW_lib_             [@http://www.libraw.org/]]
+[def _RAW_Wiki_            [@http://en.wikipedia.org/wiki/Raw_image_format]]
 [def _TIFF_Wiki_           [@http://en.wikipedia.org/wiki/Tagged_Image_File_Format]]
 [def _TIFF_Lib_            [@http://www.remotesensing.org/libtiff/]]
 [def _TIFF_Base_Tags_      [@http://www.awaresystems.be/imaging/tiff/tifftags/baseline.html]]
@@ -33,7 +35,8 @@ This extension to boost::gil provides an easy to use interface for reading and w
 various image formats. It also includes a framework for adding new formats.
 
 Please see section 3.3 for all supported image formats. A basic tutorial is provided 
-in section [link gil.io.tutorial Tutorial]. Also, this extension requires Boost version 1.42 and up.
+in section [link gil.io.tutorial Tutorial]. Also, this extension requires Boost version 1.42 and up. Furthermore the gil
+extension Toolbox is used.
 
 For adding new image formats please refer to section [link gil.io.using_io.extending_gil__io_with_new_formats Extending GIL::IO with new Formats].
 [h2 Supported Platforms]
@@ -43,6 +46,8 @@ image format one or more of the following image libraries might be needed:
 * libtiff
 * libjpeg
 * libpng
+* libraw
+* zlib
 
 The library is designed to support as many formats as required by the user.
 For instance, if the user only needs bmp support none of the above mentioned 
@@ -165,6 +170,28 @@ write, seek, close, etc. Interface.
 [endsect]
 
 [section:using_io Using IO]
+[h2 General Overview]
+The tutorial pointed out some use cases for reading and writing images in various image formats. This section will provide a more thorough overview.
+
+The next sections will introduce the Read and Write interface. But it might be worth poiting out that by using some advanced metaprogramming techniques
+the interface is rather small and hopefully easy to understand.
+
+Besides the general interface the user also has the ability to interface directly with the underlying image format. For that each reader or writer 
+provides access to the so-called backend. For instance:
+
+    typedef get_reader_backend< const std::string
+                              , tag_t
+                              >::type backend_t;
+
+    backend_t backend = read_image_info( bmp_filename
+                                       , tag_t()
+                                       );
+
+    BOOST_CHECK_EQUAL( backend._info._width , 127 );
+    BOOST_CHECK_EQUAL( backend._info._height, 64 );
+
+Of course, the typedef can be removed when using c++11's auto feature.
+
 [h2 Read Interface]
 As the Tutorial demonstrated there are a few ways to read images. Here is an enumeration of 
 all read functions with a short description:
@@ -219,6 +246,52 @@ The following example shows this feature:
               , runtime_image
               , tiff_tag()
               );
+
+
+During the review it became clear that there is a need to read big images scanline by scanline. To support such use case 
+a scanline_reader is implemented for all supported image formats. The scanline_read_iterators will then allow to traverse 
+through the image. The following code sample shows the usage:
+
+    // define the reader type
+    typedef scanline_reader< typename get_read_device< const char*
+                                                     , FormatTag
+                                                     >::type
+                           , FormatTag
+                           > reader_t;
+
+    // create the reader object and read the image's header information
+    reader_t reader = make_scanline_reader( file_name, FormatTag() );
+
+    // create an image
+    Image dst( reader._info._width, reader._info._height );
+
+    // create a scanline 
+    byte_t* buffer = new byte_t[ reader._scanline_length ];
+
+    // setup two iterators
+    auto it  = scanline_read_iterator< reader_t >( reader, buffer );
+    auto end = scanline_read_iterator< reader_t >();
+
+    int row = 0;
+
+    // loop through the image
+    while( it != end )
+    {
+        // read the next scanline
+        *it;
+
+        // copy scanline into image
+        copy_pixels( interleaved_view( reader._info._width, 1, ( typename Image::view_t::x_iterator ) buffer, reader._scanline_length )
+                   , subimage_view( view( dst    ), 0, row, reader._info._width, 1 )
+                   );
+
+        ++row;
+    }
+
+    delete[] buffer;
+
+There are many ways to travese an image but for as of now only by scanline is supported.
+
 
 [h2 Write Interface]
 There is only one function for writing out images, write_view. Similar to reading the first parameter is either
@@ -286,7 +359,6 @@ This is subject to change soon.
 BOOST_GIL_EXTENSION_IO_JPEG_C_LIB_COMPILED_AS_CPLUSPLUS
 This symbol can be used to let compiler know that libjpeg was compiled as a cpp project. By default this symbol is off. 
 
-
 [h3 PNG]
 For a general overview of the PNG image file format go to the following _PNG_Wiki_.
 
@@ -318,6 +390,11 @@ Read: gray1, gray8, rgb8
 Write: gray1, gray8, rgb8
 
 When reading a mono text image the data is read as a gray8 image.
+
+[h3 RAW]
+For a general overview see _RAW_Wiki.
+
+Currently the extension is only able to read rgb8 images.
 
 [h3 TARGA]
 For a general overview of the BMP image file format go to the following _TARGA_Wiki_.

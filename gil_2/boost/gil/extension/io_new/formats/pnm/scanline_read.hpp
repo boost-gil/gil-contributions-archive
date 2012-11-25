@@ -76,7 +76,9 @@ public:
     void clean_up() {}
 
     /// Read part of image defined by View and return the data.
-    void read( byte_t* dst, int pos )
+    void read( byte_t* dst
+             , int
+             )
     {
         _read_function( this, dst );
     }

@@ -34,6 +34,11 @@
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4611) //interaction between '_setjmp' and C++ object destruction is non-portable 
+#endif
+
 ///
 /// JPEG Scanline Reader
 ///
@@ -62,7 +67,9 @@ public:
         initialize();
     }
 
-    void read( byte_t* dst, int pos )
+    void read( byte_t* dst
+             , int
+             )
     {
         // Fire exception in case of error.
         if( setjmp( this->_mark )) { this->raise_error(); }
@@ -139,6 +146,10 @@ private:
 
     }
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

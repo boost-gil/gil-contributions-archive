@@ -100,6 +100,14 @@ public:
     }
 };
 
+/// is_read_only metafunction
+/// \brief Determines if reader type is read only ( no conversion ).
+template< typename Conversion_Policy >
+struct is_read_only : mpl::false_ {};
+
+template<>
+struct is_read_only< detail::read_and_no_convert > : mpl::true_ {};
+
 } // namespace detail
 } // namespace gil
 } // namespace boost

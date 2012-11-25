@@ -23,6 +23,11 @@
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#endif
+
 ///
 /// RAW Backend
 ///
@@ -93,7 +98,7 @@ public:
         _info._aperture          = _io_dev.get_aperture();
         _info._focal_length      = _io_dev.get_focal_len();
         _info._timestamp         = _io_dev.get_timestamp();
-        _info._shot_order        = _io_dev.get_shot_order();
+        _info._shot_order        = static_cast< uint16_t >( _io_dev.get_shot_order() );
         //_io_dev.get_gpsdata();
         _info._image_description = _io_dev.get_desc();
         _info._artist            = _io_dev.get_artist();
@@ -112,6 +117,10 @@ public:
 
     std::size_t _scanline_length;
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

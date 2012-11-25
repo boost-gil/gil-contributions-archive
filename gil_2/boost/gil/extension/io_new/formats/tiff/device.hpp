@@ -290,7 +290,7 @@ public:
     struct read_tag {};
     struct write_tag {};
 
-    file_stream_device( std::string const& file_name, read_tag, bool close = true )
+    file_stream_device( std::string const& file_name, read_tag )
     {
         TIFF* tiff;
 

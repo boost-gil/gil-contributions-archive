@@ -33,23 +33,23 @@ BOOST_AUTO_TEST_CASE( index_image_test )
 
         generate_pixels( img.get_indices_view()
                        , [] () -> uint8_t
-                       {
-                            static int i = -1;
+                        {
+                            static uint8_t i = 0;
                             i = ( i == 256 ) ? 0 : ++i;
 
                             return gray8_pixel_t( i );
-                       }
+                        }
                        );
 
 
         generate_pixels( img.get_palette_view()
                        , [] () ->rgb8_pixel_t
-                       {
-                          static int i = -1;
-                          i = ( i == 256 ) ? 0 : ++i;
+                        {
+                            static uint8_t i = 0;
+                            i = ( i == 256 ) ? 0 : ++i;
 
-                          return rgb8_pixel_t( i, i, i );
-                       }
+                            return rgb8_pixel_t( i, i, i );
+                        }
                        );
 
         int i = ( 640 * 10 + 10 ) % 256;
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( index_image_test )
         generate_pixels( img.get_indices_view()
                        , [] () -> uint8_t
                        {
-                            static int i = -1;
+                            static uint8_t i = 0;
                             i = ( i == 256 ) ? 0 : ++i;
 
                             return i;
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( index_image_test )
         generate_pixels( img.get_palette_view()
                        , [] () ->rgb8_pixel_t
                        {
-                          static int i = -1;
+                          static uint8_t i = 0;
                           i = ( i == 256 ) ? 0 : ++i;
 
                           return rgb8_pixel_t( i, i, i );
@@ -100,11 +100,11 @@ BOOST_AUTO_TEST_CASE( index_image_test )
         typedef indexed_image< uint8_t, rgb8_pixel_t > image_t;
         image_t img( 640, 480, 256 );
 
-        for( int y=0; y < view( img ).height(); ++y )
+        for( image_t::y_coord_t y = 0; y < view( img ).height(); ++y )
         {
             image_t::view_t::x_iterator it = view( img ).row_begin( y );
 
-            for( int x = 0; x < view( img ).width(); ++x )
+            for( image_t::x_coord_t x = 0; x < view( img ).width(); ++x )
             {
                 rgb8_pixel_t p = *it;
                 it++;

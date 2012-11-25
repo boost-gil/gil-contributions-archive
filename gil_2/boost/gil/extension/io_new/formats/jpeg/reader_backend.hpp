@@ -23,6 +23,12 @@
 
 namespace boost { namespace gil {
 
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
+#pragma warning(disable:4611) //interaction between '_setjmp' and C++ object destruction is non-portable 
+#endif
+
 namespace detail { 
 
 ///
@@ -287,6 +293,10 @@ public:
     // libjpeg default is 4096 - see jdatasrc.c
     JOCTET buffer[4096];
 };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost
