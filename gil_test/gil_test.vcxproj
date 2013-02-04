@@ -147,7 +147,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="packed_channel_reference_test.cpp" />
     <ClCompile Include="packed_channel_value_test.cpp" />
-    <ClCompile Include="packed_dynamic_channel_reference.cpp" />
     <ClCompile Include="pixel_tests.cpp" />
     <ClCompile Include="scoped_channel_value_test.cpp" />
     <ClCompile Include="stdafx.cpp">

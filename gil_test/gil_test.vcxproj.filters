@@ -50,8 +50,5 @@
     <ClCompile Include="scoped_channel_value_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="packed_dynamic_channel_reference.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
