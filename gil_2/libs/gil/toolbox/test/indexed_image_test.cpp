@@ -31,26 +31,26 @@ BOOST_AUTO_TEST_CASE( index_image_test )
 
         indexed_image< gray8_pixel_t, rgb8_pixel_t > img( 640, 480, 256 );
 
-        generate_pixels( img.get_indices_view()
-                       , [] () -> uint8_t
-                        {
-                            static uint8_t i = 0;
-                            i = ( i == 256 ) ? 0 : ++i;
+        //generate_pixels( img.get_indices_view()
+        //               , [] () -> uint8_t
+        //                {
+        //                    static uint8_t i = 0;
+        //                    i = ( i == 256 ) ? 0 : ++i;
 
-                            return gray8_pixel_t( i );
-                        }
-                       );
+        //                    return gray8_pixel_t( i );
+        //                }
+        //               );
 
 
-        generate_pixels( img.get_palette_view()
-                       , [] () ->rgb8_pixel_t
-                        {
-                            static uint8_t i = 0;
-                            i = ( i == 256 ) ? 0 : ++i;
+        //generate_pixels( img.get_palette_view()
+        //               , [] () ->rgb8_pixel_t
+        //                {
+        //                    static uint8_t i = 0;
+        //                    i = ( i == 256 ) ? 0 : ++i;
 
-                            return rgb8_pixel_t( i, i, i );
-                        }
-                       );
+        //                    return rgb8_pixel_t( i, i, i );
+        //                }
+        //               );
 
         int i = ( 640 * 10 + 10 ) % 256;
 
@@ -65,26 +65,26 @@ BOOST_AUTO_TEST_CASE( index_image_test )
     {
         indexed_image< uint8_t, rgb8_pixel_t > img( 640, 480, 256 );
 
-        generate_pixels( img.get_indices_view()
-                       , [] () -> uint8_t
-                       {
-                            static uint8_t i = 0;
-                            i = ( i == 256 ) ? 0 : ++i;
+        //generate_pixels( img.get_indices_view()
+        //               , [] () -> uint8_t
+        //               {
+        //                    static uint8_t i = 0;
+        //                    i = ( i == 256 ) ? 0 : ++i;
 
-                            return i;
-                       }
-                       );
+        //                    return i;
+        //               }
+        //               );
 
 
-        generate_pixels( img.get_palette_view()
-                       , [] () ->rgb8_pixel_t
-                       {
-                          static uint8_t i = 0;
-                          i = ( i == 256 ) ? 0 : ++i;
+        //generate_pixels( img.get_palette_view()
+        //               , [] () ->rgb8_pixel_t
+        //               {
+        //                  static uint8_t i = 0;
+        //                  i = ( i == 256 ) ? 0 : ++i;
 
-                          return rgb8_pixel_t( i, i, i );
-                       }
-                       );
+        //                  return rgb8_pixel_t( i, i, i );
+        //               }
+        //               );
 
         int i = ( 640 * 10 + 10 ) % 256;
 

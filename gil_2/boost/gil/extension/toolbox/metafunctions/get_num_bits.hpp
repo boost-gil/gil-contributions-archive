@@ -41,6 +41,19 @@ struct get_num_bits< const packed_channel_reference< B, I, S, M > >
     BOOST_STATIC_CONSTANT( int, value = S );
 };
 
+template<typename B, int I, bool M>
+struct get_num_bits< packed_dynamic_channel_reference< B, I, M > >
+{
+    BOOST_STATIC_CONSTANT( int, value = I );
+};
+
+template<typename b, int i, bool m>
+struct get_num_bits< const packed_dynamic_channel_reference< b, i, m > >
+{
+    BOOST_STATIC_CONSTANT( int, value = i );
+};
+
+
 } // namespace gil
 } // namespace boost
 

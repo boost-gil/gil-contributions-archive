@@ -13,12 +13,18 @@ BOOST_AUTO_TEST_CASE( gray_alpha_test )
 {
     {
         gray_alpha8_pixel_t a( 10, 20 );
+        gray8_pixel_t  b;
+
+        color_convert( a, b );
+    }
+
+    {
+        gray_alpha8_pixel_t a( 10, 20 );
         rgb8_pixel_t  b;
         gray_alpha8_pixel_t c;
 
         color_convert( a, b );
     }
-
 
     {
         gray_alpha8_pixel_t a( 10, 20 );

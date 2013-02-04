@@ -66,6 +66,7 @@ struct default_color_converter_impl<gray_alpha_t,rgba_t> {
     }
 };
 
+/// \brief Gray Alpha to RGB
 template <>
 struct default_color_converter_impl<gray_alpha_t,rgb_t> {
     template <typename P1, typename P2>
@@ -85,6 +86,7 @@ struct default_color_converter_impl<gray_alpha_t,rgb_t> {
     }
 };
 
+/// \brief Gray Alpha to Gray
 template <>
 struct default_color_converter_impl<gray_alpha_t,gray_t> {
     template <typename P1, typename P2>

@@ -12,9 +12,19 @@ BOOST_AUTO_TEST_SUITE( get_pixel_type_test )
 
 BOOST_AUTO_TEST_CASE( get_pixel_type_test )
 {
-    typedef bit_aligned_image3_type< 4, 15, 4, rgb_layout_t >::type image_t;
-    typedef kth_channel_view_type< 0, image_t::view_t >::type channel_view_0_t;
-    typedef channel_type< get_pixel_type< channel_view_0_t >::type >  channel_type_t;
+    {
+        typedef bit_aligned_image3_type< 4, 15, 4, rgb_layout_t >::type image_t;
+        BOOST_STATIC_ASSERT(( is_same< get_pixel_type< image_t::view_t >::type
+                            , image_t::view_t::reference >::value
+                           ));
+    }
+
+    {
+        typedef rgb8_image_t image_t;
+        BOOST_STATIC_ASSERT(( is_same< get_pixel_type< image_t::view_t >::type
+                            , image_t::view_t::value_type >::value
+                           ));
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -14,8 +14,12 @@ BOOST_AUTO_TEST_SUITE( get_num_bits_test )
 BOOST_AUTO_TEST_CASE( get_num_bits_test )
 {
     typedef bit_aligned_image4_type<4, 4, 4, 4, rgb_layout_t>::type image_t;
+
     typedef channel_type< image_t::view_t::reference >::type channel_t;
-    //int i = get_num_bits< channel_t >::value;
+    BOOST_STATIC_ASSERT( get_num_bits< channel_t >::value == 4 );
+
+    typedef channel_type< image_t::const_view_t::reference >::type const_channel_t;
+    BOOST_STATIC_ASSERT( get_num_bits< const_channel_t >::value == 4 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
