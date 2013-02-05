@@ -19,9 +19,9 @@ void test_packed_channel()
 {
     typedef packed_channel_value<K> bits_t;
 
-    BOOST_CHECK_EQUAL(channel_traits<bits_t>::min_value(),                                                 0 );
-    BOOST_CHECK_EQUAL(channel_traits<bits_t>::max_value(),                ( unsigned __int64( 1 ) << K ) - 1 );
-    BOOST_CHECK_EQUAL(detail::unsigned_integral_max_value<bits_t>::value, ( unsigned __int64( 1 ) << K ) - 1 );
+    BOOST_CHECK_EQUAL( channel_traits<bits_t>::min_value(),                                         0 );
+    BOOST_CHECK_EQUAL( channel_traits<bits_t>::max_value(),                ( uint64_t( 1 ) << K ) - 1 );
+    BOOST_CHECK_EQUAL( detail::unsigned_integral_max_value<bits_t>::value, ( uint64_t( 1 ) << K ) - 1 );
 
     BOOST_CHECK_EQUAL( sizeof( bits_t ), K / 8 + 1 );
     BOOST_STATIC_ASSERT(( boost::is_integral< bits_t >::value ));
