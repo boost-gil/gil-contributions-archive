@@ -128,14 +128,6 @@ inline const char* convert_to_native_string( const std::wstring& str )
     return c;
 }
 
-#ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-inline const char* convert_to_native_string( const filesystem::path& path )
-{
-    ///@todo this leaks
-    return convert_to_native_string( path.wstring() );
-}
-#endif // BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
-
 } // namespace detail
 } // namespace gil
 } // namespace boost
