@@ -10,6 +10,7 @@ template< typename Image
         >
 void test_scanline_reader( const char* file_name )
 {
+    using namespace boost::gil;
 
     // read image using scanline_read_iterator
     typedef scanline_reader< typename get_read_device< const char*

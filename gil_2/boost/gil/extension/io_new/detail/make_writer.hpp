@@ -72,11 +72,11 @@ make_writer( const std::wstring&                  file_name
 
     delete[] str;
 
-    return get_writer< std::wstring
-                     , FormatTag
-                     >::type( device
-                            , info
-                            );
+    return typename get_writer< std::wstring
+                              , FormatTag
+                              >::type( device
+                                     , info
+                                     );
 }
 
 #ifdef BOOST_GIL_IO_ADD_FS_PATH_SUPPORT
@@ -115,11 +115,11 @@ make_writer( Device&                              file
                     , FormatTag
                     >::type device( file );
 
-    return get_writer< Device
-                     , FormatTag
-                     >::type( device
-                            , info
-                            );
+    return typename get_writer< Device
+                              , FormatTag
+                              >::type( device
+                                     , info
+                                     );
 }
 
 

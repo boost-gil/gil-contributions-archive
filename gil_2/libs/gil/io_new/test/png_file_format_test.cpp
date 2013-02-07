@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE( file_format_test )
 {
    string in ( png_in + "PngSuite\\" );
 
-   fs::path in_path = fs::system_complete( fs::path( in, fs::native ) );
+   fs::path in_path = fs::system_complete( fs::path( in ));
 
    if ( fs::is_directory( in_path ) )
    {

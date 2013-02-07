@@ -135,7 +135,7 @@ private:
 
         tiff_samples_per_pixel::type samples_per_pixel = num_channels< pixel_t >::value;
 
-        write_header( view );
+        this->write_header( view );
 
         if( this->_info._is_tiled == false )
         {

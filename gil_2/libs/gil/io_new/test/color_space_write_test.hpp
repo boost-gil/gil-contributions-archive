@@ -12,6 +12,8 @@ void color_space_write_test( const std::string& file_name_1
                            , const std::string& file_name_2
                            )
 {
+    using namespace boost::gil;
+
     rgb8_image_t rgb( 320, 200 );
     bgr8_image_t bgr( 320, 200 );
 

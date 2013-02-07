@@ -217,7 +217,7 @@ public:
             else if( this->_info._planar_configuration == PLANARCONFIG_CONTIG )
             {
                 read( dst_view
-                    , is_read_only::type()
+                    , typename is_read_only::type()
                     );
             }
             else

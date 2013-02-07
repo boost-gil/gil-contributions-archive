@@ -306,9 +306,9 @@ public:
         }
         else
         {
-            init_image( images
-                      , this->_settings
-                      );
+            this->init_image( images
+                            , this->_settings
+                            );
 
             detail::dynamic_io_fnobj< detail::jpeg_read_is_supported
                                     , parent_t

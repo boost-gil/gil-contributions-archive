@@ -118,11 +118,23 @@ public:
 
 private:
 
-    template< int Channels > unsigned int get_type( mpl::true_  /* is_bit_aligned */ ) { return pnm_image_type::color_bin_t::value; }
-    template< int Channels > unsigned int get_type( mpl::false_ /* is_bit_aligned */ ) { return pnm_image_type::color_bin_t::value; }
+    template< int Channels >
+    unsigned int get_type( mpl::true_  /* is_bit_aligned */ )
+    {
+        return boost::mpl::if_c< Channels == 1
+                               , pnm_image_type::mono_bin_t
+                               , pnm_image_type::color_bin_t
+                               >::type::value;
+    }
 
-    template<>               unsigned int get_type< 1 >( mpl::true_  /* is_bit_aligned */ ) { return pnm_image_type::mono_bin_t::value; }
-    template<>               unsigned int get_type< 1 >( mpl::false_ /* is_bit_aligned */ ) { return pnm_image_type::gray_bin_t::value; }
+    template< int Channels >
+    unsigned int get_type( mpl::false_ /* is_bit_aligned */ )
+    {
+        return boost::mpl::if_c< Channels == 1
+                               , pnm_image_type::gray_bin_t
+                               , pnm_image_type::color_bin_t
+                               >::type::value;
+    }
 
     template< typename View >
     void write_data( const View&   src

@@ -128,7 +128,7 @@ public:
         // TODO: better error handling based on return code
         int return_code = this->_io_dev.unpack();
         io_error_if( return_code != LIBRAW_SUCCESS, "Unable to unpack image" );
-        _info._unpack_function_name = _io_dev.get_unpack_function_name();
+        this->_info._unpack_function_name = _io_dev.get_unpack_function_name();
 
         return_code = this->_io_dev.dcraw_process();
         io_error_if( return_code != LIBRAW_SUCCESS, "Unable to emulate dcraw behavior to process image" );
@@ -230,7 +230,7 @@ public:
             std::ostringstream error_message;
             error_message << "No matching image type between those of the given any_image and that of the file.\n";
             error_message << "Image type must be {gray||rgb}{8||16} unsigned for RAW image files.";
-            io_error( error_message.str() );
+            io_error( error_message.str().c_str() );
         }
         else
         {
