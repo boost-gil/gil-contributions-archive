@@ -18,7 +18,7 @@
 
 [section Overview]
 
-ToolBox provides some helpful extension for boost::gil that are too small to be an extension themself. There are:
+ToolBox provides some helpful extension for boost::gil that are too small to be an extension themselves. There are:
 
 * color spaces: cmyka, gray_alpha, hsl, hsv, lab, xyz
 * metafunctions: channel_type_to_index, is_bit_aligned, is_similar, is_homogeneous, get_num_bits, channel_type, get_pixel_type, pixel_bit_size
