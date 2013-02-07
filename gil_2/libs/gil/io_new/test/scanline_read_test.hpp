@@ -24,8 +24,8 @@ void test_scanline_reader( const char* file_name )
     Image dst( reader._info._width, reader._info._height );
     byte_t* buffer = new byte_t[ reader._scanline_length ];
 
-    auto it  = scanline_read_iterator< reader_t >( reader, buffer );
-    auto end = scanline_read_iterator< reader_t >();
+    scanline_read_iterator< reader_t > it  = scanline_read_iterator< reader_t >( reader, buffer );
+    scanline_read_iterator< reader_t > end = scanline_read_iterator< reader_t >();
 
     int row = 0;
     while( it != end )
