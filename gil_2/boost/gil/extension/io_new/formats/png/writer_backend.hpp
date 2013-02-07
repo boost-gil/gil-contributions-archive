@@ -156,7 +156,7 @@ protected:
         {
             png_set_gAMA( get_struct()
                         , get_info()
-                        , _info._gamma
+                        , _info._file_gamma
                         );
         }
 #else
@@ -291,23 +291,33 @@ protected:
         {
             png_set_sCAL( get_struct()
                         , get_info()
-                        , _info._scale_unit
-                        , _info._scale_width
-                        , _info._scale_height
+                        , this->_info._scale_unit
+                        , this->_info._scale_width
+                        , this->_info._scale_height
                         );
         }
 #else
 #ifdef BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
-
+        if( _info._valid_scale_factors )
+        {
+            png_set_sCAL_fixed( get_struct()
+                              , get_info()
+                              , this->_info._scale_unit
+                              , this->_info._scale_width
+                              , this->_info._scale_height
+                              );
+        }
+#else
         if( _info._valid_scale_factors )
         {
             png_set_sCAL_s( get_struct()
                           , get_info()
-                          , _scale_unit
-                          , const_cast< png_charp >( _scale_width.c_str()  )
-                          , const_cast< png_charp >( _scale_height.c_str() )
+                          , this->_info._scale_unit
+                          , const_cast< png_charp >( this->_info._scale_width.c_str()  )
+                          , const_cast< png_charp >( this->_info._scale_height.c_str() )
                           );
         }
+
 #endif // BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
 #endif // BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
 
@@ -319,8 +329,8 @@ protected:
             {
                 png_text pt;
                 pt.compression = _info._text[i]._compression;
-                pt.key         = const_cast< png_charp >( _info._text[i]._key.c_str()  );
-                pt.text        = const_cast< png_charp >( _info._text[i]._text.c_str() );
+                pt.key         = const_cast< png_charp >( this->_info._text[i]._key.c_str()  );
+                pt.text        = const_cast< png_charp >( this->_info._text[i]._text.c_str() );
                 pt.text_length = _info._text[i]._text.length();
 
                 texts[i] = pt;

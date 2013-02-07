@@ -492,14 +492,25 @@ public:
 #ifdef BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
         if( this->_settings._read_scale_factors )
         {
-            png_charp scale_width, scale_height;
+            this->_info._valid_scale_factors = png_get_sCAL_fixed( get_struct()
+                                                                 , get_info()
+                                                                 , &this->_info._scale_unit
+                                                                 , &this->_info._scale_width
+                                                                 , &this->_info._scale_height
+                                                                 );
+        }
+#else
+        if( this->_settings._read_scale_factors )
+        {
+            png_charp scale_width  = NULL;
+            png_charp scale_height = NULL;
 
             if( this->_info._valid_scale_factors = png_get_sCAL_s( get_struct()
                                                                  , get_info()
                                                                  , &this->_info._scale_unit
                                                                  , &scale_width
                                                                  , &scale_height
-                                                                 )
+                                                                 ) > 0
               )
             {
                 if( scale_width )

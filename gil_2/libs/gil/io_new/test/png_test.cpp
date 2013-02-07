@@ -4,6 +4,9 @@
 #include <fstream>
 
 #include <boost/gil/gil_all.hpp>
+
+//#define BOOST_GIL_IO_PNG_FLOATING_POINT_SUPPORTED
+//#define BOOST_GIL_IO_PNG_FIXED_POINT_SUPPORTED
 #include <boost/gil/extension/io_new/png_all.hpp>
 
 #include <boost/type_traits/is_same.hpp>
