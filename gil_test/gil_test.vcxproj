@@ -85,7 +85,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\boost\stage\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\boost\stage\lib\x86</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,7 +144,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="channel_tests.cpp" />
+    <ClCompile Include="error_if.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="old_channel_tests.cpp" />
     <ClCompile Include="packed_channel_reference_test.cpp" />
     <ClCompile Include="packed_channel_value_test.cpp" />
     <ClCompile Include="pixel_tests.cpp" />

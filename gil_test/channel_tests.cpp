@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE( channel_test )
     BOOST_CHECK_EQUAL( channel_convert<bits8>(c8_max), c8_max );
     BOOST_CHECK_EQUAL( channel_convert<bits16>(c8_max), c16_max );
     BOOST_CHECK_EQUAL( channel_convert<bits32>(c8_max), c32_max );
-    BOOST_CHECK_EQUAL( channel_convert<bits64>(c8_max), c64_max );
+    //BOOST_CHECK_EQUAL( channel_convert<bits64>(c8_max), c64_max );
 
     //reference test
 

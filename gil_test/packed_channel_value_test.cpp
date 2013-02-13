@@ -14,6 +14,7 @@ BOOST_AUTO_TEST_SUITE( gil_test )
 //
 // These tests make sure that a value is represented correctly.
 //
+
 template< int K >
 void test_packed_channel()
 {
@@ -25,6 +26,39 @@ void test_packed_channel()
 
     BOOST_CHECK_EQUAL( sizeof( bits_t ), K / 8 + 1 );
     BOOST_STATIC_ASSERT(( boost::is_integral< bits_t >::value ));
+
+    {
+        typedef packed_channel_value< K > bits_t;
+        bits_t::value_type v = bits_t::min_value();
+
+    }
+
+    {
+        unsigned int v = 10;
+
+        typedef packed_channel_value< 5 > bits_t;
+        bits_t b( v );
+
+        bits_t::integer_t v2 = b;
+        BOOST_CHECK_EQUAL( v, v2 );
+    }
+
+    {
+        typedef packed_channel_value< 12 > bits_t;
+        bits_t a(5), b(5), c;
+
+        c = channel_multiply( a, b );
+
+        BOOST_CHECK_EQUAL( channel_multiply( bits_t( 5 ), bits_t( 5 ) ), bits_t( 0 ) );
+    }
+
+    {
+        unsigned int value = 0;
+        
+        typedef packed_channel_reference< unsigned short, 0, 5, 1 > channel_t;
+        channel_t c( &value );
+        c = channel_traits<channel_t>::min_value();
+    }
 }
 
 BOOST_AUTO_TEST_CASE( packed_channel_test )

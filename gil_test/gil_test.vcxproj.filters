@@ -50,5 +50,11 @@
     <ClCompile Include="scoped_channel_value_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="old_channel_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="error_if.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
