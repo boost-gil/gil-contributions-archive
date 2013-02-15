@@ -96,12 +96,12 @@ BOOST_AUTO_TEST_CASE( packed_channel_reference_test )
     mutable_test< bits8, mpl::vector3_c< unsigned, 3, 3, 2 > >();
     mutable_test< bits16, mpl::vector3_c< unsigned, 5, 5, 6 > >();
     mutable_test< bits32, mpl::vector3_c< unsigned, 11, 11, 10 > >();
-    mutable_test< bits64, mpl::vector3_c< unsigned, 21, 21, 22 > >();
+    mutable_test< bits64, mpl::vector3_c< unsigned, 21, 21, 21 > >();
 
     immutable_test< bits8, mpl::vector3_c< unsigned, 3, 3, 2 > >();
     immutable_test< bits16, mpl::vector3_c< unsigned, 5, 5, 6 > >();
     immutable_test< bits32, mpl::vector3_c< unsigned, 11, 11, 10 > >();
-    immutable_test< bits64, mpl::vector3_c< unsigned, 21, 21, 22 > >();
+    immutable_test< bits64, mpl::vector3_c< unsigned, 21, 21, 5 > >();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

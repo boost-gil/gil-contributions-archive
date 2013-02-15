@@ -333,24 +333,24 @@ void test_packed_dynamic_channel_reference() {
 
 BOOST_AUTO_TEST_CASE( old_channel_test )
 {
-    //test_channel_value_impl<bits8>();
-    //test_channel_value_impl<bits8s>();
-    //test_channel_value_impl<bits16>();
-    //test_channel_value_impl<bits16s>();
-    //test_channel_value_impl<bits32>();
-    //test_channel_value_impl<bits32s>();
+    test_channel_value_impl<bits8>();
+    test_channel_value_impl<bits8s>();
+    test_channel_value_impl<bits16>();
+    test_channel_value_impl<bits16s>();
+    test_channel_value_impl<bits32>();
+    test_channel_value_impl<bits32s>();
 
-    //test_channel_value_impl<bits32f>();
+    test_channel_value_impl<bits32f>();
 
-    //test_packed_channel_reference();
-    //test_packed_dynamic_channel_reference();
+    test_packed_channel_reference();
+    test_packed_dynamic_channel_reference();
 
-    //// Do only compile-time tests for the archetype (because asserts like val1<val2 fail)
-    //boost::function_requires<MutableChannelConcept<channel_archetype> >();
+    // Do only compile-time tests for the archetype (because asserts like val1<val2 fail)
+    boost::function_requires<MutableChannelConcept<channel_archetype> >();
 
-    //do_test<value_core<channel_value_archetype> >();
-    //do_test<reference_core<channel_archetype> >();
-    //do_test<reference_core<const channel_archetype&> >();
+    do_test<value_core<channel_value_archetype> >();
+    do_test<reference_core<channel_archetype> >();
+    do_test<reference_core<const channel_archetype&> >();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -8,6 +8,7 @@ gil_fix/tiled_tiff.png svn_mime_002dtype=application%2Foctet-stream
 gil_test/error_if.cpp svn_eol_002dstyle=native
 gil_test/old_channel_tests.cpp svn_eol_002dstyle=native
 gil_test/packed_dynamic_channel_reference.cpp svn_eol_002dstyle=native
+gil_test/test.cpp svn_eol_002dstyle=native
 /numeric.zip svn_mime_002dtype=application%2Foctet-stream
 test_images/bmp/Thumbs.db svn_mime_002dtype=application%2Foctet-stream
 test_images/bmp/g01bg.bmp svn_mime_002dtype=application%2Foctet-stream

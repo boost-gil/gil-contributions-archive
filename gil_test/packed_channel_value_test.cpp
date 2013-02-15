@@ -1,11 +1,14 @@
 #include "stdafx.h"
 
 #include <boost/gil/gil_all.hpp>
+#include <boost/gil/extension/toolbox/metafunctions/get_num_bits.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 #include "base_types.hpp"
 
-using namespace boost::gil;
+using namespace boost;
+using namespace gil;
 
 BOOST_AUTO_TEST_SUITE( gil_test )
 
@@ -22,7 +25,7 @@ void test_packed_channel()
 
     BOOST_CHECK_EQUAL( channel_traits<bits_t>::min_value(),                                         0 );
     BOOST_CHECK_EQUAL( channel_traits<bits_t>::max_value(),                ( uint64_t( 1 ) << K ) - 1 );
-    BOOST_CHECK_EQUAL( detail::unsigned_integral_max_value<bits_t>::value, ( uint64_t( 1 ) << K ) - 1 );
+    BOOST_CHECK_EQUAL( gil::detail::unsigned_integral_max_value<bits_t>::value, ( uint64_t( 1 ) << K ) - 1 );
 
     BOOST_CHECK_EQUAL( sizeof( bits_t ), K / 8 + 1 );
     BOOST_STATIC_ASSERT(( boost::is_integral< bits_t >::value ));
@@ -30,7 +33,6 @@ void test_packed_channel()
     {
         typedef packed_channel_value< K > bits_t;
         bits_t::value_type v = bits_t::min_value();
-
     }
 
     {
@@ -69,6 +71,11 @@ BOOST_AUTO_TEST_CASE( packed_channel_test )
     test_packed_channel< 24 >();
     test_packed_channel< 31 >();
     test_packed_channel< 63 >();
+
+    mpl::false_ oo;
+    mpl::true_ pp;
+    auto ll = is_integral< unsigned char >::type();
+    auto kk = mpl::not_< is_class< unsigned char > >::type();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
