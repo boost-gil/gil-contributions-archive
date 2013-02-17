@@ -1,17 +1,18 @@
 #ifndef BOOST_GIL_TIFF_TILED_READ_MACROS_HPP
 #define BOOST_GIL_TIFF_TILED_READ_MACROS_HPP
 
-#include <boost/mpl/vector.hpp>
-#include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/io_new/tiff_read.hpp>
-
-#include "paths.hpp"
-
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/comparison/less.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
+
+#include <boost/mpl/vector.hpp>
+#include <boost/gil/gil_all.hpp>
+#include <boost/gil/extension/io_new/tiff_read.hpp>
+
+#include "paths.hpp"
+#include "write_test_image.hpp"
 
 typedef boost::gil::tiff_tag tag_t;
 

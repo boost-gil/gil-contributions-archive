@@ -14,6 +14,7 @@
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -23,6 +24,8 @@ namespace fs = boost::filesystem;
 typedef bmp_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( bmp_test )
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
@@ -35,8 +38,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 127 );
-        BOOST_CHECK_EQUAL( backend._info._height, 64 );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000 );
+        BOOST_CHECK_EQUAL( backend._info._height, 600  );
     }
 
     {
@@ -50,8 +53,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 127 );
-        BOOST_CHECK_EQUAL( backend._info._height, 64 );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000 );
+        BOOST_CHECK_EQUAL( backend._info._height, 600  );
     }
 
     {
@@ -65,8 +68,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
                                            , tag_t()
                                            );
         
-        BOOST_CHECK_EQUAL( backend._info._width , 127 );
-        BOOST_CHECK_EQUAL( backend._info._height, 64 );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000 );
+        BOOST_CHECK_EQUAL( backend._info._height, 600  );
     }
 
     {
@@ -80,8 +83,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 127 );
-        BOOST_CHECK_EQUAL( backend._info._height, 64  );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000 );
+        BOOST_CHECK_EQUAL( backend._info._height, 600   );
     }
 }
 
@@ -91,8 +94,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( bmp_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
+        BOOST_CHECK_EQUAL( img.width() , 1000 );
+        BOOST_CHECK_EQUAL( img.height(), 600  );
     }
 
     {
@@ -101,8 +104,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
+        BOOST_CHECK_EQUAL( img.width() , 1000 );
+        BOOST_CHECK_EQUAL( img.height(), 600  );
     }
 
     {
@@ -111,8 +114,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
+        BOOST_CHECK_EQUAL( img.width() , 1000 );
+        BOOST_CHECK_EQUAL( img.height(), 600  );
     }
 
     {
@@ -121,8 +124,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( my_path, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
+        BOOST_CHECK_EQUAL( img.width() , 1000 );
+        BOOST_CHECK_EQUAL( img.height(), 600  );
     }
 }
 
@@ -132,8 +135,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( bmp_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
+        BOOST_CHECK_EQUAL( img.width() , 1000 );
+        BOOST_CHECK_EQUAL( img.height(), 600  );
     }
 
     {
@@ -142,8 +145,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
+        BOOST_CHECK_EQUAL( img.width() , 1000 );
+        BOOST_CHECK_EQUAL( img.height(), 600  );
     }
 
     {
@@ -152,29 +155,29 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
+        BOOST_CHECK_EQUAL( img.width() , 1000 );
+        BOOST_CHECK_EQUAL( img.height(), 600  );
     }
 }
 
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
-        rgb8_image_t img( 127, 64 );
+        rgb8_image_t img( 1000, 600  );
         read_view( bmp_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( bmp_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 127, 64 );
+        rgb8_image_t img( 1000, 600  );
         read_view( in, view( img ), tag_t() );
     }
 
     {
         FILE* file = fopen( bmp_filename.c_str(), "rb" );
         
-        rgb8_image_t img( 127, 64 );
+        rgb8_image_t img( 1000, 600  );
         read_view( file, view( img ), tag_t() );
     }
 }
@@ -182,21 +185,21 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
     {
-        rgb8_image_t img( 127, 64 );
+        rgb8_image_t img( 1000, 600  );
         read_and_convert_view( bmp_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( bmp_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 127, 64 );
+        rgb8_image_t img( 1000, 600  );
         read_and_convert_view( in, view( img ), tag_t() );
     }
 
     {
         FILE* file = fopen( bmp_filename.c_str(), "rb" );
         
-        rgb8_image_t img( 127, 64 );
+        rgb8_image_t img( 1000, 600  );
         read_and_convert_view( file
                              , view( img )
                              , tag_t()
@@ -206,16 +209,17 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     {
         string filename( bmp_out + "write_test_string.bmp" );
 
-        write_view( filename
-                  , create_mandel_view( 127, 64
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( filename
+                       , create_mandel_view( 1000, 600 
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
@@ -223,13 +227,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         ofstream out( filename.c_str(), ios::binary );
 
-        write_view( out
-                  , create_mandel_view( 127, 64
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( out
+                       , create_mandel_view( 1000, 600 
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
@@ -237,13 +241,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
-        write_view( file
-                  , create_mandel_view( 127, 64
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( file
+                       , create_mandel_view( 1000, 600 
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
@@ -253,14 +257,16 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
 
-        write_view( file
-                  , create_mandel_view( 127, 64
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , info
-                  );
+        write_test_view( file
+                       , create_mandel_view( 1000, 600 
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , info
+                       );
     }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 BOOST_AUTO_TEST_CASE( stream_test )
@@ -286,7 +292,7 @@ BOOST_AUTO_TEST_CASE( stream_test )
     // 5. Write out image.
     string filename( bmp_out + "stream_test.bmp" );
     ofstream out( filename.c_str(), ios_base::binary );
-    write_view( out, view( dst ), tag_t() );
+    write_test_view( out, view( dst ), tag_t() );
 }
 
 BOOST_AUTO_TEST_CASE( stream_test_2 )
@@ -307,7 +313,7 @@ BOOST_AUTO_TEST_CASE( subimage_test )
 {
     run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
                                             , point_t(   0, 0 )
-                                            , point_t( 127, 1 )
+                                            , point_t( 1000, 1 )
                                             );
 
     run_subimage_test< rgb8_image_t, tag_t >( bmp_filename
@@ -332,10 +338,12 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
               , tag_t()
               );
 
-    write_view( bmp_out + "dynamic_image_test.bmp"
-              , view( runtime_image )
-              , tag_t()
-              );
+    write_test_view( bmp_out + "dynamic_image_test.bmp"
+                   , view( runtime_image )
+                   , tag_t()
+                   );
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

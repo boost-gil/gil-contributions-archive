@@ -7,8 +7,11 @@
 #include <boost/test/unit_test.hpp>
 
 #include "tiff_tiled_write_macros.hpp"
+#include "write_test_image.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
+
+#ifdef BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_PP_REPEAT_FROM_TO(11, 16, GENERATE_WRITE_TILE_BIT_ALIGNED_MINISBLACK, minisblack )
 BOOST_PP_REPEAT_FROM_TO(17, 21, GENERATE_WRITE_TILE_BIT_ALIGNED_MINISBLACK, minisblack )
@@ -30,9 +33,14 @@ BOOST_AUTO_TEST_CASE( write_minisblack_tile_and_compare_with_16 )
     info._is_tiled = true;
     info._tile_width = info._tile_length = 16;
 
-    write_view( tiff_out + "write_minisblack_tile_and_compare_with_16.tif", view(img_strip), info );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_test_view( tiff_out + "write_minisblack_tile_and_compare_with_16.tif", view(img_strip), info );
     read_image( tiff_out + "write_minisblack_tile_and_compare_with_16.tif", img_saved, tag_t() );
+
     BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_saved) ), true);
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
+
+#endif // BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

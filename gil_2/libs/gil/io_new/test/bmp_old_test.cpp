@@ -6,6 +6,7 @@
 
 #include "mandel_view.hpp"
 #include "paths.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -13,64 +14,54 @@ using namespace gil;
 
 BOOST_AUTO_TEST_SUITE( bmp_test )
 
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
+
 BOOST_AUTO_TEST_CASE( old_read_dimensions_test )
 {
-    {
-        point2< ptrdiff_t > dim = bmp_read_dimensions( bmp_filename );
+    point2< ptrdiff_t > dim = bmp_read_dimensions( bmp_filename );
 
-        BOOST_CHECK_EQUAL( dim.x, 127 );
-        BOOST_CHECK_EQUAL( dim.y, 64 );
-    }
+    BOOST_CHECK_EQUAL( dim.x, 1000 );
+    BOOST_CHECK_EQUAL( dim.y, 600  );
 }
 
 BOOST_AUTO_TEST_CASE( old_read_image_test )
 {
-    {
-        rgb8_image_t img;
-        bmp_read_image( bmp_filename, img );
+    rgb8_image_t img;
+    bmp_read_image( bmp_filename, img );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
-    }
+    BOOST_CHECK_EQUAL( img.width() , 1000 );
+    BOOST_CHECK_EQUAL( img.height(), 600  );
 }
 
 BOOST_AUTO_TEST_CASE( old_read_and_convert_image_test )
 {
-    {
-        rgb8_image_t img;
-        bmp_read_and_convert_image( bmp_filename, img );
+    rgb8_image_t img;
+    bmp_read_and_convert_image( bmp_filename, img );
 
-        BOOST_CHECK_EQUAL( img.width() , 127 );
-        BOOST_CHECK_EQUAL( img.height(), 64 );
-    }
+    BOOST_CHECK_EQUAL( img.width() , 1000 );
+    BOOST_CHECK_EQUAL( img.height(), 600  );
 }
 
 BOOST_AUTO_TEST_CASE( old_read_view_test )
 {
-    {
-        rgb8_image_t img( 127, 64 );
-        bmp_read_view( bmp_filename, view( img ) );
-    }
+    rgb8_image_t img( 1000, 600 );
+    bmp_read_view( bmp_filename, view( img ) );
 }
 
 BOOST_AUTO_TEST_CASE( old_read_and_convert_view_test )
 {
-    {
-        rgb8_image_t img( 127, 64 );
-        bmp_read_and_convert_view( bmp_filename, view( img ) );
-    }
+    rgb8_image_t img( 1000, 600 );
+    bmp_read_and_convert_view( bmp_filename, view( img ) );
 }
 
 BOOST_AUTO_TEST_CASE( old_write_view_test )
 {
-    {
-        bmp_write_view( bmp_out + "old_write_view_test.bmp"
-                      , create_mandel_view( 127, 64
-                                          , rgb8_pixel_t( 0,   0, 255 )
-                                          , rgb8_pixel_t( 0, 255,   0 )
-                                          )
-                      );
-    }
+    bmp_write_test_view( bmp_out + "old_write_view_test.bmp"
+                       , create_mandel_view( 1000, 600
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       );
 }
 
 BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
@@ -88,9 +79,10 @@ BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
                   , runtime_image
                   );
 
-    bmp_write_view( bmp_out + "old_dynamic_image_test.bmp"
-                  , view( runtime_image )
-                  );
+    bmp_write_test_view( bmp_out + "old_dynamic_image_test.bmp"
+                       , view( runtime_image )
+                       );
 }
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

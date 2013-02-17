@@ -25,12 +25,12 @@ static const std::string tiff_in    = base + "test_images/tiff/";
 static const std::string tiff_out   = base + "output/tiff/";
 static const std::string tiff_in_GM = tiff_in + "GraphicsMagick/tiff-sample-images/";
 
-static const std::string bmp_filename  ( bmp_in    + "rgb.bmp"                            );
-static const std::string jpeg_filename ( jpeg_in   + "found online/test.jpg"              );
-static const std::string png_filename  ( base      + "test_images/png/wikipedia/test.png" );
-static const std::string pnm_filename  ( pnm_in    + "rgb.pnm"                            );
-static const std::string raw_filename  ( raw_in    + "RAW_CANON_D30_SRGB.CRW"             );
-static const std::string targa_filename( targa_in  + "24BPP_compressed.tga"               );
-static const std::string tiff_filename ( tiff_in   + "test.tif"                           );
+static const std::string bmp_filename  ( bmp_in      + "test.bmp"               );
+static const std::string jpeg_filename ( jpeg_in     + "test.jpg"               );
+static const std::string png_filename  ( png_base_in + "test.png"               );
+static const std::string pnm_filename  ( pnm_in      + "rgb.pnm"                );
+static const std::string raw_filename  ( raw_in      + "RAW_CANON_D30_SRGB.CRW" );
+static const std::string targa_filename( targa_in    + "24BPP_compressed.tga"   );
+static const std::string tiff_filename ( tiff_in     + "test.tif"               );
 
 #endif // BOOST_GIL_IO_UNIT_TEST_PATHS_HPP

@@ -13,6 +13,7 @@
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -22,6 +23,8 @@ using namespace filesystem;
 typedef jpeg_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( jpeg_test )
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
@@ -35,8 +38,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 136u );
-        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 
     {
@@ -50,8 +53,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 136u );
-        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 
     {
@@ -65,8 +68,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                                        , tag_t()
                                                        );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 136u );
-        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 
     {
@@ -78,8 +81,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                                        , tag_t()
                                                        );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 136u );
-        BOOST_CHECK_EQUAL( backend._info._height, 98u  );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 }
 
@@ -89,8 +92,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( jpeg_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 136u );
-        BOOST_CHECK_EQUAL( img.height(), 98u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
@@ -99,8 +102,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 136u );
-        BOOST_CHECK_EQUAL( img.height(), 98u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
@@ -109,8 +112,8 @@ BOOST_AUTO_TEST_CASE( read_image_test )
         rgb8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 136u );
-        BOOST_CHECK_EQUAL( img.height(), 98u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
@@ -147,42 +150,42 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
-        rgb8_image_t img( 136, 98 );
+        rgb8_image_t img( 1000, 600 );
         read_view( jpeg_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( jpeg_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 136, 98 );
+        rgb8_image_t img( 1000, 600 );
         read_view( in, view( img ), tag_t() );
     }
 
     {
         FILE* file = fopen( jpeg_filename.c_str(), "rb" );
         
-        rgb8_image_t img( 136, 98 );
+        rgb8_image_t img( 1000, 600 );
         read_view( file, view( img ), tag_t() );
     }
 }
 BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
     {
-        rgb8_image_t img( 136, 98 );
+        rgb8_image_t img( 1000, 600 );
         read_and_convert_view( jpeg_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( jpeg_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 136, 98 );
+        rgb8_image_t img( 1000, 600 );
         read_and_convert_view( in, view( img ), tag_t() );
     }
 
     {
         FILE* file = fopen( jpeg_filename.c_str(), "rb" );
 
-        rgb8_image_t img( 136, 98 );
+        rgb8_image_t img( 1000, 600 );
         read_and_convert_view( file
                              , view( img )
                              , tag_t()
@@ -192,29 +195,30 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     {
         string filename( jpeg_out + "write_test_string.jpg" );
 
-        write_view( filename
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( filename
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
         string filename( jpeg_out + "write_test_ofstream.jpg" );
         ofstream out( filename.c_str(), ios::binary );
 
-        write_view( out
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( out
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
@@ -222,13 +226,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
-        write_view( file
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( file
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
@@ -236,14 +240,15 @@ BOOST_AUTO_TEST_CASE( write_view_test )
         FILE* file = fopen( filename.c_str(), "wb" );
 
         image_write_info< jpeg_tag > info;
-        write_view( file
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , info
-                  );
+        write_test_view( file
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , info
+                       );
     }
+#endif //BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 BOOST_AUTO_TEST_CASE( stream_test )
@@ -269,7 +274,7 @@ BOOST_AUTO_TEST_CASE( stream_test )
     // 5. Write out image.
     string filename( jpeg_out + "stream_test.jpg" );
     ofstream out( filename.c_str(), ios_base::binary );
-    write_view( out, view( dst ), tag_t() );
+    write_test_view( out, view( dst ), tag_t() );
 }
 
 BOOST_AUTO_TEST_CASE( stream_test_2 )
@@ -315,10 +320,12 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
               , jpeg_tag()
               );
 
-    write_view( jpeg_out + "old_dynamic_image_test.jpg"
-              , view( runtime_image )
-              , jpeg_tag()
-              );
+    write_test_view( jpeg_out + "old_dynamic_image_test.jpg"
+                   , view( runtime_image )
+                   , jpeg_tag()
+                   );
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

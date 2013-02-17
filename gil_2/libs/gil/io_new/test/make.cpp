@@ -19,6 +19,8 @@ namespace fs = boost::filesystem;
 
 BOOST_AUTO_TEST_SUITE( make_test )
 
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
+
 BOOST_AUTO_TEST_CASE( make_reader_backend_test )
 {
     {
@@ -122,25 +124,6 @@ BOOST_AUTO_TEST_CASE( make_dynamic_image_reader_test )
 
 BOOST_AUTO_TEST_CASE( make_writer_test )
 {
-
-    {
-        //const char file_name[] = "c:\\chhenning\\rgb.bmp";
-
-        //typedef get_write_device< const char*
-        //                        , bmp_tag
-        //                        >::type write_device_t;
-        //
-        //write_device_t f( file_name, gil::detail::file_stream_device< bmp_tag >::write_tag() );
-
-        //typedef get_writer< const char*
-        //                  , bmp_tag
-        //                  >::type writer_t;
-
-        //writer_t w( bmp_filename.c_str(), image_write_info< bmp_tag >() );
-
-        //BOOST_STATIC_ASSERT(( is_same< gil::detail::is_writer< writer_t >::type, boost::mpl::true_ >::value ));
-    }
-
     {
         typedef get_writer< const char*
                           , bmp_tag
@@ -212,5 +195,7 @@ BOOST_AUTO_TEST_CASE( make_dynamic_image_writer_test )
         get_dynamic_image_writer< fs::path    , bmp_tag >::type writer_path    = make_dynamic_image_writer( my_path          , image_write_info< bmp_tag >() );
     }
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

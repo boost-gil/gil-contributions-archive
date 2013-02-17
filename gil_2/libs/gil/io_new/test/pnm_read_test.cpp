@@ -5,6 +5,7 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -13,15 +14,17 @@ typedef pnm_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( pnm_test )
 
+#ifdef BOOST_GIL_IO_USE_PNM_TEST_SUITE_IMAGES
+
 template< typename Image >
 void write( Image&        img
           , const string& file_name
           )
 {
-    write_view( pnm_out + file_name
-              , view( img )
-              , tag_t()
-              );
+    write_test_view( pnm_out + file_name
+                   , view( img )
+                   , tag_t()
+                   );
 }
 
 template< typename Image >
@@ -128,5 +131,7 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
         test_pnm_scanline_reader< rgb8_image_t >( "p6.pnm" );
     }
 }
+
+#endif // BOOST_GIL_IO_USE_PNM_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

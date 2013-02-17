@@ -181,6 +181,29 @@ public:
         } // for
     }
 
+    /// Check if image is large enough.
+    void check_image_size( const point_t& img_dim )
+    {
+        if( _settings._dim.x > 0 )
+        {
+            if( img_dim.x < _settings._dim.x ) { io_error( "Supplied image is too small" ); }
+        }
+        else
+        {
+            if( img_dim.x < _info._width ) { io_error( "Supplied image is too small" ); }
+        }
+
+
+        if( _settings._dim.y > 0 )
+        {
+            if( img_dim.y < _settings._dim.y ) { io_error( "Supplied image is too small" ); }
+        }
+        else
+        {
+            if( img_dim.y < _info._height ) { io_error( "Supplied image is too small" ); }
+        }
+    }
+
 public:
 
     Device _io_dev;

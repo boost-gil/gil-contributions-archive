@@ -24,6 +24,8 @@ typedef raw_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( raw_test )
 
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
+
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
 
@@ -133,5 +135,7 @@ BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 //              , tag_t()
 //              );
 //}
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

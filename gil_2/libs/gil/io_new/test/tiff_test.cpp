@@ -22,6 +22,8 @@
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
+#include "write_test_image.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -31,6 +33,8 @@ namespace fs = boost::filesystem;
 typedef tiff_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( read_image_info_test )
 {
@@ -43,8 +47,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 200u );
-        BOOST_CHECK_EQUAL( backend._info._height, 133u );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 
     {
@@ -58,8 +62,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width , 200u );
-        BOOST_CHECK_EQUAL( backend._info._height, 133u );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 
     {
@@ -73,8 +77,8 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                            , tag_t()
                                            );
                                            
-        BOOST_CHECK_EQUAL( backend._info._width , 200u );
-        BOOST_CHECK_EQUAL( backend._info._height, 133u );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 
     {
@@ -89,40 +93,40 @@ BOOST_AUTO_TEST_CASE( read_image_info_test )
                                            );
 
 
-        BOOST_CHECK_EQUAL( backend._info._width , 200u );
-        BOOST_CHECK_EQUAL( backend._info._height, 133u );
+        BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height,  600u );
     }
 }
 
 BOOST_AUTO_TEST_CASE( read_image_test )
 {
     {
-        rgb8_image_t img;
+        rgba8_image_t img;
         read_image( tiff_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
 
         ifstream in( tiff_filename.c_str(), ios::binary );
 
-        rgb8_image_t img;
+        rgba8_image_t img;
         read_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
         TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
-        rgb8_image_t img;
+        rgba8_image_t img;
         read_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 }
 
@@ -132,8 +136,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( tiff_filename, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
@@ -142,8 +146,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( in, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
@@ -152,8 +156,8 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test )
         rgb8_image_t img;
         read_and_convert_image( file, img, tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 }
 
@@ -162,7 +166,7 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test_2 )
     gray8_image_t img;
     read_and_convert_image( tiff_filename, img, tag_t() );
 
-    rgb8_image_t img2;
+    rgba8_image_t img2;
     read_image( tiff_filename, img2, tag_t() );
 
 
@@ -175,24 +179,24 @@ BOOST_AUTO_TEST_CASE( read_and_convert_image_test_2 )
 BOOST_AUTO_TEST_CASE( read_view_test )
 {
     {
-        rgb8_image_t img( 200, 133 );
+        rgba8_image_t img( 1000, 600 );
         read_view( tiff_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( tiff_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 200, 133 );
+        rgba8_image_t img( 1000, 600 );
         read_view( in, view( img ), tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
         TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
-        rgb8_image_t img( 200, 133 );
+        rgba8_image_t img( 1000, 600 );
         read_view( file, view( img ), tag_t() );
     }
 }
@@ -200,90 +204,95 @@ BOOST_AUTO_TEST_CASE( read_view_test )
 BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 {
     {
-        rgb8_image_t img( 200, 133 );
+        rgb8_image_t img( 1000, 600 );
         read_and_convert_view( tiff_filename, view( img ), tag_t() );
     }
 
     {
         ifstream in( tiff_filename.c_str(), ios::binary );
 
-        rgb8_image_t img( 200, 133 );
+        rgb8_image_t img( 1000, 600 );
         read_and_convert_view( in, view( img ), tag_t() );
 
-        BOOST_CHECK_EQUAL( img.width() , 200u );
-        BOOST_CHECK_EQUAL( img.height(), 133u );
+        BOOST_CHECK_EQUAL( img.width() , 1000u );
+        BOOST_CHECK_EQUAL( img.height(),  600u );
     }
 
     {
         TIFF* file = TIFFOpen( tiff_filename.c_str(), "r" );
 
-        rgb8_image_t img( 200, 133 );
+        rgb8_image_t img( 1000, 600 );
         read_and_convert_view( file, view( img ), tag_t() );
     }
 }
 
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
+
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
-    rgb8_image_t img( 320, 240 );
-
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     {
         string filename( tiff_out + "write_test_string.tif" );
 
-        write_view( filename
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( filename
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
         string filename( tiff_out + "write_test_ofstream.tif" );
         ofstream out( filename.c_str(), ios_base::binary );
 
-        write_view( out
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( out
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
         string filename( tiff_out + "write_test_tiff.tif" );
         TIFF* file = TIFFOpen( filename.c_str(), "w" );
         
-        write_view( file
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( file
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
         string filename( tiff_out + "write_test_info.tif" );
 
         image_write_info< tiff_tag > info;
-        write_view( filename
-                  , create_mandel_view( 320, 240
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , info
-                  );
+        write_test_view( filename
+                       , create_mandel_view( 320, 240
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , info
+                       );
     }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( stream_test )
 {
     // 1. Read an image.
     ifstream in( tiff_filename.c_str(), ios::binary );
 
-    rgb8_image_t img;
+    rgba8_image_t img;
     read_image( in, img, tag_t() );
 
     // 2. Write image to in-memory buffer.
@@ -295,13 +304,13 @@ BOOST_AUTO_TEST_CASE( stream_test )
     in_buffer << out_buffer.rdbuf();
 
     // 4. Read in-memory buffer to gil image
-    rgb8_image_t dst;
+    rgba8_image_t dst;
     read_image( in_buffer, dst, tag_t() );
 
     // 5. Write out image.
     string filename( tiff_out + "stream_test.tif" );
     ofstream out( filename.c_str(), ios_base::binary );
-    write_view( out, view( dst ), tag_t() );
+    write_test_view( out, view( dst ), tag_t() );
 }
 
 BOOST_AUTO_TEST_CASE( stream_test_2 )
@@ -314,21 +323,21 @@ BOOST_AUTO_TEST_CASE( stream_test_2 )
 
     istream in( &in_buf );
 
-    rgb8_image_t img;
+    rgba8_image_t img;
     read_image( in, img, tag_t() );
 }
 
 BOOST_AUTO_TEST_CASE( subimage_test )
 {
-    run_subimage_test< rgb8_image_t, tag_t >( tiff_filename
-                                            , point_t(  0,  0 )
-                                            , point_t( 50, 50 )
-                                            );
+    run_subimage_test< rgba8_image_t, tag_t >( tiff_filename
+                                             , point_t(  0,  0 )
+                                             , point_t( 50, 50 )
+                                             );
 
-    run_subimage_test< rgb8_image_t, tag_t >( tiff_filename
-                                            , point_t(  50,  50 )
-                                            , point_t(  50,  50 )
-                                            );
+    run_subimage_test< rgba8_image_t, tag_t >( tiff_filename
+                                             , point_t(  50,  50 )
+                                             , point_t(  50,  50 )
+                                             );
 }
 
 BOOST_AUTO_TEST_CASE( dynamic_image_test )
@@ -338,7 +347,7 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
 
     typedef mpl::vector< gray8_image_t
                        , gray16_image_t
-                       , rgb8_image_t
+                       , rgba8_image_t
                        , gray1_image_t
                        > my_img_types;
 
@@ -350,10 +359,12 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
               , tag_t()
               );
 
-    write_view( tiff_out + "dynamic_image_test.tif"
-              , view( runtime_image )
-              , tag_t()
-              );
+    write_test_view( tiff_out + "dynamic_image_test.tif"
+                   , view( runtime_image )
+                   , tag_t()
+                   );
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

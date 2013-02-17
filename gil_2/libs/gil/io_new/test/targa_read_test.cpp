@@ -7,6 +7,7 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -14,6 +15,8 @@ using namespace boost::gil;
 typedef targa_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( targa_test )
+
+#ifdef BOOST_GIL_IO_USE_TARGA_FILEFORMAT_TEST_SUITE_IMAGES
 
 template< typename Image >
 void test_targa_scanline_reader( string filename )
@@ -26,10 +29,10 @@ void write( Image&        img
           , const string& file_name
           )
 {
-    write_view( targa_out + file_name
-              , view( img )
-              , tag_t()
-              );
+    write_test_view( targa_out + file_name
+                   , view( img )
+                   , tag_t()
+                   );
 }
 
 BOOST_AUTO_TEST_CASE( read_header_test )
@@ -122,11 +125,13 @@ BOOST_AUTO_TEST_CASE( partial_image_test )
                   );
 
 
-        write_view( targa_out + "targa_partial.tga"
-                  , view( img )
-                  , tag_t()
-                  );
+        write_test_view( targa_out + "targa_partial.tga"
+                       , view( img )
+                       , tag_t()
+                       );
     }
 }
+
+#endif // BOOST_GIL_IO_USE_TARGA_FILEFORMAT_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -9,6 +9,7 @@
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -46,6 +47,8 @@ typedef tiff_tag tag_t;
     } \
 
 BOOST_AUTO_TEST_SUITE( tiff_subimage_test )
+
+#ifdef BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_PP_REPEAT_FROM_TO(  1,  8, GENERATE_SUBIMAGE_TEST, minisblack )
 BOOST_PP_REPEAT_FROM_TO(  9, 16, GENERATE_SUBIMAGE_TEST, minisblack )
@@ -104,5 +107,7 @@ BOOST_AUTO_TEST_CASE( subimage_test_32 )
     BOOST_CHECK( equal_pixels( const_view( img1 ), const_view( img2 )));
     BOOST_CHECK( equal_pixels( const_view( img1 ), subimage_view( view( img3 ), top_left, dim )));
 }
+
+#endif // BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

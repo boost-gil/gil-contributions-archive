@@ -50,6 +50,8 @@ void read_and_convert_view( Reader&     reader
                           >::type* /* ptr */ = 0
                           )
 {
+    reader.check_image_size( view.dimensions() );
+
     reader.init_view( view
                     , reader._settings
                     );

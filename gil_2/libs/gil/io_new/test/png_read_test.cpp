@@ -15,6 +15,7 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -55,13 +56,15 @@ void test_file( string filename )
               , settings
               );
 
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     image_write_info< png_tag > write_info;
     write_info._file_gamma = backend._info._file_gamma;
 
-    write_view( png_out + filename
-              , view( src )
-              , write_info
-              );
+    write_test_view( png_out + filename
+                   , view( src )
+                   , write_info
+                   );
 
     read_image( png_out + filename
               , dst
@@ -73,6 +76,7 @@ void test_file( string filename )
                              , const_view( dst )
                              )
                );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 template< typename Image >
@@ -91,8 +95,8 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                        , tag_t()
                                        );
 
-    BOOST_CHECK_EQUAL( backend._info._width , 320u );
-    BOOST_CHECK_EQUAL( backend._info._height, 240u );
+    BOOST_CHECK_EQUAL( backend._info._width , 1000u );
+    BOOST_CHECK_EQUAL( backend._info._height,  600u );
 
     BOOST_CHECK_EQUAL( backend._info._num_channels, 4                   );
     BOOST_CHECK_EQUAL( backend._info._bit_depth   , 8                   );
@@ -105,6 +109,8 @@ BOOST_AUTO_TEST_CASE( read_header_test )
 
     BOOST_CHECK_EQUAL( backend._info._file_gamma, 1 );
 }
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( read_pixel_per_meter )
 {
@@ -122,6 +128,10 @@ BOOST_AUTO_TEST_CASE( read_pixel_per_meter )
     BOOST_CHECK_EQUAL( backend._info._pixels_per_meter, png_uint_32( 1417 ));
 
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
+
+#ifdef BOOST_GIL_IO_USE_PNG_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_CASE( BASIc_format_test )
 {
@@ -493,5 +503,7 @@ BOOST_AUTO_TEST_CASE( gamma_test )
     // G25N3P04 - paletted, file-gamma = 2.50
     test_file< rgb8_image_t >( "G25N3P04.PNG" );
 }
+
+#endif // BOOST_GIL_IO_USE_PNG_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

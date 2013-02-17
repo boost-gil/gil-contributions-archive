@@ -10,6 +10,7 @@
 #include <boost/gil/extension/io_new/png_all.hpp>
 
 #include "paths.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -18,6 +19,8 @@ namespace fs = boost::filesystem;
 typedef png_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( png_test )
+
+#ifdef BOOST_GIL_IO_USE_PNG_TEST_SUITE_IMAGES
 
 // Test will loop through the "in" folder to read and convert
 // the png's to rgb8_image_t's. Which then will be written in
@@ -54,13 +57,15 @@ BOOST_AUTO_TEST_CASE( file_format_test )
             string filename = in + dir_itr->path().leaf().string();
             read_and_convert_image( filename, img, tag_t() );
 
-            write_view( png_out + fs::basename( dir_itr->path() ) + ".png"
-                      , view( img )
-                      , png_tag()
-                      );
+            write_test_view( png_out + fs::basename( dir_itr->path() ) + ".png"
+                           , view( img )
+                           , png_tag()
+                           );
          }
       }
    }
 }
+
+#endif // BOOST_GIL_IO_USE_PNG_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

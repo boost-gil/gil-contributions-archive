@@ -7,6 +7,7 @@
 #include "color_space_write_test.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -20,35 +21,37 @@ BOOST_AUTO_TEST_CASE( write_test )
     // test writing all supported image types
 
     {
-        write_view( jpeg_out + "gray8_test.jpg"
-                  , create_mandel_view( 200, 200
-                                      , gray8_pixel_t( 0   )
-                                      , gray8_pixel_t( 255 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( jpeg_out + "gray8_test.jpg"
+                       , create_mandel_view( 200, 200
+                                           , gray8_pixel_t( 0   )
+                                           , gray8_pixel_t( 255 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
-        write_view( jpeg_out + "rgb8_test.jpg"
-                  , create_mandel_view( 200, 200
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( jpeg_out + "rgb8_test.jpg"
+                       , create_mandel_view( 200, 200
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
-        write_view( jpeg_out + "cmyk8_test.jpg"
-                  , create_mandel_view( 200, 200
-                                      , cmyk8_pixel_t( 0,   0, 255, 127 )
-                                      , cmyk8_pixel_t( 0, 255,   0, 127 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( jpeg_out + "cmyk8_test.jpg"
+                       , create_mandel_view( 200, 200
+                                           , cmyk8_pixel_t( 0,   0, 255, 127 )
+                                           , cmyk8_pixel_t( 0, 255,   0, 127 )
+                                           )
+                       , tag_t()
+                       );
     }
 }
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( dct_method_write_test )
 {
@@ -64,12 +67,14 @@ BOOST_AUTO_TEST_CASE( dct_method_write_test )
         image_write_info< jpeg_tag > info;
         info._dct_method = jpeg_dct_method::fast;
 
-        write_view( jpeg_out + "fast_dct_write_test.jpg"
-                  , view( img )
-                  , info
-                  );
+        write_test_view( jpeg_out + "fast_dct_write_test.jpg"
+                       , view( img )
+                       , info
+                       );
     }
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( rgb_color_space_write_test )
 {

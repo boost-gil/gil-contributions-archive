@@ -13,6 +13,7 @@
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -22,6 +23,8 @@ namespace fs = boost::filesystem;
 typedef targa_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( targa_test )
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( read_image_info_using_string )
 {
@@ -194,20 +197,23 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
     }
 }
 
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
+
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     {
         string filename( targa_out + "write_test_ofstream.tga" );
 
         ofstream out( filename.c_str(), ios::binary );
 
-        write_view( out
-                  , create_mandel_view( 124, 124
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( out
+                       , create_mandel_view( 124, 124
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
@@ -215,13 +221,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
-        write_view( file
-                  , create_mandel_view( 124, 124
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , tag_t()
-                  );
+        write_test_view( file
+                       , create_mandel_view( 124, 124
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , tag_t()
+                       );
     }
 
     {
@@ -231,15 +237,18 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
 
-        write_view( file
-                  , create_mandel_view( 124, 124
-                                      , rgb8_pixel_t( 0,   0, 255 )
-                                      , rgb8_pixel_t( 0, 255,   0 )
-                                      )
-                  , info
-                  );
+        write_test_view( file
+                       , create_mandel_view( 124, 124
+                                           , rgb8_pixel_t( 0,   0, 255 )
+                                           , rgb8_pixel_t( 0, 255,   0 )
+                                           )
+                       , info
+                       );
     }
+#endif //BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( stream_test )
 {
@@ -264,7 +273,7 @@ BOOST_AUTO_TEST_CASE( stream_test )
     // 5. Write out image.
     string filename( targa_out + "stream_test.tga" );
     ofstream out( filename.c_str(), ios_base::binary );
-    write_view( out, view( dst ), tag_t() );
+    write_test_view( out, view( dst ), tag_t() );
 }
 
 BOOST_AUTO_TEST_CASE( stream_test_2 )
@@ -311,10 +320,12 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
               , tag_t()
               );
 
-    write_view( targa_out + "dynamic_image_test.tga"
-              , view( runtime_image )
-              , tag_t()
-              );
+    write_test_view( targa_out + "dynamic_image_test.tga"
+                   , view( runtime_image )
+                   , tag_t()
+                   );
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

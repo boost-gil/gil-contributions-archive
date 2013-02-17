@@ -9,6 +9,7 @@
 
 #include <boost/gil/extension/io_new/tiff_read.hpp>
 #include "paths.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -17,6 +18,8 @@ using namespace gil;
 typedef tiff_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
+
+#ifdef BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_CASE( read_tile_infos_test )
 {
@@ -85,5 +88,7 @@ BOOST_AUTO_TEST_CASE( read_tile_infos_test )
         BOOST_CHECK_EQUAL( backend._info._tile_length, 16 );
     }
 }
+
+#endif // BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

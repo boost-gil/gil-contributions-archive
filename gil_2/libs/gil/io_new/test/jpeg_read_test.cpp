@@ -6,6 +6,7 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -13,6 +14,8 @@ using namespace boost::gil;
 typedef jpeg_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( jpeg_test )
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_CASE( read_header_test )
 {
@@ -25,8 +28,8 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._width         , 136u );
-        BOOST_CHECK_EQUAL( backend._info._height        , 98u  );
+        BOOST_CHECK_EQUAL( backend._info._width         , 1000u );
+        BOOST_CHECK_EQUAL( backend._info._height        ,  600u );
 
         BOOST_CHECK_EQUAL( backend._info._num_components, 3         );
         BOOST_CHECK_EQUAL( backend._info._color_space   , JCS_YCbCr );
@@ -77,46 +80,44 @@ BOOST_AUTO_TEST_CASE( read_pixel_density_test )
 
 BOOST_AUTO_TEST_CASE( read_reference_images_test )
 {
-    {
-        typedef rgb8_image_t image_t;
-        image_t img;
+    typedef rgb8_image_t image_t;
+    image_t img;
 
-        read_image( jpeg_filename
-                  , img
-                  , tag_t()
-                  );
+    read_image( jpeg_filename
+                , img
+                , tag_t()
+                );
 
-        write_view( jpeg_out + "rgb8_test.jpg"
-                  , view( img )
-                  , tag_t()
-                  );
-    }
+    write_test_view( jpeg_out + "rgb8_test.jpg"
+                    , view( img )
+                    , tag_t()
+                    );
 }
 
 BOOST_AUTO_TEST_CASE( dct_method_read_test )
 {
-    {
-        typedef rgb8_image_t image_t;
-        image_t img;
+    typedef rgb8_image_t image_t;
+    image_t img;
 
-        image_read_settings< jpeg_tag > settings;
-        settings._dct_method = jpeg_dct_method::fast;
+    image_read_settings< jpeg_tag > settings;
+    settings._dct_method = jpeg_dct_method::fast;
 
-        read_image( jpeg_filename
-                  , img
-                  , settings
-                  );
+    read_image( jpeg_filename
+                , img
+                , settings
+                );
 
-        write_view( jpeg_out + "fast_dct_read_test.jpg"
-                  , view( img )
-                  , tag_t()
-                  );
-    }
+    write_test_view( jpeg_out + "fast_dct_read_test.jpg"
+                    , view( img )
+                    , tag_t()
+                    );
 }
 
 BOOST_AUTO_TEST_CASE( read_reference_images_image_iterator_test )
 {
     test_scanline_reader< rgb8_image_t, jpeg_tag >( jpeg_filename.c_str() );
 }
+
+#endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

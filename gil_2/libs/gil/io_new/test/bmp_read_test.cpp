@@ -8,6 +8,7 @@
 #include "scanline_read_test.hpp"
 
 #include "paths.hpp"
+#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -16,15 +17,17 @@ typedef bmp_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( bmp_test )
 
+#ifdef BOOST_GIL_IO_USE_BMP_TEST_SUITE_IMAGES
+
 template< typename Image >
 void write( Image&        img
           , const string& file_name
           )
 {
-    write_view( bmp_out + file_name
-              , view( img )
-              , tag_t()
-              );
+    write_test_view( bmp_out + file_name
+                   , view( img )
+                   , tag_t()
+                   );
 }
 
 BOOST_AUTO_TEST_CASE( read_header_test )
@@ -38,18 +41,18 @@ BOOST_AUTO_TEST_CASE( read_header_test )
                                            , tag_t()
                                            );
 
-        BOOST_CHECK_EQUAL( backend._info._offset               ,    54u );
-        BOOST_CHECK_EQUAL( backend._info._header_size          ,    40u );
-        BOOST_CHECK_EQUAL( backend._info._width                ,   127  );
-        BOOST_CHECK_EQUAL( backend._info._height               ,    64  );
-        BOOST_CHECK_EQUAL( backend._info._bits_per_pixel       ,    24  );
-        BOOST_CHECK_EQUAL( backend._info._compression          ,     0u );
-        BOOST_CHECK_EQUAL( backend._info._image_size           , 24576u );
-        BOOST_CHECK_EQUAL( backend._info._horizontal_resolution,     0  );
-        BOOST_CHECK_EQUAL( backend._info._vertical_resolution  ,     0  );
-        BOOST_CHECK_EQUAL( backend._info._num_colors           ,     0u );
-        BOOST_CHECK_EQUAL( backend._info._num_important_colors ,     0u );
-        BOOST_CHECK_EQUAL( backend._info._valid                ,  true  );
+        BOOST_CHECK_EQUAL( backend._info._offset               ,      54u );
+        BOOST_CHECK_EQUAL( backend._info._header_size          ,      40u );
+        BOOST_CHECK_EQUAL( backend._info._width                ,     1000 );
+        BOOST_CHECK_EQUAL( backend._info._height               ,      600 );
+        BOOST_CHECK_EQUAL( backend._info._bits_per_pixel       ,       24 );
+        BOOST_CHECK_EQUAL( backend._info._compression          ,       0u );
+        BOOST_CHECK_EQUAL( backend._info._image_size           , 1800000u );
+        BOOST_CHECK_EQUAL( backend._info._horizontal_resolution,        0 );
+        BOOST_CHECK_EQUAL( backend._info._vertical_resolution  ,        0 );
+        BOOST_CHECK_EQUAL( backend._info._num_colors           ,       0u );
+        BOOST_CHECK_EQUAL( backend._info._num_important_colors ,       0u );
+        BOOST_CHECK_EQUAL( backend._info._valid                ,     true );
     }
 }
 
@@ -482,11 +485,13 @@ BOOST_AUTO_TEST_CASE( partial_image_test )
                   );
 
 
-        write_view( bmp_out + "rgb_partial.bmp"
-                  , view( img )
-                  , tag_t()
-                  );
+        write_test_view( bmp_out + "rgb_partial.bmp"
+                       , view( img )
+                       , tag_t()
+                       );
     }
 }
+
+#endif // BOOST_GIL_IO_USE_BMP_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()

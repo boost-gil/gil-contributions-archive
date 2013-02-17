@@ -7,8 +7,11 @@
 #include <boost/test/unit_test.hpp>
 
 #include "tiff_tiled_read_macros.hpp"
+#include "write_test_image.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
+
+#ifdef BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_PP_REPEAT_FROM_TO(21, 32, GENERATE_TILE_STRIP_COMPARISON_BIT_ALIGNED_RGB, (rgb,planar) )
 
@@ -47,5 +50,7 @@ BOOST_AUTO_TEST_CASE( read_tile_and_compare_with_rgb_planar_strip_64 )
 
     BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_tile) ), true);
 }
+
+#endif // BOOST_GIL_IO_USE_TIFF_GRAPHICSMAGICK_TEST_SUITE_IMAGES
 
 BOOST_AUTO_TEST_SUITE_END()
