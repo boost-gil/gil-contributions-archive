@@ -230,6 +230,7 @@ test_images/png/PngSuite/Z00N2C08.PNG svn_mime_002dtype=application%2Foctet-stre
 test_images/png/PngSuite/Z03N2C08.PNG svn_mime_002dtype=application%2Foctet-stream
 test_images/png/PngSuite/Z06N2C08.PNG svn_mime_002dtype=application%2Foctet-stream
 test_images/png/PngSuite/Z09N2C08.PNG svn_mime_002dtype=application%2Foctet-stream
+test_images/png/test.png svn_mime_002dtype=image%2Fpng
 test_images/png/wikipedia/Thumbs.db svn_mime_002dtype=application%2Foctet-stream
 test_images/png/wikipedia/test.png svn_mime_002dtype=application%2Foctet-stream
 test_images/pnm/p4.pnm svn_mime_002dtype=application%2Foctet-stream
