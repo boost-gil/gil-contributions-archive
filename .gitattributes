@@ -1,23 +1,23 @@
 gil_1/test/test[!!-~]images.zip svn_mime_002dtype=application%2Foctet-stream
 /gil_2.zip svn_mime_002dtype=application%2Foctet-stream
 gil_2/boost/gil/extension/numeric svnc_bugtraq_003anumber=true
-gil_2/libs/gil/io_new/test_images/bmp/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
-gil_2/libs/gil/io_new/test_images/bmp/test.bmp svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/test_images/jpg/EddDawson/36dpi.jpg svn_mime_002dtype=image%2Fjpeg
-gil_2/libs/gil/io_new/test_images/jpg/test.jpg svn_mime_002dtype=image%2Fjpeg
-gil_2/libs/gil/io_new/test_images/png/EddDawson/36dpi.png svn_mime_002dtype=image%2Fpng
-gil_2/libs/gil/io_new/test_images/png/PngSuite/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
-gil_2/libs/gil/io_new/test_images/png/test.png svn_mime_002dtype=image%2Fpng
-gil_2/libs/gil/io_new/test_images/pnm/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
-gil_2/libs/gil/io_new/test_images/raw/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
-gil_2/libs/gil/io_new/test_images/targa/24BPP_compressed.tga svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/test_images/targa/24BPP_uncompressed.tga svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/test_images/targa/32BPP_compressed.tga svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/test_images/targa/32BPP_uncompressed.tga svn_mime_002dtype=application%2Foctet-stream
-gil_2/libs/gil/io_new/test_images/targa/fileformat.info/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
-gil_2/libs/gil/io_new/test_images/tiff/graphicmagick/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
-gil_2/libs/gil/io_new/test_images/tiff/libtiffpic/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
-gil_2/libs/gil/io_new/test_images/tiff/test.tif svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/io/test_images/bmp/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
+gil_2/libs/gil/io/test_images/bmp/test.bmp svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/io/test_images/jpg/EddDawson/36dpi.jpg svn_mime_002dtype=image%2Fjpeg
+gil_2/libs/gil/io/test_images/jpg/test.jpg svn_mime_002dtype=image%2Fjpeg
+gil_2/libs/gil/io/test_images/png/EddDawson/36dpi.png svn_mime_002dtype=image%2Fpng
+gil_2/libs/gil/io/test_images/png/PngSuite/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
+gil_2/libs/gil/io/test_images/png/test.png svn_mime_002dtype=image%2Fpng
+gil_2/libs/gil/io/test_images/pnm/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
+gil_2/libs/gil/io/test_images/raw/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
+gil_2/libs/gil/io/test_images/targa/24BPP_compressed.tga svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/io/test_images/targa/24BPP_uncompressed.tga svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/io/test_images/targa/32BPP_compressed.tga svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/io/test_images/targa/32BPP_uncompressed.tga svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/io/test_images/targa/fileformat.info/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
+gil_2/libs/gil/io/test_images/tiff/graphicmagick/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
+gil_2/libs/gil/io/test_images/tiff/libtiffpic/readme.txt svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
+gil_2/libs/gil/io/test_images/tiff/test.tif svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/opencv/in/in.png svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/opencv/rgb.bmp svn_mime_002dtype=application%2Foctet-stream
 gil_fix/tiled_tiff.png svn_mime_002dtype=application%2Foctet-stream
