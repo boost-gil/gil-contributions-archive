@@ -70,6 +70,7 @@ test_images/jpg/found[!!-~]online/test.jpg svn_mime_002dtype=application%2Foctet
 test_images/jpg/found[!!-~]online/w3.org/Thumbs.db svn_mime_002dtype=application%2Foctet-stream
 test_images/jpg/found[!!-~]online/w3.org/jpeg400jfif.jpg svn_mime_002dtype=application%2Foctet-stream
 test_images/jpg/found[!!-~]online/w3.org/jpeg422jfif.jpg svn_mime_002dtype=application%2Foctet-stream
+test_images/jpg/test.jpg svn_mime_002dtype=image%2Fjpeg
 test_images/opencv/in.png svn_mime_002dtype=application%2Foctet-stream
 test_images/png/EddDawson/36dpi.png svn_mime_002dtype=application%2Foctet-stream
 test_images/png/PngSuite/BASI0G01.PNG svn_mime_002dtype=application%2Foctet-stream
