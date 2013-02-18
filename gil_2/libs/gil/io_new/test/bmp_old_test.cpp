@@ -6,7 +6,6 @@
 
 #include "mandel_view.hpp"
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -56,12 +55,14 @@ BOOST_AUTO_TEST_CASE( old_read_and_convert_view_test )
 
 BOOST_AUTO_TEST_CASE( old_write_view_test )
 {
-    bmp_write_test_view( bmp_out + "old_write_view_test.bmp"
-                       , create_mandel_view( 1000, 600
-                                           , rgb8_pixel_t( 0,   0, 255 )
-                                           , rgb8_pixel_t( 0, 255,   0 )
-                                           )
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    bmp_write_view( bmp_out + "old_write_view_test.bmp"
+                  , create_mandel_view( 1000, 600
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
@@ -79,9 +80,11 @@ BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
                   , runtime_image
                   );
 
-    bmp_write_test_view( bmp_out + "old_dynamic_image_test.bmp"
-                       , view( runtime_image )
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    bmp_write_view( bmp_out + "old_dynamic_image_test.bmp"
+                  , view( runtime_image )
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 #endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 

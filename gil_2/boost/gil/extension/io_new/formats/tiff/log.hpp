@@ -27,6 +27,17 @@ extern "C" {
 
 namespace boost { namespace gil {
 
+class tiff_no_log
+{
+public:
+
+    tiff_no_log()
+    {
+        TIFFSetErrorHandler  ( NULL );
+        TIFFSetWarningHandler( NULL );
+    }
+};
+
 class console_log
 {
 public:

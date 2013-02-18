@@ -11,7 +11,6 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -42,12 +41,12 @@ BOOST_AUTO_TEST_CASE( two_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test4.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test4.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -65,12 +64,12 @@ BOOST_AUTO_TEST_CASE( four_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test5.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test5.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -88,12 +87,12 @@ BOOST_AUTO_TEST_CASE( six_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test6.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test6.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -111,12 +110,12 @@ BOOST_AUTO_TEST_CASE( eight_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test7.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test7.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -134,12 +133,12 @@ BOOST_AUTO_TEST_CASE( ten_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test8.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test8.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -157,12 +156,12 @@ BOOST_AUTO_TEST_CASE( twelve_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test9.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test9.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -180,12 +179,12 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test10.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test10.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -203,12 +202,12 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test11.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test11.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -226,12 +225,12 @@ BOOST_AUTO_TEST_CASE( twentyfour_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test12.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test12.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -249,12 +248,12 @@ BOOST_AUTO_TEST_CASE( thirtytwo_bit_minisblack_gray_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test13.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test13.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -272,12 +271,12 @@ BOOST_AUTO_TEST_CASE( four_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test14.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test14.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -295,12 +294,12 @@ BOOST_AUTO_TEST_CASE( sixteen_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test15.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test15.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -318,12 +317,12 @@ BOOST_AUTO_TEST_CASE( twohundred_twenty_five_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test16.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test16.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -341,12 +340,12 @@ BOOST_AUTO_TEST_CASE( sixtyfive_thousand_entry_colormapped_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test17.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test17.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -364,12 +363,12 @@ BOOST_AUTO_TEST_CASE( two_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test18.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test18.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -387,12 +386,12 @@ BOOST_AUTO_TEST_CASE( four_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test19.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test19.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -410,12 +409,12 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test20.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test20.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -433,12 +432,12 @@ BOOST_AUTO_TEST_CASE( ten_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test21.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test21.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -456,12 +455,12 @@ BOOST_AUTO_TEST_CASE( twelve_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test22.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test22.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -479,12 +478,12 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test23.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test23.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -502,12 +501,12 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test24.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test24.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -525,12 +524,12 @@ BOOST_AUTO_TEST_CASE( twenty_four_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test25.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test25.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -548,12 +547,12 @@ BOOST_AUTO_TEST_CASE( thirty_two_bit_contiguous_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test26.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test26.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -571,11 +570,12 @@ BOOST_AUTO_TEST_CASE( two_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test27.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test27.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -593,11 +593,12 @@ BOOST_AUTO_TEST_CASE( four_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test28.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test28.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -615,11 +616,12 @@ BOOST_AUTO_TEST_CASE( eight_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test29.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test29.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -637,10 +639,12 @@ BOOST_AUTO_TEST_CASE( ten_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test30.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test30.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -658,10 +662,12 @@ BOOST_AUTO_TEST_CASE( twelve_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test31.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test31.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -679,10 +685,12 @@ BOOST_AUTO_TEST_CASE( fourteen_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test32.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test32.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -700,10 +708,12 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test33.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test33.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -721,10 +731,12 @@ BOOST_AUTO_TEST_CASE( twenty_four_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test34.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test34.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -742,10 +754,12 @@ BOOST_AUTO_TEST_CASE( thirty_two_bit_seperated_RGB_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test35.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test35.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -763,12 +777,12 @@ BOOST_AUTO_TEST_CASE( eight_bit_contiguous_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test36.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test36.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -786,12 +800,12 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_contiguous_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test37.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
-        test_tiff_scanline_reader< image_t >( filename );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test37.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -809,10 +823,12 @@ BOOST_AUTO_TEST_CASE( eight_bit_separated_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test38.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test38.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -830,10 +846,12 @@ BOOST_AUTO_TEST_CASE( sixteen_bit_separated_CMYK_image_test )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test39.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test39.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -854,11 +872,12 @@ BOOST_AUTO_TEST_CASE( tiger_separated_strip_contig_08 )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test40.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
-
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test40.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -875,10 +894,12 @@ BOOST_AUTO_TEST_CASE( tiger_separated_strip_contig_16 )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test41.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test41.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -895,10 +916,12 @@ BOOST_AUTO_TEST_CASE( tiger_separated_strip_planar_08 )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test42.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test42.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -915,10 +938,12 @@ BOOST_AUTO_TEST_CASE( tiger_separated_strip_planar_16 )
                   , tag_t()
                   );
 
-        write_test_view( tiff_out + "test43.tif"
-                       , view( img )
-                       , tiff_tag()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( tiff_out + "test43.tif"
+                  , view( img )
+                  , tiff_tag()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 

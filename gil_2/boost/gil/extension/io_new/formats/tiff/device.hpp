@@ -38,9 +38,11 @@
 
 #include <boost/gil/extension/io_new/detail/base.hpp>
 #include <boost/gil/extension/io_new/detail/io_device.hpp>
+#include <boost/gil/extension/io_new/formats/tiff/log.hpp>
 
 namespace boost { namespace gil { namespace detail {
 
+template< typename Log >
 class tiff_device_base
 {
 public:
@@ -268,6 +270,7 @@ protected:
    typedef shared_ptr<TIFF> tiff_file_t;
    tiff_file_t _tiff_file;
 
+    Log _log;
 };
 
 /*!
@@ -275,7 +278,7 @@ protected:
  * file_stream_device specialization for tiff images, which are based on TIFF*.
  */
 template<>
-class file_stream_device< tiff_tag > : public tiff_device_base
+class file_stream_device< tiff_tag > : public tiff_device_base< tiff_no_log >
 {
 public:
 
@@ -312,7 +315,7 @@ public:
  * ostream_device specialization for tiff images.
  */
 template<>
-class ostream_device< tiff_tag > : public tiff_device_base
+class ostream_device< tiff_tag > : public tiff_device_base< tiff_no_log >
 {
 public:
     ostream_device( std::ostream & out )
@@ -343,7 +346,7 @@ private:
  * ostream_device specialization for tiff images.
  */
 template<>
-class istream_device< tiff_tag > : public tiff_device_base
+class istream_device< tiff_tag > : public tiff_device_base< tiff_no_log >
 {
 public:
     istream_device( std::istream & in )

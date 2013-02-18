@@ -16,7 +16,6 @@
 #include "color_space_write_test.hpp"
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;

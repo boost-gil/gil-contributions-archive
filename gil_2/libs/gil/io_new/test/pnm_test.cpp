@@ -11,7 +11,6 @@
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -181,20 +180,20 @@ BOOST_AUTO_TEST_CASE( read_and_convert_view_test )
 
 #endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 
 BOOST_AUTO_TEST_CASE( write_view_test )
 {
-#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     {
         string filename( pnm_out + "write_test_string.pnm" );
 
-        write_test_view( filename
-                       , create_mandel_view( 320, 240
-                                           , rgb8_pixel_t( 0,   0, 255 )
-                                           , rgb8_pixel_t( 0, 255,   0 )
-                                           )
-                       , tag_t()
-                       );
+        write_view( filename
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
     }
 
     {
@@ -202,13 +201,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         ofstream out( filename.c_str(), ios::out | ios::binary );
 
-        write_test_view( out
-                       , create_mandel_view( 320, 240
-                                           , rgb8_pixel_t( 0,   0, 255 )
-                                           , rgb8_pixel_t( 0, 255,   0 )
-                                           )
-                       , tag_t()
-                       );
+        write_view( out
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
     }
 
     {
@@ -216,13 +215,13 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         FILE* file = fopen( filename.c_str(), "wb" );
         
-        write_test_view( file
-                       , create_mandel_view( 320, 240
-                                           , rgb8_pixel_t( 0,   0, 255 )
-                                           , rgb8_pixel_t( 0, 255,   0 )
-                                           )
-                       , tag_t()
-                       );
+        write_view( file
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , tag_t()
+                  );
     }
 
     {
@@ -231,16 +230,16 @@ BOOST_AUTO_TEST_CASE( write_view_test )
 
         image_write_info< tag_t > info;
 
-        write_test_view( file
-                       , create_mandel_view( 320, 240
-                                           , rgb8_pixel_t( 0,   0, 255 )
-                                           , rgb8_pixel_t( 0, 255,   0 )
-                                           )
-                       , info
-                       );
+        write_view( file
+                  , create_mandel_view( 320, 240
+                                      , rgb8_pixel_t( 0,   0, 255 )
+                                      , rgb8_pixel_t( 0, 255,   0 )
+                                      )
+                  , info
+                  );
     }
-#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 
 #ifdef BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES
 
@@ -267,7 +266,9 @@ BOOST_AUTO_TEST_CASE( stream_test )
     // 5. Write out image.
     string filename( pnm_out + "stream_test.pnm" );
     ofstream out( filename.c_str(), ios_base::binary );
-    write_test_view( out, view( dst ), tag_t() );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_view( out, view( dst ), tag_t() );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 BOOST_AUTO_TEST_CASE( stream_test_2 )
@@ -313,10 +314,12 @@ BOOST_AUTO_TEST_CASE( dynamic_image_test )
               , tag_t()
               );
 
-    write_test_view( pnm_out + "dynamic_image_test.pnm"
-                   , view( runtime_image )
-                   , tag_t()
-                   );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_view( pnm_out + "dynamic_image_test.pnm"
+              , view( runtime_image )
+              , tag_t()
+              );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 #endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES

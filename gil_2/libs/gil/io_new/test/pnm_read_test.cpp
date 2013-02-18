@@ -5,7 +5,6 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -21,10 +20,12 @@ void write( Image&        img
           , const string& file_name
           )
 {
-    write_test_view( pnm_out + file_name
-                   , view( img )
-                   , tag_t()
-                   );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_view( pnm_out + file_name
+              , view( img )
+              , tag_t()
+              );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 template< typename Image >

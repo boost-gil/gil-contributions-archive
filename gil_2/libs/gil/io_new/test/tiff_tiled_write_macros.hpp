@@ -35,7 +35,7 @@ typedef boost::gil::tiff_tag tag_t;
       image_write_info<tag_t> info; \
       info._is_tiled = true; \
       info._tile_width = info._tile_length = 16; \
-      write_test_view( tiff_out + filename, view(img_strip), info ); \
+      write_view( tiff_out + filename, view(img_strip), info ); \
       read_image( tiff_out + filename, img_saved, tag_t() ); \
       BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_saved) ), true); \
     } \
@@ -59,7 +59,7 @@ typedef boost::gil::tiff_tag tag_t;
       image_write_info<tag_t> info; \
       info._is_tiled = true; \
       info._tile_width = info._tile_length = 16; \
-      write_test_view( tiff_out + filename, view(img_strip), info ); \
+      write_view( tiff_out + filename, view(img_strip), info ); \
       read_image( tiff_out + filename, img_saved, tag_t() ); \
       BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_saved) ), true); \
     } \
@@ -83,7 +83,7 @@ typedef boost::gil::tiff_tag tag_t;
       image_write_info<tag_t> info; \
       info._is_tiled = true; \
       info._tile_width = info._tile_length = 16; \
-      write_test_view( tiff_out + filename, view(img_strip), info ); \
+      write_view( tiff_out + filename, view(img_strip), info ); \
       read_image( tiff_out + filename, img_saved, tag_t() ); \
       BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_saved) ), true); \
     } \

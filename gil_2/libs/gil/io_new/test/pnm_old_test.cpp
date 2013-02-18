@@ -5,7 +5,6 @@
 #include <boost/gil/extension/io_new/pnm_io_old.hpp>
 
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -67,9 +66,11 @@ BOOST_AUTO_TEST_CASE( old_write_view_test )
 {
     {
         string filename( pnm_out + "test5.pnm" );
-
         gray8_image_t img( 256, 256);
-        pnm_write_test_view( filename, view( img ) );
+
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        pnm_write_view( filename, view( img ) );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 
@@ -88,9 +89,11 @@ BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
                   , runtime_image
                   );
 
-    pnm_write_test_view( pnm_out + "old_dynamic_image_test.pnm"
-                       , view( runtime_image )
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    pnm_write_view( pnm_out + "old_dynamic_image_test.pnm"
+                  , view( runtime_image )
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 #endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES

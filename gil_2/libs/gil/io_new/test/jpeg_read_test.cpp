@@ -6,7 +6,6 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -88,10 +87,12 @@ BOOST_AUTO_TEST_CASE( read_reference_images_test )
                 , tag_t()
                 );
 
-    write_test_view( jpeg_out + "rgb8_test.jpg"
-                    , view( img )
-                    , tag_t()
-                    );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_view( jpeg_out + "rgb8_test.jpg"
+               , view( img )
+               , tag_t()
+               );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 BOOST_AUTO_TEST_CASE( dct_method_read_test )
@@ -107,10 +108,12 @@ BOOST_AUTO_TEST_CASE( dct_method_read_test )
                 , settings
                 );
 
-    write_test_view( jpeg_out + "fast_dct_read_test.jpg"
-                    , view( img )
-                    , tag_t()
-                    );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_view( jpeg_out + "fast_dct_read_test.jpg"
+               , view( img )
+               , tag_t()
+               );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 BOOST_AUTO_TEST_CASE( read_reference_images_image_iterator_test )

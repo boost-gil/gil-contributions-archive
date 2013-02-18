@@ -10,7 +10,6 @@
 #include <boost/gil/extension/io_new/png_all.hpp>
 
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -57,10 +56,12 @@ BOOST_AUTO_TEST_CASE( file_format_test )
             string filename = in + dir_itr->path().leaf().string();
             read_and_convert_image( filename, img, tag_t() );
 
-            write_test_view( png_out + fs::basename( dir_itr->path() ) + ".png"
-                           , view( img )
-                           , png_tag()
-                           );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+            write_view( png_out + fs::basename( dir_itr->path() ) + ".png"
+                      , view( img )
+                      , png_tag()
+                      );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
          }
       }
    }

@@ -6,7 +6,6 @@
 #include "color_space_write_test.hpp"
 #include "mandel_view.hpp"
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -15,6 +14,7 @@ typedef pnm_tag tag_t;
 
 BOOST_AUTO_TEST_SUITE( pnm_test )
 
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 BOOST_AUTO_TEST_CASE( write_test )
 {
     mandel_view< rgb8_pixel_t >::type v = create_mandel_view( 200, 200
@@ -29,10 +29,10 @@ BOOST_AUTO_TEST_CASE( write_test )
 
         copy_and_convert_pixels( v, view( dst ));
 
-        write_test_view( pnm_out + "p4_write_test.pnm"
-                       , view( dst )
-                       , pnm_tag()
-                       );
+        write_view( pnm_out + "p4_write_test.pnm"
+                  , view( dst )
+                  , pnm_tag()
+                  );
     }
 
     {
@@ -40,19 +40,20 @@ BOOST_AUTO_TEST_CASE( write_test )
 
         copy_and_convert_pixels( v, view( dst ));
 
-        write_test_view( pnm_out + "p5_write_test.pnm"
-                       , view( dst )
-                       , pnm_tag()
-                       );
+        write_view( pnm_out + "p5_write_test.pnm"
+                  , view( dst )
+                  , pnm_tag()
+                  );
     }
 
     {
-        write_test_view( pnm_out + "p6_write_test.pnm"
-                       , v
-                       , pnm_tag()
-                       );
+        write_view( pnm_out + "p6_write_test.pnm"
+                  , v
+                  , pnm_tag()
+                  );
     }
 }
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 
 BOOST_AUTO_TEST_CASE( rgb_color_space_write_test )
 {

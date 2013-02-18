@@ -12,7 +12,6 @@
 #include <boost/gil/extension/io_new/tiff_read.hpp>
 
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 typedef boost::gil::tiff_tag tag_t;
 

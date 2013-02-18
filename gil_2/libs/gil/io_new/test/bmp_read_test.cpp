@@ -8,7 +8,6 @@
 #include "scanline_read_test.hpp"
 
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost::gil;
@@ -24,10 +23,12 @@ void write( Image&        img
           , const string& file_name
           )
 {
-    write_test_view( bmp_out + file_name
-                   , view( img )
-                   , tag_t()
-                   );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_view( bmp_out + file_name
+              , view( img )
+              , tag_t()
+              );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 BOOST_AUTO_TEST_CASE( read_header_test )
@@ -484,11 +485,12 @@ BOOST_AUTO_TEST_CASE( partial_image_test )
                   , image_read_settings< bmp_tag >( point_t( 0, 0 ), point_t( 50, 50 ) )
                   );
 
-
-        write_test_view( bmp_out + "rgb_partial.bmp"
-                       , view( img )
-                       , tag_t()
-                       );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+        write_view( bmp_out + "rgb_partial.bmp"
+                  , view( img )
+                  , tag_t()
+                  );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     }
 }
 

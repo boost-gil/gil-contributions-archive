@@ -15,7 +15,6 @@
 
 #include "paths.hpp"
 #include "scanline_read_test.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -61,10 +60,10 @@ void test_file( string filename )
     image_write_info< png_tag > write_info;
     write_info._file_gamma = backend._info._file_gamma;
 
-    write_test_view( png_out + filename
-                   , view( src )
-                   , write_info
-                   );
+    write_view( png_out + filename
+              , view( src )
+              , write_info
+              );
 
     read_image( png_out + filename
               , dst

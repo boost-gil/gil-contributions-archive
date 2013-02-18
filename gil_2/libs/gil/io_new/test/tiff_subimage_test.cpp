@@ -9,7 +9,6 @@
 #include "mandel_view.hpp"
 #include "paths.hpp"
 #include "subimage_test.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;

@@ -6,7 +6,6 @@
 #include <boost/gil/gil_all.hpp>
 
 #include "cmp_view.hpp"
-#include "write_test_image.hpp"
 
 template< typename Tag >
 void color_space_write_test( const std::string& file_name_1
@@ -21,8 +20,10 @@ void color_space_write_test( const std::string& file_name_1
     fill_pixels( view(rgb), rgb8_pixel_t(  0, 0, 255 ));
     fill_pixels( view(bgr), bgr8_pixel_t(255, 0,   0 ));
 
-    write_test_view( file_name_1, view( rgb ), Tag() );
-    write_test_view( file_name_2, view( bgr ), Tag() );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    write_view( file_name_1, view( rgb ), Tag() );
+    write_view( file_name_2, view( bgr ), Tag() );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 
 #ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
     rgb8_image_t rgb_1;

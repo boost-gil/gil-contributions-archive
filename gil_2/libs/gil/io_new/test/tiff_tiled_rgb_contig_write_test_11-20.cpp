@@ -7,7 +7,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "tiff_tiled_write_macros.hpp"
-#include "write_test_image.hpp"
 
 BOOST_AUTO_TEST_SUITE( tiff_test )
 
@@ -33,7 +32,7 @@ BOOST_AUTO_TEST_CASE( write_tile_and_compare_with_rgb_strip_contig_16 )
     info._tile_width = info._tile_length = 16;
 
 #ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
-    write_test_view( tiff_out + "write_tile_and_compare_with_rgb_strip_contig_16.tif", view(img_strip), info );
+    write_view( tiff_out + "write_tile_and_compare_with_rgb_strip_contig_16.tif", view(img_strip), info );
     read_image( tiff_out + "write_tile_and_compare_with_rgb_strip_contig_16.tif", img_saved, tag_t() );
 
     BOOST_CHECK_EQUAL( equal_pixels( const_view(img_strip), const_view(img_saved) ), true);

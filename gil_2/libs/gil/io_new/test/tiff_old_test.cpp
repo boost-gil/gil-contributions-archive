@@ -13,7 +13,6 @@
 #include <boost/gil/extension/io_new/tiff_io_old.hpp>
 
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
@@ -76,9 +75,11 @@ BOOST_AUTO_TEST_CASE( old_dynamic_image_test )
                    , runtime_image
                    );
 
-    tiff_write_test_view( tiff_out + "old_dynamic_image_test.tif"
-                        , view( runtime_image )
-                        );
+#ifdef BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
+    tiff_write_view( tiff_out + "old_dynamic_image_test.tif"
+                   , view( runtime_image )
+                   );
+#endif // BOOST_GIL_IO_TEST_ALLOW_WRITING_IMAGES
 }
 
 #endif // BOOST_GIL_IO_TEST_ALLOW_READING_IMAGES

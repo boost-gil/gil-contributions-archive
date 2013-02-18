@@ -26,6 +26,6 @@
 #include "detail/read_and_convert_image.hpp"
 #include "detail/read_and_convert_view.hpp"
 
-#include "detail/image_read_iterator.hpp"
+#include "detail/scanline_read_iterator.hpp"
 
 #endif // BOOST_GIL_EXTENSION_IO_RAW_READ_HPP

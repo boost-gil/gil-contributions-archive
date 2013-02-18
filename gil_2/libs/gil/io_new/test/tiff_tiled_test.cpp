@@ -9,7 +9,6 @@
 
 #include <boost/gil/extension/io_new/tiff_read.hpp>
 #include "paths.hpp"
-#include "write_test_image.hpp"
 
 using namespace std;
 using namespace boost;
