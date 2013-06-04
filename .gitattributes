@@ -4,6 +4,7 @@ gil_2/boost/gil/extension/numeric svnc_bugtraq_003anumber=true
 gil_2/boost/gil/extension/yuv/yuv_planar_pixel_iterator.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/libs/gil/opencv/in/in.png svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/opencv/rgb.bmp svn_mime_002dtype=application%2Foctet-stream
+gil_2/libs/gil/yuv/yuv_tests.cpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_fix/tiled_tiff.png svn_mime_002dtype=application%2Foctet-stream
 /gil_test svnc_bugtraq_003anumber=true
 gil_test/channel_stuff/channel[!!-~]-[!!-~]Copy.hpp svn_keywords=Author+Date+Id+Rev+URL svn_eol_002dstyle=native
