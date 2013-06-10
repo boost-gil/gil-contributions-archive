@@ -12,6 +12,24 @@
 namespace boost { 
 namespace gil {
 
+
+/// \defgroup ColorBaseModelPlanarPtr yuv_planar_pixel_iterator
+/// \ingroup ColorBaseModel
+/// \brief A homogeneous color base whose element is a channel iterator. Models HomogeneousColorBaseValueConcept
+/// This class is used as an iterator to a planar yuv pixel.
+
+/// \defgroup PixelIteratorModelPlanarPtr yuv_planar_pixel_iterator
+/// \ingroup PixelIteratorModel
+/// \brief An iterator over planar pixels. Models PixelIteratorConcept, HomogeneousPixelBasedConcept, MemoryBasedIteratorConcept, HasDynamicXStepTypeConcept
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \brief An iterator over yuv planar pixels. Models HomogeneousColorBaseConcept, PixelIteratorConcept, HomogeneousPixelBasedConcept, MemoryBasedIteratorConcept, HasDynamicXStepTypeConcept
+///
+/// YUV Planar pixels have channel data that is not consecutive in memory.
+/// To abstract this we use classes to represent references and pointers to yuv planar pixels.
+///
+/// \ingroup PixelIteratorModelPlanarPtr ColorBaseModelPlanarPtr PixelBasedModel
+
 template < typename ChannelPtr
          , typename ColorSpace
          >
@@ -253,6 +271,21 @@ template <typename IC, typename C>
 struct dynamic_x_step_type<yuv_planar_pixel_iterator<IC,C> > {
     typedef memory_based_step_iterator<yuv_planar_pixel_iterator<IC,C> > type;
 };
+
+
+/////////////////////////////
+//  iterator_is_basic
+/////////////////////////////
+
+template <typename T, typename Cs>  // mutable   planar
+struct iterator_is_basic< yuv_planar_pixel_iterator<      T*,Cs> > : public mpl::true_ {};
+template <typename T, typename Cs>    // immutable planar
+struct iterator_is_basic< yuv_planar_pixel_iterator<const T*,Cs> > : public mpl::true_ {};
+
+template <typename T, typename Cs>  // mutable   planar step
+struct iterator_is_basic<memory_based_step_iterator<yuv_planar_pixel_iterator<      T*,Cs> > > : public mpl::true_ {};
+template <typename T, typename Cs>    // immutable planar step
+struct iterator_is_basic<memory_based_step_iterator<yuv_planar_pixel_iterator<const T*,Cs> > > : public mpl::true_ {};
 
 
 } // namespace gil

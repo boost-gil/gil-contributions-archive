@@ -1,6 +1,7 @@
 gil_1/test/test[!!-~]images.zip svn_mime_002dtype=application%2Foctet-stream
 /gil_2.zip svn_mime_002dtype=application%2Foctet-stream
 gil_2/boost/gil/extension/numeric svnc_bugtraq_003anumber=true
+gil_2/boost/gil/extension/yuv/yuv_image.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/boost/gil/extension/yuv/yuv_planar_pixel_iterator.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/libs/gil/opencv/in/in.png svn_mime_002dtype=application%2Foctet-stream
 gil_2/libs/gil/opencv/rgb.bmp svn_mime_002dtype=application%2Foctet-stream
