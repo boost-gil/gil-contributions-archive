@@ -2,8 +2,10 @@
 #define GIL_YUV_IMAGE_HPP
 
 #include <boost/gil/image.hpp>
-
 #include <boost/gil/extension/toolbox/color_spaces/ycbcr.hpp>
+
+#include <boost/gil/extension/yuv/yuv_planar_pixel_iterator.hpp>
+
 
 namespace boost { 
 namespace gil {
