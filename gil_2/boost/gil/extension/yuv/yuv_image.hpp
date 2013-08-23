@@ -176,7 +176,7 @@ struct IMC2
     {
         y_plane = data;
         v_plane = y_plane + width * height * channel_size;
-        u_plane = v_plane + ( width  / SS_X ) 
+        u_plane = v_plane + ( width / SS_X ) 
                           * channel_size;
     }
 };
