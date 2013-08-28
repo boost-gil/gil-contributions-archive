@@ -7,7 +7,7 @@
 #include <boost/gil/extension/yuv/yuv_planar_pixel_iterator.hpp>
 
 
-namespace boost { 
+namespace boost {
 namespace gil {
 
 template< int J
@@ -23,7 +23,7 @@ struct Scaling_Factors
                                             , mpl::equal_to< mpl::int_< a >, mpl::int_< 1 > >
                                             >
                                   >::type::value
-                       )); 
+                       ));
 
     BOOST_STATIC_ASSERT(( mpl::or_< mpl::equal_to< mpl::int_< b >, mpl::int_< 4 > >
                                   , mpl::or_< mpl::equal_to< mpl::int_< b >, mpl::int_< 2 > >
@@ -32,7 +32,7 @@ struct Scaling_Factors
                                                       >
                                             >
                                   >::type::value
-                       )); 
+                       ));
 
     BOOST_STATIC_CONSTANT( int, ss_X = ( mpl::divides< mpl::int_< J >
                                                      , mpl::int_< a >
@@ -41,10 +41,10 @@ struct Scaling_Factors
 
     BOOST_STATIC_CONSTANT( int, ss_Y = ( mpl::if_< mpl::equal_to< mpl::int_< b >, mpl::int_< 0 > >
                                                  , mpl::int_< 2 >
-                                                 , mpl::if_< mpl::equal_to< mpl::int_< a >, mpl::int_< b > >
-                                                           , mpl::int_< 1 >
-                                                           , mpl::int_< 4 >
-                                                           >::type
+                                                 , typename mpl::if_< mpl::equal_to< mpl::int_< a >, mpl::int_< b > >
+                                                                    , mpl::int_< 1 >
+                                                                    , mpl::int_< 4 >
+                                                                    >::type
                                                  >::type::value )
                          );
 };
@@ -152,7 +152,7 @@ struct IMC1
     {
         y_plane = data;
         v_plane = y_plane + width * height * channel_size;
-        u_plane = v_plane + ( width  / SS_X ) 
+        u_plane = v_plane + ( width  / SS_X )
                           * ( height / SS_Y )
                           * channel_size;
     }
@@ -176,7 +176,7 @@ struct IMC2
     {
         y_plane = data;
         v_plane = y_plane + width * height * channel_size;
-        u_plane = v_plane + ( width / SS_X ) 
+        u_plane = v_plane + ( width / SS_X )
                           * channel_size;
     }
 };
@@ -211,7 +211,7 @@ yuv_view( std::size_t width
 
     channel_ptr_t y_base, v_base, u_base;
 
-    Format::set_planes< channel_ptr_t
+    Format::template set_planes< channel_ptr_t
                       , scaling_factors_t::ss_X
                       , scaling_factors_t::ss_Y
                       >( width
