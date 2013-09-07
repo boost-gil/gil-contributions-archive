@@ -32,6 +32,8 @@ public:
 
     typedef bgra8_view_t view_t;
 
+    typedef SDL_Event event_t;
+
 public:
 
     static Uint32 draw( Uint32 interval, void* param )
@@ -155,7 +157,8 @@ public:
         return index;
     }
 
-    void add_event( int e )
+    // Adds an event into window's message queue.
+    void add_event( const event_t& e )
     {
         _queue->push( e );
     }
@@ -207,16 +210,118 @@ public:
 
 private:
 
+    // Window's message queue.
     void _run()
     {
-        int e;
+        event_t e;
             
         while( get_cancel() == false )
         {
             _queue->wait_and_pop( e );
 
-            switch( e )
+            switch( e.type )
             {
+                case SDL_WINDOWEVENT:
+                {
+                    switch ( e.window.event)
+                    {
+                        case SDL_WINDOWEVENT_SHOWN:
+                        {
+                            SDL_Log("Window %d shown", e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_HIDDEN:
+                        {
+                            SDL_Log("Window %d hidden", e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_EXPOSED:
+                        {
+                            SDL_Log("Window %d exposed", e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_MOVED:
+                        {
+                            SDL_Log("Window %d moved to %d,%d",
+                                    e.window.windowID, e.window.data1,
+                                    e.window.data2);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_RESIZED:
+                        {
+                            SDL_Log("Window %d resized to %dx%d",
+                                    e.window.windowID, e.window.data1,
+                                    e.window.data2);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_MINIMIZED:
+                        {
+                            SDL_Log("Window %d minimized", e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_MAXIMIZED:
+                        {
+                            SDL_Log("Window %d maximized", e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_RESTORED:
+                        {
+                            SDL_Log("Window %d restored", e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_ENTER:
+                        {
+                            SDL_Log("Mouse entered window %d",
+                                    e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_LEAVE:
+                        {
+                            SDL_Log("Mouse left window %d", e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_FOCUS_GAINED:
+                        {
+                            SDL_Log("Window %d gained keyboard focus",
+                                    e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_FOCUS_LOST:
+                        {
+                            SDL_Log("Window %d lost keyboard focus",
+                                    e.window.windowID);
+                            break;
+                        }
+
+                        case SDL_WINDOWEVENT_CLOSE:
+                        {
+                            SDL_Log("Window %d closed", e.window.windowID);
+                            break;
+                        }
+
+                        default:
+                        {
+                            SDL_Log("Window %d got unknown event %d",
+                                    e.window.windowID, e.window.event);
+                            break;
+                        }
+
+                    }
+
+                    break;
+                }
+
                 case SDL_QUIT:
                 {
                     set_cancel( true );
@@ -228,8 +333,14 @@ private:
                 {
                     break;
                 }
-            }
-        }
+
+                default:
+                {
+                }
+            } // switch
+
+
+        } // while
     }
 
 private:
@@ -250,7 +361,7 @@ private:
 
     typedef boost::shared_ptr< boost::mutex > mutex_ptr_t;
 
-    typedef threadsafe_queue< int > queue_t;
+    typedef threadsafe_queue< event_t > queue_t;
     typedef boost::shared_ptr< queue_t > queue_ptr_t;
 
 

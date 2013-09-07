@@ -41,7 +41,7 @@ public:
                 {
                     case SDL_WINDOWEVENT:
                     {
-                        add_event( SDL_WINDOWEVENT
+                        add_event( e
                                  , e.window.windowID
                                  );
 
@@ -50,19 +50,20 @@ public:
 
                     case SDL_QUIT:
                     {
-                        add_event( SDL_QUIT );
-
                         quit = true;
 
+                        add_event( e );
+
                         break;
                     }
 
-                    case SDL_KEYDOWN:
+                    default: 
                     {
-                        add_event( SDL_KEYDOWN );
+                        add_event( e );
 
                         break;
                     }
+
                 }
             }
         }
@@ -70,7 +71,7 @@ public:
 
 private:
 
-    void add_event( int e )
+    void add_event( const SDL_Event& e )
     {
         std::for_each( _windows.begin(), _windows.end()
                      , [&]( window_map_t::reference w ) 
@@ -85,7 +86,7 @@ private:
                      );
     }
 
-    void add_event( int e, int id )
+    void add_event( const SDL_Event& e, int id )
     {
         auto* w = _windows[id];
         assert( w );
