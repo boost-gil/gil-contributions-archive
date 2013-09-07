@@ -5,6 +5,8 @@
 
 #include <unordered_map>
 
+#include <boost/noncopyable.hpp>
+
 #include <boost/thread/once.hpp>
 
 #include <boost/gil/extension/sdl2/threadsafe_queue.hpp>
@@ -12,59 +14,55 @@
 
 namespace boost { namespace gil { namespace sdl {
 
-class initializer
-{
-public:
-
-    // constructor
-    initializer()
-    {
-        static boost::once_flag flag = BOOST_ONCE_INIT;
-        boost::call_once( flag, [] () { SDL_Init( SDL_INIT_EVERYTHING ); } );
-    }
-
-    // destructor
-    ~initializer()
-    {
-        static boost::once_flag flag = BOOST_ONCE_INIT;
-        boost::call_once( flag, [] () { SDL_Quit(); } );
-    }
-};
-
-class service
+class service : boost::noncopyable
 {
 
 public:
 
-    service()
-    : initializer( boost::make_shared< sdl::initializer >() )
+    service( boost::uint32_t flag = SDL_INIT_EVERYTHING )
+    : _initializer( flag )
     {}
 
-    void add_window( const window& w )
+    void add_window( window& w )
     {
-        _windows[w.get_index()] = w;
+        _windows[w.get_id()] = &w;
     }
 
     void run()
     {
+        bool quit = false;
         SDL_Event e;
 
-        while( SDL_PollEvent( &e ))
+        while( quit == false )
         {
-            switch( e.type )
+            while( SDL_PollEvent( &e ))
             {
-                case SDL_WINDOWEVENT:
+                switch( e.type )
                 {
-                    add_event( SDL_WINDOWEVENT
-                             , e.window.windowID
-                             );
-                }
+                    case SDL_WINDOWEVENT:
+                    {
+                        add_event( SDL_WINDOWEVENT
+                                 , e.window.windowID
+                                 );
 
-                case SDL_QUIT:
-                {
-                    add_event( SDL_QUIT );
+                        break;
+                    }
 
-                    break;
+                    case SDL_QUIT:
+                    {
+                        add_event( SDL_QUIT );
+
+                        quit = true;
+
+                        break;
+                    }
+
+                    case SDL_KEYDOWN:
+                    {
+                        add_event( SDL_KEYDOWN );
+
+                        break;
+                    }
                 }
             }
         }
@@ -75,22 +73,56 @@ private:
     void add_event( int e )
     {
         std::for_each( _windows.begin(), _windows.end()
-                , [&]( window_map_t::reference w ) { w.second.add_event( e ); }
-                );
+                     , [&]( window_map_t::reference w ) 
+                        {
+                            assert( w.second );
+
+                            if( w.second )
+                            {
+                                w.second->add_event( e );
+                            }
+                        }
+                     );
     }
 
     void add_event( int e, int id )
     {
-        _windows[id].add_event( e );
+        auto* w = _windows[id];
+        assert( w );
+        
+        if( w )
+        {
+            w->add_event( e );
+        }
     }
+
+private:
+
+    class initializer
+    {
+    public:
+
+        // constructor
+        initializer( boost::uint32_t flags )
+        {
+            static boost::once_flag flag = BOOST_ONCE_INIT;
+            boost::call_once( flag, [&flags] () { SDL_Init( flags ); } );
+        }
+
+        // destructor
+        ~initializer()
+        {
+            static boost::once_flag flag = BOOST_ONCE_INIT;
+            boost::call_once( flag, [] () { SDL_Quit(); } );
+        }
+    };
 
 
 private:
 
-    typedef boost::shared_ptr< initializer > initializer_ptr_t;
-    initializer_ptr_t initializer;
+    initializer _initializer;
 
-    typedef std::unordered_map< int, window > window_map_t;
+    typedef std::unordered_map< int, window* > window_map_t;
     window_map_t _windows;
 };
 

@@ -3,9 +3,12 @@
 
 #include <boost/test/unit_test.hpp>
 
+
+#include <boost/thread.hpp>
+
 #include <boost/gil/extension/sdl2/threadsafe_queue.hpp>
 
-BOOST_AUTO_TEST_CASE( test_convert_color )
+BOOST_AUTO_TEST_CASE( test_threadsafe_queue )
 {
     threadsafe_queue<int> queue;
 

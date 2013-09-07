@@ -30,6 +30,36 @@ class window
 {
 public:
 
+    typedef bgra8_view_t view_t;
+
+public:
+
+    static Uint32 draw( Uint32 interval, void* param )
+    {
+        window* w = (window*) param;
+
+        SDL_Rect viewport;
+        SDL_RenderGetViewport( w->_renderer.get(), &viewport );
+
+        SDL_SetRenderDrawColor(w->_renderer.get(), 0, 0, 0, 255);
+        SDL_RenderFillRect(w->_renderer.get(), NULL);
+
+
+        SDL_SetRenderDrawColor( w->_renderer.get(), 255, 255, 0, 255 );
+
+        for( int i = 0; i < 10; ++i )
+        {
+            SDL_RenderDrawPoint( w->_renderer.get()
+                               , rand() % viewport.w
+                               , rand() % viewport.h
+                               );
+        }
+
+        SDL_RenderPresent( w->_renderer.get() );
+
+        return interval;
+    }
+
     // Constructor
     window( const char*           title = NULL
           , const int             window_pos_x = SDL_WINDOWPOS_CENTERED
@@ -77,37 +107,45 @@ public:
         }
 
         // create surface
-        _surface = surface_ptr_t( SDL_CreateRGBSurface( 0 // obsolete
-                                                      , window_width
-                                                      , window_height
-                                                      , 32
-                                                      , 0, 0, 0, 0
-                                                      )
-                                , SDL_FreeSurface
-                                );
+        //_surface = surface_ptr_t( SDL_CreateRGBSurface( 0 // obsolete
+        //                                              , window_width
+        //                                              , window_height
+        //                                              , 32
+        //                                              , 0, 0, 0, 0
+        //                                              )
+        //                        , SDL_FreeSurface
+        //                        );
 
-        if( _surface == NULL )
-        {
-            set_error( true );
-            return;
-        }
+        //if( _surface == NULL )
+        //{
+        //    set_error( true );
+        //    return;
+        //}
+
+
+        // create message queue
+        _queue = boost::make_shared< queue_t >();
 
         // create event loop
-        _thread = boost::make_shared< thread_t >( &window::_run, this );
+        _thread = boost::thread( &window::_run, this );
+
+        SDL_AddTimer( 100, window::draw, this );
     }
 
     // Destructor
     ~window()
     {
-        _thread->join();
+        set_error( true );
+
+        _thread.join();
     }
 
-    int get_index() const 
+    int get_id() const 
     {
         if( get_error() ) 
             throw sdl_error();
 
-        int index = SDL_GetWindowDisplayIndex( _window.get() );
+        int index = SDL_GetWindowID( _window.get() );
 
         if( index == -1 )
         {
@@ -151,20 +189,21 @@ public:
         boost::this_thread::sleep( boost::posix_time::milliseconds( 2000 ));
     }
 
-    bgra8_view_t wrap_sdl_image()
+    bgra8_view_t get_view()
     {
-       return interleaved_view( _surface->w
-                              , _surface->h
-                              , (boost::gil::bgra8_pixel_t*) _surface->pixels
-                              , _surface->pitch   );
+        return interleaved_view( _surface->w
+                               , _surface->h
+                               , (boost::gil::bgra8_pixel_t*) _surface->pixels
+                               , _surface->pitch
+                               );
     }
 
 
-    void set_cancel( const bool cancel ) { lock_t l( *_mutex ); _cancel = cancel; }
-    bool get_cancel()              const { lock_t l( *_mutex );   return _cancel; }
+    void set_cancel( const bool cancel ) { lock_t l( _mutex ); _cancel = cancel; }
+    bool get_cancel()              const { lock_t l( _mutex );   return _cancel; }
 
-    void set_error( const bool error ) { lock_t l( *_mutex ); _error = error; }
-    bool get_error() const             { lock_t l( *_mutex );  return _error; }
+    void set_error( const bool error ) { lock_t l( _mutex ); _error = error; }
+    bool get_error() const             { lock_t l( _mutex );  return _error; }
 
 private:
 
@@ -172,7 +211,7 @@ private:
     {
         int e;
             
-        while( get_cancel() )
+        while( get_cancel() == false )
         {
             _queue->wait_and_pop( e );
 
@@ -180,6 +219,8 @@ private:
             {
                 case SDL_QUIT:
                 {
+                    set_cancel( true );
+
                     break;
                 }
 
@@ -207,9 +248,6 @@ private:
     typedef SDL_Texture texture_t;
     typedef boost::shared_ptr< texture_t > texture_ptr_t;
 
-    typedef boost::thread thread_t;
-    typedef boost::shared_ptr< thread_t > thread_ptr_t;
-
     typedef boost::shared_ptr< boost::mutex > mutex_ptr_t;
 
     typedef threadsafe_queue< int > queue_t;
@@ -223,8 +261,8 @@ private:
 
     queue_ptr_t _queue;
 
-    thread_ptr_t _thread;
-    mutable mutex_ptr_t _mutex;
+    boost::thread _thread;
+    mutable boost::mutex _mutex;
 
     bool _error;
     bool _cancel;

@@ -10,13 +10,4 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include <SDL.h>
 
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <boost/thread.hpp>
-
-#include <boost/gil/gil_all.hpp>

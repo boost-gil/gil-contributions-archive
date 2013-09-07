@@ -28,8 +28,6 @@ BOOST_AUTO_TEST_SUITE( gil_yuv_tests )
 
 BOOST_AUTO_TEST_CASE( x_iterator_test )
 {
-
-
     typedef unsigned char* channel_ptr_t;
     typedef mpl::vector3<red_t,green_t,blue_t> color_space_t;
     typedef yuv_planar_pixel_iterator< channel_ptr_t, color_space_t > x_iterator;
