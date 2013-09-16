@@ -30,7 +30,7 @@ class window
 {
 public:
 
-    typedef bgra8_view_t view_t;
+    typedef rgba8_view_t view_t;
 
     typedef SDL_Event event_t;
 
@@ -40,30 +40,34 @@ public:
     {
         window* w = (window*) param;
 
-        SDL_Rect viewport;
-        SDL_RenderGetViewport( w->_renderer.get(), &viewport );
+        SDL_Log( w->get_cancel() ? "true" : "false" );
 
-        SDL_SetRenderDrawColor(w->_renderer.get(), 0, 0, 0, 255);
-        SDL_RenderFillRect(w->_renderer.get(), NULL);
-
-
-        SDL_SetRenderDrawColor( w->_renderer.get(), 255, 255, 0, 255 );
-
-        for( int i = 0; i < 10; ++i )
+        if( w->get_cancel() == false )
         {
-            SDL_RenderDrawPoint( w->_renderer.get()
-                               , rand() % viewport.w
-                               , rand() % viewport.h
-                               );
-        }
+            view_t v = w->get_view();
 
-        SDL_RenderPresent( w->_renderer.get() );
+            fill_pixels( v, view_t::value_type( 255, 0 , 0, 255 ));
+
+            SDL_UpdateTexture( w->_texture.get()
+                             , NULL
+                             , interleaved_view_get_raw_data( v )
+                             , num_channels< view_t >::value * v.width()
+                             );
+
+            SDL_RenderClear( w->_renderer.get() );
+    
+            SDL_RenderCopy( w->_renderer.get(), w->_texture.get(), NULL, NULL );
+
+            SDL_RenderPresent( w->_renderer.get() );
+
+        }
 
         return interval;
     }
 
     // Constructor
-    window( const char*           title = NULL
+    window( rgba8_view_t          view
+          , const char*           title = NULL
           , const int             window_pos_x = SDL_WINDOWPOS_CENTERED
           , const int             window_pos_y = SDL_WINDOWPOS_CENTERED
           , const int             window_width = 640
@@ -108,22 +112,26 @@ public:
             return;
         }
 
-        // create surface
-        //_surface = surface_ptr_t( SDL_CreateRGBSurface( 0 // obsolete
-        //                                              , window_width
-        //                                              , window_height
-        //                                              , 32
-        //                                              , 0, 0, 0, 0
-        //                                              )
-        //                        , SDL_FreeSurface
-        //                        );
+        // create texture
+        _texture = texture_ptr_t( SDL_CreateTexture( _renderer.get()
+                                                   , SDL_PIXELFORMAT_RGBA8888
+                                                   , SDL_TEXTUREACCESS_STREAMING
+                                                   , window_width
+                                                   , window_height
+                                                   )
+                                , SDL_DestroyTexture
+                                );
 
-        //if( _surface == NULL )
-        //{
-        //    set_error( true );
-        //    return;
-        //}
+        if( _texture == NULL )
+        {
+            set_error( true );
+            return;
+        }
 
+        // create image
+        _image = image_t( window_width
+                        , window_height
+                        );
 
         // create message queue
         _queue = boost::make_shared< queue_t >();
@@ -131,13 +139,15 @@ public:
         // create event loop
         _thread = boost::thread( &window::_run, this );
 
-        SDL_AddTimer( 100, window::draw, this );
+        _timer_id = SDL_AddTimer( 100, window::draw, this );
     }
 
     // Destructor
     ~window()
     {
-        set_error( true );
+        set_cancel( true );
+
+        SDL_RemoveTimer( _timer_id );
 
         _thread.join();
     }
@@ -169,38 +179,9 @@ public:
         {
             throw sdl_error();
         }
-
-        texture_ptr_t texture = texture_ptr_t( SDL_CreateTextureFromSurface( _renderer.get()
-                                                                           , _surface.get()
-                                                                           )
-                                             , SDL_DestroyTexture
-                                             );
-
-        if( texture == NULL )
-        {
-            throw sdl_error();
-        }
-        
-        SDL_RenderCopy( _renderer.get()
-                      , texture.get()
-                      , NULL
-                      , NULL
-                      );
-
-        SDL_RenderPresent( _renderer.get() );
-
-        boost::this_thread::sleep( boost::posix_time::milliseconds( 2000 ));
     }
 
-    bgra8_view_t get_view()
-    {
-        return interleaved_view( _surface->w
-                               , _surface->h
-                               , (boost::gil::bgra8_pixel_t*) _surface->pixels
-                               , _surface->pitch
-                               );
-    }
-
+    view_t get_view() { lock_t l( _mutex ); return _view; }
 
     void set_cancel( const bool cancel ) { lock_t l( _mutex ); _cancel = cancel; }
     bool get_cancel()              const { lock_t l( _mutex );   return _cancel; }
@@ -326,6 +307,8 @@ private:
                 {
                     set_cancel( true );
 
+                    SDL_RemoveTimer( _timer_id );
+
                     break;
                 }
 
@@ -353,9 +336,6 @@ private:
     typedef SDL_Renderer renderer_t;
     typedef boost::shared_ptr< renderer_t > renderer_ptr_t;
 
-    typedef SDL_Surface surface_t;
-    typedef boost::shared_ptr< surface_t > surface_ptr_t;
-
     typedef SDL_Texture texture_t;
     typedef boost::shared_ptr< texture_t > texture_ptr_t;
 
@@ -364,11 +344,11 @@ private:
     typedef threadsafe_queue< event_t > queue_t;
     typedef boost::shared_ptr< queue_t > queue_ptr_t;
 
-
-
     window_ptr_t   _window;
     renderer_ptr_t _renderer;
-    surface_ptr_t  _surface;
+    texture_ptr_t  _texture;
+
+    view_t _view;
 
     queue_ptr_t _queue;
 
@@ -377,6 +357,8 @@ private:
 
     bool _error;
     bool _cancel;
+
+    SDL_TimerID _timer_id;
 };
 
 } } } // namespace boost::gil::sdl

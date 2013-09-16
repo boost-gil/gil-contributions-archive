@@ -54,6 +54,10 @@ public:
 
                         add_event( e );
 
+                        SDL_Log( "quitting" );
+
+                        //boost::this_thread::sleep( boost::posix_time::milliseconds( 2000 ));
+
                         break;
                     }
 

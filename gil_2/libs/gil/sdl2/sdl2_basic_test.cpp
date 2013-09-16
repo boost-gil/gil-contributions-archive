@@ -12,12 +12,12 @@ using namespace sdl;
 
 BOOST_AUTO_TEST_CASE( test_sdl_basic )
 {
+    rgba8_image_t img( 640, 480 );
+
     service sdl_service;
 
-    window w;
+    window w( view( img ));
     sdl_service.add_window( w );
-
-    //fill_pixels( w.get_view(), window::view_t::value_type());
 
     sdl_service.run();
 }
