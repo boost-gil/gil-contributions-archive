@@ -26,48 +26,26 @@ struct sdl_error : std::exception
     }
 };
 
+struct redraw_handler
+{
+    void operator() ( rgba8_view_t view )
+    {
+    }
+};
+
 class window
 {
 public:
 
-    typedef rgba8_view_t view_t;
+    typedef rgba8_image_t image_t;
+    typedef image_t::view_t view_t;
 
     typedef SDL_Event event_t;
 
 public:
 
-    static Uint32 draw( Uint32 interval, void* param )
-    {
-        window* w = (window*) param;
-
-        SDL_Log( w->get_cancel() ? "true" : "false" );
-
-        if( w->get_cancel() == false )
-        {
-            view_t v = w->get_view();
-
-            fill_pixels( v, view_t::value_type( 255, 0 , 0, 255 ));
-
-            SDL_UpdateTexture( w->_texture.get()
-                             , NULL
-                             , interleaved_view_get_raw_data( v )
-                             , num_channels< view_t >::value * v.width()
-                             );
-
-            SDL_RenderClear( w->_renderer.get() );
-    
-            SDL_RenderCopy( w->_renderer.get(), w->_texture.get(), NULL, NULL );
-
-            SDL_RenderPresent( w->_renderer.get() );
-
-        }
-
-        return interval;
-    }
-
     // Constructor
-    window( rgba8_view_t          view
-          , const char*           title = NULL
+    window( const char*           title = NULL
           , const int             window_pos_x = SDL_WINDOWPOS_CENTERED
           , const int             window_pos_y = SDL_WINDOWPOS_CENTERED
           , const int             window_width = 640
@@ -139,7 +117,8 @@ public:
         // create event loop
         _thread = boost::thread( &window::_run, this );
 
-        _timer_id = SDL_AddTimer( 100, window::draw, this );
+        //
+        _refresh_thread = boost::thread( &window::_refresh, this );
     }
 
     // Destructor
@@ -147,9 +126,8 @@ public:
     {
         set_cancel( true );
 
-        SDL_RemoveTimer( _timer_id );
-
         _thread.join();
+        _refresh_thread.join();
     }
 
     int get_id() const 
@@ -172,16 +150,6 @@ public:
     {
         _queue->push( e );
     }
-
-    void draw()
-    {
-        if( _error )
-        {
-            throw sdl_error();
-        }
-    }
-
-    view_t get_view() { lock_t l( _mutex ); return _view; }
 
     void set_cancel( const bool cancel ) { lock_t l( _mutex ); _cancel = cancel; }
     bool get_cancel()              const { lock_t l( _mutex );   return _cancel; }
@@ -307,8 +275,6 @@ private:
                 {
                     set_cancel( true );
 
-                    SDL_RemoveTimer( _timer_id );
-
                     break;
                 }
 
@@ -324,6 +290,37 @@ private:
 
 
         } // while
+    }
+
+    // Refresh thread
+    void _refresh()
+    {
+        redraw_handler rh;
+
+        while(  get_cancel() == false 
+             ||  get_error() == true
+             )
+        {
+            view_t v = view( _image );
+
+            rh(v);
+
+            fill_pixels( v, view_t::value_type( 0, 0, 255, 255 ));
+
+            SDL_UpdateTexture( _texture.get()
+                             , NULL
+                             , interleaved_view_get_raw_data( v )
+                             , num_channels< view_t >::value * v.width()
+                             );
+
+            SDL_RenderClear( _renderer.get() );
+    
+            SDL_RenderCopy( _renderer.get(), _texture.get(), NULL, NULL );
+
+            SDL_RenderPresent( _renderer.get() );
+
+            boost::this_thread::sleep( boost::posix_time::milliseconds( 100 ) );
+        }
     }
 
 private:
@@ -348,17 +345,17 @@ private:
     renderer_ptr_t _renderer;
     texture_ptr_t  _texture;
 
-    view_t _view;
+    image_t _image;
 
     queue_ptr_t _queue;
 
     boost::thread _thread;
     mutable boost::mutex _mutex;
 
+    boost::thread _refresh_thread;
+
     bool _error;
     bool _cancel;
-
-    SDL_TimerID _timer_id;
 };
 
 } } } // namespace boost::gil::sdl
