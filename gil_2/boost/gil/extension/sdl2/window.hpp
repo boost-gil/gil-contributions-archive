@@ -14,7 +14,8 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <boost/gil/extension/sdl2/threadsafe_queue.hpp>
+#include <boost/gil/extension/sdl2/base.hpp>
+#include <boost/gil/extension/sdl2/default_event_handlers.hpp>
 
 namespace boost { namespace gil { namespace sdl {
 
@@ -26,26 +27,75 @@ struct sdl_error : std::exception
     }
 };
 
-struct redraw_handler
-{
-    void operator() ( rgba8_view_t view )
-    {
-    }
-};
-
-class window
+//
+// A base class for windows which can be passed around to access
+// some information. No template arguments should be needed here.
+//
+class window_base
 {
 public:
+
+    window_base()
+    : _error( false )
+    , _cancel( false )
+    {}
+
+    bool get_cancel() const { lock_t l( _mutex ); return _cancel; }
+    bool get_error()  const { lock_t l( _mutex ); return _error; }
+
+    // Adds an event into window's message queue.
+    void add_event( const event_t& e )
+    {
+        _queue->push( e );
+    }
+
+protected:
+
+    // these function will be called from the two window threads ( event loop and redraw ).
+    void set_cancel( const bool cancel ) { _cancel = cancel; }
+    void set_error( const bool error ) { _error = error; }
+
+protected:
+
+    typedef boost::lock_guard< boost::mutex > lock_t;
+
+    queue_ptr_t _queue;
+
+    mutable boost::mutex _mutex;
+
+    bool _error;
+    bool _cancel;
+};
+
+
+//
+// Window class which wraps SDL's window specifics.
+//
+// Despite the SDL specifics each window has a message queue to receive
+// events. A seperate thread will serve as a event loop.
+//
+// Another thread encapsulates the redrawing functionality. This thread
+// will run at a different speed than the event loop. Ideally the redrsw 
+// handler only copies the next image into the window's texture.
+// 
+template< typename Redraw_Handler         = default_redraw_handler
+        , typename Keyboard_Event_Handler = default_keyboard_event_handler
+        >
+class window : public window_base
+{
+public:
+
+    typedef window_base base_t;
+    typedef window< Redraw_Handler, Keyboard_Event_Handler > this_t;
 
     typedef rgba8_image_t image_t;
     typedef image_t::view_t view_t;
 
-    typedef SDL_Event event_t;
-
 public:
 
     // Constructor
-    window( const char*           title = NULL
+    window( const unsigned int    fps = 30
+          , const char*           title = NULL
           , const int             window_pos_x = SDL_WINDOWPOS_CENTERED
           , const int             window_pos_y = SDL_WINDOWPOS_CENTERED
           , const int             window_width = 640
@@ -54,8 +104,8 @@ public:
           , const int             renderer_index = -1
           , const boost::uint32_t renderer_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
           )
-    : _error( false )
-    , _cancel( false )
+    : window_base()
+    , _fps( fps )
     {
         // create window
         _window = window_ptr_t( SDL_CreateWindow( title
@@ -92,7 +142,7 @@ public:
 
         // create texture
         _texture = texture_ptr_t( SDL_CreateTexture( _renderer.get()
-                                                   , SDL_PIXELFORMAT_RGBA8888
+                                                   , SDL_PIXELFORMAT_ABGR8888
                                                    , SDL_TEXTUREACCESS_STREAMING
                                                    , window_width
                                                    , window_height
@@ -115,19 +165,20 @@ public:
         _queue = boost::make_shared< queue_t >();
 
         // create event loop
-        _thread = boost::thread( &window::_run, this );
+        _event_loop = boost::thread( &window::_run, this );
 
         //
-        _refresh_thread = boost::thread( &window::_refresh, this );
+        _redraw_thread = boost::thread( &window::_redraw, this );
     }
 
     // Destructor
+    // will be called when SDL service finishes.
     ~window()
     {
         set_cancel( true );
 
-        _thread.join();
-        _refresh_thread.join();
+        _event_loop.join();
+        _redraw_thread.join();
     }
 
     int get_id() const 
@@ -145,129 +196,33 @@ public:
         return index;
     }
 
-    // Adds an event into window's message queue.
-    void add_event( const event_t& e )
-    {
-        _queue->push( e );
-    }
 
-    void set_cancel( const bool cancel ) { lock_t l( _mutex ); _cancel = cancel; }
-    bool get_cancel()              const { lock_t l( _mutex );   return _cancel; }
+    void         set_fps( const unsigned int fps ) { lock_t l( _mutex ); _fps = fps; }
+    unsigned int get_fps() const                   { lock_t l( _mutex );  return _fps; }
 
-    void set_error( const bool error ) { lock_t l( _mutex ); _error = error; }
-    bool get_error() const             { lock_t l( _mutex );  return _error; }
+    queue_ptr_t get_queue() const { return _queue; }
 
 private:
 
     // Window's message queue.
     void _run()
     {
+        Keyboard_Event_Handler keh;
+
         event_t e;
             
         while( get_cancel() == false )
         {
             _queue->wait_and_pop( e );
 
+            lock_t l( _mutex );
+
+            SDL_Log( "process event" );
+
             switch( e.type )
             {
                 case SDL_WINDOWEVENT:
                 {
-                    switch ( e.window.event)
-                    {
-                        case SDL_WINDOWEVENT_SHOWN:
-                        {
-                            SDL_Log("Window %d shown", e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_HIDDEN:
-                        {
-                            SDL_Log("Window %d hidden", e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_EXPOSED:
-                        {
-                            SDL_Log("Window %d exposed", e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_MOVED:
-                        {
-                            SDL_Log("Window %d moved to %d,%d",
-                                    e.window.windowID, e.window.data1,
-                                    e.window.data2);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_RESIZED:
-                        {
-                            SDL_Log("Window %d resized to %dx%d",
-                                    e.window.windowID, e.window.data1,
-                                    e.window.data2);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_MINIMIZED:
-                        {
-                            SDL_Log("Window %d minimized", e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_MAXIMIZED:
-                        {
-                            SDL_Log("Window %d maximized", e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_RESTORED:
-                        {
-                            SDL_Log("Window %d restored", e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_ENTER:
-                        {
-                            SDL_Log("Mouse entered window %d",
-                                    e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_LEAVE:
-                        {
-                            SDL_Log("Mouse left window %d", e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_FOCUS_GAINED:
-                        {
-                            SDL_Log("Window %d gained keyboard focus",
-                                    e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_FOCUS_LOST:
-                        {
-                            SDL_Log("Window %d lost keyboard focus",
-                                    e.window.windowID);
-                            break;
-                        }
-
-                        case SDL_WINDOWEVENT_CLOSE:
-                        {
-                            SDL_Log("Window %d closed", e.window.windowID);
-                            break;
-                        }
-
-                        default:
-                        {
-                            SDL_Log("Window %d got unknown event %d",
-                                    e.window.windowID, e.window.event);
-                            break;
-                        }
-
-                    }
-
                     break;
                 }
 
@@ -280,52 +235,54 @@ private:
 
                 case SDL_KEYDOWN:
                 {
+                    SDL_Log( "Keydown event." );
+
+                    keh(*this, e);
+
                     break;
                 }
-
-                default:
-                {
-                }
             } // switch
-
-
         } // while
     }
 
     // Refresh thread
-    void _refresh()
+    void _redraw()
     {
-        redraw_handler rh;
+        Redraw_Handler rh;
 
         while(  get_cancel() == false 
              ||  get_error() == true
              )
         {
-            view_t v = view( _image );
+            {
+                lock_t l( _mutex );
 
-            rh(v);
+                SDL_Log( "redraw" );
 
-            fill_pixels( v, view_t::value_type( 0, 0, 255, 255 ));
+                view_t v = view( _image );
 
-            SDL_UpdateTexture( _texture.get()
-                             , NULL
-                             , interleaved_view_get_raw_data( v )
-                             , num_channels< view_t >::value * v.width()
-                             );
+                rh.operator()< view_t >( v );
 
-            SDL_RenderClear( _renderer.get() );
+                SDL_UpdateTexture( _texture.get()
+                                 , NULL
+                                 , interleaved_view_get_raw_data( v )
+                                 , num_channels< view_t >::value * v.width()
+                                 );
+
+                SDL_RenderClear( _renderer.get() );
     
-            SDL_RenderCopy( _renderer.get(), _texture.get(), NULL, NULL );
+                SDL_RenderCopy( _renderer.get(), _texture.get(), NULL, NULL );
 
-            SDL_RenderPresent( _renderer.get() );
+                SDL_RenderPresent( _renderer.get() );
 
-            boost::this_thread::sleep( boost::posix_time::milliseconds( 100 ) );
+            }
+
+            //boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 / get_fps() ) );
+            boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 ) );
         }
     }
 
 private:
-
-    typedef boost::lock_guard< boost::mutex > lock_t;
 
     typedef SDL_Window window_t;
     typedef boost::shared_ptr< window_t > window_ptr_t;
@@ -336,26 +293,20 @@ private:
     typedef SDL_Texture texture_t;
     typedef boost::shared_ptr< texture_t > texture_ptr_t;
 
-    typedef boost::shared_ptr< boost::mutex > mutex_ptr_t;
-
-    typedef threadsafe_queue< event_t > queue_t;
-    typedef boost::shared_ptr< queue_t > queue_ptr_t;
-
     window_ptr_t   _window;
     renderer_ptr_t _renderer;
     texture_ptr_t  _texture;
 
     image_t _image;
 
-    queue_ptr_t _queue;
+    boost::thread _event_loop;
+    boost::thread _redraw_thread;
 
-    boost::thread _thread;
-    mutable boost::mutex _mutex;
+    unsigned int _fps;
 
-    boost::thread _refresh_thread;
 
-    bool _error;
-    bool _cancel;
+    friend Redraw_Handler;
+    friend Keyboard_Event_Handler;
 };
 
 } } } // namespace boost::gil::sdl

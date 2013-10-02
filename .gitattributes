@@ -1,5 +1,7 @@
 gil_1/test/test[!!-~]images.zip svn_mime_002dtype=application%2Foctet-stream
 /gil_2.zip svn_mime_002dtype=application%2Foctet-stream
+gil_2/boost/gil/extension/sdl2/base.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
+gil_2/boost/gil/extension/sdl2/default_event_handlers.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/boost/gil/extension/sdl2/service.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/boost/gil/extension/sdl2/threadsafe_queue.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/boost/gil/extension/sdl2/window.hpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native

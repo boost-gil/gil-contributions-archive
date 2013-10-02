@@ -9,6 +9,7 @@
 
 #include <boost/thread/once.hpp>
 
+#include <boost/gil/extension/sdl2/base.hpp>
 #include <boost/gil/extension/sdl2/threadsafe_queue.hpp>
 #include <boost/gil/extension/sdl2/window.hpp>
 
@@ -23,7 +24,8 @@ public:
     : _initializer( flag )
     {}
 
-    void add_window( window& w )
+    template< typename Window >
+    void add_window( Window& w )
     {
         _windows[w.get_id()] = &w;
     }
@@ -35,8 +37,12 @@ public:
 
         while( quit == false )
         {
+            // we need to use SDL_PollEvent since the windows will
+            // shut down asynchronously.
             while( SDL_PollEvent( &e ))
             {
+                SDL_Log( "pool event." );
+
                 switch( e.type )
                 {
                     case SDL_WINDOWEVENT:
@@ -48,40 +54,30 @@ public:
                         break;
                     }
 
-                    case SDL_QUIT:
-                    {
-                        quit = true;
-
-                        add_event( e );
-
-                        SDL_Log( "quitting" );
-
-                        //boost::this_thread::sleep( boost::posix_time::milliseconds( 2000 ));
-
-                        break;
-                    }
-
                     default: 
                     {
                         add_event( e );
 
                         break;
                     }
+                } // switch
+            }
 
-                }
+            if( done() )
+            {
+                quit = true;
+                break;
             }
         }
     }
 
 private:
 
-    void add_event( const SDL_Event& e )
+    void add_event( const event_t& e )
     {
         std::for_each( _windows.begin(), _windows.end()
                      , [&]( window_map_t::reference w ) 
                         {
-                            assert( w.second );
-
                             if( w.second )
                             {
                                 w.second->add_event( e );
@@ -90,15 +86,35 @@ private:
                      );
     }
 
-    void add_event( const SDL_Event& e, int id )
+    void add_event( const event_t& e, int id )
     {
-        auto* w = _windows[id];
-        assert( w );
+        window_base* w = _windows[id];
         
         if( w )
         {
             w->add_event( e );
         }
+    }
+
+    // Loop through all windows and if all are done return true.
+    bool done()
+    {
+        bool quit = true;
+
+        std::for_each( _windows.begin(), _windows.end()
+                     , [&]( window_map_t::reference w ) 
+                        {
+                            if( w.second )
+                            {
+                                if( w.second->get_cancel() == false )
+                                {
+                                    quit = false;
+                                }
+                            }
+                        }
+                     );
+
+        return quit;
     }
 
 private:
@@ -125,9 +141,12 @@ private:
 
 private:
 
+    // Sleep the event receiving thread for some time. 
+    unsigned int _delay;
+    
     initializer _initializer;
 
-    typedef std::unordered_map< int, window* > window_map_t;
+    typedef std::unordered_map< int, window_base* > window_map_t;
     window_map_t _windows;
 };
 
