@@ -172,7 +172,7 @@ public:
     }
 
     // Destructor
-    // will be called when SDL service finishes.
+    // Will be called when SDL service finishes.
     ~window()
     {
         set_cancel( true );
@@ -211,13 +211,11 @@ private:
 
         event_t e;
             
-        while( get_cancel() == false )
+        while( get_cancel() == false && get_error() == false )
         {
             _queue->wait_and_pop( e );
 
             lock_t l( _mutex );
-
-            SDL_Log( "process event" );
 
             switch( e.type )
             {
@@ -235,14 +233,15 @@ private:
 
                 case SDL_KEYDOWN:
                 {
-                    SDL_Log( "Keydown event." );
-
                     keh(*this, e);
 
                     break;
                 }
             } // switch
+
         } // while
+
+        _close();
     }
 
     // Refresh thread
@@ -256,8 +255,6 @@ private:
         {
             {
                 lock_t l( _mutex );
-
-                SDL_Log( "redraw" );
 
                 view_t v = view( _image );
 
@@ -280,6 +277,17 @@ private:
             //boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 / get_fps() ) );
             boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 ) );
         }
+    }
+
+    void _close()
+    {
+        lock_t l( _mutex );
+
+        _texture.reset();
+        _renderer.reset();
+        
+        // resetting a window doesn't work here. So the destructor will have to do.
+        //_window.reset();
     }
 
 private:

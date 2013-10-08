@@ -41,8 +41,6 @@ public:
             // shut down asynchronously.
             while( SDL_PollEvent( &e ))
             {
-                SDL_Log( "pool event." );
-
                 switch( e.type )
                 {
                     case SDL_WINDOWEVENT:

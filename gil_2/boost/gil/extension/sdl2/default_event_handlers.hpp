@@ -9,8 +9,7 @@ namespace boost { namespace gil { namespace sdl {
 struct default_redraw_handler
 {
     void operator() ( rgba8_view_t view )
-    {
-    }
+    {}
 };
 
 struct default_keyboard_event_handler
@@ -19,14 +18,16 @@ struct default_keyboard_event_handler
     void operator() ( Window& w
                     , event_t e
                     )
-    {
-        w.set_cancel( true );
-    }
+    {}
 };
 
 struct default_window_event_handler
 {
-
+    template< typename Window >
+    void operator() ( Window& w
+                    , event_t e
+                    )
+    {}
 };
 
 
