@@ -14,6 +14,7 @@ gil_2/libs/gil/sdl2/main.cpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_
 gil_2/libs/gil/sdl2/sdl2_basic_test.cpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/libs/gil/sdl2/stdafx.cpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/libs/gil/sdl2/stdafx.h svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
+gil_2/libs/gil/sdl2/sync_manager_test.cpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/libs/gil/sdl2/targetver.h svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/libs/gil/sdl2/threadsafe_queue_tests.cpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
 gil_2/libs/gil/yuv/yuv_tests.cpp svn_mime_002dtype=text%2Fplain svn_keywords=Id svn_eol_002dstyle=native
