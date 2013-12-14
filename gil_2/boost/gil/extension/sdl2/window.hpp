@@ -1,3 +1,12 @@
+/*
+    Copyright 2013 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef BOOST_GIL_SDL_WINDOWS_HPP
 #define BOOST_GIL_SDL_WINDOWS_HPP
 
@@ -113,7 +122,7 @@ public:
                                                 , window_pos_y
                                                 , window_width
                                                 , window_height
-                                                , window_flags
+                                                , window_flags | SDL_WINDOW_BORDERLESS
                                                 )
 
                               , SDL_DestroyWindow
@@ -274,8 +283,8 @@ private:
 
             }
 
-            //boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 / get_fps() ) );
-            boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 ) );
+            boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 / get_fps() ) );
+            //boost::this_thread::sleep( boost::posix_time::milliseconds( 1000 ) );
         }
     }
 
@@ -311,7 +320,6 @@ private:
     boost::thread _redraw_thread;
 
     unsigned int _fps;
-
 
     friend Redraw_Handler;
     friend Keyboard_Event_Handler;

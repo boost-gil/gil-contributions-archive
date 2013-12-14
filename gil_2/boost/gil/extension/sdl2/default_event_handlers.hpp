@@ -1,8 +1,16 @@
+/*
+    Copyright 2013 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef BOOST_GIL_SDL_DEAULT_EVENT_HANDLERS_HPP
 #define BOOST_GIL_SDL_DEAULT_EVENT_HANDLERS_HPP
 
 #include <boost/gil/extension/sdl2/base.hpp>
-
 
 namespace boost { namespace gil { namespace sdl {
 

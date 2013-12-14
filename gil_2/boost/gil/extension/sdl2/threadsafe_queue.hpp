@@ -1,3 +1,12 @@
+/*
+    Copyright 2013 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef THREADSAFE_QUEUE_HPP
 #define THREADSAFE_QUEUE_HPP
 
@@ -8,6 +17,8 @@
 
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+
+namespace boost { namespace gil { namespace sdl {
 
 template< typename T >
 struct threadsafe_queue
@@ -121,5 +132,6 @@ private:
 
 };
 
+} } } // namespace boost::gil::sdl
 
 #endif // THREADSAFE_QUEUE_HPP
