@@ -1,3 +1,11 @@
+/*
+    Copyright 2013 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
 
 #include <boost/test/unit_test.hpp>
 
@@ -10,8 +18,11 @@
 #include <boost/gil/extension/sdl2/service.hpp>
 #include <boost/gil/extension/sdl2/window.hpp>
 
+#include <boost/chrono.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace chrono;
 using namespace gil;
 using namespace cv;
 using namespace sdl;
@@ -44,6 +55,9 @@ struct redraw_handler
 
 BOOST_AUTO_TEST_CASE( test_opencv_basic )
 {
+    high_resolution_clock::time_point start = high_resolution_clock::now();
+
+
     //Mat cv_img( 480, 640, CV_8UC3 );
     //cv_img.setTo(Scalar( 255, 255, 0 ));
     //circle( cv_img, Point( 320, 240 ), 20, Scalar( 255, 0, 0 ));
@@ -58,10 +72,10 @@ BOOST_AUTO_TEST_CASE( test_opencv_basic )
 
     //write_view( "./gil_image.bmp", view( img ), bmp_tag() );
 
-    service sdl_service;
+    //service sdl_service;
 
-    window<redraw_handler> w;
-    sdl_service.add_window( w );
+    //window<redraw_handler> w;
+    //sdl_service.add_window( w );
 
-    sdl_service.run();
+    //sdl_service.run();
 }
