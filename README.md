@@ -1,9 +1,11 @@
-# Gil Contributions Archive
+# GIL Contributions Archive
 
-Current Boost.GIL repository available at https://github.com/boostorg/gil
+Archive of old contributions to [Boost.GIL].
 
 This repository is a complete Subversion to Git [import] of the old gil-contributions
 repository archived at https://code.google.com/archive/p/gil-contributions/
+
+## Content
 
 This repository hosts old contributions only:
 
@@ -33,9 +35,9 @@ The old [Adobe GIL] website lists some more contributions
 Unfortunately, archives of those are no longer available to download due to broken links.
 Please, let us know if you have those codes.
 
-@[Boost.GIL Team]
+@[Boost.GIL] Team
 
-[Boost.GIL Team]: https://github.com/boostorg/gil
+[Boost.GIL]: https://github.com/boostorg/gil
 [reviewed and accepted in 2010]: https://lists.boost.org/boost-announce/2010/11/0273.php
 [I/O v1]: https://github.com/boost-gil/gil-contributions-archive/tree/master/gil_1/gil/extension/io
 [I/O v2]: https://github.com/chyh1990/gil-contributions/tree/master/gil_2/libs/gil/io
