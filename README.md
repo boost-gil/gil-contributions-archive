@@ -10,7 +10,7 @@ https://code.google.com/archive/p/gil-contributions/
 
 This repository hosts a collection of old contributions only.
 
-### Extensions in master
+### Extensions in master branch
 
 * [I/O v1]
 * [I/O v2] (placeholder only, code already moved to Boost after [reviewed and accepted in 2010])
@@ -19,7 +19,7 @@ This repository hosts a collection of old contributions only.
 * [SDL]
 * [SDL2]
 
-## Extensions in sandbox branch
+### Extensions in sandbox branch
 
 * [FreetypeGIL] by Tom Brinkman - A Freetype wrapper for GIL. Renders text onto GIL views.
 
