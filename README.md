@@ -27,13 +27,32 @@ This repository hosts old contributions only:
 
     * [I/O v2 todo] list
  
+## Missing Content
+
 The old [Adobe GIL] website lists some more contributions
 
 * FreetypeGIL by Tom Brinkman - A Freetype wrapper for GIL. Renders text onto GIL views.
+
+    Tom's original announcement posted to Boost developers mailing list:
+    [boost::freetype - extension for boost::gil](https://lists.boost.org/Archives/boost/2007/04/119826.php)
+
 * WulineGIL by Tom Brinkman - Draws antialiased lines into GIL views using the Wu algorithm.
 
 Unfortunately, archives of those are no longer available to download due to broken links.
-Please, let us know if you have those codes.
+
+**Please, let us know if you have any version of those missing extensions.**
+
+## License
+
+Distributed under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
+
+## Maintenance Help Wanted!
+
+Although this is an archive of the old repository, we would appreciate any help
+in bringing those extensions up to date and usable with the current Boost.GIL.
+
+If any pull requests arrive, we will consider moving updated extensions to Boost.GIL
+or creating dedicated repository in this space.
 
 @[Boost.GIL] Team
 
